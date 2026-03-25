@@ -1,0 +1,279 @@
+@import "tailwindcss";
+
+/* ============================================
+   النبض المستدام — Design Tokens (Tailwind v4 - Light Premium Theme)
+   ============================================ */
+
+@theme inline {
+  /* ---- Colors ---- */
+  --color-primary: #173A7C; /* Navy Blue from TTi Logo */
+  --color-primary-light: #1E4D9D;
+  --color-secondary: #0F172A; /* Deep Slate/Navy */
+  --color-secondary-light: #334155;
+  --color-accent: #5CB07C; /* Green from Logo */
+  --color-accent-light: #7DD09D;
+  
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F8FAFC;
+  --color-border-subtle: rgba(15, 23, 42, 0.06);
+  --color-border-subtle-hover: rgba(15, 23, 42, 0.12);
+
+  /* ---- Fonts ---- */
+  --font-cairo: "Cairo", sans-serif;
+  --font-sora: "Sora", sans-serif;
+
+  /* ---- Spacing / Radius ---- */
+  --radius-card: 20px; /* Slightly softer for premium feel */
+  --radius-pill: 9999px;
+  --radius-button: 12px;
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
+:root {
+  --hero-gradient: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+  --card-shadow-hover: 0 12px 40px rgba(15, 23, 42, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-cairo);
+  background: #F8FAFC; /* Light slate-50 */
+  color: #0F172A; /* Dark slate-900 */
+  overflow-x: hidden;
+}
+
+/* ============================================
+   Light Premium Glassmorphism & Cards
+   ============================================ */
+
+.glass {
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.04);
+  border-radius: var(--radius-card);
+}
+
+.glass-dark {
+  /* Used for dark contrast sections if needed, but redesigned for light theme */
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-card);
+  color: #FFFFFF;
+}
+
+.glass-card {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: var(--color-border-subtle-hover);
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* ============================================
+   Hero Particles / Backgrounds
+   ============================================ */
+
+.hero-gradient {
+  background: var(--hero-gradient);
+  position: relative;
+  overflow: hidden;
+}
+
+.particles-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(15,23,42,0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: particlesFloat 30s linear infinite;
+}
+
+@keyframes particlesFloat {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, -20px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ============================================
+   Shimmer Skeleton (Light)
+   ============================================ */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #F1F5F9 25%,
+    #E2E8F0 50%,
+    #F1F5F9 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================
+   Ripple Effect for Buttons
+   ============================================ */
+
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 10%, transparent 70%);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.3s;
+  border-radius: inherit;
+}
+
+.btn-ripple:active::after {
+  transform: scale(4);
+  opacity: 1;
+  transition: transform 0s, opacity 0s;
+}
+
+/* ============================================
+   Scroll Indicator
+   ============================================ */
+
+.scroll-indicator {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+/* ============================================
+   Marquee Animation
+   ============================================ */
+
+.marquee-track {
+  display: flex;
+  animation: marquee 35s linear infinite;
+  width: max-content;
+  will-change: transform;
+}
+
+.marquee-track-fast {
+  display: flex;
+  animation: marquee 25s linear infinite;
+  width: max-content;
+  will-change: transform;
+}
+
+.marquee-track-slow {
+  display: flex;
+  animation: marquee 45s linear infinite;
+  width: max-content;
+  will-change: transform;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(33.33%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-33.33%); }
+}
+
+/* ============================================
+   Gradient Text
+   ============================================ */
+
+.gradient-text {
+  background: linear-gradient(135deg, #173A7C, #5CB07C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-emerald {
+  background: linear-gradient(135deg, #0F172A, #334155);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   Section Divider
+   ============================================ */
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(15,23,42,0.06), transparent);
+}
+
+/* ============================================
+   Custom Scrollbar
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F8FAFC;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* ============================================
+   Focus Styles (A11y)
+   ============================================ */
+
+:focus-visible {
+  outline: 2px solid #173A7C;
+  outline-offset: 2px;
+}
+
+/* ============================================
+   Selection
+   ============================================ */
+
+::selection {
+  background: rgba(23, 58, 124, 0.15);
+  color: #173A7C;
+}
