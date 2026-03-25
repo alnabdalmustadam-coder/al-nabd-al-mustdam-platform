@@ -78,7 +78,7 @@ export default function HeroSection() {
       <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-6 xl:px-12 2xl:px-16 flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-6 sm:gap-10 lg:gap-4 xl:gap-8 min-h-[500px] lg:min-h-[450px] xl:min-h-[550px] py-8 lg:py-16 xl:py-20 pointer-events-none mt-4 lg:mt-0 xl:mt-4 -translate-y-[4vh] lg:-translate-y-[5vh]">
         
         {/* Left Side (Text content) */}
-        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-2 lg:order-1 flex items-stretch justify-center pointer-events-none">
+        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-3 lg:order-1 flex items-stretch justify-center pointer-events-none mb-16 lg:mb-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -192,7 +192,7 @@ export default function HeroSection() {
         </div>
 
         {/* Right Side (Image Area) */}
-        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-3 flex items-stretch justify-center pointer-events-none mb-16 lg:mb-0">
+        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-2 lg:order-3 flex items-stretch justify-center pointer-events-none">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
