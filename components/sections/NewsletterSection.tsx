@@ -54,7 +54,7 @@ export default function NewsletterSection() {
           {/* Form */}
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col sm:flex-row items-center gap-3 max-w-2xl mx-auto p-2.5 bg-white/80 backdrop-blur-2xl rounded-full border border-slate-200 ring-1 ring-inset ring-slate-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-2xl mx-auto p-4 sm:p-2.5 bg-white/80 backdrop-blur-2xl rounded-[2rem] sm:rounded-full border border-slate-200 ring-1 ring-inset ring-slate-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
           >
             <div className="relative flex-1 w-full">
               <input
@@ -62,7 +62,7 @@ export default function NewsletterSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="أدخل بريدك الإلكتروني"
-                className="w-full px-6 py-4 rounded-full bg-transparent border-none text-[#173A7C] font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none text-base"
+                className="w-full px-6 py-3 sm:py-4 rounded-full bg-slate-50 sm:bg-transparent border border-slate-100 sm:border-none text-[#173A7C] font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none text-base text-center sm:text-right shadow-inner sm:shadow-none"
                 dir="rtl"
                 required
               />

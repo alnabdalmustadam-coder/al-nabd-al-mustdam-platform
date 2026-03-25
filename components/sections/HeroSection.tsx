@@ -161,13 +161,13 @@ export default function HeroSection() {
             <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/50 to-transparent pointer-events-none rounded-t-[1.5rem] lg:rounded-t-[1.25rem] xl:rounded-t-[1.5rem]" />
             
             {/* Stat 1 */}
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 lg:gap-2 xl:gap-3 relative z-10 w-1/2 justify-center text-center sm:text-right">
+            <div className="flex flex-row items-center gap-2 sm:gap-4 lg:gap-2 xl:gap-3 relative z-10 w-1/2 justify-center text-right">
               <div className="w-10 h-10 sm:w-16 sm:h-16 lg:w-8 lg:h-8 xl:w-12 xl:h-12 shrink-0 rounded-[1rem] sm:rounded-[1.25rem] lg:rounded-[0.5rem] xl:rounded-[1rem] bg-white/80 flex items-center justify-center shadow-sm border border-white/90 backdrop-blur-md group-hover:scale-110 transition-transform duration-500">
                 <svg className="w-5 h-5 sm:w-8 sm:h-8 lg:w-4 lg:h-4 xl:w-6 xl:h-6 text-[#173A7C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path d="M12 14l9-5-9-5-9 5 9 5z" /><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                 </svg>
               </div>
-              <div className="flex flex-col text-center sm:text-right w-full sm:w-auto">
+              <div className="flex flex-col text-right w-auto">
                 <span className="text-2xl sm:text-4xl lg:text-lg xl:text-3xl 2xl:text-4xl font-black text-slate-900 leading-tight mb-0.5 drop-shadow-sm">+50</span>
                 <span className="text-[10px] sm:text-sm lg:text-[8px] xl:text-[11px] 2xl:text-sm text-slate-600 font-bold tracking-wide">دورة معتمدة</span>
               </div>
@@ -177,13 +177,13 @@ export default function HeroSection() {
             <div className="w-px h-10 sm:h-16 lg:h-8 xl:h-12 bg-black/10 relative z-10 shadow-sm block rounded-full"></div>
             
             {/* Stat 2 */}
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 lg:gap-2 xl:gap-3 relative z-10 w-1/2 justify-center text-center sm:text-right">
+            <div className="flex flex-row items-center gap-2 sm:gap-4 lg:gap-2 xl:gap-3 relative z-10 w-1/2 justify-center text-right">
               <div className="w-10 h-10 sm:w-16 sm:h-16 lg:w-8 lg:h-8 xl:w-12 xl:h-12 shrink-0 rounded-[1rem] sm:rounded-[1.25rem] lg:rounded-[0.5rem] xl:rounded-[1rem] bg-white/80 flex items-center justify-center shadow-sm border border-white/90 backdrop-blur-md group-hover:scale-110 transition-transform duration-500">
                 <svg className="w-5 h-5 sm:w-8 sm:h-8 lg:w-4 lg:h-4 xl:w-6 xl:h-6 text-[#5CB07C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <div className="flex flex-col text-center sm:text-right w-full sm:w-auto">
+              <div className="flex flex-col text-right w-auto">
                 <span className="text-2xl sm:text-4xl lg:text-lg xl:text-3xl 2xl:text-4xl font-black text-slate-900 leading-tight mb-0.5 drop-shadow-sm">+5000</span>
                 <span className="text-[10px] sm:text-sm lg:text-[8px] xl:text-[11px] 2xl:text-sm text-slate-600 font-bold tracking-wide">متدرب ومتدربة</span>
               </div>
@@ -221,7 +221,7 @@ export default function HeroSection() {
       </div>
 
       {/* Carousel Controls Container */}
-      <div className="absolute bottom-8 lg:bottom-4 xl:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-6 lg:gap-3 xl:gap-6 z-30 pointer-events-auto bg-white/40 sm:bg-white/20 backdrop-blur-md px-6 sm:px-8 py-2.5 sm:py-3 lg:px-4 lg:py-1.5 xl:px-6 xl:py-2 rounded-full border border-white/50 shadow-lg">
+      <div className="absolute bottom-24 lg:bottom-4 xl:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-6 lg:gap-3 xl:gap-6 z-30 pointer-events-auto bg-white/40 sm:bg-white/20 backdrop-blur-md px-6 sm:px-8 py-2.5 sm:py-3 lg:px-4 lg:py-1.5 xl:px-6 xl:py-2 rounded-full border border-white/50 shadow-lg">
         <button aria-label="الشريحة السابقة" onClick={prevSlide} className="w-10 h-10 sm:w-12 sm:h-12 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-full bg-white/95 hover:bg-[#173A7C] hover:text-white backdrop-blur-xl flex items-center justify-center text-[#173A7C] transition-all shadow-md group/btn ring-2 ring-white/50">
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 lg:w-4 lg:h-4 xl:w-5 xl:h-5 group-hover/btn:scale-110 transition-transform" />
         </button>

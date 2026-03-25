@@ -97,18 +97,18 @@ export default function CtaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16"
+          className="grid grid-cols-3 items-start justify-center gap-2 sm:gap-8 lg:gap-16 w-full max-w-3xl mx-auto"
         >
           {stats.map((stat, i) => {
             const StatIcon = stat.icon;
             return (
-              <div key={i} className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1a4490] to-[#1e5a6e] flex items-center justify-center shadow-lg shadow-[#173A7C]/10">
-                  <StatIcon className="w-7 h-7 text-white" strokeWidth={1.5} />
+              <div key={i} className="flex flex-col items-center justify-center gap-2 sm:gap-4 text-center">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1a4490] to-[#1e5a6e] flex items-center justify-center shadow-lg shadow-[#173A7C]/10">
+                  <StatIcon className="w-5 h-5 sm:w-7 sm:h-7 text-white" strokeWidth={1.5} />
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl sm:text-3xl font-black text-[#173A7C]">{stat.value}</div>
-                  <div className="text-slate-400 text-sm font-bold">{stat.label}</div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="text-lg sm:text-3xl font-black text-[#173A7C] leading-none mb-1 sm:mb-2">{stat.value}</div>
+                  <div className="text-slate-400 text-[10px] sm:text-sm font-bold tracking-tight">{stat.label}</div>
                 </div>
               </div>
             );
