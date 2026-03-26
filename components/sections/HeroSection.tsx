@@ -60,7 +60,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-screen 2xl:h-[100vh] flex flex-col items-center justify-center overflow-x-hidden overflow-y-auto bg-slate-50 pt-28 pb-16 lg:pt-20 lg:pb-0">
-      
+
       {/* Particle Grid */}
       <div className="particles-grid opacity-60" />
 
@@ -76,7 +76,7 @@ export default function HeroSection() {
 
       {/* Hero Content Container */}
       <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-6 xl:px-12 2xl:px-16 flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-6 sm:gap-10 lg:gap-4 xl:gap-8 min-h-[500px] lg:min-h-[450px] xl:min-h-[550px] py-8 lg:py-16 xl:py-20 pointer-events-none mt-4 lg:mt-0 xl:mt-4 -translate-y-[9vh] lg:-translate-y-[3vh]">
-        
+
         {/* Left Side (Text content) */}
         <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-3 lg:order-1 flex items-stretch justify-center pointer-events-none mb-16 lg:mb-0">
           <AnimatePresence mode="wait">
@@ -116,7 +116,7 @@ export default function HeroSection() {
           >
             <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/60 to-transparent pointer-events-none rounded-t-[2.5rem] lg:rounded-t-[1.5rem] xl:rounded-t-[2rem] 2xl:rounded-t-[3rem]" />
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
-            
+
             <div className="relative z-10 text-center w-full">
               {/* Subtitle */}
               <p className="text-[#5CB07C] text-xs sm:text-sm lg:text-[10px] xl:text-xs 2xl:text-sm font-bold mb-4 sm:mb-6 lg:mb-3 xl:mb-5 tracking-wide bg-white/70 shadow-sm border border-white/90 inline-block px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 rounded-full backdrop-blur-md">
@@ -159,7 +159,7 @@ export default function HeroSection() {
             className="w-full relative bg-white/40 backdrop-blur-[40px] border border-white/40 shadow-[0_20px_50px_-10px_rgba(23,58,124,0.1)] rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-[1.25rem] xl:rounded-[1.5rem] p-4 sm:p-6 lg:p-3 xl:p-5 flex flex-row items-center justify-around gap-2 sm:gap-6 lg:gap-2 xl:gap-4 transition-all duration-700 hover:shadow-[0_30px_60px_-10px_rgba(23,58,124,0.18)] hover:-translate-y-0.5 group shrink-0"
           >
             <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/50 to-transparent pointer-events-none rounded-t-[1.5rem] lg:rounded-t-[1.25rem] xl:rounded-t-[1.5rem]" />
-            
+
             {/* Stat 1 */}
             <div className="flex flex-row items-center gap-2 sm:gap-4 lg:gap-2 xl:gap-3 relative z-10 w-1/2 justify-center text-right">
               <div className="w-10 h-10 sm:w-16 sm:h-16 lg:w-8 lg:h-8 xl:w-12 xl:h-12 shrink-0 rounded-[1rem] sm:rounded-[1.25rem] lg:rounded-[0.5rem] xl:rounded-[1rem] bg-white/80 flex items-center justify-center shadow-sm border border-white/90 backdrop-blur-md group-hover:scale-110 transition-transform duration-500">
@@ -172,10 +172,10 @@ export default function HeroSection() {
                 <span className="text-[10px] sm:text-sm lg:text-[8px] xl:text-[11px] 2xl:text-sm text-slate-600 font-bold tracking-wide">دورة معتمدة</span>
               </div>
             </div>
-            
+
             {/* Divider */}
             <div className="w-px h-10 sm:h-16 lg:h-8 xl:h-12 bg-black/10 relative z-10 shadow-sm block rounded-full"></div>
-            
+
             {/* Stat 2 */}
             <div className="flex flex-row items-center gap-2 sm:gap-4 lg:gap-2 xl:gap-3 relative z-10 w-1/2 justify-center text-right">
               <div className="w-10 h-10 sm:w-16 sm:h-16 lg:w-8 lg:h-8 xl:w-12 xl:h-12 shrink-0 rounded-[1rem] sm:rounded-[1.25rem] lg:rounded-[0.5rem] xl:rounded-[1rem] bg-white/80 flex items-center justify-center shadow-sm border border-white/90 backdrop-blur-md group-hover:scale-110 transition-transform duration-500">
@@ -207,7 +207,7 @@ export default function HeroSection() {
               <div className="w-full h-full relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem]">
                 <img src={heroCourses[currentSlide].image} alt={heroCourses[currentSlide].title} className="w-full h-full object-cover sm:object-cover transition-transform duration-[1.5s] ease-out hover:scale-[1.08]" />
               </div>
-              
+
               <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 lg:-top-3 lg:-right-3 xl:-top-5 xl:-right-5 px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 bg-white/80 backdrop-blur-[30px] rounded-xl sm:rounded-2xl lg:rounded-lg xl:rounded-xl shadow-[0_15px_40px_rgba(23,58,124,0.15)] border border-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30">
                 <img src="/tabby.webp" alt="Tabby" className="h-6 sm:h-8 lg:h-4 xl:h-6 2xl:h-8 w-auto object-contain drop-shadow-sm" />
               </div>
@@ -231,9 +231,8 @@ export default function HeroSection() {
               key={idx}
               aria-label={`انتقل إلى شريحة ${idx + 1}`}
               onClick={() => setCurrentSlide(idx)}
-              className={`h-2.5 sm:h-3 lg:h-1.5 xl:h-2 rounded-full transition-all duration-500 shadow-inner ${
-                currentSlide === idx ? "bg-[#173A7C] w-8 sm:w-10 lg:w-5 xl:w-8" : "bg-slate-300/80 w-2.5 sm:w-3 lg:w-1.5 xl:w-2 hover:bg-[#173A7C]/40"
-              }`}
+              className={`h-2.5 sm:h-3 lg:h-1.5 xl:h-2 rounded-full transition-all duration-500 shadow-inner ${currentSlide === idx ? "bg-[#173A7C] w-8 sm:w-10 lg:w-5 xl:w-8" : "bg-slate-300/80 w-2.5 sm:w-3 lg:w-1.5 xl:w-2 hover:bg-[#173A7C]/40"
+                }`}
             />
           ))}
         </div>
@@ -251,7 +250,7 @@ export default function HeroSection() {
           <div className="absolute bottom-0 left-0 w-full h-[1px] bg-slate-200/50"></div>
         </div>
       </div>
-      
+
     </section>
   );
 }

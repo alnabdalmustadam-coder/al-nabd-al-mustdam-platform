@@ -133,13 +133,13 @@ export default function PremiumCourseHighlights() {
               >
                 <Link href={`/courses/${course.slug}`} className="block h-full">
                   {/* Outer glow on hover */}
-                  <div className={`absolute -inset-[1px] rounded-[2rem] bg-gradient-to-br ${course.accent} opacity-0 group-hover:opacity-[0.12] blur-sm transition-opacity duration-500 z-0`}></div>
+                  <div className={`absolute -inset-[1px] rounded-[2rem] bg-gradient-to-br ${course.accent} opacity-[0.08] group-hover:opacity-[0.15] blur-sm transition-opacity duration-500 z-0`}></div>
                   
                   {/* Card */}
                   <div className="relative bg-white rounded-[1.75rem] p-7 border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.04)] group-hover:shadow-[0_20px_60px_-10px_rgba(23,58,124,0.18)] group-hover:border-slate-200 hover:-translate-y-2 transition-all duration-500 overflow-hidden z-10 h-full flex flex-col text-start">
                     
                     {/* Top accent gradient bar */}
-                    <div className={`absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r ${course.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                    <div className={`absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r ${course.accent} opacity-70 group-hover:opacity-100 transition-opacity duration-500`}></div>
 
                     {/* Decorative corner gradient */}
                     <div className={`absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br ${course.accent} opacity-[0.03] group-hover:opacity-[0.07] rounded-full blur-2xl transition-opacity duration-700`}></div>

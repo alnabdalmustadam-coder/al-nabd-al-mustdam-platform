@@ -21,7 +21,7 @@ const renderCard = (name: string, i: number) => (
     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out bg-gradient-to-r from-transparent via-[#173A7C]/[0.04] to-transparent pointer-events-none" />
 
     {/* Premium top accent line */}
-    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#173A7C] via-[#5CB07C] to-[#173A7C] opacity-0 group-hover:opacity-80 transition-opacity duration-500" />
+    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#173A7C] via-[#5CB07C] to-[#173A7C] opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
 
     {/* Corner decorative glow */}
     <div className="absolute -top-8 -right-8 w-20 h-20 bg-gradient-to-br from-[#5CB07C]/10 to-transparent rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
