@@ -24,18 +24,20 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="h-full"
     >
-      <div className="relative group h-full flex flex-col bg-white rounded-[2rem] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_30px_60px_-15px_rgba(23,58,124,0.15)] hover:-translate-y-2 transition-all duration-500 overflow-hidden">
-        
+      <div className="relative group h-full flex flex-col bg-gradient-to-b from-white via-white to-slate-50/80 rounded-[2rem] border border-slate-200/70 ring-1 ring-inset ring-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.06),0_2px_8px_rgb(0,0,0,0.04)] hover:shadow-[0_30px_70px_-15px_rgba(23,58,124,0.22),0_0_0_1px_rgba(23,58,124,0.08)] hover:-translate-y-2.5 transition-all duration-500 overflow-hidden">
+        {/* Premium top accent bar */}
+        <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#173A7C] via-[#5CB07C] to-[#173A7C] z-30 opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+
         {/* Top Image Section */}
         <div className="relative h-56 bg-gradient-to-br from-slate-50 to-slate-100 p-8 flex items-center justify-center overflow-hidden">
           {/* Subtle Glow Background Behind Image */}
           <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10 opacity-60"></div>
-          
+
           <div className="relative w-full h-full z-0">
-            <Image 
-              src={imageUrl} 
-              alt={course.title} 
-              fill 
+            <Image
+              src={imageUrl}
+              alt={course.title}
+              fill
               className="object-contain opacity-90 group-hover:scale-110 transition-transform duration-700 drop-shadow-sm"
             />
           </div>
