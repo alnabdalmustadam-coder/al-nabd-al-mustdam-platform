@@ -69,9 +69,9 @@ export default function HeroSection() {
       <div className="absolute bottom-10 left-[5%] w-[300px] h-[300px] bg-[#5CB07C]/25 rounded-full blur-[100px] mix-blend-multiply animate-pulse [animation-duration:10s]" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#1E4D9D]/10 rounded-full blur-[120px]" />
 
-      {/* Section-wide Ornament Background (bg.svg) */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none overflow-hidden z-0">
-        <img src="/bg.svg" alt="" className="w-full h-full object-contain" />
+      {/* Section-wide Ornament Background (bg.webp) */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.07] pointer-events-none overflow-hidden z-0">
+        <img src="/bg.webp" alt="" className="w-full h-full object-cover" />
       </div>
 
       {/* Hero Content Container */}

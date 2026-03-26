@@ -13,12 +13,12 @@ const stats = [
 export default function CtaSection() {
   return (
     <section className="py-28 relative overflow-hidden bg-gradient-to-br from-white via-slate-50 to-[#173A7C]/5">
-      {/* Section-wide Ornament Background (bg.svg) */}
+      {/* Section-wide Ornament Background (bg.webp) */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none overflow-hidden z-0">
         <img 
-          src="/bg.svg" 
+          src="/bg.webp" 
           alt="" 
-          className="w-full h-full object-cover sm:object-contain" 
+          className="w-full h-full object-cover sm:object-cover" 
         />
       </div>
 
