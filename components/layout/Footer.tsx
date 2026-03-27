@@ -165,8 +165,8 @@ export default function Footer() {
                 <div className="w-9 h-9 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-[#5CB07C] transition-colors duration-300">
                   <Mail className="w-4 h-4 text-white/80 group-hover:text-white transition-colors" />
                 </div>
-                <a href="mailto:Alqemmatraining@Gmail.Com" className="text-[13.5px] text-white/60 font-medium hover:text-white hover:font-bold transition-colors duration-300 font-sans group-hover:text-white" dir="ltr">
-                  Alqemmatraining@Gmail.Com
+                <a href="mailto:alnabdalmustadam@gmail.com" className="text-[13.5px] text-white/60 font-medium hover:text-white hover:font-bold transition-colors duration-300 font-sans group-hover:text-white" dir="ltr">
+                  alnabdalmustadam@gmail.com
                 </a>
               </li>
 

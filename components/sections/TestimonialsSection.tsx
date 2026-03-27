@@ -37,7 +37,12 @@ export default function TestimonialsSection() {
   };
 
   return (
-    <section className="pt-32 pb-44 relative overflow-hidden bg-gradient-to-br from-white via-slate-50 to-[#173A7C]/5">
+    <section className="relative w-full h-[100vh] min-h-[750px] flex flex-col justify-center overflow-hidden bg-gradient-to-br from-white via-slate-50 to-[#173A7C]/5">
+      {/* Background Ornament (bg.webp) */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none overflow-hidden z-0">
+        <img src="/bg.webp" alt="" className="w-full h-full object-cover" />
+      </div>
+
       {/* Background Soft Glows */}
       <div className="absolute top-0 right-0 -m-32 w-[600px] h-[600px] bg-[#173A7C]/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 -m-32 w-[600px] h-[600px] bg-[#5CB07C]/5 rounded-full blur-[120px] pointer-events-none" />
@@ -51,13 +56,13 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-16 sm:mb-20"
         >
           <span className="inline-flex items-center gap-2 text-[#173A7C] text-sm font-black tracking-widest uppercase bg-white px-5 py-2 rounded-full mb-6 border border-slate-200 shadow-sm mx-auto">
             <MessageSquareQuote className="w-4 h-4 text-[#5CB07C]" />
             آراء المتدربين
           </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#173A7C] mt-2 leading-[1.2] tracking-tight">
+          <h2 className="text-4xl sm:text-4xl lg:text-3xl font-black text-[#173A7C] mt-2 leading-[1.2] tracking-tight">
             ماذا يقول <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">متدربونا</span>؟
           </h2>
           <p className="mt-6 text-slate-500 text-lg max-w-xl mx-auto font-medium leading-relaxed">
@@ -66,11 +71,12 @@ export default function TestimonialsSection() {
         </motion.div>
 
         {/* 3D Carousel */}
-        <div className="relative h-[400px] sm:h-[340px] w-full flex items-center justify-center [perspective:1200px] overflow-visible">
+        <div className="relative h-[420px] sm:h-[380px] w-full flex items-center justify-center [perspective:2000px] overflow-visible">
           {testimonials.map((t, index) => {
             const offset = getOffset(index);
             const isActive = offset === 0;
-            const isVisible = Math.abs(offset) <= 2;
+            // Only show 3 cards on larger screens (offset -1, 0, 1)
+            const isVisible = Math.abs(offset) <= 1;
 
             if (!isVisible) return null;
 
@@ -78,14 +84,14 @@ export default function TestimonialsSection() {
               <motion.div
                 key={t.id}
                 animate={{
-                  x: `${offset * 320}px`,
-                  scale: isActive ? 1 : 0.88,
-                  zIndex: isActive ? 30 : 20 - Math.abs(offset),
-                  opacity: isActive ? 1 : Math.abs(offset) === 1 ? 0.5 : 0.15,
-                  rotateY: offset * -6,
+                  x: `${offset * (typeof window !== 'undefined' && window.innerWidth < 640 ? 280 : 380)}px`,
+                  scale: isActive ? 1 : 0.85,
+                  zIndex: isActive ? 30 : 20,
+                  opacity: isActive ? 1 : 0.45, // Increased inactive opacity for better contrast
+                  rotateY: offset * -15,
                 }}
-                transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-                className="absolute w-[280px] sm:w-[360px] cursor-pointer"
+                transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1.2] }}
+                className="absolute w-[280px] sm:w-[400px] cursor-pointer"
                 onClick={() => {
                   if (offset !== 0) {
                     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -94,62 +100,71 @@ export default function TestimonialsSection() {
                   }
                 }}
               >
-                {/* Ultra Premium Dark Card */}
-                <div className={`relative rounded-[2rem] overflow-hidden transition-all duration-500 ${isActive
-                    ? "bg-gradient-to-br from-[#173A7C] via-[#1a4490] to-[#1e5a6e] border border-white/15 shadow-[0_30px_70px_-20px_rgba(23,58,124,0.5),0_0_60px_-10px_rgba(92,176,124,0.1)] ring-1 ring-inset ring-white/10"
-                    : "bg-gradient-to-br from-[#173A7C]/90 to-[#1a4490]/80 border border-white/10 shadow-lg"
+                {/* Ultra Professional Light Card (Compact & High Contrast) */}
+                <div className={`relative rounded-[2rem] transition-all duration-700 ${isActive
+                    ? "bg-white backdrop-blur-xl border border-white shadow-[0_20px_60px_-15px_rgba(23,58,124,0.15),0_10px_30px_-10px_rgba(92,176,124,0.08),inset_0_0_0_1px_rgba(255,255,255,1)]"
+                    : "bg-slate-50/90 border border-slate-200/50 shadow-xl backdrop-blur-md grayscale-[10%]"
                   }`}>
 
-                  {/* Top Accent Gradient Stripe */}
-                  <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#5CB07C] to-transparent opacity-60" />
+                  {/* Elegant Gradient Accent */}
+                  <div className={`absolute top-0 left-1/2 -translate-x-1/2 h-[3px] bg-gradient-to-r from-transparent via-[#5CB07C] to-transparent transition-all duration-700 ${isActive ? 'w-1/2 opacity-100' : 'w-0 opacity-0'}`} />
 
-                  {/* Corner Decorative Glow */}
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#5CB07C]/10 rounded-full blur-3xl pointer-events-none" />
-                  <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-[#173A7C]/15 rounded-full blur-3xl pointer-events-none" />
-
-                  <div className="relative z-10 p-7 sm:p-8">
-
-                    {/* Header: Avatar + Name + Quote */}
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="flex items-center gap-4">
-                        {/* Glowing Avatar */}
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-gradient-to-br from-[#5CB07C] to-[#173A7C] rounded-full blur-md opacity-40 scale-110" />
-                          <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-[#5CB07C] to-[#173A7C] p-[2px] shadow-lg">
-                            <div className="w-full h-full rounded-full bg-[#173A7C] flex items-center justify-center text-lg font-black text-white">
+                  {/* Avatar - Floating Aura */}
+                  <div className={`absolute -top-10 left-1/2 -translate-x-1/2 z-20 transition-all duration-700 ${isActive ? 'scale-100 translate-y-0' : 'scale-90 translate-y-3 opacity-90'}`}>
+                    <div className="relative group">
+                      {/* Magnetic Inner Glow */}
+                      <div className={`absolute inset-0 bg-gradient-to-b from-[#173A7C]/30 to-[#5CB07C]/40 rounded-full blur-lg transition-all duration-700 ${isActive ? 'opacity-100 scale-125' : 'opacity-0 scale-100'}`} />
+                      
+                      <div className={`relative w-20 h-20 rounded-full bg-white p-1 transition-all duration-700 ${isActive ? 'shadow-[0_10px_20px_-5px_rgba(23,58,124,0.3)]' : 'shadow-md inline-block border border-slate-200'}`}>
+                        <div className="w-full h-full rounded-full overflow-hidden border border-slate-100">
+                          {t.avatar ? (
+                            <img src={t.avatar} alt={t.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-2xl font-black text-[#173A7C] bg-gradient-to-br from-slate-50 to-slate-100">
                               {t.name[0]}
                             </div>
-                          </div>
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="text-white font-bold text-[15px] truncate">{t.name}</h4>
-                          <p className="text-slate-400 text-xs truncate mt-0.5">{t.role}</p>
+                          )}
                         </div>
                       </div>
-                      <Quote className="w-9 h-9 text-[#5CB07C]/15 rotate-180 flex-shrink-0 mt-1" />
+                    </div>
+                  </div>
+
+                  <div className={`relative z-10 p-8 pt-14 pb-12 text-center transition-all duration-700 ${isActive ? 'scale-100' : 'scale-95'}`}>
+                    
+                    {/* Header: Name + Gradient + Role */}
+                    <div className="mb-5">
+                      <h4 className={`font-black text-lg sm:text-xl tracking-tight mb-2 transition-all duration-700 ${isActive ? 'text-[#173A7C]' : 'text-slate-500'}`}>
+                        {t.name}
+                      </h4>
+                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors duration-700 ${isActive ? 'bg-slate-100/50 border border-slate-200 shadow-sm' : 'bg-transparent'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full transition-colors duration-700 ${isActive ? 'bg-[#5CB07C] shadow-[0_0_8px_rgba(92,176,124,0.8)] animate-pulse' : 'bg-slate-300'}`} />
+                        <p className={`text-[9.5px] font-bold uppercase tracking-[0.1em] transition-colors duration-700 ${isActive ? 'text-slate-600' : 'text-slate-400'}`}>{t.role}</p>
+                      </div>
                     </div>
 
-                    {/* Stars */}
-                    <div className="mb-4">
-                      <StarRating rating={t.rating} size="sm" className="justify-start" />
+                    {/* Content with Watermark Quote */}
+                    <div className="relative mb-7 max-w-[95%] mx-auto">
+                      <Quote strokeWidth={1} className={`absolute -top-4 -right-2 w-16 h-16 -scale-x-100 z-0 transition-all duration-700 ${isActive ? 'text-slate-100/80 rotate-12' : 'text-slate-200/50 rotate-0'}`} />
+                      <p className={`relative z-10 text-[14px] leading-[1.8] font-bold tracking-tight transition-colors duration-700 ${isActive ? 'text-slate-800' : 'text-slate-500'}`}>
+                        &quot;{t.content}&quot;
+                      </p>
                     </div>
 
-                    {/* Content */}
-                    <p className="text-slate-300/90 text-[13.5px] leading-[2] mb-6 line-clamp-3 font-medium tracking-wide">
-                      &quot;{t.content}&quot;
-                    </p>
-
-                    {/* Footer: Course Badge */}
-                    <div className="pt-5 border-t border-white/[0.06] flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 bg-[#5CB07C]/[0.08] text-[#5CB07C] border border-[#5CB07C]/15 px-3.5 py-1.5 rounded-full text-[11px] font-bold truncate max-w-[85%]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#5CB07C] flex-shrink-0 shadow-[0_0_6px_rgba(92,176,124,0.6)]" />
+                    {/* Footer: Course Pill Details */}
+                    <div className={`pt-4 border-t border-dashed transition-all duration-700 flex flex-col items-center gap-2 ${isActive ? 'border-slate-300/80' : 'border-slate-200/50'}`}>
+                      <span className={`text-[9.5px] font-black uppercase tracking-[0.15em] block transition-colors duration-700 ${isActive ? 'text-slate-500' : 'text-slate-400'}`}>
+                        المتدرب في دورة
+                      </span>
+                      <span className={`text-[#173A7C] text-[12px] font-extrabold bg-[#173A7C]/[0.05] px-3.5 py-1.5 rounded-full border border-[#173A7C]/10 transition-all duration-700 ${isActive ? 'opacity-100 scale-100' : 'opacity-70 scale-95 grayscale'}`}>
                         {t.courseTitle}
                       </span>
-                      <div className="flex gap-0.5">
-                        {[...Array(3)].map((_, k) => (
-                          <div key={k} className="w-1 h-1 rounded-full bg-white/20" />
-                        ))}
-                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rating Pill - Award Token Style */}
+                  <div className={`absolute -bottom-5 left-1/2 -translate-x-1/2 z-20 transition-all duration-700 ${isActive ? 'scale-100 translate-y-0 opacity-100' : 'scale-90 -translate-y-4 opacity-0 pointer-events-none'}`}>
+                    <div className="bg-white border border-slate-200 shadow-[0_8px_16px_-4px_rgba(23,58,124,0.2)] ring-1 ring-slate-200/60 rounded-full px-5 py-2 flex items-center justify-center min-w-[140px] backdrop-blur-md">
+                      <StarRating rating={t.rating} size="sm" className="gap-1 brightness-110" />
                     </div>
                   </div>
                 </div>
@@ -159,7 +174,7 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Navigation Controls */}
-        <div className="flex items-center justify-center gap-6 mt-14 relative z-30">
+        <div className="flex items-center justify-center gap-6 mt-16 sm:mt-20 relative z-30">
           <button
             onClick={() => go(-1)}
             className="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#173A7C] hover:border-[#173A7C]/30 hover:bg-[#173A7C]/5 transition-all cursor-pointer shadow-sm hover:shadow-lg"

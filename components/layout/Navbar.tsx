@@ -99,19 +99,19 @@ export default function Navbar() {
                       className={`absolute top-full right-1/2 translate-x-1/2 pt-10 w-[800px] transition-all duration-300 transform origin-top ${megaMenuOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                         }`}
                     >
-                      <div className="bg-white/80 backdrop-blur-2xl rounded-2xl shadow-[0_30px_60px_-15px_rgba(23,58,124,0.3)] border border-[#173A7C]/30 ring-1 ring-[#173A7C]/10 p-8 grid grid-cols-2 gap-x-12 gap-y-4">
+                      <div className="bg-[#173A7C]/90 backdrop-blur-2xl rounded-2xl shadow-[0_30px_60px_-15px_rgba(23,58,124,0.5)] border border-white/10 ring-1 ring-white/5 p-8 grid grid-cols-2 gap-x-12 gap-y-4">
                         {megaMenuItems.map((item, idx) => (
                           <Link
                             key={idx}
                             href={item.href}
-                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 group border border-transparent hover:border-white/80 transition-all duration-300"
+                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/10 group border border-transparent hover:border-white/10 transition-all duration-300"
                           >
-                            <div className="w-10 h-10 rounded-lg bg-[#5CB07C]/10 text-[#5CB07C] flex items-center justify-center shrink-0 group-hover:scale-110 shadow-sm transition-transform">
+                            <div className="w-10 h-10 rounded-lg bg-white/5 text-[#5CB07C] flex items-center justify-center shrink-0 group-hover:scale-110 shadow-sm transition-transform border border-white/5">
                               <item.icon className="w-5 h-5" />
                             </div>
                             <div>
-                              <strong className="block text-sm text-slate-800 font-bold group-hover:text-[#173A7C] transition-colors">{item.label}</strong>
-                              <span className="text-xs text-slate-500 mt-1 line-clamp-1">انقر للوصول إلى النموذج الخاص بـ {item.label}</span>
+                              <strong className="block text-sm text-white font-bold group-hover:text-[#5CB07C] transition-colors">{item.label}</strong>
+                              <span className="text-xs text-slate-300 mt-1 line-clamp-1">انقر للوصول إلى النموذج الخاص بـ {item.label}</span>
                             </div>
                           </Link>
                         ))}
