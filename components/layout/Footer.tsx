@@ -4,18 +4,18 @@ import Link from "next/link";
 import { Mail, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 
 const policiesAndGuides = [
-  "سياسة الخصوصية والاستخدام",
-  "سياسات وقوانين النزاهة الاكاديمية",
-  "مبادئ حقوق الملكية الفكرية وحقوق النشر",
-  "وثيقة الهيكلة التنظيمية والأدوار والمسؤوليات",
-  "الادلة الإرشادية والدعم والتدريب",
-  "الخطة التدريبية",
-  "سياسة واجراءات واضحة للخصوصية والاستخدام",
-  "وثيقة المواصفات للتفاصيل",
-  "آلية فحص أعمال المتدربين ومنع الغش",
-  "إجراءات التحقق من هوية المستفيد",
-  "الدليل الإرشادي والدعم للمدرب",
-  "الدليل الإرشادي والدعم للمتدرب",
+  { label: "سياسة الخصوصية والاستخدام", href: "/privacy" },
+  { label: "سياسات وقوانين النزاهة الاكاديمية", href: "/academic-integrity" },
+  { label: "مبادئ حقوق الملكية الفكرية وحقوق النشر", href: "/intellectual-property" },
+  { label: "وثيقة الهيكلة التنظيمية والأدوار والمسؤوليات", href: "/organizational-structure" },
+  { label: "الادلة الإرشادية والدعم والتدريب", href: "/guidance-manuals" },
+  { label: "الخطة التدريبية", href: "/training-plan" },
+  { label: "سياسة واجراءات واضحة للخصوصية والاستخدام", href: "/privacy" },
+  { label: "وثيقة المواصفات للتفاصيل", href: "#" },
+  { label: "آلية فحص أعمال المتدربين ومنع الغش", href: "#" },
+  { label: "إجراءات التحقق من هوية المستفيد", href: "#" },
+  { label: "الدليل الإرشادي والدعم للمدرب", href: "#" },
+  { label: "الدليل الإرشادي والدعم للمتدرب", href: "#" },
 ];
 
 const supportLinks = [
@@ -115,11 +115,11 @@ export default function Footer() {
               <span className="absolute bottom-0 right-0 w-8 h-[3px] bg-gradient-to-r from-[#5CB07C] to-[#173A7C] rounded-full" />
             </h3>
             <ul className="space-y-3.5 flex flex-col items-start pr-0">
-              {policiesAndGuides.map((link, idx) => (
+              {policiesAndGuides.map((item, idx) => (
                 <li key={idx} className="group relative inline-flex">
                   <span className="absolute right-0 top-[6px] w-[5px] h-[5px] rounded-full bg-[#5CB07C] opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_10px_rgba(92,176,124,0.8)]" />
-                  <Link href="#" className="text-[13.5px] text-white/50 font-medium hover:text-white hover:pr-4 hover:font-bold transition-all duration-300 inline-block">
-                    {link}
+                  <Link href={item.href} className="text-[13.5px] text-white/50 font-medium hover:text-white hover:pr-4 hover:font-bold transition-all duration-300 inline-block">
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -217,7 +217,7 @@ export default function Footer() {
             © {new Date().getFullYear()} جميع الحقوق محفوظة لـ <span className="font-black text-white">النبض المستدام</span>
           </p>
           <div className="flex items-center gap-4">
-            <Link href="#" className="text-[12px] text-white/40 hover:text-[#5CB07C] transition-colors">
+            <Link href="/privacy" className="text-[12px] text-white/40 hover:text-[#5CB07C] transition-colors">
               سياسة الخصوصية
             </Link>
             <span className="w-1 h-1 rounded-full bg-white/20" />

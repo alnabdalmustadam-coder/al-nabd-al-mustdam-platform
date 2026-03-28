@@ -218,7 +218,7 @@ export default function CoursesPage() {
 
           {/* Mobile Filters Bottom Sheet */}
           {filtersOpen && (
-            <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="fixed inset-0 z-[100] lg:hidden">
               <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setFiltersOpen(false)} />
               <div className="absolute bottom-0 inset-x-0 bg-white border-t border-slate-200 rounded-t-3xl p-6 md:p-8 max-h-[80vh] overflow-y-auto shadow-2xl">
                 <div className="flex items-center justify-between mb-8">
