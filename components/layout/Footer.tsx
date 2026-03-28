@@ -11,11 +11,11 @@ const policiesAndGuides = [
   { label: "الادلة الإرشادية والدعم والتدريب", href: "/guidance-manuals" },
   { label: "الخطة التدريبية", href: "/training-plan" },
   { label: "سياسة واجراءات واضحة للخصوصية والاستخدام", href: "/privacy" },
-  { label: "وثيقة المواصفات للتفاصيل", href: "#" },
-  { label: "آلية فحص أعمال المتدربين ومنع الغش", href: "#" },
-  { label: "إجراءات التحقق من هوية المستفيد", href: "#" },
-  { label: "الدليل الإرشادي والدعم للمدرب", href: "#" },
-  { label: "الدليل الإرشادي والدعم للمتدرب", href: "#" },
+  { label: "وثيقة المواصفات للتفاصيل", href: "/technical-specifications" },
+  { label: "آلية فحص أعمال المتدربين ومنع الغش", href: "/anti-plagiarism" },
+  { label: "إجراءات التحقق من هوية المستفيد", href: "/identity-verification" },
+  { label: "الدليل الإرشادي والدعم للمدرب", href: "/trainer-guide" },
+  { label: "الدليل الإرشادي والدعم للمتدرب", href: "/trainee-guide" },
 ];
 
 const supportLinks = [
