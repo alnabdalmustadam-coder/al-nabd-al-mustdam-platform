@@ -19,13 +19,13 @@ const policiesAndGuides = [
 ];
 
 const supportLinks = [
-  "من نحن",
-  "قنوات الدعم الفني",
-  "رفع الشكاوى والمقترحات",
-  "سياسة الحضور",
-  "دوراتنا المعتمدة",
-  "دورات الشركات",
-  "نظام التنبيهات",
+  { label: "من نحن", href: "/about" },
+  { label: "قنوات الدعم الفني", href: "/support-channels" },
+  { label: "رفع الشكاوى والمقترحات", href: "/complaints" },
+  { label: "سياسة الحضور", href: "/attendance-policy" },
+  { label: "دوراتنا المعتمدة", href: "/courses" },
+  { label: "دورات الشركات", href: "/corporate" },
+  { label: "نظام التنبيهات", href: "/notifications" },
 ];
 
 export default function Footer() {
@@ -133,11 +133,11 @@ export default function Footer() {
               <span className="absolute bottom-0 right-0 w-8 h-[3px] bg-gradient-to-r from-[#5CB07C] to-[#173A7C] rounded-full" />
             </h3>
             <ul className="space-y-3.5 flex flex-col items-start pr-0">
-              {supportLinks.map((link, idx) => (
+              {supportLinks.map((item, idx) => (
                 <li key={idx} className="group relative inline-flex">
                   <span className="absolute right-0 top-[6px] w-[5px] h-[5px] rounded-full bg-[#5CB07C] opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_10px_rgba(92,176,124,0.8)]" />
-                  <Link href="#" className="text-[13.5px] text-white/50 font-medium hover:text-white hover:pr-4 hover:font-bold transition-all duration-300 inline-block">
-                    {link}
+                  <Link href={item.href} className="text-[13.5px] text-white/50 font-medium hover:text-white hover:pr-4 hover:font-bold transition-all duration-300 inline-block">
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -211,8 +211,58 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* ═══════════════════════════════ PARTNERS & LICENSES STRIP ═══════════════════════════════ */}
+        <div className="mt-16 pt-10 border-t border-white/10">
+          {/* Partners Section */}
+          <div className="mb-10">
+            <h3 className="text-[15px] font-black text-white/80 mb-8 text-center relative">
+              <span className="relative z-10 px-4 bg-gradient-to-br from-[#0A162B] via-[#0E2242] to-[#173A7C] inline-block">شركاؤنا المعتمدون</span>
+              <span className="absolute top-1/2 left-0 w-full h-[1px] bg-white/10 -translate-y-1/2" />
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
+              {[
+                { src: "/logo1_المركز_الوطني.webp", alt: "المركز الوطني للتعليم الإلكتروني", name: "المركز الوطني للتعليم الإلكتروني", glow: "rgba(92,176,124,0.15)" },
+                { src: "/logo2_جمعية_القلب_السعودية.webp", alt: "جمعية القلب السعودية", name: "جمعية القلب السعودية", glow: "rgba(220,38,38,0.12)" },
+                { src: "/logo3_المؤسسة_العامة_للتدريب.webp", alt: "المؤسسة العامة للتدريب التقني والمهني", name: "المؤسسة العامة للتدريب التقني والمهني", glow: "rgba(23,58,124,0.15)" },
+              ].map((partner, idx) => (
+                <div key={idx} className="group relative rounded-[1.5rem] p-[1px] bg-gradient-to-b from-white/20 via-white/5 to-transparent hover:-translate-y-1.5 transition-all duration-500">
+                  <div className="rounded-[1.5rem] bg-[#0E1F3D] p-6 flex flex-col items-center gap-4 h-full relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: `radial-gradient(circle at 50% 30%, ${partner.glow}, transparent 70%)` }} />
+                    <div className="w-[72px] h-[72px] rounded-xl bg-white shadow-lg shadow-black/10 flex items-center justify-center p-2.5 relative z-10 group-hover:scale-105 transition-transform duration-300">
+                      <img src={partner.src} alt={partner.alt} className="w-full h-full object-contain" />
+                    </div>
+                    <span className="text-[12px] font-bold text-white/50 text-center leading-relaxed relative z-10 group-hover:text-white/80 transition-colors duration-300">{partner.name}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* License Numbers Strip */}
+          <div className="mb-8">
+            <h3 className="text-[15px] font-black text-white/80 mb-6 text-center relative">
+              <span className="relative z-10 px-4 bg-gradient-to-br from-[#0A162B] via-[#0E2242] to-[#173A7C] inline-block">التراخيص والاعتمادات الرسمية</span>
+              <span className="absolute top-1/2 left-0 w-full h-[1px] bg-white/10 -translate-y-1/2" />
+            </h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: "السجل التجاري", number: "4030484498", org: "وزارة التجارة", color: "#5CB07C" },
+                { label: "الرقم الضريبي", number: "314195012200003", org: "هيئة الزكاة والضريبة", color: "#0C8983" },
+                { label: "رخصة بلدي", number: "470822783752", org: "وزارة الشؤون البلدية", color: "#76B82A" },
+                { label: "ترخيص السلامة", number: "47-06312100-1", org: "الدفاع المدني", color: "#E3A832" },
+              ].map((license, idx) => (
+                <div key={idx} className="bg-white/[0.04] backdrop-blur-sm border border-white/[0.07] rounded-2xl p-4 sm:p-5 text-center hover:bg-white/[0.08] hover:border-white/15 transition-all duration-300 group">
+                  <p className="text-[11px] font-bold text-white/40 mb-1.5 group-hover:text-white/60 transition-colors">{license.org}</p>
+                  <h4 className="text-[13px] font-black text-white/80 mb-2">{license.label}</h4>
+                  <span className="text-[13px] font-black tracking-wider font-sans" dir="ltr" style={{ color: license.color }}>{license.number}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 pb-4">
+        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 pb-4">
           <p className="text-sm text-white/40 font-medium">
             © {new Date().getFullYear()} جميع الحقوق محفوظة لـ <span className="font-black text-white">النبض المستدام</span>
           </p>

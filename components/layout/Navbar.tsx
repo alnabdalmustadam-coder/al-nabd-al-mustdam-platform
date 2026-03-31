@@ -10,7 +10,7 @@ import {
 import Button from "@/components/ui/Button";
 
 const megaMenuItems = [
-  { label: "تقييم مستوى اللغة الانجليزية", href: "/trainees/english-evaluation", icon: FileText },
+  { label: "تقييم مستوى اللغة الانجليزية", href: "/english-evaluation", icon: FileText },
   { label: "قياس رضا المتدرب", href: "/trainees/satisfaction", icon: FileText },
   { label: "استمارة تقييم دورة اون لاين", href: "/trainees/evaluation-online", icon: FileText },
   { label: "استمارة تقييم دورة", href: "/trainees/evaluation-offline", icon: FileText },
