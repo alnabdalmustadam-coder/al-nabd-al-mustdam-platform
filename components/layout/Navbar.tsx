@@ -11,11 +11,11 @@ import Button from "@/components/ui/Button";
 
 const megaMenuItems = [
   { label: "تقييم مستوى اللغة الانجليزية", href: "/english-evaluation", icon: FileText },
-  { label: "قياس رضا المتدرب", href: "/trainees/satisfaction", icon: FileText },
+  { label: "قياس رضا المتدرب", href: "/trainee-satisfaction", icon: FileText },
   { label: "استمارة تقييم دورة اون لاين", href: "/trainees/evaluation-online", icon: FileText },
   { label: "استمارة تقييم دورة", href: "/trainees/evaluation-offline", icon: FileText },
   { label: "استشارة التطوير الوظيفي", href: "/trainees/career-consulting", icon: FileText },
-  { label: "استمارة مهارات وتطبيقات البرنامج", href: "/trainees/skills-evaluation", icon: FileText },
+  { label: "استمارة مهارات وتطبيقات البرنامج", href: "/trainees/skills-applications", icon: FileText },
   { label: "استطلاع رأي عن اقامة الدورات", href: "/trainees/courses-survey", icon: FileText },
   { label: "استمارة طلب العضوية", href: "/trainees/membership", icon: FileText },
   { label: "استمارة الاشتراك في الموقع الإلكتروني", href: "/trainees/subscription", icon: FileText },
@@ -26,7 +26,7 @@ const navLinks = [
   { label: "نبذة عنا", href: "/about", icon: Info },
   { label: "أحدث الدورات", href: "/courses", icon: BookOpen },
   { label: "دورات الشركات", href: "/corporate", icon: Briefcase },
-  { label: "المدربيين", href: "/trainers", icon: UserCheck },
+  { label: "المدربين", href: "/trainers", icon: UserCheck },
   {
     label: "المتدربين",
     href: "#",
@@ -99,7 +99,7 @@ export default function Navbar() {
                       className={`absolute top-full right-1/2 translate-x-1/2 pt-10 w-[800px] transition-all duration-300 transform origin-top ${megaMenuOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                         }`}
                     >
-                      <div className="bg-[#173A7C]/90 backdrop-blur-2xl rounded-2xl shadow-[0_30px_60px_-15px_rgba(23,58,124,0.5)] border border-white/10 ring-1 ring-white/5 p-8 grid grid-cols-2 gap-x-12 gap-y-4">
+                      <div className="bg-gradient-to-br from-[#0A162B]/95 via-[#0E2242]/95 to-[#173A7C]/95 backdrop-blur-2xl rounded-2xl shadow-[0_30px_60px_-15px_rgba(23,58,124,0.5)] border border-white/10 ring-1 ring-white/5 p-8 grid grid-cols-2 gap-x-12 gap-y-4">
                         {megaMenuItems.map((item, idx) => (
                           <Link
                             key={idx}

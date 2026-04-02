@@ -8,16 +8,39 @@ export default function ComplaintsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      type: "complaint",
+      name: formData.get("name"),
+      phone: formData.get("phone"),
+      email: formData.get("email"),
+      subject: formData.get("subject"),
+      message: formData.get("message"),
+    };
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        setIsSubmitted(true);
+        e.currentTarget.reset();
+        setTimeout(() => setIsSubmitted(false), 3000);
+      } else {
+        alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+      }
+    } catch (error) {
+      alert("تعذر الاتصال بالخادم، يرجى التحقق من اتصالك بالإنترنت.");
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-      // Reset after 3 seconds
-      setTimeout(() => setIsSubmitted(false), 3000);
-    }, 1500);
+    }
   };
 
   return (
@@ -83,6 +106,7 @@ export default function ComplaintsPage() {
                   <input 
                     type="text" 
                     id="name" 
+                    name="name"
                     required 
                     placeholder="اكتب اسمك هنا" 
                     className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all"
@@ -95,6 +119,7 @@ export default function ComplaintsPage() {
                   <input 
                     type="tel" 
                     id="phone" 
+                    name="phone"
                     required 
                     placeholder="اكتب رقم جوالك للتواصل" 
                     className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all"
@@ -109,6 +134,7 @@ export default function ComplaintsPage() {
                   <input 
                     type="email" 
                     id="email" 
+                    name="email"
                     required 
                     placeholder="اكتب بريدك الإلكتروني" 
                     className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all text-right"
@@ -122,6 +148,7 @@ export default function ComplaintsPage() {
                   <input 
                     type="text" 
                     id="subject" 
+                    name="subject"
                     required 
                     placeholder="اكتب عنوان الرسالة" 
                     className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all"
@@ -134,6 +161,7 @@ export default function ComplaintsPage() {
                 <label htmlFor="message" className="text-sm font-bold text-slate-700 mx-1 block">محتوى الرسالة <span className="text-red-500">*</span></label>
                 <textarea 
                   id="message" 
+                  name="message"
                   required 
                   rows={6}
                   placeholder="اكتب محتوى الرسالة أو الاستفسار بالتفصيل..." 

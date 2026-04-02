@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
+import Script from "next/script";
 
 const cairo = Cairo({
   variable: "--font-cairo",
@@ -72,6 +73,12 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <WhatsAppFloat />
+        <Script 
+          src="https://beta.leadconnectorhq.com/loader.js"  
+          data-resources-url="https://beta.leadconnectorhq.com/chat-widget/loader.js" 
+          data-widget-id="69cd9d874fab82876c2c10e7"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

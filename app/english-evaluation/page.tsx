@@ -128,10 +128,11 @@ export default function EnglishEvaluationPage() {
       isCorrect: answers[i] === q.correct,
     }));
     try {
-      const res = await fetch("/api/send-results", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          type: "placement-test",
           student_name: name,
           student_email: email,
           student_phone: phone,
