@@ -15,12 +15,28 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const text = `الاسم: ${form.name}%0Aالبريد: ${form.email}%0Aالهاتف: ${form.phone}%0Aالموضوع: ${form.subject}%0Aالرسالة: ${form.message}`;
-    window.open(`https://wa.me/966549105986?text=${text}`, "_blank");
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "contact", ...form }),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+        setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+        setTimeout(() => setSubmitted(false), 4000);
+      } else {
+        alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+      }
+    } catch (err) {
+      alert("تعذر الاتصال بالخادم، يرجى التحقق من اتصالك بالإنترنت.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
@@ -137,8 +153,10 @@ export default function ContactPage() {
                   placeholder="اكتب رسالتك هنا..."
                 />
               </div>
-              <Button type="submit" size="lg" className="w-full sm:w-auto mt-4 px-10 shadow-lg shadow-[#173A7C]/10">
-                {submitted ? (
+              <Button type="submit" size="lg" className="w-full sm:w-auto mt-4 px-10 shadow-lg shadow-[#173A7C]/10" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  "جاري الإرسال..."
+                ) : submitted ? (
                   <><CheckCircle className="w-5 h-5" /> تم الإرسال!</>
                 ) : (
                   <><Send className="w-5 h-5 rtl:rotate-180" /> إرسال الرسالة</>

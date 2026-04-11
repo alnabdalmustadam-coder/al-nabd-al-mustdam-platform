@@ -105,6 +105,35 @@ export async function POST(request: Request) {
         </div>
       </body>
       </html>`;
+    } else if (type === "contact") {
+      const { name, email, phone, subject: msgSubject, message } = payload;
+      subject = `📨 New Contact Message: ${msgSubject} — from ${name}`;
+      htmlEmail = `
+      <!DOCTYPE html>
+      <html dir="rtl">
+      <head><meta charset="utf-8"></head>
+      <body style="margin: 0; padding: 0; background: #f8fafc; font-family: sans-serif; text-align: right;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          <div style="background: #173A7C; border-radius: 20px 20px 0 0; padding: 30px; text-align: center;">
+            <h1 style="color: white; font-size: 24px; margin: 0;">رسالة تواصل جديدة</h1>
+          </div>
+          <div style="background: white; padding: 30px; border-radius: 0 0 20px 20px; border: 1px solid #e2e8f0;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+              <tr><td style="padding: 10px 0; color: #64748b; width: 120px;">الاسم:</td><td style="padding: 10px 0; font-weight: 700;">${name}</td></tr>
+              <tr><td style="padding: 10px 0; color: #64748b;">الجوال:</td><td style="padding: 10px 0; font-weight: 700; text-align: left;" dir="ltr">${phone}</td></tr>
+              <tr><td style="padding: 10px 0; color: #64748b;">البريد:</td><td style="padding: 10px 0; font-weight: 700; text-align: left;" dir="ltr">${email}</td></tr>
+              <tr><td style="padding: 10px 0; color: #64748b;">الموضوع:</td><td style="padding: 10px 0; font-weight: 700;">${msgSubject}</td></tr>
+            </table>
+            <div style="background: #f1f5f9; padding: 25px; border-radius: 15px; border-right: 4px solid #173A7C; color: #334155; line-height: 1.8;">
+              ${message}
+            </div>
+            <div style="margin-top: 30px; text-align: center; color: #94a3b8; font-size: 12px;">
+              تم الإرسال عبر نموذج "تواصل معنا" في منصة النبض المستدام
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>`;
     } else if (type === "satisfaction") {
       const {
         name, phone, employer, jobTitle,
@@ -620,38 +649,51 @@ export async function POST(request: Request) {
       </html>`;
     }
 
-    await transporter.sendMail({
-      from: `"Sustain Pulse Platform" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,
-      subject: subject,
-      html: htmlEmail,
-    });
-
-    // Submitting to LeadConnector (GoHighLevel) Form "O8dD5KvfiHWPaB3zpuzM"
+    // 1. Send Email Notification
     try {
-      if (type === "complaint" || type === "satisfaction" || type === "evaluation-online" || type === "evaluation-offline" || type === "career-consulting" || type === "skills-applications" || type === "courses-survey" || type === "membership" || type === "subscription") {
+      if (subject && htmlEmail) {
+        await transporter.sendMail({
+          from: `"Sustain Pulse Platform" <${process.env.GMAIL_USER}>`,
+          to: process.env.GMAIL_USER,
+          subject: subject,
+          html: htmlEmail,
+        });
+        console.log("📧 تم إرسال البريد الإلكتروني بنجاح.");
+      }
+    } catch (emailErr) {
+      console.error("❌ فشل إرسال البريد الإلكتروني (تحقق من App Password):", emailErr);
+    }
+
+    // 2. Submitting to LeadConnector (GoHighLevel) Form "O8dD5KvfiHWPaB3zpuzM"
+    try {
+      if (type === "contact" || type === "complaint" || type === "satisfaction" || type === "evaluation-online" || type === "evaluation-offline" || type === "career-consulting" || type === "skills-applications" || type === "courses-survey" || type === "membership" || type === "subscription") {
         const { name, email, phone } = payload;
         const ghlBody = new FormData();
-        ghlBody.set(
-          "formData",
-          JSON.stringify({
-            formId: "O8dD5KvfiHWPaB3zpuzM",
-            name: name || "",
-            email: email || "no-reply@sustainpulse.sa",
-            phone: phone || "",
-          })
-        );
+        ghlBody.set("formId", "O8dD5KvfiHWPaB3zpuzM");
+        ghlBody.set("name", name || "");
+        ghlBody.append("email", email || "no-reply@sustainpulse.sa");
+        ghlBody.append("phone", phone || "");
 
-        await fetch("https://backend.leadconnectorhq.com/forms/submit", {
+        const ghlResponse = await fetch("https://backend.leadconnectorhq.com/forms/submit", {
           method: "POST",
           body: ghlBody,
           headers: {
             "Accept": "application/json",
+            "Origin": "https://al-nabd-al-mustdam-platform.vercel.app",
+            "Referer": "https://al-nabd-al-mustdam-platform.vercel.app/",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
           },
         });
+        
+        const ghlData = await ghlResponse.json().catch(() => null);
+        if (ghlResponse.ok) {
+          console.log("✅ تم إرسال البيانات للـ Webhook (LeadConnector) بنجاح:", ghlData);
+        } else {
+          console.error("❌ فشل إرسال البيانات للـ Webhook (LeadConnector):", ghlResponse.status, ghlData);
+        }
       }
     } catch (ghlErr) {
-      console.error("GHL Submission Error:", ghlErr);
+      console.error("❌ حدث خطأ اثناء الاتصال بـ GHL Webhook:", ghlErr);
     }
 
     return NextResponse.json({ success: true });

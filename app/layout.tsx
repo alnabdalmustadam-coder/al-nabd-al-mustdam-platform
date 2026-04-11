@@ -67,6 +67,7 @@ export default function RootLayout({
       dir="rtl"
       suppressHydrationWarning
       className={`${cairo.variable} ${sora.variable}`}
+      data-scroll-behavior="smooth"
     >
       <body className="min-h-screen flex flex-col font-[family-name:var(--font-cairo)]">
         <Navbar />

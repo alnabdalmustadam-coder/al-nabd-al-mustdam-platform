@@ -153,46 +153,7 @@ export default function EnglishEvaluationPage() {
     }
   };
 
-  const sendViaWhatsApp = () => {
-    const pct = Math.round((score / totalPoints) * 100);
-    const level = getLevel(score);
-    const correctCount = questions.filter((q, i) => answers[i] === q.correct).length;
-    const wrongCount = questions.length - correctCount;
 
-    let text = ``;
-    text += `🏫 *معهد النبض المستدام*\n`;
-    text += `📋 *تقرير اختبار تحديد المستوى (لغة إنجليزية)*\n`;
-    text += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
-
-    text += `👤 *بيانات المتدرب*\n`;
-    text += `▸ الاسم: *${name}*\n`;
-    text += `▸ رقم الجوال: ${phone}\n`;
-    text += `▸ رقم الهوية: ${idNumber}\n`;
-    text += `▸ البريد الإلكتروني: ${email}\n`;
-    text += `▸ التخصص: ${specialization}\n`;
-    text += `▸ القسم: ${section}\n\n`;
-
-    text += `━━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `📊 *نتيجة الاختبار*\n`;
-    text += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
-
-    text += `🏆 *الدرجة:* ${score} / ${totalPoints}\n`;
-    text += `📈 *النسبة:* ${pct}%\n`;
-    text += `🎯 *المستوى:* ${level.emoji} ${level.labelAr}\n`;
-    text += `      _(${level.label})_\n\n`;
-
-    text += `✅ إجابات صحيحة: ${correctCount}  |  ❌ إجابات خاطئة: ${wrongCount}\n\n`;
-
-    text += `━━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `✍️ *قسم الكتابة*\n`;
-    text += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    text += `${writingAnswer || "لا يوجد"}\n\n`;
-
-    text += `━━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `_تم الإنشاء آلياً عبر منصة النبض المستدام_`;
-
-    window.open(`https://wa.me/966549105986?text=${encodeURIComponent(text)}`, "_blank");
-  };
 
   const sendViaMailto = () => {
     const { pct, level, correctCount, details } = buildResultsSummary();
@@ -443,9 +404,7 @@ export default function EnglishEvaluationPage() {
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="relative z-10 mb-8">
                   <p className="text-xs font-bold text-slate-300 mb-3 uppercase tracking-wider">Manual Send Options</p>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button onClick={sendViaWhatsApp} className="flex items-center gap-3 px-6 py-3 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#128C7E] font-bold text-sm transition-all hover:-translate-y-0.5 w-full sm:w-auto justify-center">
-                      <MessageCircle className="w-5 h-5" /> WhatsApp
-                    </button>
+
                     <button onClick={sendViaMailto} className="flex items-center gap-3 px-6 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600 font-bold text-sm transition-all hover:-translate-y-0.5 w-full sm:w-auto justify-center">
                       <Mail className="w-5 h-5" /> Email
                     </button>
