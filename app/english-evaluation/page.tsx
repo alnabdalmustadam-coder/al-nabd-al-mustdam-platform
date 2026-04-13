@@ -270,7 +270,6 @@ export default function EnglishEvaluationPage() {
                       <li>Spend no more than 10 minutes on the test.</li>
                     </ul>
                   </div>
-                  </div>
                 </div>
 
                 {/* Terms & Conditions */}
