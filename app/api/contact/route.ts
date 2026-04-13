@@ -664,38 +664,6 @@ export async function POST(request: Request) {
       console.error("❌ فشل إرسال البريد الإلكتروني (تحقق من App Password):", emailErr);
     }
 
-    // 2. Submitting to LeadConnector (GoHighLevel) Form "O8dD5KvfiHWPaB3zpuzM"
-    try {
-      if (type === "contact" || type === "complaint" || type === "satisfaction" || type === "evaluation-online" || type === "evaluation-offline" || type === "career-consulting" || type === "skills-applications" || type === "courses-survey" || type === "membership" || type === "subscription") {
-        const { name, email, phone } = payload;
-        const ghlBody = new FormData();
-        ghlBody.set("formId", "O8dD5KvfiHWPaB3zpuzM");
-        ghlBody.set("name", name || "");
-        ghlBody.append("email", email || "no-reply@sustainpulse.sa");
-        ghlBody.append("phone", phone || "");
-
-        const ghlResponse = await fetch("https://backend.leadconnectorhq.com/forms/submit", {
-          method: "POST",
-          body: ghlBody,
-          headers: {
-            "Accept": "application/json",
-            "Origin": "https://al-nabd-al-mustdam-platform.vercel.app",
-            "Referer": "https://al-nabd-al-mustdam-platform.vercel.app/",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-          },
-        });
-        
-        const ghlData = await ghlResponse.json().catch(() => null);
-        if (ghlResponse.ok) {
-          console.log("✅ تم إرسال البيانات للـ Webhook (LeadConnector) بنجاح:", ghlData);
-        } else {
-          console.error("❌ فشل إرسال البيانات للـ Webhook (LeadConnector):", ghlResponse.status, ghlData);
-        }
-      }
-    } catch (ghlErr) {
-      console.error("❌ حدث خطأ اثناء الاتصال بـ GHL Webhook:", ghlErr);
-    }
-
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Email error:", error);

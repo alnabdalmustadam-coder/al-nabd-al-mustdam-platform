@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Menu, X, Home, Info, BookOpen, Briefcase,
-  Users, UserCheck, Phone, ChevronDown, FileText, ChevronLeft
+  Users, UserCheck, Phone, ChevronDown, FileText, ChevronLeft, User
 } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { useSession } from "next-auth/react";
 
 const megaMenuItems = [
   { label: "تقييم مستوى اللغة الانجليزية", href: "/english-evaluation", icon: FileText },
@@ -41,7 +42,9 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
   const [mobileMegaMenuOpen, setMobileMegaMenuOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -139,15 +142,30 @@ export default function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
-            <Link
-              href="/auth/login"
-              className="text-xs xl:text-sm font-bold text-slate-700 hover:text-[#173A7C] transition-colors px-2 xl:px-4 py-2 whitespace-nowrap"
-            >
-              تسجيل دخول
-            </Link>
-            <Button href="/auth/register" size="sm" className="hidden lg:flex text-xs xl:text-sm px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap">
-              سجّل الآن
-            </Button>
+            {session ? (
+              <Link href="/dashboard" className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 rounded-full transition-colors border border-transparent hover:border-slate-200">
+                {session?.user?.image && !imgError ? (
+                  <img src={session.user.image} onError={() => setImgError(true)} alt={session?.user?.name || "User"} className="w-8 h-8 rounded-full border border-slate-200" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-[#173A7C]/10 border border-[#173A7C]/20 flex items-center justify-center text-[#173A7C]">
+                    <User className="w-4 h-4" />
+                  </div>
+                )}
+                <span className="text-sm font-bold text-slate-700">{session?.user?.name?.split(" ")[0]}</span>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="text-xs xl:text-sm font-bold text-slate-700 hover:text-[#173A7C] transition-colors px-2 xl:px-4 py-2 whitespace-nowrap"
+                >
+                  تسجيل دخول
+                </Link>
+                <Button href="/auth/register" size="sm" className="hidden lg:flex text-xs xl:text-sm px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap">
+                  سجّل الآن
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Toggle */}
@@ -240,12 +258,30 @@ export default function Navbar() {
             })}
 
             <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col gap-3">
-              <Button href="/auth/login" variant="secondary" size="lg" className="w-full justify-center">
-                تسجيل دخول
-              </Button>
-              <Button href="/auth/register" size="lg" className="w-full justify-center">
-                سجّل الآن
-              </Button>
+              {session ? (
+                <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                  {session?.user?.image && !imgError ? (
+                    <img src={session.user.image} onError={() => setImgError(true)} alt={session?.user?.name || "User"} className="w-10 h-10 rounded-full border border-slate-200" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-[#173A7C]/10 border border-[#173A7C]/20 flex items-center justify-center text-[#173A7C]">
+                      <User className="w-5 h-5" />
+                    </div>
+                  )}
+                  <div>
+                    <strong className="block text-sm text-slate-900 font-bold">{session?.user?.name}</strong>
+                    <span className="text-xs text-slate-500 line-clamp-1">{session?.user?.email}</span>
+                  </div>
+                </Link>
+              ) : (
+                <>
+                  <Button href="/auth/login" variant="secondary" size="lg" className="w-full justify-center">
+                    تسجيل دخول
+                  </Button>
+                  <Button href="/auth/register" size="lg" className="w-full justify-center">
+                    سجّل الآن
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

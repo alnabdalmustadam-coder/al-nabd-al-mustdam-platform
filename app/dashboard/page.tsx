@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download } from "lucide-react";
+import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download, LogOut } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 
 const sidebarLinks = [
   { key: "courses", label: "دوراتي", icon: BookOpen },
@@ -30,6 +31,13 @@ const activities = [
 
 export default function DashboardPage() {
   const [activeSection, setActiveSection] = useState("courses");
+  const [imgError, setImgError] = useState(false);
+  const { data: session } = useSession();
+
+  const userName = session?.user?.name || "متدرب النبض المستدام";
+  const userEmail = session?.user?.email || "khalid@example.com";
+  const userImage = session?.user?.image || "";
+  const firstLetter = userName.charAt(0) || "م";
 
   return (
     <div className="min-h-screen pt-28 pb-20 bg-slate-50">
@@ -40,13 +48,15 @@ export default function DashboardPage() {
             <div className="bg-white border border-slate-200 shadow-sm rounded-[24px] p-6 sticky top-28">
               {/* User Info */}
               <div className="flex items-center gap-4 mb-6 border-b border-slate-100 pb-6">
-                <div className="w-14 h-14 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center p-1">
-                  <div className="w-full h-full rounded-full bg-slate-200 flex items-center justify-center text-xl font-bold text-slate-500">
-                    خ
+                {userImage && !imgError ? (
+                  <img src={userImage} alt={userName} onError={() => setImgError(true)} className="w-14 h-14 rounded-full border border-slate-200 shadow-sm" />
+                ) : (
+                  <div className="w-14 h-14 rounded-full bg-[#173A7C]/5 border border-[#173A7C]/10 flex items-center justify-center text-[#173A7C]">
+                    <User className="w-7 h-7" />
                   </div>
-                </div>
+                )}
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">خالد الغامدي</h3>
+                  <h3 className="text-base font-bold text-slate-900">{userName}</h3>
                   <p className="text-sm font-medium text-slate-500">متدرب</p>
                 </div>
               </div>
@@ -71,6 +81,15 @@ export default function DashboardPage() {
                   );
                 })}
               </nav>
+              {session && (
+                <button
+                  onClick={() => signOut({ callbackUrl: "/auth/login" })}
+                  className="w-full mt-6 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-red-100 text-red-600 bg-red-50 hover:bg-red-100 text-sm font-bold transition-all cursor-pointer"
+                >
+                  <LogOut className="w-5 h-5" />
+                  تسجيل الخروج
+                </button>
+              )}
             </div>
           </aside>
 
@@ -86,7 +105,7 @@ export default function DashboardPage() {
               <div className="relative z-10 flex flex-col sm:flex-row items-start justify-between gap-6">
                 <div>
                   <h1 className="text-3xl sm:text-4xl font-black mb-2">
-                    أهلاً بك، <span className="text-white">خالد</span> 👋
+                    أهلاً بك، <span className="text-white">{userName.split(' ')[0]}</span> 👋
                   </h1>
                   <p className="text-base text-white/80 font-medium">تابع رحلتك التعليمية وحقق أهدافك المهنية بثقة.</p>
                 </div>
@@ -181,11 +200,11 @@ export default function DashboardPage() {
                 <div className="space-y-6 max-w-xl">
                   <div>
                     <label htmlFor="profile-name" className="text-sm font-bold text-slate-700 block mb-2">الاسم الكامل</label>
-                    <input id="profile-name" defaultValue="خالد الغامدي" className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" />
+                    <input id="profile-name" defaultValue={userName} className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" />
                   </div>
                   <div>
                     <label htmlFor="profile-email" className="text-sm font-bold text-slate-700 block mb-2">البريد الإلكتروني</label>
-                    <input id="profile-email" defaultValue="khalid@example.com" className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" dir="ltr" />
+                    <input id="profile-email" defaultValue={userEmail} readOnly disabled className="w-full px-5 py-3.5 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 focus:outline-none text-base font-medium cursor-not-allowed" dir="ltr" />
                   </div>
                   <button className="px-8 py-3.5 rounded-2xl bg-[#173A7C] text-white text-base font-bold cursor-pointer hover:bg-[#1E4D9D] transition-all shadow-md shadow-[#173A7C]/20 mt-4">
                     حفظ التغييرات

@@ -8,6 +8,7 @@ import {
   Sparkles, ClipboardCheck, Users, MessageSquare, Globe,
   ChevronLeft, ChevronRight, Award, Mail, BookOpen, MonitorPlay, Lightbulb, UsersRound
 } from "lucide-react";
+import { submitToGHL } from "@/lib/ghl";
 
 type Rating = "عالي" | "متوسط" | "منخفض" | "";
 
@@ -90,6 +91,7 @@ export default function OnlineEvaluationPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [agreed, setAgreed] = useState(false);
   const [alertModal, setAlertModal] = useState<{ open: boolean; type: "warning" | "error"; message: string }>({ open: false, type: "warning", message: "" });
 
   const showAlert = (message: string, type: "warning" | "error" = "warning") => {
@@ -149,6 +151,10 @@ export default function OnlineEvaluationPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "evaluation-online", ...form }),
       });
+
+      // Submit to GHL from client-side
+      await submitToGHL(form);
+
       if (res.ok) {
         setSubmitted(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -720,8 +726,24 @@ export default function OnlineEvaluationPage() {
                         </div>
                       </div>
 
+                      {/* Terms & Conditions */}
+                      <div className="flex items-start gap-3 py-2 px-1 justify-end mt-4">
+                        <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
+                          أوافق على <span className="text-[#173A7C] font-bold">الشروط والأحكام</span> و <span className="text-[#173A7C] font-bold">سياسة الخصوصية</span>
+                        </label>
+                        <input
+                          type="checkbox"
+                          id="agreed"
+                          required
+                          checked={agreed}
+                          onChange={(e) => setAgreed(e.target.checked)}
+                          className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                        />
+                      </div>
+
                     </div>
                   </motion.div>
+
                 )}
               </AnimatePresence>
 
@@ -764,7 +786,7 @@ export default function OnlineEvaluationPage() {
                     type="submit"
                     size="lg"
                     className="px-10 shadow-xl shadow-[#173A7C]/20 group rounded-full"
-                    disabled={loading}
+                    disabled={loading || !agreed}
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">

@@ -8,6 +8,7 @@ import {
   ShieldAlert, Globe, CreditCard, ChevronLeft, ChevronRight,
   Sparkles, ShieldCheck
 } from "lucide-react";
+import { submitToGHL } from "@/lib/ghl";
 
 interface FormState {
   firstName: string;
@@ -116,6 +117,7 @@ export default function SubscriptionPage() {
   const [form, setForm] = useState<FormState>(initialFormState);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [alertModal, setAlertModal] = useState<{ open: boolean; type: "warning" | "error"; message: string }>({ open: false, type: "warning", message: "" });
 
   const showAlert = (message: string, type: "warning" | "error" = "warning") => {
@@ -147,6 +149,14 @@ export default function SubscriptionPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "subscription", ...form }),
       });
+
+      // Submit to GHL from client-side
+      await submitToGHL({
+        name: `${form.firstName} ${form.surname}`,
+        email: form.email,
+        phone: form.phone,
+      });
+
       if (res.ok) {
         setSubmitted(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -353,9 +363,24 @@ export default function SubscriptionPage() {
                   </div>
                 </div>
 
+                {/* Terms & Conditions */}
+                <div className="flex items-start gap-3 py-4 px-1 justify-end">
+                  <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
+                    أوافق على <span className="text-[#173A7C] font-bold">الشروط والأحكام</span> و <span className="text-[#173A7C] font-bold">سياسة الخصوصية</span>
+                  </label>
+                  <input
+                    type="checkbox"
+                    id="agreed"
+                    required
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                  />
+                </div>
+
                 {/* Submit button */}
                 <div className="flex justify-start">
-                  <Button type="submit" size="lg" className="px-14 shadow-2xl shadow-[#173A7C]/30 group rounded-full" disabled={loading}>
+                  <Button type="submit" size="lg" className="px-14 shadow-2xl shadow-[#173A7C]/30 group rounded-full" disabled={loading || !agreed}>
                     {loading ? "جاري الإرسال..." : <span className="flex items-center gap-3">إشتراك <Send className="w-5 h-5 rtl:rotate-180" /></span>}
                   </Button>
                 </div>

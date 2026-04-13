@@ -43,6 +43,7 @@ export type CourseLevel = 'beginner' | 'intermediate' | 'advanced' | 'all';
 export interface Testimonial {
   id: number;
   name: string;
+  gender?: 'male' | 'female';
   role: string;
   avatar: string;
   content: string;

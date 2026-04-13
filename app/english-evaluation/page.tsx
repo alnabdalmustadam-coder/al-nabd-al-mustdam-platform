@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Clock, CheckCircle2, XCircle, ArrowLeft, ArrowRight, Send, Trophy, RotateCcw, GraduationCap, Target, Sparkles, AlertCircle, Mail, MessageCircle, Loader2 } from "lucide-react";
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { submitToGHL } from "@/lib/ghl";
 
 /* ═══════════════════════════════════════════════════════════════════════
    QUESTIONS
@@ -60,6 +61,7 @@ export default function EnglishEvaluationPage() {
   const [idNumber, setIdNumber] = useState("");
   const [email, setEmail] = useState("");
   const [currentQ, setCurrentQ] = useState(0);
+  const [agreed, setAgreed] = useState(false);
   const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
   const [timeLeft, setTimeLeft] = useState(TIMER_MINUTES * 60);
   const [timerActive, setTimerActive] = useState(false);
@@ -146,6 +148,22 @@ export default function EnglishEvaluationPage() {
           detailed_answers: detailed,
         }),
       });
+
+      // Submit to GHL from client-side
+      await submitToGHL({
+        type: "placement-test",
+        student_name: name,
+        student_email: email,
+        student_phone: phone,
+        student_id: idNumber,
+        student_specialization: specialization,
+        student_section: section,
+        score, total: totalPoints, percentage: pct,
+        level: level.label, levelAr: level.labelAr,
+        correct_count: correctCount, total_questions: questions.length,
+        writing_answer: writingAnswer || "N/A",
+      });
+
       if (res.ok) setEmailStatus("sent");
       else setEmailStatus("error");
     } catch {
@@ -252,8 +270,25 @@ export default function EnglishEvaluationPage() {
                       <li>Spend no more than 10 minutes on the test.</li>
                     </ul>
                   </div>
+                  </div>
                 </div>
-                <button type="submit" className="w-full mt-8 py-4 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#2F66D6] hover:shadow-xl text-white font-bold text-base transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-[#173A7C]/20 flex items-center justify-center gap-3 relative z-10">
+
+                {/* Terms & Conditions */}
+                <div className="flex items-start gap-3 py-4 px-1 relative z-10">
+                  <input
+                    type="checkbox"
+                    id="agreed"
+                    required
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                  />
+                  <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
+                    I agree to the <span className="text-[#173A7C] font-bold">Terms & Conditions</span> and <span className="text-[#173A7C] font-bold">Privacy Policy</span>
+                  </label>
+                </div>
+
+                <button type="submit" disabled={!agreed} className="w-full mt-8 py-4 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#2F66D6] hover:shadow-xl text-white font-bold text-base transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-[#173A7C]/20 flex items-center justify-center gap-3 relative z-10 disabled:opacity-50 disabled:cursor-not-allowed">
                   <span>Start the Test</span><ArrowRight className="w-5 h-5" />
                 </button>
               </form>

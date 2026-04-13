@@ -3,10 +3,12 @@
 import { motion } from "framer-motion";
 import { MessageSquarePlus, Send, MessageCircle, Phone, Mail, MapPin, CheckCircle2, Clock, Headset } from "lucide-react";
 import React, { useState } from "react";
+import { submitToGHL } from "@/lib/ghl";
 
 export default function ComplaintsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,6 +29,13 @@ export default function ComplaintsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+      });
+
+      // Submit to GHL from client-side
+      await submitToGHL({
+        name: data.name as string,
+        email: data.email as string,
+        phone: data.phone as string,
       });
 
       if (response.ok) {
@@ -169,10 +178,25 @@ export default function ComplaintsPage() {
                 ></textarea>
               </div>
 
+              {/* Terms & Conditions */}
+              <div className="flex items-start gap-3 py-2 px-1">
+                <input
+                  type="checkbox"
+                  id="agreed"
+                  required
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                />
+                <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
+                  أوافق على <span className="text-[#173A7C] font-bold">الشروط والأحكام</span> و <span className="text-[#173A7C] font-bold">سياسة الخصوصية</span>
+                </label>
+              </div>
+
               {/* Submit Button */}
               <button 
                 type="submit" 
-                disabled={isSubmitting || isSubmitted}
+                disabled={isSubmitting || isSubmitted || !agreed}
                 className={`w-full py-4 rounded-xl font-bold text-[16px] transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group ${
                   isSubmitted 
                     ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" 

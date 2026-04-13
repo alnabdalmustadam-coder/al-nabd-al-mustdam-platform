@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import { Phone, Mail, MapPin, Send, CheckCircle, MessageCircle } from "lucide-react";
+import { submitToGHL } from "@/lib/ghl";
 
 const contactInfo = [
   { icon: Phone, label: "الهاتف", value: "+966 54 910 5986", dir: "ltr" as const },
@@ -14,6 +15,7 @@ const contactInfo = [
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [agreed, setAgreed] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,6 +27,10 @@ export default function ContactPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "contact", ...form }),
       });
+
+      // Submit to GHL from client-side
+      await submitToGHL(form);
+
       if (res.ok) {
         setSubmitted(true);
         setForm({ name: "", email: "", phone: "", subject: "", message: "" });
@@ -153,7 +159,21 @@ export default function ContactPage() {
                   placeholder="اكتب رسالتك هنا..."
                 />
               </div>
-              <Button type="submit" size="lg" className="w-full sm:w-auto mt-4 px-10 shadow-lg shadow-[#173A7C]/10" disabled={isSubmitting}>
+              <div className="flex items-start gap-3 py-2 px-1">
+                <input
+                  type="checkbox"
+                  id="agreed"
+                  required
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                />
+                <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
+                  أوافق على <span className="text-[#173A7C] font-bold">الشروط والأحكام</span> و <span className="text-[#173A7C] font-bold">سياسة الخصوصية</span>
+                </label>
+              </div>
+
+              <Button type="submit" size="lg" className="w-full sm:w-auto mt-4 px-10 shadow-lg shadow-[#173A7C]/10" disabled={isSubmitting || !agreed}>
                 {isSubmitting ? (
                   "جاري الإرسال..."
                 ) : submitted ? (
