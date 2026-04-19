@@ -18,10 +18,15 @@ export const {
   },
   callbacks: {
     async redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url;
+      // Ensure the URL is properly encoded to avoid ByteString errors with Arabic characters
+      try {
+        const decodedUrl = decodeURIComponent(url);
+        if (decodedUrl.startsWith("/")) return `${baseUrl}${url}`;
+        const urlObj = new URL(url);
+        if (urlObj.origin === baseUrl) return url;
+      } catch (e) {
+        if (url.startsWith("/")) return `${baseUrl}${url}`;
+      }
       return baseUrl;
     }
   }

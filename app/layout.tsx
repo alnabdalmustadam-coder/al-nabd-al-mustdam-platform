@@ -23,7 +23,7 @@ const sora = Sora({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | النبض المستدام",
+    template: "%s | Sustain Pulse",
     default: "النبض المستدام — منصة التميز المهني",
   },
   description:
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
       "منصة تعليمية رائدة تقدم دورات مهنية وتقنية باللغة العربية.",
     type: "website",
     locale: "ar_SA",
-    siteName: "النبض المستدام",
+    siteName: "Sustain Pulse",
   },
   twitter: {
     card: "summary_large_image",
@@ -80,7 +80,7 @@ export default function RootLayout({
         <Script 
           src="https://beta.leadconnectorhq.com/loader.js"  
           data-resources-url="https://beta.leadconnectorhq.com/chat-widget/loader.js" 
-          data-widget-id="69cd9d874fab82876c2c10e7"
+          data-widget-id="73hS2pnWQWKCJaCEjUqq"
           strategy="lazyOnload"
         />
       </body>

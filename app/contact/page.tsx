@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import { Phone, Mail, MapPin, Send, CheckCircle, MessageCircle } from "lucide-react";
-import { submitToGHL } from "@/lib/ghl";
+
 
 const contactInfo = [
   { icon: Phone, label: "الهاتف", value: "+966 54 910 5986", dir: "ltr" as const },
@@ -22,14 +22,14 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      // 1. Send to local API (for Email)
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "contact", ...form }),
       });
 
-      // Submit to GHL from client-side
-      await submitToGHL(form);
+
 
       if (res.ok) {
         setSubmitted(true);

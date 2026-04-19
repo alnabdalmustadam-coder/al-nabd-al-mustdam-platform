@@ -29,7 +29,7 @@ export async function submitToGHL(data: { name?: string; email?: string; phone?:
     });
 
     // Use the correct white-labeled form submission endpoint
-    const response = await fetch("https://link.digitalsolution.vip/jobs/form/submit", {
+    const response = await fetch("https://services.leadconnectorhq.com/form/submit", {
       method: "POST",
 
       body: ghlBody.toString(),

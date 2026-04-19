@@ -664,6 +664,40 @@ export async function POST(request: Request) {
       console.error("❌ فشل إرسال البريد الإلكتروني (تحقق من App Password):", emailErr);
     }
 
+    // 2. Submit to GoHighLevel (GHL)
+    try {
+      if (type === "contact") {
+        const { name, email, phone, message, subject: msgSubject } = payload;
+        const nameParts = (name || "").trim().split(/\s+/);
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+
+        const ghlBody = new URLSearchParams();
+        ghlBody.append("formId", "O8dD5KvfiHWPaB3zpuzM");
+        ghlBody.append("locationId", "73hS2pnWQWKCJaCEjUqq");
+        ghlBody.append("firstName", firstName);
+        ghlBody.append("lastName", lastName);
+        ghlBody.append("email", email || "");
+        ghlBody.append("phone", phone || "");
+        ghlBody.append("message", message || "");
+        ghlBody.append("subject", msgSubject || "");
+        ghlBody.append("terms", "on");
+
+        await fetch("https://services.leadconnectorhq.com/form/submit", {
+          method: "POST",
+          body: ghlBody.toString(),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          },
+        });
+        console.log("✅ تم إرسال البيانات إلى GoHighLevel بنجاح.");
+      }
+    } catch (ghlErr) {
+      console.error("⚠️ فشل الإرسال إلى GoHighLevel:", ghlErr);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Email error:", error);

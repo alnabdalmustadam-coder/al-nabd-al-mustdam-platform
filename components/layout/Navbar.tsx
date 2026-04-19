@@ -34,6 +34,7 @@ const navLinks = [
     icon: Users,
     hasMegaMenu: true
   },
+  { label: "احجز استشارة", href: "https://link.digitalsolution.vip/widget/booking/wjLw0LIzohqnw41l2sxs", icon: FileText },
   { label: "تواصل معنا", href: "/contact", icon: Phone },
 ];
 
