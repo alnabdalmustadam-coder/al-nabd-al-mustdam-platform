@@ -1,6 +1,6 @@
 export default function NELCBadge() {
   return (
-    <div className="fixed bottom-4 right-4 md:bottom-10 md:right-10 z-50">
+    <div className="flex justify-center items-center">
       {/* NELC Entity Verification Badge */}
       <iframe
         src="https://services.futurex.sa/entity-badge?code=In0nMIrPxIi9YTjE"

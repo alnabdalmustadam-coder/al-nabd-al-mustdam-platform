@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Mail, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
+import NELCBadge from "@/components/ui/NELCBadge";
 
 const policiesAndGuides = [
   { label: "سياسة الخصوصية والاستخدام", href: "/privacy" },
@@ -263,6 +264,11 @@ export default function Footer() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* NELC Badge */}
+        <div className="mb-8 flex justify-center">
+          <NELCBadge />
         </div>
 
         {/* Bottom Bar */}
