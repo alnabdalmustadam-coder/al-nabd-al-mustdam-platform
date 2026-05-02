@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
+import NELCBadge from "@/components/ui/NELCBadge";
 import Script from "next/script";
 import { Providers } from "./providers";
 
@@ -76,6 +77,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <WhatsAppFloat />
+          <NELCBadge />
         </Providers>
         <Script 
           src="https://beta.leadconnectorhq.com/loader.js"  
