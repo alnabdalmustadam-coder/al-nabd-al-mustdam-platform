@@ -75,8 +75,6 @@ export default function RootLayout({
       className={`${cairo.variable} ${sora.variable}`}
       data-scroll-behavior="smooth"
     >
-      <head>
-      </head>
       <body className="min-h-screen flex flex-col font-[family-name:var(--font-cairo)]">
         <Providers>
           <Navbar />
