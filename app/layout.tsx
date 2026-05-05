@@ -55,10 +55,8 @@ export const metadata: Metadata = {
     icon: "/logo.svg",
     apple: "/logo.svg",
   },
-  verification: {
-    other: {
-      "domain-verification": "1a75bb4fb187894394a0db2d2bd4034e193d8bd9e1e721705748c3a9d35aeab8",
-    },
+  other: {
+    "domain-verification": "1a75bb4fb187894394a0db2d2bd4034e193d8bd9e1e721705748c3a9d35aeab8",
   },
 };
 
