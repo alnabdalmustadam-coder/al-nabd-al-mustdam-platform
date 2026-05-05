@@ -157,12 +157,12 @@ export default function Navbar() {
             ) : (
               <>
                 <Link
-                  href="/auth/login"
+                  href="https://members.nabdtraining.com/"
                   className="text-xs xl:text-sm font-bold text-slate-700 hover:text-[#173A7C] transition-colors px-2 xl:px-4 py-2 whitespace-nowrap"
                 >
                   تسجيل دخول
                 </Link>
-                <Button href="/auth/register" size="sm" className="hidden lg:flex text-xs xl:text-sm px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap">
+                <Button href="https://members.nabdtraining.com/" size="sm" className="hidden lg:flex text-xs xl:text-sm px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap">
                   سجّل الآن
                 </Button>
               </>
@@ -275,10 +275,10 @@ export default function Navbar() {
                 </Link>
               ) : (
                 <>
-                  <Button href="/auth/login" variant="secondary" size="lg" className="w-full justify-center">
+                  <Button href="https://members.nabdtraining.com/" variant="secondary" size="lg" className="w-full justify-center">
                     تسجيل دخول
                   </Button>
-                  <Button href="/auth/register" size="lg" className="w-full justify-center">
+                  <Button href="https://members.nabdtraining.com/" size="lg" className="w-full justify-center">
                     سجّل الآن
                   </Button>
                 </>
