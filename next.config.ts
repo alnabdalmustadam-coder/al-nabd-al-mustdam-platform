@@ -17,6 +17,19 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async headers() {
+    return [
+      {
+        source: "/api/auth/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "https://register.nabdtraining.com" },
+          { key: "Access-Control-Allow-Methods", value: "GET, POST, OPTIONS" },
+          { key: "Access-Control-Allow-Headers", value: "Content-Type" },
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
