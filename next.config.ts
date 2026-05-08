@@ -7,12 +7,12 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/auth/login',
-        destination: 'https://members.nabdtraining.com/',
+        destination: 'https://register.nabdtraining.com/register-page',
         permanent: true,
       },
       {
         source: '/auth/register',
-        destination: 'https://members.nabdtraining.com/',
+        destination: 'https://register.nabdtraining.com/register-page',
         permanent: true,
       },
     ];
