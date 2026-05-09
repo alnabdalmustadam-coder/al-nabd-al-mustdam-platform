@@ -14,10 +14,10 @@ export async function OPTIONS() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { fullName, email, phone, password, nationalId } = body;
+    const { fullName, email, phone, nationalId } = body;
 
     // Validation
-    if (!fullName || !email || !phone || !password) {
+    if (!fullName || !email || !phone) {
       return NextResponse.json(
         { message: "جميع الحقول مطلوبة" },
         { status: 400, headers: CORS }
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
         const portalRes = await fetch(
           `https://services.leadconnectorhq.com/contacts/${contactId}/memberships`,
           {
-            method: "POST", 
+            method: "POST",
             headers: {
               Authorization: `Bearer ${GHL_KEY}`,
               "Content-Type": "application/json",
@@ -102,7 +102,6 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               locationId: process.env.GHL_LOCATION_ID,
               email: email,
-              password: password,
             }),
           }
         );
