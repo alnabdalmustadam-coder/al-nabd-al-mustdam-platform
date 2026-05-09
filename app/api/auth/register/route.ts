@@ -85,6 +85,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const contactId = contactData?.contact?.id;
+
+    // منح portal access
+    if (contactId) {
+      try {
+        const portalRes = await fetch(
+          `https://services.leadconnectorhq.com/contacts/${contactId}/memberships`,
+          {
+            method: "POST", 
+            headers: {
+              Authorization: `Bearer ${GHL_KEY}`,
+              "Content-Type": "application/json",
+              "Version": "2021-07-28",
+            },
+            body: JSON.stringify({
+              locationId: process.env.GHL_LOCATION_ID,
+              email: email,
+              password: password,
+            }),
+          }
+        );
+        console.log("Portal Access Status:", portalRes.status);
+      } catch (portalErr) {
+        console.error("Portal access error:", portalErr);
+      }
+    }
+
     // إيميل ترحيب (اختياري - لو فشل مش مشكلة)
     try {
       const transporter = nodemailer.createTransport({
