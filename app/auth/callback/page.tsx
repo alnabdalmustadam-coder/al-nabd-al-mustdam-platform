@@ -8,27 +8,34 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function AuthCallback() {
+export default function AuthCallbackPage() {
   useEffect(() => {
-    async function init() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        window.location.href =
-          "https://register.nabdtraining.com/register-page?error=no_session";
-        return;
-      }
-
+    async function handleAuth() {
       try {
-        const res = await fetch("/api/auth/finalize-login", {
+        // يقرأ access_token من URL تلقائياً
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.user) {
+          window.location.href =
+            "https://register.nabdtraining.com/register-page?error=no_session";
+          return;
+        }
+
+        // أرسل بيانات المستخدم للسيرفر
+        const res = await fetch("/api/auth/google-complete", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            access_token: session.access_token,
+            userId: session.user.id,
+            email: session.user.email,
+            fullName:
+              session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              "",
           }),
         });
 
@@ -37,28 +44,27 @@ export default function AuthCallback() {
         if (data.redirectUrl) {
           window.location.href = data.redirectUrl;
         } else {
-          window.location.href =
-            "https://members.nabdtraining.com";
+          window.location.href = "https://members.nabdtraining.com";
         }
-      } catch (e) {
-        console.error(e);
-
+      } catch (err) {
+        console.error(err);
         window.location.href =
-          "https://members.nabdtraining.com";
+          "https://register.nabdtraining.com/register-page?error=server_error";
       }
     }
 
-    init();
+    handleAuth();
   }, []);
 
   return (
     <div
       style={{
+        height: "100vh",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: "100vh",
         fontFamily: "sans-serif",
+        direction: "rtl",
       }}
     >
       جاري تسجيل الدخول...
