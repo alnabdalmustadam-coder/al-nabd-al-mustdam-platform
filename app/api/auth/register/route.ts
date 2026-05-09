@@ -45,27 +45,31 @@ export async function POST(req: NextRequest) {
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(" ") || "-";
 
-    // إنشاء Contact في GHL
+    // إنشاء Contact في GHL - API v2
     const contactBody: Record<string, any> = {
       firstName,
       lastName,
       email,
       phone,
+      locationId: process.env.GHL_LOCATION_ID,
     };
 
     const NID_FIELD = process.env.GHL_NATIONAL_ID_FIELD_ID;
     if (nationalId && NID_FIELD) {
-      contactBody.customField = [{ id: NID_FIELD, value: nationalId }];
+      // API v2 format for custom fields
+      contactBody.customFields = [{ id: NID_FIELD, value: nationalId }];
       contactBody.tags = ["nelc-eligible"];
     }
 
     console.log("Creating GHL contact:", JSON.stringify({ firstName, email }));
 
-    const contactRes = await fetch("https://rest.gohighlevel.com/v1/contacts/", {
+    // ✅ API v2 endpoint
+    const contactRes = await fetch("https://services.leadconnectorhq.com/contacts/", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${GHL_KEY}`,
         "Content-Type": "application/json",
+        "Version": "2021-07-28",
       },
       body: JSON.stringify(contactBody),
     });
