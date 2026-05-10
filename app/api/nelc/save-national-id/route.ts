@@ -38,26 +38,26 @@ export async function POST(req: NextRequest) {
     }
 
     // Upsert into profiles — save National ID linked to email
+    // Note: We use email as the conflict target. If id is required, this might fail unless id has a default or is nullable.
     const { error } = await supabase.from("profiles").upsert(
       {
         email: email.toLowerCase().trim(),
         national_id: nationalId,
         nelc_eligible: true,
-        updated_at: new Date().toISOString(),
       },
       { onConflict: "email" }
     );
 
     if (error) {
-      console.error("Supabase save-national-id error:", error);
+      console.error("Supabase save-national-id error detail:", JSON.stringify(error));
       return NextResponse.json(
-        { success: false, message: "Database error" },
+        { success: false, message: "Database error", detail: error.message },
         { status: 500, headers: CORS }
       );
     }
 
     console.log(`NELC: National ID saved for ${email}`);
-    return NextResponse.json({ success: true }, { headers: CORS });
+    return NextResponse.json({ success: true, message: "Saved successfully" }, { headers: CORS });
   } catch (err: any) {
     console.error("save-national-id error:", err);
     return NextResponse.json(
