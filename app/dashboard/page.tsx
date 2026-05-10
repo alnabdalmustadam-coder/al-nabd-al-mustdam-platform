@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download, LogOut } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
@@ -37,6 +37,58 @@ export default function DashboardPage() {
   const userName = session?.user?.name || "متدرب النبض المستدام";
   const userEmail = session?.user?.email || "khalid@example.com";
   const userImage = session?.user?.image || "";
+  const userId = session?.user?.id || "";
+
+  // State for profile editing
+  const [profileName, setProfileName] = useState(userName);
+  const [profilePhone, setProfilePhone] = useState("");
+  const [profileNationalId, setProfileNationalId] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
+
+  useEffect(() => {
+    async function fetchProfile() {
+      if (!userId) return;
+      const res = await fetch(`/api/auth/get-profile?userId=${userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.profile) {
+          if (data.profile.phone) setProfilePhone(data.profile.phone);
+          if (data.profile.national_id) setProfileNationalId(data.profile.national_id);
+          if (data.profile.full_name) setProfileName(data.profile.full_name);
+        }
+      }
+    }
+    fetchProfile();
+  }, [userId]);
+
+  const handleUpdateProfile = async () => {
+    setIsSaving(true);
+    setSaveMessage("");
+    try {
+      const res = await fetch("/api/auth/update-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          fullName: profileName,
+          phone: profilePhone,
+          nationalId: profileNationalId,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSaveMessage("تم الحفظ بنجاح!");
+      } else {
+        setSaveMessage(data.message || "حدث خطأ أثناء الحفظ");
+      }
+    } catch (err) {
+      setSaveMessage("تعذر الاتصال بالخادم");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const firstLetter = userName.charAt(0) || "م";
 
   return (
@@ -198,16 +250,32 @@ export default function DashboardPage() {
               <div className="bg-white border border-slate-200 shadow-sm p-8 rounded-[24px]">
                 <h2 className="text-2xl font-black text-slate-900 mb-8 border-b border-slate-100 pb-4">الملف الشخصي</h2>
                 <div className="space-y-6 max-w-xl">
+                  {saveMessage && (
+                    <div className={`p-4 rounded-xl text-sm font-bold ${saveMessage.includes('بنجاح') ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                      {saveMessage}
+                    </div>
+                  )}
                   <div>
                     <label htmlFor="profile-name" className="text-sm font-bold text-slate-700 block mb-2">الاسم الكامل</label>
-                    <input id="profile-name" defaultValue={userName} className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" />
+                    <input id="profile-name" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" />
                   </div>
                   <div>
                     <label htmlFor="profile-email" className="text-sm font-bold text-slate-700 block mb-2">البريد الإلكتروني</label>
                     <input id="profile-email" defaultValue={userEmail} readOnly disabled className="w-full px-5 py-3.5 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 focus:outline-none text-base font-medium cursor-not-allowed" dir="ltr" />
                   </div>
-                  <button className="px-8 py-3.5 rounded-2xl bg-[#173A7C] text-white text-base font-bold cursor-pointer hover:bg-[#1E4D9D] transition-all shadow-md shadow-[#173A7C]/20 mt-4">
-                    حفظ التغييرات
+                  <div>
+                    <label htmlFor="profile-phone" className="text-sm font-bold text-slate-700 block mb-2">رقم الجوال <span className="text-slate-400 font-normal">(اختياري)</span></label>
+                    <input id="profile-phone" value={profilePhone} onChange={(e) => setProfilePhone(e.target.value)} placeholder="05XXXXXXXX" className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" dir="ltr" />
+                  </div>
+                  <div className="bg-blue-50/50 border border-blue-100 p-5 rounded-2xl">
+                    <label htmlFor="profile-national-id" className="text-sm font-bold text-[#173A7C] block mb-2">رقم الهوية الوطنية / الإقامة <span className="text-slate-400 font-normal">(اختياري)</span></label>
+                    <input id="profile-national-id" value={profileNationalId} onChange={(e) => setProfileNationalId(e.target.value)} placeholder="1XXXXXXXXX" className="w-full px-5 py-3.5 rounded-xl bg-white border border-blue-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] outline-none text-base font-medium mb-2" dir="ltr" />
+                    <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                      * إدخال رقم الهوية ورقم الجوال مطلوب <strong className="text-slate-700">فقط</strong> إذا كنت ترغب في الحصول على شهادات معتمدة من المركز الوطني للتعليم الإلكتروني (NELC).
+                    </p>
+                  </div>
+                  <button onClick={handleUpdateProfile} disabled={isSaving} className="px-8 py-3.5 rounded-2xl bg-[#173A7C] text-white text-base font-bold cursor-pointer hover:bg-[#1E4D9D] transition-all shadow-md shadow-[#173A7C]/20 mt-4 disabled:opacity-70">
+                    {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
                   </button>
                 </div>
               </div>

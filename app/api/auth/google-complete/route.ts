@@ -47,32 +47,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    let redirectUrl = "https://members.nabdtraining.com";
-
-    // إنشاء Magic Link
-    if (ghlContactId) {
-      const magicRes = await fetch(
-        "https://services.leadconnectorhq.com/client-portal/magic-links",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.GHL_API_KEY}`,
-            "Content-Type": "application/json",
-            Version: "2021-07-28",
-          },
-          body: JSON.stringify({
-            contactId: ghlContactId,
-            locationId: process.env.GHL_LOCATION_ID,
-          }),
-        }
-      );
-
-      const magicData = await magicRes.json();
-
-      if (magicData?.link) {
-        redirectUrl = magicData.link;
-      }
-    }
+    let redirectUrl = "/dashboard";
 
     return NextResponse.json({
       success: true,

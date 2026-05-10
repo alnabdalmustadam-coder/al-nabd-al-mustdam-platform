@@ -6,13 +6,13 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: '/auth/login',
-        destination: 'https://register.nabdtraining.com/register-page',
+        source: "/auth/login",
+        destination: "https://members.nabdtraining.com/login",
         permanent: true,
       },
       {
-        source: '/auth/register',
-        destination: 'https://register.nabdtraining.com/register-page',
+        source: "/auth/register",
+        destination: "https://members.nabdtraining.com/login",
         permanent: true,
       },
     ];
@@ -22,10 +22,26 @@ const nextConfig: NextConfig = {
       {
         source: "/api/auth/:path*",
         headers: [
-          { key: "Access-Control-Allow-Origin", value: "https://register.nabdtraining.com" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
           { key: "Access-Control-Allow-Methods", value: "GET, POST, OPTIONS" },
           { key: "Access-Control-Allow-Headers", value: "Content-Type" },
           { key: "Access-Control-Allow-Credentials", value: "true" },
+        ],
+      },
+      {
+        source: "/api/nelc/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Methods", value: "POST, OPTIONS" },
+          { key: "Access-Control-Allow-Headers", value: "Content-Type" },
+        ],
+      },
+      {
+        source: "/api/webhooks/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Methods", value: "POST, OPTIONS" },
+          { key: "Access-Control-Allow-Headers", value: "Content-Type" },
         ],
       },
     ];

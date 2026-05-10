@@ -44,7 +44,7 @@ export default function AuthCallbackPage() {
         if (data.redirectUrl) {
           window.location.href = data.redirectUrl;
         } else {
-          window.location.href = "https://members.nabdtraining.com";
+          window.location.href = "/dashboard";
         }
       } catch (err) {
         console.error(err);

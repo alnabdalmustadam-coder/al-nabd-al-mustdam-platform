@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      redirectUrl: "https://members.nabdtraining.com",
+      redirectUrl: "/dashboard",
     });
   } catch (e) {
     console.error(e);

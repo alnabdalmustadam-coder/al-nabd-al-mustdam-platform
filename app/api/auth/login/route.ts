@@ -40,33 +40,8 @@ export async function POST(req: NextRequest) {
       .eq("id", authData.user.id)
       .single();
 
-    // 3. اطلب Magic Link من GHL
-    let redirectUrl = "https://members.nabdtraining.com";
-
-    if (profile?.ghl_contact_id) {
-      try {
-        const magicRes = await fetch(
-          "https://services.leadconnectorhq.com/client-portal/magic-links",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${process.env.GHL_API_KEY}`,
-              "Content-Type": "application/json",
-              Version: "2021-07-28",
-            },
-            body: JSON.stringify({
-              contactId: profile.ghl_contact_id,
-              locationId: process.env.GHL_LOCATION_ID,
-            }),
-          }
-        );
-        const magicData = await magicRes.json();
-        console.log("Magic Link Response:", JSON.stringify(magicData));
-        if (magicData?.link) redirectUrl = magicData.link;
-      } catch (magicErr) {
-        console.error("Magic link error (non-fatal):", magicErr);
-      }
-    }
+    // 3. توجيه المستخدم للداشبورد مباشرة
+    let redirectUrl = "/dashboard";
 
     return NextResponse.json(
       { success: true, redirectUrl },
