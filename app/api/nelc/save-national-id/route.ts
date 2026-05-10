@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import crypto from "crypto";
 
 /**
  * POST /api/nelc/save-national-id
@@ -37,21 +38,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Upsert into profiles — save National ID linked to email
-    // Note: We use email as the conflict target. If id is required, this might fail unless id has a default or is nullable.
-    const { error } = await supabase.from("profiles").upsert(
-      {
-        email: email.toLowerCase().trim(),
-        national_id: nationalId,
-        nelc_eligible: true,
-      },
-      { onConflict: "email" }
-    );
+    // 1. Check if profile exists by email
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("email", email.toLowerCase().trim())
+      .single();
 
-    if (error) {
-      console.error("Supabase save-national-id error detail:", JSON.stringify(error));
+    let result;
+
+    if (existingProfile) {
+      // 2. Update existing profile
+      result = await supabase
+        .from("profiles")
+        .update({
+          national_id: nationalId,
+          nelc_eligible: true,
+        })
+        .eq("email", email.toLowerCase().trim());
+    } else {
+      // 3. Create new profile with a generated UUID
+      // We use crypto.randomUUID() or a similar method if available, 
+      // but since we are in Node/Next.js, we can use a library or just let Supabase handle it if possible.
+      // However, to be safe with the PK constraint, we generate one.
+      const tempId = crypto.randomUUID();
+      result = await supabase
+        .from("profiles")
+        .insert({
+          id: tempId,
+          email: email.toLowerCase().trim(),
+          national_id: nationalId,
+          nelc_eligible: true,
+        });
+    }
+
+    if (result.error) {
+      console.error("Supabase save-national-id error detail:", JSON.stringify(result.error));
       return NextResponse.json(
-        { success: false, message: "Database error", detail: error.message },
+        { success: false, message: "Database error", detail: result.error.message },
         { status: 500, headers: CORS }
       );
     }
