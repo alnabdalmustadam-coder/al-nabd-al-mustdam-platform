@@ -13,11 +13,13 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, fullName, phone, nationalId } = await req.json();
+    const { email, userId, fullName, phone, nationalId } = await req.json();
 
-    if (!userId) {
+    // Support both email and userId as identifiers
+    const identifier = email || userId;
+    if (!identifier) {
       return NextResponse.json(
-        { message: "المستخدم غير موجود" },
+        { message: "البريد الإلكتروني أو معرّف المستخدم مطلوب" },
         { status: 400, headers: CORS }
       );
     }
@@ -29,40 +31,59 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Update Supabase
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({
-        full_name: fullName,
-        phone: phone || null,
-        national_id: nationalId || null,
-        nelc_eligible: !!nationalId,
-      })
-      .eq("id", userId);
+    // Determine which field to match on
+    const matchField = email ? "email" : "id";
+    const matchValue = email ? email.toLowerCase().trim() : userId;
 
-    if (updateError) {
-      throw updateError;
+    // Check if profile exists
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("id, ghl_contact_id")
+      .eq(matchField, matchValue)
+      .maybeSingle();
+
+    let result;
+
+    if (existingProfile) {
+      // Update existing profile
+      result = await supabase
+        .from("profiles")
+        .update({
+          full_name: fullName || undefined,
+          phone: phone || null,
+          national_id: nationalId || null,
+          nelc_eligible: !!nationalId,
+        })
+        .eq(matchField, matchValue);
+    } else if (email) {
+      // Create new profile if searching by email
+      const crypto = await import("crypto");
+      result = await supabase
+        .from("profiles")
+        .insert({
+          id: crypto.randomUUID(),
+          email: email.toLowerCase().trim(),
+          full_name: fullName || null,
+          phone: phone || null,
+          national_id: nationalId || null,
+          nelc_eligible: !!nationalId,
+        });
+    } else {
+      return NextResponse.json(
+        { message: "البروفايل غير موجود" },
+        { status: 404, headers: CORS }
+      );
     }
 
-    // We can also optionally update GHL contact if needed, but for now we just update our DB.
-    // If you need to update GHL, we'd fetch the ghl_contact_id first.
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("ghl_contact_id")
-      .eq("id", userId)
-      .single();
+    if (result?.error) {
+      throw result.error;
+    }
 
-    if (profile?.ghl_contact_id) {
+    // Optionally update GHL contact
+    if (existingProfile?.ghl_contact_id) {
       try {
-        const customFields = [];
-        if (nationalId) {
-            // we will need the actual custom field ID here if we want to update it via API
-            // but we can also just update tags.
-            customFields.push({ id: "Z9wz4Vn0yJq0c2eO8H4y", key: "contact.national_id", field_value: nationalId });
-        }
-
         await fetch(
-          `https://services.leadconnectorhq.com/contacts/${profile.ghl_contact_id}`,
+          `https://services.leadconnectorhq.com/contacts/${existingProfile.ghl_contact_id}`,
           {
             method: "PUT",
             headers: {
@@ -71,11 +92,10 @@ export async function POST(req: NextRequest) {
               Version: "2021-07-28",
             },
             body: JSON.stringify({
-              firstName: fullName.split(" ")[0],
-              lastName: fullName.split(" ").slice(1).join(" ") || "-",
+              firstName: fullName?.split(" ")[0],
+              lastName: fullName?.split(" ").slice(1).join(" ") || "-",
               phone: phone || undefined,
               tags: nationalId ? ["website-registered", "nelc-eligible"] : ["website-registered"],
-              // customFields: customFields
             }),
           }
         );
@@ -88,7 +108,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("Update profile error:", err);
     return NextResponse.json(
-      { message: "حدث خطأ في الخادم" },
+      { message: "حدث خطأ في الخادم", detail: err.message },
       { status: 500, headers: CORS }
     );
   }

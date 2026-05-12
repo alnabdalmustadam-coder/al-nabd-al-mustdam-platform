@@ -3,19 +3,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download, LogOut } from "lucide-react";
-import { useSession, signOut } from "next-auth/react";
 
 const sidebarLinks = [
   { key: "courses", label: "دوراتي", icon: BookOpen },
   { key: "certificates", label: "شهاداتي", icon: Award },
   { key: "profile", label: "ملفي", icon: User },
   { key: "settings", label: "الإعدادات", icon: Settings },
-];
-
-const enrolledCourses = [
-  { title: "استخدام الحاسب الآلي في الأعمال المكتبية", progress: 75, lastLesson: "الدرس 24: الرسوم البيانية في Excel", image: "" },
-  { title: "دورات ادخال بيانات ومعالجة نصوص", progress: 30, lastLesson: "الدرس 14: تنسيق المستندات المتقدم", image: "" },
-  { title: "دورة اللغة الانجليزية", progress: 10, lastLesson: "الدرس 4: المحادثات اليومية", image: "" },
 ];
 
 const certificates = [
@@ -32,37 +25,93 @@ const activities = [
 export default function DashboardPage() {
   const [activeSection, setActiveSection] = useState("courses");
   const [imgError, setImgError] = useState(false);
-  const { data: session } = useSession();
 
-  const userName = session?.user?.name || "متدرب النبض المستدام";
-  const userEmail = session?.user?.email || "khalid@example.com";
-  const userImage = session?.user?.image || "";
-  const userId = session?.user?.id || "";
-
-  // State for profile editing
-  const [profileName, setProfileName] = useState(userName);
+  // Email-based auth (replaces next-auth)
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userName, setUserName] = useState("متدرب النبض المستدام");
   const [profilePhone, setProfilePhone] = useState("");
   const [profileNationalId, setProfileNationalId] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
+  const [showIdentityGate, setShowIdentityGate] = useState(false);
+  const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+  // 1. Check for email on mount (from URL param or localStorage)
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const emailFromUrl = params.get("email");
+
+    if (emailFromUrl) {
+      const clean = emailFromUrl.toLowerCase().trim();
+      localStorage.setItem("nabd_user_email", clean);
+      setUserEmail(clean);
+      // Clean URL
+      window.history.replaceState({}, "", "/dashboard");
+    } else {
+      const stored = localStorage.getItem("nabd_user_email");
+      if (stored) {
+        setUserEmail(stored);
+      } else {
+        // No email found — redirect to GHL login
+        window.location.href = "https://members.nabdtraining.com/login";
+        return;
+      }
+    }
+    setIsCheckingAuth(false);
+  }, []);
+
+  // 2. Fetch profile when email is available
+  useEffect(() => {
+    if (!userEmail) return;
     async function fetchProfile() {
-      if (!userId) return;
-      const res = await fetch(`/api/auth/get-profile?userId=${userId}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.profile) {
-          if (data.profile.phone) setProfilePhone(data.profile.phone);
-          if (data.profile.national_id) setProfileNationalId(data.profile.national_id);
-          if (data.profile.full_name) setProfileName(data.profile.full_name);
+      try {
+        const res = await fetch(`/api/auth/get-profile?email=${encodeURIComponent(userEmail!)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.profile) {
+            if (data.profile.full_name) setUserName(data.profile.full_name);
+            if (data.profile.phone) setProfilePhone(data.profile.phone);
+            if (data.profile.national_id) {
+              setProfileNationalId(data.profile.national_id);
+              setShowIdentityGate(false);
+            } else {
+              setShowIdentityGate(true);
+            }
+          } else {
+            setShowIdentityGate(true);
+          }
         }
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
       }
     }
     fetchProfile();
-  }, [userId]);
+  }, [userEmail]);
+
+  // 3. Fetch courses when email is available
+  useEffect(() => {
+    if (!userEmail) return;
+    async function fetchCourses() {
+      setIsLoadingCourses(true);
+      try {
+        const res = await fetch(`/api/ghl/get-courses?email=${encodeURIComponent(userEmail!)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setEnrolledCourses(data.courses || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch courses");
+      } finally {
+        setIsLoadingCourses(false);
+      }
+    }
+    fetchCourses();
+  }, [userEmail]);
 
   const handleUpdateProfile = async () => {
+    if (!userEmail) return;
     setIsSaving(true);
     setSaveMessage("");
     try {
@@ -70,8 +119,8 @@ export default function DashboardPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId,
-          fullName: profileName,
+          email: userEmail,
+          fullName: userName,
           phone: profilePhone,
           nationalId: profileNationalId,
         }),
@@ -79,6 +128,7 @@ export default function DashboardPage() {
       const data = await res.json();
       if (res.ok) {
         setSaveMessage("تم الحفظ بنجاح!");
+        setShowIdentityGate(false);
       } else {
         setSaveMessage(data.message || "حدث خطأ أثناء الحفظ");
       }
@@ -89,7 +139,22 @@ export default function DashboardPage() {
     }
   };
 
-  const firstLetter = userName.charAt(0) || "م";
+  const handleLogout = () => {
+    localStorage.removeItem("nabd_user_email");
+    window.location.href = "https://members.nabdtraining.com/login";
+  };
+
+  // Loading state while checking auth
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[#173A7C] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-500 font-medium">جاري التحقق...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-28 pb-20 bg-slate-50">
@@ -98,22 +163,15 @@ export default function DashboardPage() {
           {/* Sidebar */}
           <aside className="w-full lg:w-72 shrink-0">
             <div className="bg-white border border-slate-200 shadow-sm rounded-[24px] p-6 sticky top-28">
-              {/* User Info */}
               <div className="flex items-center gap-4 mb-6 border-b border-slate-100 pb-6">
-                {userImage && !imgError ? (
-                  <img src={userImage} alt={userName} onError={() => setImgError(true)} className="w-14 h-14 rounded-full border border-slate-200 shadow-sm" />
-                ) : (
-                  <div className="w-14 h-14 rounded-full bg-[#173A7C]/5 border border-[#173A7C]/10 flex items-center justify-center text-[#173A7C]">
-                    <User className="w-7 h-7" />
-                  </div>
-                )}
+                <div className="w-14 h-14 rounded-full bg-[#173A7C]/5 border border-[#173A7C]/10 flex items-center justify-center text-[#173A7C]">
+                  <User className="w-7 h-7" />
+                </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">{userName}</h3>
                   <p className="text-sm font-medium text-slate-500">متدرب</p>
                 </div>
               </div>
-
-              {/* Nav */}
               <nav className="space-y-2">
                 {sidebarLinks.map((link) => {
                   const Icon = link.icon;
@@ -133,15 +191,13 @@ export default function DashboardPage() {
                   );
                 })}
               </nav>
-              {session && (
-                <button
-                  onClick={() => signOut({ callbackUrl: "/auth/login" })}
-                  className="w-full mt-6 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-red-100 text-red-600 bg-red-50 hover:bg-red-100 text-sm font-bold transition-all cursor-pointer"
-                >
-                  <LogOut className="w-5 h-5" />
-                  تسجيل الخروج
-                </button>
-              )}
+              <button
+                onClick={handleLogout}
+                className="w-full mt-6 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-red-100 text-red-600 bg-red-50 hover:bg-red-100 text-sm font-bold transition-all cursor-pointer"
+              >
+                <LogOut className="w-5 h-5" />
+                تسجيل الخروج
+              </button>
             </div>
           </aside>
 
@@ -178,40 +234,93 @@ export default function DashboardPage() {
             {/* Courses Section */}
             {activeSection === "courses" && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-black text-slate-900 mb-6">دوراتي المسجلة</h2>
-                {enrolledCourses.map((c, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="bg-white border border-slate-200 shadow-sm p-6 rounded-[24px] flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:shadow-md transition-shadow group cursor-pointer"
-                  >
-                    <div className="w-16 h-16 rounded-[20px] bg-[#173A7C]/5 flex items-center justify-center shrink-0 group-hover:bg-[#173A7C] transition-colors">
-                      <BookOpen className="w-8 h-8 text-[#173A7C] group-hover:text-white transition-colors" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-slate-900 text-lg mb-2 truncate">{c.title}</h3>
-                      <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5 mb-3">
-                        <Clock className="w-4 h-4" /> {c.lastLesson}
-                      </p>
-                      {/* Progress Bar */}
-                      <div className="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden border border-slate-200/50">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${c.progress}%` }}
-                          transition={{ duration: 1, delay: 0.3 }}
-                          className="h-full rounded-full bg-[#173A7C]"
-                        />
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-black text-slate-900">دوراتي المسجلة</h2>
+                  {(showIdentityGate || isLoadingCourses) && (
+                    <span className="px-4 py-1.5 bg-amber-50 text-amber-600 text-xs font-bold rounded-full border border-amber-100 flex items-center gap-2">
+                      <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                      {isLoadingCourses ? "جاري جلب الدورات..." : "مطلوب توثيق الهوية"}
+                    </span>
+                  )}
+                </div>
+
+                {isLoadingCourses ? (
+                  <div className="grid gap-6">
+                    {[1, 2].map((i) => (
+                      <div key={i} className="bg-white border border-slate-200 p-6 rounded-[24px] animate-pulse">
+                        <div className="flex items-center gap-6">
+                          <div className="w-16 h-16 bg-slate-100 rounded-[20px]" />
+                          <div className="flex-1">
+                            <div className="h-4 bg-slate-100 rounded w-1/2 mb-3" />
+                            <div className="h-3 bg-slate-50 rounded w-1/4" />
+                          </div>
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                ) : showIdentityGate ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-white border-2 border-dashed border-[#173A7C]/20 rounded-[32px] p-10 text-center"
+                  >
+                    <div className="w-20 h-20 bg-[#173A7C]/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Award className="w-10 h-10 text-[#173A7C]" />
                     </div>
-                    <div className="text-center shrink-0 min-w-16">
-                      <div className="text-2xl font-black text-[#173A7C] font-sora">{c.progress}%</div>
-                      <div className="text-xs font-bold text-slate-400">مكتمل</div>
-                    </div>
-                    <ChevronLeft className="w-5 h-5 text-slate-300 shrink-0 hidden sm:block rtl:rotate-180" />
+                    <h3 className="text-xl font-black text-slate-900 mb-3">توثيق الهوية الوطنية مطلوب</h3>
+                    <p className="text-slate-500 max-w-md mx-auto mb-8 font-medium leading-relaxed">
+                      بناءً على تعليمات المركز الوطني للتعلم الإلكتروني (NELC)، يجب توثيق رقم الهوية الوطنية للتمكن من دخول الدورات والحصول على الشهادات المعتمدة.
+                    </p>
+                    <button
+                      onClick={() => setActiveSection("profile")}
+                      className="px-10 py-4 bg-[#173A7C] text-white rounded-2xl font-black hover:bg-[#1E4D9D] transition-all shadow-lg shadow-[#173A7C]/20 cursor-pointer"
+                    >
+                      توثيق الهوية الآن
+                    </button>
                   </motion.div>
-                ))}
+                ) : enrolledCourses.length === 0 ? (
+                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-[32px] p-16 text-center">
+                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <BookOpen className="w-10 h-10 text-slate-300" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد دورات مسجلة بعد</h3>
+                    <p className="text-slate-500 font-medium">ابدأ رحلتك التعليمية واشترك في إحدى دوراتنا المتميزة.</p>
+                  </div>
+                ) : (
+                  enrolledCourses.map((c, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="bg-white border border-slate-200 shadow-sm p-6 rounded-[24px] flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:shadow-md transition-shadow group cursor-pointer"
+                      onClick={() => window.open('https://members.nabdtraining.com', '_blank')}
+                    >
+                      <div className="w-16 h-16 rounded-[20px] bg-[#173A7C]/5 flex items-center justify-center shrink-0 group-hover:bg-[#173A7C] transition-colors">
+                        <BookOpen className="w-8 h-8 text-[#173A7C] group-hover:text-white transition-colors" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-slate-900 text-lg mb-2 truncate">{c.title}</h3>
+                        <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5 mb-3">
+                          <Clock className="w-4 h-4" /> اضغط للبدء في التعلم
+                        </p>
+                        <div className="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden border border-slate-200/50">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `10%` }}
+                            transition={{ duration: 1, delay: 0.3 }}
+                            className="h-full rounded-full bg-[#173A7C]"
+                          />
+                        </div>
+                      </div>
+                      <div className="text-center shrink-0 min-w-16">
+                        <div className="text-2xl font-black text-[#173A7C] font-sora">10%</div>
+                        <div className="text-xs font-bold text-slate-400">مكتمل</div>
+                      </div>
+                      <ChevronLeft className="w-5 h-5 text-slate-300 shrink-0 hidden sm:block rtl:rotate-180" />
+                    </motion.div>
+                  ))
+                )}
               </div>
             )}
 
@@ -257,21 +366,28 @@ export default function DashboardPage() {
                   )}
                   <div>
                     <label htmlFor="profile-name" className="text-sm font-bold text-slate-700 block mb-2">الاسم الكامل</label>
-                    <input id="profile-name" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" />
+                    <input id="profile-name" value={userName} onChange={(e) => setUserName(e.target.value)} className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" />
                   </div>
                   <div>
                     <label htmlFor="profile-email" className="text-sm font-bold text-slate-700 block mb-2">البريد الإلكتروني</label>
-                    <input id="profile-email" defaultValue={userEmail} readOnly disabled className="w-full px-5 py-3.5 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 focus:outline-none text-base font-medium cursor-not-allowed" dir="ltr" />
+                    <input id="profile-email" defaultValue={userEmail || ""} readOnly disabled className="w-full px-5 py-3.5 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 focus:outline-none text-base font-medium cursor-not-allowed" dir="ltr" />
                   </div>
                   <div>
                     <label htmlFor="profile-phone" className="text-sm font-bold text-slate-700 block mb-2">رقم الجوال <span className="text-slate-400 font-normal">(اختياري)</span></label>
                     <input id="profile-phone" value={profilePhone} onChange={(e) => setProfilePhone(e.target.value)} placeholder="05XXXXXXXX" className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" dir="ltr" />
                   </div>
-                  <div className="bg-blue-50/50 border border-blue-100 p-5 rounded-2xl">
-                    <label htmlFor="profile-national-id" className="text-sm font-bold text-[#173A7C] block mb-2">رقم الهوية الوطنية / الإقامة <span className="text-slate-400 font-normal">(اختياري)</span></label>
-                    <input id="profile-national-id" value={profileNationalId} onChange={(e) => setProfileNationalId(e.target.value)} placeholder="1XXXXXXXXX" className="w-full px-5 py-3.5 rounded-xl bg-white border border-blue-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] outline-none text-base font-medium mb-2" dir="ltr" />
-                    <p className="text-xs font-medium text-slate-500 leading-relaxed">
-                      * إدخال رقم الهوية ورقم الجوال مطلوب <strong className="text-slate-700">فقط</strong> إذا كنت ترغب في الحصول على شهادات معتمدة من المركز الوطني للتعليم الإلكتروني (NELC).
+                  <div className={`p-5 rounded-2xl border transition-all ${showIdentityGate ? 'bg-amber-50 border-amber-200 animate-pulse' : 'bg-blue-50/50 border-blue-100'}`}>
+                    <label htmlFor="profile-national-id" className={`text-sm font-bold block mb-2 ${showIdentityGate ? 'text-amber-700' : 'text-[#173A7C]'}`}>رقم الهوية الوطنية / الإقامة <span className="text-red-500">*</span></label>
+                    <input
+                      id="profile-national-id"
+                      value={profileNationalId}
+                      onChange={(e) => setProfileNationalId(e.target.value)}
+                      placeholder="1XXXXXXXXX"
+                      className={`w-full px-5 py-3.5 rounded-xl bg-white border outline-none text-base font-medium mb-2 ${showIdentityGate ? 'border-amber-300 focus:border-amber-500' : 'border-blue-200 focus:border-[#173A7C]'}`}
+                      dir="ltr"
+                    />
+                    <p className={`text-xs font-medium leading-relaxed ${showIdentityGate ? 'text-amber-600' : 'text-slate-500'}`}>
+                      * إدخال رقم الهوية الوطنية <strong className="text-slate-900">إلزامي</strong> وفقاً لمتطلبات المركز الوطني للتعلم الإلكتروني (NELC) لاعتماد شهادتك.
                     </p>
                   </div>
                   <button onClick={handleUpdateProfile} disabled={isSaving} className="px-8 py-3.5 rounded-2xl bg-[#173A7C] text-white text-base font-bold cursor-pointer hover:bg-[#1E4D9D] transition-all shadow-md shadow-[#173A7C]/20 mt-4 disabled:opacity-70">

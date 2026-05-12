@@ -1,59 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
+/**
+ * صفحة callback قديمة — الآن التسجيل يتم عبر GHL Client Portal.
+ * هذه الصفحة تعيد التوجيه فقط.
+ */
 export default function AuthCallbackPage() {
   useEffect(() => {
-    async function handleAuth() {
-      try {
-        // يقرأ access_token من URL تلقائياً
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session?.user) {
-          window.location.href =
-            "https://register.nabdtraining.com/register-page?error=no_session";
-          return;
-        }
-
-        // أرسل بيانات المستخدم للسيرفر
-        const res = await fetch("/api/auth/google-complete", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: session.user.id,
-            email: session.user.email,
-            fullName:
-              session.user.user_metadata?.full_name ||
-              session.user.user_metadata?.name ||
-              "",
-          }),
-        });
-
-        const data = await res.json();
-
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl;
-        } else {
-          window.location.href = "/dashboard";
-        }
-      } catch (err) {
-        console.error(err);
-        window.location.href =
-          "https://register.nabdtraining.com/register-page?error=server_error";
-      }
-    }
-
-    handleAuth();
+    window.location.href = "https://members.nabdtraining.com/login";
   }, []);
 
   return (
@@ -67,7 +22,7 @@ export default function AuthCallbackPage() {
         direction: "rtl",
       }}
     >
-      جاري تسجيل الدخول...
+      جاري إعادة التوجيه...
     </div>
   );
 }
