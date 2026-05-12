@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     if (!email || !nationalId) {
       return NextResponse.json(
-        { success: false, message: "email and nationalId are required" },
+        { success: false, message: "Email and National ID are required" },
         { status: 400, headers: CORS }
       );
     }
@@ -38,12 +38,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+
     // 1. Check if profile exists by email
     const { data: existingProfile } = await supabase
       .from("profiles")
       .select("id")
-      .eq("email", email.toLowerCase().trim())
-      .single();
+      .eq("email", cleanEmail)
+      .maybeSingle();
 
     let result;
 
@@ -55,37 +57,40 @@ export async function POST(req: NextRequest) {
           national_id: nationalId,
           nelc_eligible: true,
         })
-        .eq("email", email.toLowerCase().trim());
+        .eq("email", cleanEmail);
     } else {
-      // 3. Create new profile with a generated UUID
-      // We use crypto.randomUUID() or a similar method if available, 
-      // but since we are in Node/Next.js, we can use a library or just let Supabase handle it if possible.
-      // However, to be safe with the PK constraint, we generate one.
+      // 3. Create new profile
       const tempId = crypto.randomUUID();
       result = await supabase
         .from("profiles")
         .insert({
           id: tempId,
-          email: email.toLowerCase().trim(),
+          email: cleanEmail,
           national_id: nationalId,
           nelc_eligible: true,
         });
     }
 
     if (result.error) {
-      console.error("Supabase save-national-id error detail:", JSON.stringify(result.error));
+      console.error("Supabase Operation Error:", result.error);
       return NextResponse.json(
-        { success: false, message: "Database error", detail: result.error.message },
+        { 
+          success: false, 
+          message: "Database operation failed", 
+          detail: result.error.message,
+          hint: result.error.hint
+        },
         { status: 500, headers: CORS }
       );
     }
 
-    console.log(`NELC: National ID saved for ${email}`);
-    return NextResponse.json({ success: true, message: "Saved successfully" }, { headers: CORS });
+    console.log(`NELC Success: National ID ${nationalId} saved for ${cleanEmail}`);
+    return NextResponse.json({ success: true, message: "Data synchronized successfully" }, { headers: CORS });
+
   } catch (err: any) {
     console.error("save-national-id error:", err);
     return NextResponse.json(
-      { success: false, message: "Server error" },
+      { success: false, message: "Server error", detail: err.message },
       { status: 500, headers: CORS }
     );
   }
