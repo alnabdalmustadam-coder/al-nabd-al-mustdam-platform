@@ -39,21 +39,32 @@ export default function DashboardPage() {
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // 1. Check for email on mount (from URL param or localStorage)
+  // 1. Check for email and name on mount (from URL param or localStorage)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const emailFromUrl = params.get("email");
+    const nameFromUrl = params.get("name");
 
     if (emailFromUrl) {
       const clean = emailFromUrl.toLowerCase().trim();
       localStorage.setItem("nabd_user_email", clean);
       setUserEmail(clean);
+      
+      if (nameFromUrl) {
+        localStorage.setItem("nabd_user_name", nameFromUrl.trim());
+        setUserName(nameFromUrl.trim());
+      }
+      
       // Clean URL
       window.history.replaceState({}, "", "/dashboard");
     } else {
-      const stored = localStorage.getItem("nabd_user_email");
-      if (stored) {
-        setUserEmail(stored);
+      const storedEmail = localStorage.getItem("nabd_user_email");
+      const storedName = localStorage.getItem("nabd_user_name");
+      if (storedEmail) {
+        setUserEmail(storedEmail);
+        if (storedName) {
+          setUserName(storedName);
+        }
       } else {
         // No email found — redirect to GHL login
         window.location.href = "https://members.nabdtraining.com/login";

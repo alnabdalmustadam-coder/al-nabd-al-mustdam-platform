@@ -48,14 +48,19 @@ export default function Navbar() {
   const { data: session } = useSession();
 
   const [localUserEmail, setLocalUserEmail] = useState<string | null>(null);
+  const [localUserName, setLocalUserName] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for GHL authenticated user email
+    // Check for GHL authenticated user email and name
     const storedEmail = localStorage.getItem("nabd_user_email");
+    const storedName = localStorage.getItem("nabd_user_name");
+    
     if (storedEmail) {
       setLocalUserEmail(storedEmail);
+      if (storedName) setLocalUserName(storedName);
     } else {
       setLocalUserEmail(null);
+      setLocalUserName(null);
     }
   }, [pathname]);
 
@@ -165,7 +170,7 @@ export default function Navbar() {
                   </div>
                 )}
                 <span className="text-sm font-bold text-slate-700">
-                  {session?.user?.name?.split(" ")[0] || localUserEmail?.split('@')[0]}
+                  {session?.user?.name?.split(" ")[0] || localUserName?.split(' ')[0] || localUserEmail?.split('@')[0]}
                 </span>
               </Link>
             ) : (
@@ -284,7 +289,7 @@ export default function Navbar() {
                   )}
                   <div>
                     <strong className="block text-sm text-slate-900 font-bold">
-                      {session?.user?.name || localUserEmail?.split('@')[0]}
+                      {session?.user?.name || localUserName || localUserEmail?.split('@')[0]}
                     </strong>
                     <span className="text-xs text-slate-500 line-clamp-1">
                       {session?.user?.email || localUserEmail}
