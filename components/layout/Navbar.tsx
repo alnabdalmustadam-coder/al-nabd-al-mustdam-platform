@@ -47,6 +47,18 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
 
+  const [localUserEmail, setLocalUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check for GHL authenticated user email
+    const storedEmail = localStorage.getItem("nabd_user_email");
+    if (storedEmail) {
+      setLocalUserEmail(storedEmail);
+    } else {
+      setLocalUserEmail(null);
+    }
+  }, [pathname]);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -143,7 +155,7 @@ export default function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
-            {session ? (
+            {(session || localUserEmail) ? (
               <Link href="/dashboard" className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 rounded-full transition-colors border border-transparent hover:border-slate-200">
                 {session?.user?.image && !imgError ? (
                   <img src={session.user.image} onError={() => setImgError(true)} alt={session?.user?.name || "User"} className="w-8 h-8 rounded-full border border-slate-200" />
@@ -152,7 +164,9 @@ export default function Navbar() {
                     <User className="w-4 h-4" />
                   </div>
                 )}
-                <span className="text-sm font-bold text-slate-700">{session?.user?.name?.split(" ")[0]}</span>
+                <span className="text-sm font-bold text-slate-700">
+                  {session?.user?.name?.split(" ")[0] || localUserEmail?.split('@')[0]}
+                </span>
               </Link>
             ) : (
               <>
@@ -259,7 +273,7 @@ export default function Navbar() {
             })}
 
             <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col gap-3">
-              {session ? (
+              {(session || localUserEmail) ? (
                 <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
                   {session?.user?.image && !imgError ? (
                     <img src={session.user.image} onError={() => setImgError(true)} alt={session?.user?.name || "User"} className="w-10 h-10 rounded-full border border-slate-200" />
@@ -269,8 +283,12 @@ export default function Navbar() {
                     </div>
                   )}
                   <div>
-                    <strong className="block text-sm text-slate-900 font-bold">{session?.user?.name}</strong>
-                    <span className="text-xs text-slate-500 line-clamp-1">{session?.user?.email}</span>
+                    <strong className="block text-sm text-slate-900 font-bold">
+                      {session?.user?.name || localUserEmail?.split('@')[0]}
+                    </strong>
+                    <span className="text-xs text-slate-500 line-clamp-1">
+                      {session?.user?.email || localUserEmail}
+                    </span>
                   </div>
                 </Link>
               ) : (
