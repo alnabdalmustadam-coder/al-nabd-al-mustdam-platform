@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download, LogOut } from "lucide-react";
+import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download, LogOut, ExternalLink, CheckCircle2, Play } from "lucide-react";
 
 const sidebarLinks = [
   { key: "courses", label: "دوراتي", icon: BookOpen },
@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [saveMessage, setSaveMessage] = useState("");
   const [showIdentityGate, setShowIdentityGate] = useState(false);
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
+  const [completedCount, setCompletedCount] = useState(0);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
@@ -100,6 +101,7 @@ export default function DashboardPage() {
         if (res.ok) {
           const data = await res.json();
           setEnrolledCourses(data.courses || []);
+          setCompletedCount(data.completedCount || 0);
         }
       } catch (err) {
         console.error("Failed to fetch courses");
@@ -224,6 +226,11 @@ export default function DashboardPage() {
                   </div>
                   <div className="w-px h-12 bg-white/20" />
                   <div>
+                    <div className="text-3xl font-black text-white mb-1 font-sora">{completedCount}</div>
+                    <div className="text-sm font-semibold text-white/80">مكتملة</div>
+                  </div>
+                  <div className="w-px h-12 bg-white/20" />
+                  <div>
                     <div className="text-3xl font-black text-white mb-1 font-sora">{certificates.length}</div>
                     <div className="text-sm font-semibold text-white/80">شهادات</div>
                   </div>
@@ -287,39 +294,96 @@ export default function DashboardPage() {
                     <p className="text-slate-500 font-medium">ابدأ رحلتك التعليمية واشترك في إحدى دوراتنا المتميزة.</p>
                   </div>
                 ) : (
-                  enrolledCourses.map((c, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.1 }}
-                      className="bg-white border border-slate-200 shadow-sm p-6 rounded-[24px] flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:shadow-md transition-shadow group cursor-pointer"
-                      onClick={() => window.open('https://members.nabdtraining.com', '_blank')}
-                    >
-                      <div className="w-16 h-16 rounded-[20px] bg-[#173A7C]/5 flex items-center justify-center shrink-0 group-hover:bg-[#173A7C] transition-colors">
-                        <BookOpen className="w-8 h-8 text-[#173A7C] group-hover:text-white transition-colors" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-slate-900 text-lg mb-2 truncate">{c.title}</h3>
-                        <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5 mb-3">
-                          <Clock className="w-4 h-4" /> اضغط للبدء في التعلم
-                        </p>
-                        <div className="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden border border-slate-200/50">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `10%` }}
-                            transition={{ duration: 1, delay: 0.3 }}
-                            className="h-full rounded-full bg-[#173A7C]"
-                          />
+                  enrolledCourses.map((c, i) => {
+                    const isCompleted = c.status === "completed";
+                    const progress = c.progress || 0;
+                    const courseUrl = c.course_url || "https://members.nabdtraining.com";
+
+                    return (
+                      <motion.div
+                        key={c.course_id || i}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className={`bg-white border shadow-sm p-6 rounded-[24px] flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:shadow-md transition-shadow group ${
+                          isCompleted ? "border-emerald-200" : "border-slate-200"
+                        }`}
+                      >
+                        {/* Icon */}
+                        <div className={`w-16 h-16 rounded-[20px] flex items-center justify-center shrink-0 transition-colors ${
+                          isCompleted
+                            ? "bg-emerald-50 border border-emerald-100"
+                            : "bg-[#173A7C]/5 group-hover:bg-[#173A7C]"
+                        }`}>
+                          {isCompleted
+                            ? <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+                            : <BookOpen className="w-8 h-8 text-[#173A7C] group-hover:text-white transition-colors" />
+                          }
                         </div>
-                      </div>
-                      <div className="text-center shrink-0 min-w-16">
-                        <div className="text-2xl font-black text-[#173A7C] font-sora">10%</div>
-                        <div className="text-xs font-bold text-slate-400">مكتمل</div>
-                      </div>
-                      <ChevronLeft className="w-5 h-5 text-slate-300 shrink-0 hidden sm:block rtl:rotate-180" />
-                    </motion.div>
-                  ))
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-bold text-slate-900 text-lg truncate">{c.title}</h3>
+                            {isCompleted && (
+                              <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full border border-emerald-100 shrink-0">
+                                مكتمل ✓
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5 mb-3">
+                            {isCompleted ? (
+                              <><Award className="w-4 h-4" /> أكملت هذه الدورة بنجاح</>
+                            ) : progress > 0 ? (
+                              <><Clock className="w-4 h-4" /> استكمل من حيث توقفت</>
+                            ) : (
+                              <><Play className="w-4 h-4" /> ابدأ التعلم الآن</>
+                            )}
+                          </p>
+                          {/* Progress Bar */}
+                          <div className="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden border border-slate-200/50">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${progress}%` }}
+                              transition={{ duration: 1, delay: 0.3 }}
+                              className={`h-full rounded-full ${
+                                isCompleted ? "bg-emerald-500" : "bg-[#173A7C]"
+                              }`}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Progress % */}
+                        <div className="text-center shrink-0 min-w-16">
+                          <div className={`text-2xl font-black font-sora ${
+                            isCompleted ? "text-emerald-600" : "text-[#173A7C]"
+                          }`}>{progress}%</div>
+                          <div className="text-xs font-bold text-slate-400">مكتمل</div>
+                        </div>
+
+                        {/* Action Button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(courseUrl, '_blank');
+                          }}
+                          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                            isCompleted
+                              ? "border border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                              : "bg-[#173A7C] text-white hover:bg-[#1E4D9D] shadow-md shadow-[#173A7C]/20"
+                          }`}
+                        >
+                          {isCompleted ? (
+                            <><Award className="w-4 h-4" /> عرض الشهادة</>
+                          ) : progress > 0 ? (
+                            <><ExternalLink className="w-4 h-4" /> استكمال</>
+                          ) : (
+                            <><Play className="w-4 h-4" /> ابدأ</>
+                          )}
+                        </button>
+                      </motion.div>
+                    );
+                  })
                 )}
               </div>
             )}
