@@ -76,7 +76,11 @@ export default function DashboardPage() {
         if (res.ok) {
           const data = await res.json();
           if (data.profile) {
-            if (data.profile.full_name) setUserName(data.profile.full_name);
+            if (data.profile.full_name) {
+              setUserName(data.profile.full_name);
+              localStorage.setItem("nabd_user_name", data.profile.full_name);
+              window.dispatchEvent(new Event("nabd_user_updated"));
+            }
             if (data.profile.phone) setProfilePhone(data.profile.phone);
             if (data.profile.national_id) {
               setProfileNationalId(data.profile.national_id);
@@ -146,6 +150,8 @@ export default function DashboardPage() {
       if (res.ok) {
         setSaveMessage("تم الحفظ بنجاح!");
         setShowIdentityGate(false);
+        localStorage.setItem("nabd_user_name", userName);
+        window.dispatchEvent(new Event("nabd_user_updated"));
       } else {
         setSaveMessage(data.message || "حدث خطأ أثناء الحفظ");
       }

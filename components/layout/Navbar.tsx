@@ -51,17 +51,24 @@ export default function Navbar() {
   const [localUserName, setLocalUserName] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for GHL authenticated user email and name
-    const storedEmail = localStorage.getItem("nabd_user_email");
-    const storedName = localStorage.getItem("nabd_user_name");
-    
-    if (storedEmail) {
-      setLocalUserEmail(storedEmail);
-      if (storedName) setLocalUserName(storedName);
-    } else {
-      setLocalUserEmail(null);
-      setLocalUserName(null);
-    }
+    const updateAuth = () => {
+      // Check for GHL authenticated user email and name
+      const storedEmail = localStorage.getItem("nabd_user_email");
+      const storedName = localStorage.getItem("nabd_user_name");
+      
+      if (storedEmail) {
+        setLocalUserEmail(storedEmail);
+        if (storedName) setLocalUserName(storedName);
+      } else {
+        setLocalUserEmail(null);
+        setLocalUserName(null);
+      }
+    };
+
+    updateAuth();
+
+    window.addEventListener("nabd_user_updated", updateAuth);
+    return () => window.removeEventListener("nabd_user_updated", updateAuth);
   }, [pathname]);
 
   useEffect(() => {
