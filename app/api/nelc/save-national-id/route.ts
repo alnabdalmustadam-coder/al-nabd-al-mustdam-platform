@@ -23,15 +23,15 @@ export async function POST(req: NextRequest) {
   try {
     const { email, nationalId, fullName, professionalId } = await req.json();
 
-    if (!email || !nationalId) {
+    if (!email) {
       return NextResponse.json(
-        { success: false, message: "Email and National ID are required" },
+        { success: false, message: "Email is required" },
         { status: 400, headers: CORS }
       );
     }
 
-    // Validate National ID format (Saudi: starts with 1, Resident: 2, GCC: 4)
-    if (!/^[124]\d{9}$/.test(nationalId)) {
+    // Validate National ID format (Saudi: starts with 1, Resident: 2, GCC: 4) only if provided
+    if (nationalId && !/^[124]\d{9}$/.test(nationalId)) {
       return NextResponse.json(
         { success: false, message: "Invalid National ID format" },
         { status: 400, headers: CORS }
@@ -54,8 +54,7 @@ export async function POST(req: NextRequest) {
       result = await supabase
         .from("profiles")
         .update({
-          national_id: nationalId,
-          nelc_eligible: true,
+          ...(nationalId ? { national_id: nationalId, nelc_eligible: true } : {}),
           ...(fullName ? { full_name: fullName } : {}),
           ...(professionalId ? { professional_id: professionalId } : {})
         })
@@ -68,8 +67,8 @@ export async function POST(req: NextRequest) {
         .insert({
           id: tempId,
           email: cleanEmail,
-          national_id: nationalId,
-          nelc_eligible: true,
+          nelc_eligible: !!nationalId,
+          ...(nationalId ? { national_id: nationalId } : {}),
           ...(fullName ? { full_name: fullName } : {}),
           ...(professionalId ? { professional_id: professionalId } : {})
         });

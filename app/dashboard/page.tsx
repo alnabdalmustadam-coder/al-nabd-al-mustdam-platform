@@ -171,6 +171,7 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     localStorage.removeItem("nabd_user_email");
+    localStorage.removeItem("nabd_user_name");
     window.location.href = "https://members.nabdtraining.com/login";
   };
 
