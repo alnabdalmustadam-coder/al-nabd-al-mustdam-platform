@@ -33,39 +33,49 @@ export default function DashboardPage() {
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // 1. Check for email and name on mount (from URL param or localStorage)
+  // 1. Check for email and name on mount (from URL param or cookies)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const emailFromUrl = params.get("email");
     const nameFromUrl = params.get("name");
 
-    if (emailFromUrl) {
-      const clean = emailFromUrl.toLowerCase().trim();
-      localStorage.setItem("nabd_user_email", clean);
-      setUserEmail(clean);
-      
-      if (nameFromUrl) {
-        localStorage.setItem("nabd_user_name", nameFromUrl.trim());
-        setUserName(nameFromUrl.trim());
-      }
-      
-      // Clean URL
-      window.history.replaceState({}, "", "/dashboard");
-    } else {
-      const storedEmail = localStorage.getItem("nabd_user_email");
-      const storedName = localStorage.getItem("nabd_user_name");
-      if (storedEmail) {
-        setUserEmail(storedEmail);
-        if (storedName) {
-          setUserName(storedName);
+    const setupSession = async () => {
+      if (emailFromUrl) {
+        const clean = emailFromUrl.toLowerCase().trim();
+        await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: clean, name: nameFromUrl ? nameFromUrl.trim() : "" }),
+        });
+        setUserEmail(clean);
+        if (nameFromUrl) {
+          setUserName(nameFromUrl.trim());
+          window.dispatchEvent(new Event("nabd_user_updated"));
         }
+        window.history.replaceState({}, "", "/dashboard");
+        setIsCheckingAuth(false);
       } else {
-        // No email found — redirect to GHL login
-        window.location.href = "https://members.nabdtraining.com/login";
-        return;
+        try {
+          const res = await fetch("/api/auth/me");
+          if (res.ok) {
+            const data = await res.json();
+            setUserEmail(data.user.email);
+            if (data.user.name) {
+              setUserName(data.user.name);
+            }
+          } else {
+            window.location.href = "https://members.nabdtraining.com/login";
+            return;
+          }
+        } catch (e) {
+          window.location.href = "https://members.nabdtraining.com/login";
+          return;
+        }
+        setIsCheckingAuth(false);
       }
-    }
-    setIsCheckingAuth(false);
+    };
+
+    setupSession();
   }, []);
 
   // 2. Fetch profile when email is available
@@ -79,7 +89,12 @@ export default function DashboardPage() {
           if (data.profile) {
             if (data.profile.full_name) {
               setUserName(data.profile.full_name);
-              localStorage.setItem("nabd_user_name", data.profile.full_name);
+              // Sync name back to session cookie
+              await fetch("/api/auth/session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: userEmail, name: data.profile.full_name }),
+              });
               window.dispatchEvent(new Event("nabd_user_updated"));
             }
             if (data.profile.phone) setProfilePhone(data.profile.phone);
@@ -157,7 +172,11 @@ export default function DashboardPage() {
       if (res.ok) {
         setSaveMessage("تم الحفظ بنجاح!");
         setShowIdentityGate(false);
-        localStorage.setItem("nabd_user_name", userName);
+        await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: userEmail, name: userName }),
+        });
         window.dispatchEvent(new Event("nabd_user_updated"));
       } else {
         setSaveMessage(data.message || "حدث خطأ أثناء الحفظ");
@@ -169,9 +188,8 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("nabd_user_email");
-    localStorage.removeItem("nabd_user_name");
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
     window.location.href = "https://members.nabdtraining.com/login";
   };
 

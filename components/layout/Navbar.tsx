@@ -51,15 +51,20 @@ export default function Navbar() {
   const [localUserName, setLocalUserName] = useState<string | null>(null);
 
   useEffect(() => {
-    const updateAuth = () => {
-      // Check for GHL authenticated user email and name
-      const storedEmail = localStorage.getItem("nabd_user_email");
-      const storedName = localStorage.getItem("nabd_user_name");
-      
-      if (storedEmail) {
-        setLocalUserEmail(storedEmail);
-        if (storedName) setLocalUserName(storedName);
-      } else {
+    const updateAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setLocalUserEmail(data.user.email);
+          if (data.user.name) {
+            setLocalUserName(data.user.name);
+          }
+        } else {
+          setLocalUserEmail(null);
+          setLocalUserName(null);
+        }
+      } catch (err) {
         setLocalUserEmail(null);
         setLocalUserName(null);
       }
