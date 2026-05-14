@@ -21,7 +21,7 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, nationalId, fullName } = await req.json();
+    const { email, nationalId, fullName, professionalId } = await req.json();
 
     if (!email || !nationalId) {
       return NextResponse.json(
@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
         .update({
           national_id: nationalId,
           nelc_eligible: true,
-          ...(fullName ? { full_name: fullName } : {})
+          ...(fullName ? { full_name: fullName } : {}),
+          ...(professionalId ? { professional_id: professionalId } : {})
         })
         .eq("email", cleanEmail);
     } else {
@@ -69,7 +70,8 @@ export async function POST(req: NextRequest) {
           email: cleanEmail,
           national_id: nationalId,
           nelc_eligible: true,
-          ...(fullName ? { full_name: fullName } : {})
+          ...(fullName ? { full_name: fullName } : {}),
+          ...(professionalId ? { professional_id: professionalId } : {})
         });
     }
 

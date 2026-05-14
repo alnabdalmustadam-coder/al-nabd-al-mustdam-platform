@@ -13,7 +13,7 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, userId, fullName, phone, nationalId } = await req.json();
+    const { email, userId, fullName, phone, nationalId, professionalId } = await req.json();
 
     // Support both email and userId as identifiers
     const identifier = email || userId;
@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
           full_name: fullName || undefined,
           phone: phone || null,
           national_id: nationalId || null,
+          professional_id: professionalId || null,
           nelc_eligible: !!nationalId,
         })
         .eq(matchField, matchValue);
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
           full_name: fullName || null,
           phone: phone || null,
           national_id: nationalId || null,
+          professional_id: professionalId || null,
           nelc_eligible: !!nationalId,
         });
     } else {

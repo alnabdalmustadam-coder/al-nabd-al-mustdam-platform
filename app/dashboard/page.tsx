@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState("متدرب النبض المستدام");
   const [profilePhone, setProfilePhone] = useState("");
   const [profileNationalId, setProfileNationalId] = useState("");
+  const [profileProfessionalId, setProfileProfessionalId] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [showIdentityGate, setShowIdentityGate] = useState(false);
@@ -84,6 +85,11 @@ export default function DashboardPage() {
             if (data.profile.phone) setProfilePhone(data.profile.phone);
             if (data.profile.national_id) {
               setProfileNationalId(data.profile.national_id);
+            }
+            if (data.profile.professional_id) {
+              setProfileProfessionalId(data.profile.professional_id);
+            }
+            if (data.profile.national_id) {
               setShowIdentityGate(false);
             } else {
               setShowIdentityGate(true);
@@ -144,6 +150,7 @@ export default function DashboardPage() {
           fullName: userName,
           phone: profilePhone,
           nationalId: profileNationalId,
+          professionalId: profileProfessionalId,
         }),
       });
       const data = await res.json();
@@ -474,6 +481,10 @@ export default function DashboardPage() {
                     <p className={`text-xs font-medium leading-relaxed ${showIdentityGate ? 'text-amber-600' : 'text-slate-500'}`}>
                       * إدخال رقم الهوية الوطنية <strong className="text-slate-900">إلزامي</strong> وفقاً لمتطلبات المركز الوطني للتعلم الإلكتروني (NELC) لاعتماد شهادتك.
                     </p>
+                  </div>
+                  <div>
+                    <label htmlFor="profile-professional-id" className="text-sm font-bold text-slate-700 block mb-2">رقم التصنيف المهني <span className="text-slate-400 font-normal">(اختياري - لساعات التعليم المستمر)</span></label>
+                    <input id="profile-professional-id" value={profileProfessionalId} onChange={(e) => setProfileProfessionalId(e.target.value)} placeholder="رقم التصنيف (إن وجد)" className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" dir="ltr" />
                   </div>
                   <button onClick={handleUpdateProfile} disabled={isSaving} className="px-8 py-3.5 rounded-2xl bg-[#173A7C] text-white text-base font-bold cursor-pointer hover:bg-[#1E4D9D] transition-all shadow-md shadow-[#173A7C]/20 mt-4 disabled:opacity-70">
                     {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
