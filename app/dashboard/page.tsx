@@ -11,16 +11,9 @@ const sidebarLinks = [
   { key: "settings", label: "الإعدادات", icon: Settings },
 ];
 
-const certificates = [
-  { title: "استخدام الحاسب الآلي في الأعمال المكتبية", date: "2025-12-15", id: "CERT-001" },
-];
+const certificates: any[] = [];
 
-const activities = [
-  { text: "أكملت الدرس 24 في دورة الحاسب الآلي", time: "منذ ساعتين" },
-  { text: "بدأت دورة إدخال البيانات", time: "منذ يوم" },
-  { text: "حصلت على شهادة دورة الحاسب الآلي", time: "منذ 3 أيام" },
-  { text: "أكملت الدرس 14 في دورة إدخال البيانات", time: "منذ 5 أيام" },
-];
+const activities: any[] = [];
 
 export default function DashboardPage() {
   const [activeSection, setActiveSection] = useState("courses");
@@ -125,6 +118,17 @@ export default function DashboardPage() {
 
   const handleUpdateProfile = async () => {
     if (!userEmail) return;
+
+    if (!profileNationalId || profileNationalId.trim() === "") {
+      setSaveMessage("يرجى إدخال رقم الهوية الوطنية أولاً");
+      return;
+    }
+
+    if (!/^[124]\d{9}$/.test(profileNationalId.trim())) {
+      setSaveMessage("رقم الهوية الوطنية غير صالح. يجب أن يتكون من 10 أرقام ويبدأ بـ 1 أو 2 أو 4");
+      return;
+    }
+
     setIsSaving(true);
     setSaveMessage("");
     try {
@@ -495,21 +499,30 @@ export default function DashboardPage() {
                 <TrendingUp className="w-7 h-7 text-[#173A7C]" />
                 نشاط التعلم الأخير
               </h2>
-              <div className="bg-white border border-slate-200 shadow-sm p-8 rounded-[24px]">
-                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[11px] rtl:before:ml-0 rtl:before:mr-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-slate-100">
-                  {activities.map((a, i) => (
-                    <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full border-4 border-white bg-[#173A7C] shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2" />
-                      <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-1">
-                          <p className="text-sm font-bold text-slate-900">{a.text}</p>
-                        </div>
-                        <p className="text-xs font-medium text-slate-500">{a.time}</p>
-                      </div>
-                    </div>
-                  ))}
+              {activities.length === 0 ? (
+                <div className="bg-white border border-slate-200 shadow-sm p-12 rounded-[24px] text-center">
+                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <TrendingUp className="w-8 h-8 text-slate-300" />
+                  </div>
+                  <p className="text-slate-500 font-medium">لا يوجد نشاط تعلم أخير حتى الآن.</p>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-white border border-slate-200 shadow-sm p-8 rounded-[24px]">
+                  <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[11px] rtl:before:ml-0 rtl:before:mr-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-slate-100">
+                    {activities.map((a, i) => (
+                      <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div className="flex items-center justify-center w-6 h-6 rounded-full border-4 border-white bg-[#173A7C] shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2" />
+                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-1">
+                            <p className="text-sm font-bold text-slate-900">{a.text}</p>
+                          </div>
+                          <p className="text-xs font-medium text-slate-500">{a.time}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
