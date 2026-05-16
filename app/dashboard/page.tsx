@@ -2,18 +2,45 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download, LogOut, ExternalLink, CheckCircle2, Play } from "lucide-react";
+import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download, LogOut, ExternalLink, CheckCircle2, Play, Activity, FileCheck, Zap } from "lucide-react";
 
 const sidebarLinks = [
   { key: "courses", label: "دوراتي", icon: BookOpen },
   { key: "certificates", label: "شهاداتي", icon: Award },
+  { key: "xapi", label: "سجل التعلم (xAPI)", icon: Activity },
   { key: "profile", label: "ملفي", icon: User },
   { key: "settings", label: "الإعدادات", icon: Settings },
 ];
 
 const certificates: any[] = [];
 
-const activities: any[] = [];
+// xAPI verb display mapping
+const VERB_AR: Record<string, { label: string; color: string; icon: any }> = {
+  registered: { label: "سجّل", color: "text-blue-600 bg-blue-50 border-blue-100", icon: FileCheck },
+  launched: { label: "بدأ", color: "text-indigo-600 bg-indigo-50 border-indigo-100", icon: Play },
+  progressed: { label: "تقدّم", color: "text-amber-600 bg-amber-50 border-amber-100", icon: TrendingUp },
+  completed: { label: "أكمل", color: "text-emerald-600 bg-emerald-50 border-emerald-100", icon: CheckCircle2 },
+  passed: { label: "اجتاز", color: "text-green-600 bg-green-50 border-green-100", icon: Award },
+  attended: { label: "حضر", color: "text-purple-600 bg-purple-50 border-purple-100", icon: User },
+  initialized: { label: "بدأ الدرس", color: "text-cyan-600 bg-cyan-50 border-cyan-100", icon: Zap },
+  terminated: { label: "أنهى", color: "text-slate-600 bg-slate-50 border-slate-100", icon: Clock },
+};
+
+// Helper: relative time display
+function getTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "الآن";
+  if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+  if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+  if (diffDays < 7) return `منذ ${diffDays} يوم`;
+  if (diffDays < 30) return `منذ ${Math.floor(diffDays / 7)} أسبوع`;
+  return `منذ ${Math.floor(diffDays / 30)} شهر`;
+}
 
 export default function DashboardPage() {
   const [activeSection, setActiveSection] = useState("courses");
@@ -32,6 +59,8 @@ export default function DashboardPage() {
   const [completedCount, setCompletedCount] = useState(0);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [xapiStatements, setXapiStatements] = useState<any[]>([]);
+  const [isLoadingXapi, setIsLoadingXapi] = useState(false);
 
   // 1. Check for email and name on mount (from URL param or cookies)
   useEffect(() => {
@@ -139,6 +168,26 @@ export default function DashboardPage() {
       }
     }
     fetchCourses();
+  }, [userEmail]);
+
+  // 4. Fetch xAPI statements when email is available
+  useEffect(() => {
+    if (!userEmail) return;
+    async function fetchXapi() {
+      setIsLoadingXapi(true);
+      try {
+        const res = await fetch(`/api/xapi/statements?agent=${encodeURIComponent(userEmail!)}&limit=30`);
+        if (res.ok) {
+          const data = await res.json();
+          setXapiStatements(data.statements || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch xAPI statements");
+      } finally {
+        setIsLoadingXapi(false);
+      }
+    }
+    fetchXapi();
   }, [userEmail]);
 
   const handleUpdateProfile = async () => {
@@ -529,13 +578,133 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Activity Timeline */}
+            {/* xAPI Learning Records */}
+            {activeSection === "xapi" && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                    <Activity className="w-7 h-7 text-[#173A7C]" />
+                    سجل التعلم (xAPI)
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1.5 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full border border-emerald-100 flex items-center gap-1.5">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      xAPI 1.0.3 متوافق
+                    </span>
+                    <span className="px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-bold rounded-full border border-blue-100">
+                      NELC معتمد
+                    </span>
+                  </div>
+                </div>
+
+                {/* xAPI Info Banner */}
+                <div className="bg-gradient-to-r from-[#173A7C]/5 to-[#1E4D9D]/5 border border-[#173A7C]/10 rounded-2xl p-5 mb-6">
+                  <p className="text-sm font-medium text-slate-700 leading-relaxed">
+                    يتم تتبع جميع أنشطة التعلم الخاصة بك وفقاً لمعيار <strong className="text-[#173A7C]">xAPI (Experience API)</strong> المطلوب من المركز الوطني للتعلم الإلكتروني (NELC). يشمل التتبع: التسجيل، بدء الدورة، التقدم، والإكمال.
+                  </p>
+                </div>
+
+                {isLoadingXapi ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="bg-white border border-slate-200 p-5 rounded-[20px] animate-pulse">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-slate-100 rounded-xl" />
+                          <div className="flex-1">
+                            <div className="h-4 bg-slate-100 rounded w-1/3 mb-2" />
+                            <div className="h-3 bg-slate-50 rounded w-1/2" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : xapiStatements.length === 0 ? (
+                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-[24px] p-16 text-center">
+                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Activity className="w-10 h-10 text-slate-300" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد سجلات تعلم بعد</h3>
+                    <p className="text-slate-500 font-medium">ستظهر سجلات xAPI هنا عند بدء أي نشاط تعليمي.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {xapiStatements.map((stmt: any, i: number) => {
+                      const verbKey = stmt.verb?.display?.["en-US"] || "unknown";
+                      const verbInfo = VERB_AR[verbKey] || { label: verbKey, color: "text-slate-600 bg-slate-50 border-slate-100", icon: Activity };
+                      const VerbIcon = verbInfo.icon;
+                      const objectName = stmt.object?.definition?.name?.["ar-SA"] || stmt.object?.definition?.name?.["en-US"] || "نشاط تعليمي";
+                      const timestamp = stmt.timestamp ? new Date(stmt.timestamp) : new Date();
+                      const timeAgo = getTimeAgo(timestamp);
+                      const progress = stmt.result?.extensions?.["https://nabdtraining.com/extensions/progress"];
+
+                      return (
+                        <motion.div
+                          key={stmt.id || i}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="bg-white border border-slate-200 shadow-sm p-5 rounded-[20px] hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${verbInfo.color}`}>
+                              <VerbIcon className="w-6 h-6" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${verbInfo.color}`}>
+                                  {verbInfo.label}
+                                </span>
+                                <h4 className="font-bold text-slate-900 text-sm truncate">{objectName}</h4>
+                              </div>
+                              <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
+                                <span className="flex items-center gap-1">
+                                  <Clock className="w-3.5 h-3.5" />
+                                  {timeAgo}
+                                </span>
+                                {progress !== undefined && (
+                                  <span className="flex items-center gap-1 text-amber-600">
+                                    <TrendingUp className="w-3.5 h-3.5" />
+                                    {progress}%
+                                  </span>
+                                )}
+                                {stmt.result?.completion && (
+                                  <span className="flex items-center gap-1 text-emerald-600">
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                    مكتمل
+                                  </span>
+                                )}
+                                {stmt.result?.score && (
+                                  <span className="flex items-center gap-1 text-blue-600">
+                                    <Award className="w-3.5 h-3.5" />
+                                    {Math.round(stmt.result.score.scaled * 100)}%
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-left shrink-0">
+                              <div className="text-xs font-medium text-slate-400 font-sora">
+                                {timestamp.toLocaleDateString("ar-SA", { month: "short", day: "numeric" })}
+                              </div>
+                              <div className="text-xs font-medium text-slate-300 font-sora">
+                                {timestamp.toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Activity Timeline (now uses xAPI data) */}
             <div className="mt-14">
               <h2 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
                 <TrendingUp className="w-7 h-7 text-[#173A7C]" />
                 نشاط التعلم الأخير
               </h2>
-              {activities.length === 0 ? (
+              {xapiStatements.length === 0 ? (
                 <div className="bg-white border border-slate-200 shadow-sm p-12 rounded-[24px] text-center">
                   <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <TrendingUp className="w-8 h-8 text-slate-300" />
@@ -543,19 +712,30 @@ export default function DashboardPage() {
                   <p className="text-slate-500 font-medium">لا يوجد نشاط تعلم أخير حتى الآن.</p>
                 </div>
               ) : (
-                <div className="bg-white border border-slate-200 shadow-sm p-8 rounded-[24px]">
-                  <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[11px] rtl:before:ml-0 rtl:before:mr-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-slate-100">
-                    {activities.map((a, i) => (
-                      <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                        <div className="flex items-center justify-center w-6 h-6 rounded-full border-4 border-white bg-[#173A7C] shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2" />
-                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm">
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-1">
-                            <p className="text-sm font-bold text-slate-900">{a.text}</p>
+                <div className="bg-white border border-slate-200 shadow-sm p-6 rounded-[24px]">
+                  <div className="space-y-4">
+                    {xapiStatements.slice(0, 5).map((stmt: any, i: number) => {
+                      const verbKey = stmt.verb?.display?.["en-US"] || "unknown";
+                      const verbInfo = VERB_AR[verbKey] || { label: verbKey, color: "text-slate-600 bg-slate-50 border-slate-100", icon: Activity };
+                      const objectName = stmt.object?.definition?.name?.["ar-SA"] || stmt.object?.definition?.name?.["en-US"] || "نشاط تعليمي";
+                      const timestamp = stmt.timestamp ? new Date(stmt.timestamp) : new Date();
+
+                      return (
+                        <div key={stmt.id || i} className="flex items-center gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${verbInfo.color}`}>
+                            <Activity className="w-4 h-4" />
                           </div>
-                          <p className="text-xs font-medium text-slate-500">{a.time}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-slate-900 truncate">
+                              {verbInfo.label} — {objectName}
+                            </p>
+                          </div>
+                          <p className="text-xs font-medium text-slate-400 shrink-0">
+                            {timestamp.toLocaleDateString("ar-SA", { month: "short", day: "numeric" })}
+                          </p>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
