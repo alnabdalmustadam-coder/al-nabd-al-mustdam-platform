@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download, LogOut, ExternalLink, CheckCircle2, Play, Activity, FileCheck, Zap } from "lucide-react";
+import { BookOpen, Award, Settings, User, Clock, ChevronLeft, TrendingUp, Download, LogOut, ExternalLink, CheckCircle2, Play, Activity, FileCheck, Zap, Star } from "lucide-react";
 
 const sidebarLinks = [
   { key: "courses", label: "دوراتي", icon: BookOpen },
@@ -23,6 +23,7 @@ const VERB_AR: Record<string, { label: string; color: string; icon: any }> = {
   passed: { label: "اجتاز", color: "text-green-600 bg-green-50 border-green-100", icon: Award },
   attended: { label: "حضر", color: "text-purple-600 bg-purple-50 border-purple-100", icon: User },
   initialized: { label: "بدأ الدرس", color: "text-cyan-600 bg-cyan-50 border-cyan-100", icon: Zap },
+  evaluated: { label: "قيّم", color: "text-orange-600 bg-orange-50 border-orange-100", icon: Star },
   terminated: { label: "أنهى", color: "text-slate-600 bg-slate-50 border-slate-100", icon: Clock },
 };
 

@@ -135,6 +135,11 @@ export const XAPI_VERBS = {
     id: "http://adlnet.gov/expapi/verbs/terminated",
     display: { "en-US": "terminated", "ar-SA": "أنهى" },
   },
+  /** المتدرب قيّم دورة */
+  evaluated: {
+    id: "http://adlnet.gov/expapi/verbs/evaluated",
+    display: { "en-US": "evaluated", "ar-SA": "قيّم" },
+  },
 } as const;
 
 // ─── Activity Types ──────────────────────────────────────────────────────────
