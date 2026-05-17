@@ -40,6 +40,8 @@ export const courses: Course[] = [
       "إدارة رسائل البريد الإلكتروني والمهام باستخدام Outlook.",
     ],
     requirements: "لا توجد متطلبات مسبقة. الدورة مصممة للمبتدئين تماماً.",
+    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
+    ghlCourseId: "course-haceb",
   },
   {
     id: 2,
@@ -69,6 +71,8 @@ export const courses: Course[] = [
       "توسيع الفرص الوظيفية في القطاعين العام والخاص.",
     ],
     requirements: "معرفة أساسية بسيطة باستخدام الحاسب الآلي.",
+    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
+    ghlCourseId: "course-data-entry",
   },
   {
     id: 3,
@@ -99,6 +103,8 @@ export const courses: Course[] = [
       "التحضير لاجتياز اختبارات تحديد المستوى العالمية.",
     ],
     requirements: "الرغبة في التعلم والتطور المستمر.",
+    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
+    ghlCourseId: "course-english",
   },
   {
     id: 4,
@@ -120,6 +126,7 @@ export const courses: Course[] = [
     ],
     outcomes: ["فهم أسس الذكاء الاصطناعي.", "تطبيقات الذكاء الاصطناعي العملية."],
     requirements: "أساسيات الحاسب الآلي.",
+    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
   },
   {
     id: 5,
@@ -141,6 +148,7 @@ export const courses: Course[] = [
     ],
     outcomes: ["معرفة أنواع الهجمات الإلكترونية وطرق الحماية.", "تأمين الشبكات والبيانات المؤسسية."],
     requirements: "معرفة جيدة بالشبكات وأنظمة التشغيل.",
+    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
   },
   {
     id: 6,
@@ -162,6 +170,7 @@ export const courses: Course[] = [
     ],
     outcomes: ["تشخيص أعطال الهواتف بكفاءة.", "إصلاح المشاكل البرمجية والعتاد (Hardware/Software)."],
     requirements: "لا توجد متطلبات سابقة.",
+    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
   },
   {
     id: 7,
@@ -183,6 +192,7 @@ export const courses: Course[] = [
     ],
     outcomes: ["فهم معايير السلامة المهنية.", "تطبيق سياسات الأوشا في بيئة العمل."],
     requirements: "لا توجد متطلبات مسبقة.",
+    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
   },
   {
     id: 8,
@@ -204,6 +214,7 @@ export const courses: Course[] = [
     ],
     outcomes: ["الحصول على التأهيل اللازم لشهادة النيبوش العالمية.", "إدارة المخاطر المهنية المتقدمة."],
     requirements: "يفضل خبرة سابقة في السلامة المهنية.",
+    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
   },
   {
     id: 9,
@@ -225,9 +236,14 @@ export const courses: Course[] = [
     ],
     outcomes: ["إتقان المهارات الكمية واللفظية.", "تطوير سرعة الحل وفهم الأسئلة المعقدة."],
     requirements: "الاستعداد النفسي والالتزام بالتدريب.",
+    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
   },
 ];
 
 export const getCourseBySlug = (slug: string): Course | undefined => {
   return courses.find(c => c.slug === slug);
 };
+
+
+
+

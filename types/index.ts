@@ -25,6 +25,8 @@ export interface Course {
   requirements?: string;
   trainerId?: string;
   enrollees?: number;
+  ghlCourseId?: string;
+  ghlCheckoutUrl?: string;
 }
 
 export interface CurriculumSection {

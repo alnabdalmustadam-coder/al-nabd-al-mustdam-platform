@@ -9,6 +9,7 @@ import CourseCard from "@/components/ui/CourseCard";
 import StarRating from "@/components/ui/StarRating";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import SmartCourseAction from "@/components/ui/SmartCourseAction";
 import {
   Clock, Users, BookOpen, Award, ChevronDown, ChevronUp,
   CheckCircle, Play
@@ -219,9 +220,11 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 </div>
               </div>
 
-              <Button href="/checkout" size="lg" className="w-full mb-3 text-lg py-4">
-                سجّل في الدورة الآن
-              </Button>
+              <SmartCourseAction 
+                ghlCourseId={course.ghlCourseId} 
+                ghlCheckoutUrl={course.ghlCheckoutUrl} 
+                courseTitle={course.title} 
+              />
               <Button variant="secondary" size="md" className="w-full font-bold">
                 تواصل للاستفسار
               </Button>

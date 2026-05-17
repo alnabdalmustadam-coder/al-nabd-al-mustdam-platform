@@ -88,10 +88,9 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2.5 mt-auto">
-            <button className="flex-1 bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] text-white text-[15px] font-black py-3 px-2 rounded-full hover:from-[#4EA06E] hover:to-[#5CB07C] transition-all shadow-[0_8px_20px_-5px_rgba(92,176,124,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(92,176,124,0.5)] hover:-translate-y-0.5 flex items-center justify-center gap-2">
-              <ShoppingCart className="w-[18px] h-[18px]" />
-              أضف للسلة
-            </button>
+            <a href={course.ghlCheckoutUrl || "https://members.nabdtraining.com/login"} target="_blank" rel="noopener noreferrer" className="flex-1 bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] text-white text-[15px] font-black py-3 px-2 rounded-full hover:from-[#4EA06E] hover:to-[#5CB07C] transition-all shadow-[0_8px_20px_-5px_rgba(92,176,124,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(92,176,124,0.5)] hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              سجل الآن
+            </a>
             <Link href={`/courses/${course.slug}`} className="flex-1 bg-white text-slate-700 text-[15px] font-black py-3 px-2 rounded-full border-2 border-slate-200 hover:border-[#173A7C] hover:text-[#173A7C] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group/btn">
               التفاصيل
               <ArrowRight className="w-[18px] h-[18px] -rotate-45 group-hover/btn:rotate-0 transition-transform text-slate-400 group-hover/btn:text-[#173A7C]" />
@@ -102,3 +101,4 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
     </motion.div>
   );
 }
+

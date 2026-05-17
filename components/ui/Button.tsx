@@ -8,6 +8,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline";
   size?: "sm" | "md" | "lg";
   href?: string;
+  target?: string;
+  rel?: string;
   className?: string;
 }
 
@@ -16,6 +18,8 @@ export default function Button({
   variant = "primary",
   size = "md",
   href,
+  target,
+  rel,
   className = "",
   ...props
 }: ButtonProps) {
@@ -46,7 +50,7 @@ export default function Button({
 
   if (href) {
     return (
-      <Link href={href} className={baseClasses}>
+      <Link href={href} target={target} rel={rel || (target === "_blank" ? "noopener noreferrer" : undefined)} className={baseClasses}>
         {children}
       </Link>
     );
