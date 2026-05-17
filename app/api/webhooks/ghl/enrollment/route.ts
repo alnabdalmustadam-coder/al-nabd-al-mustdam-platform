@@ -54,8 +54,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Extract course info
-    const courseId = payload.courseId || payload.course_id || payload.offerId || payload.offer_id || `course-${Date.now()}`;
     const courseTitle = payload.courseTitle || payload.course_title || payload.offerName || payload.offer_name || "دورة جديدة";
+    let courseId = payload.courseId || payload.course_id || payload.offerId || payload.offer_id;
+    if (!courseId) {
+      // Use deterministic ID based on title instead of Date.now() to prevent duplicates
+      courseId = `course-${courseTitle.replace(/\s+/g, '-').toLowerCase()}`;
+    }
     const courseUrl = payload.courseUrl || payload.course_url || "https://members.nabdtraining.com";
     const ghlOfferId = payload.offerId || payload.offer_id || null;
 

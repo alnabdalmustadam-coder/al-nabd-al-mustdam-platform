@@ -50,8 +50,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const courseId = payload.courseId || payload.course_id || null;
+    const courseTitle = payload.courseTitle || payload.courseName || payload.course_name || "دورة جديدة";
+    let courseId = payload.courseId || payload.course_id || null;
     
+    if (!courseId) {
+      // Deterministic ID fallback to match enrollment
+      courseId = `course-${courseTitle.replace(/\s+/g, '-').toLowerCase()}`;
+    }
+
     // Parse progress safely handling both numbers and strings (e.g., "100" or "100%")
     let parsedProgress = null;
     if (payload.progress !== undefined && payload.progress !== null) {
@@ -61,14 +67,6 @@ export async function POST(req: NextRequest) {
     const progress = parsedProgress;
     
     const completed = payload.completed === true || payload.completed === "true" || progress === 100;
-
-    if (!courseId) {
-      console.warn("⚠️ Progress webhook: No courseId in payload");
-      return NextResponse.json(
-        { success: false, message: "No courseId in payload" },
-        { status: 200, headers: CORS }
-      );
-    }
 
     // Build update object
     const updateData: Record<string, any> = {};
@@ -112,17 +110,17 @@ export async function POST(req: NextRequest) {
         .eq("email", email)
         .maybeSingle();
 
-      // Fetch course name from enrollment if not in payload
-      const courseName = payload.courseTitle || payload.courseName || payload.course_name || null;
-      let courseTitle = courseName;
-      if (!courseTitle) {
+      // courseTitle is already extracted above
+      if (!courseTitle || courseTitle === "دورة جديدة") {
         const { data: enrollment } = await supabase
           .from("enrollments")
           .select("course_title")
           .eq("email", email)
           .eq("course_id", courseId)
           .maybeSingle();
-        courseTitle = enrollment?.course_title || "دورة تدريبية";
+        if (enrollment?.course_title) {
+          // keep it
+        }
       }
 
       const learnerName = profile?.full_name || email.split("@")[0];
