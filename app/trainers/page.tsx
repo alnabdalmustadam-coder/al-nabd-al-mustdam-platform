@@ -4,80 +4,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { UserCheck, CheckCircle2, ChevronRight, Award, Star, Users, BookOpen, Sparkles, Medal, PlayCircle, Globe2 } from "lucide-react";
 import React, { useState } from "react";
 
-// Placeholder Data for Trainers
+// Real Trainer Data from Poster
 const TRAINERS = [
   {
     id: 1,
-    name: "د. أحمد العبدالله",
-    title: "خبير أمن سيبراني ومعماري تقنية",
-    description: "بخبرة تتجاوز 15 عاماً في قيادة المشاريع التقنية الكبرى وتقديم الاستشارات الأمنية، يركز د.أحمد على تأهيل جيل جديد من خبراء الأمن السيبراني.",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    cover: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    tags: ["أمن سيبراني", "بنية تحتية", "إدارة تقنية"],
-    category: "technology",
-    stats: { rating: 4.9, students: "2.4K", courses: 12 }
-  },
-  {
-    id: 2,
-    name: "م. سارة الخالد",
-    title: "مدرب معتمد لإدارة المشاريع PMP",
-    description: "من أبرز رواد التدريب في مجال الإدارة المتقدمة، ساعدت مئات المتدربين على اجتياز الاختبارات الاحترافية بنجاح وقيادة مشاريعهم بكفاءة.",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    cover: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    tags: ["إدارة مشاريع", "PMP", "قيادة"],
-    category: "management",
-    stats: { rating: 5.0, students: "5.1K", courses: 8 }
-  },
-  {
-    id: 3,
-    name: "د. محمد حسن",
-    title: "مستشار تطوير الأعمال والإدارة",
-    description: "متخصص في تأسيس وتطوير الشركات الناشئة ووضع استراتيجيات النمو. ينقل د.محمد خبراته العميقة إلى غرف التدريب بأسلوب تفاعلي وتطبيقي.",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    cover: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    tags: ["إدارة أعمال", "تخطيط استراتيجي", "MBA"],
-    category: "management",
-    stats: { rating: 4.8, students: "3.2K", courses: 15 }
-  },
-  {
-    id: 4,
-    name: "أ. ريم السعود",
-    title: "خبيرة اللغة الإنجليزية والآيلتس",
-    description: "خبرة تدريبية دولية في تطوير مهارات اللغة الإنجليزية وتقنيات اجتياز اختبار IELTS بتفوق، باستخدام أحدث أساليب التدريس التفاعلية.",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    cover: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    tags: ["IELTS", "محادثة", "تطوير الذات"],
-    category: "languages",
-    stats: { rating: 4.9, students: "8.5K", courses: 20 }
-  },
-  {
-    id: 5,
-    name: "م. يوسف العتيبي",
-    title: "خبير التسويق الرقمي واستراتيجيات النمو",
-    description: "صانع حملات إعلانية ناجحة ومدير لعدة مشاريع تسويقية كبرى. يقدم خلاصة تجاربه في التسويق المبني على البيانات وأساليب النمو المتسارع.",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    cover: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    tags: ["تسويق رقمي", "SEO", "تحليل بيانات"],
-    category: "technology",
-    stats: { rating: 4.7, students: "4.8K", courses: 10 }
-  },
-  {
-    id: 6,
-    name: "أ. نورة الجاسر",
-    title: "محللة بيانات وخبيرة ذكاء اصطناعي",
-    description: "شغوفة بعلوم البيانات والذكاء الاصطناعي، وتعمل على تبسيط المفاهيم المعقدة وجعلها قابلة للتطبيق بأسلوب مليء بالابتكار والإلهام.",
-    image: "https://images.unsplash.com/photo-1598550874175-4d0ef43ce418?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    cover: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    tags: ["الذكاء الاصطناعي", "Pyhton", "علم البيانات"],
-    category: "technology",
-    stats: { rating: 5.0, students: "1.9K", courses: 6 }
+    name: "د. عبدالرحمن المسعود",
+    title: "خبير تطوير الكوادر الطبية والإدارة الإكلينيكية",
+    description: "حاصل على بكالوريوس الطب والجراحة والبورد السعودي في طب الباطني. يقدم برامج تدريبية تعتمد على خبرة عملية وتطبيقات واقعية، بمحتوى علمي محدث واحترافي.",
+    image: "/abdurrahman-avatar.png", // User will replace this with real image
+    cover: "https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?auto=format&fit=crop&q=80&w=800",
+    courses: ["مهارات التواصل الفعّال", "مهارات اتخاذ القرار", "القيادة الإكلينيكية", "إدارة الضغوط النفسية"],
+    features: ["أون لاين & حضوري", "شهادات معتمدة"],
+    category: "medical",
   }
 ];
 
 const CATEGORIES = [
   { id: "all", label: "الكل" },
-  { id: "technology", label: "تقنية وتكنولوجيا" },
+  { id: "medical", label: "القطاع الصحي والطبي" },
   { id: "management", label: "الإدارة والأعمال" },
+  { id: "technology", label: "تقنية وتكنولوجيا" },
   { id: "languages", label: "اللغات والتطوير" },
 ];
 
@@ -289,36 +235,28 @@ export default function TrainersPage() {
                   <h3 className="text-2xl font-black text-slate-900 mb-1.5 group-hover:text-[#173A7C] transition-colors">{trainer.name}</h3>
                   <p className="text-[#5CB07C] font-bold text-sm mb-5 bg-[#5CB07C]/10 px-4 py-1.5 rounded-full">{trainer.title}</p>
 
-                  {/* Key Stats Grid */}
-                  <div className="flex items-center justify-center gap-6 w-full mb-6 pb-6 border-b border-slate-100/80">
-                    <div className="flex flex-col items-center gap-1">
-                      <div className="flex items-center gap-1 text-slate-800 font-extrabold text-lg">
-                        <span>{trainer.stats.rating}</span>
-                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                      </div>
-                      <span className="text-[11px] text-slate-400 font-medium uppercase">التقييم</span>
-                    </div>
-                    <div className="w-[1px] h-8 bg-slate-100/80"></div>
-                    <div className="flex flex-col items-center gap-1">
-                      <div className="flex items-center gap-1.5 text-slate-800 font-extrabold text-lg">
-                        <span>{trainer.stats.students}</span>
-                        <Users className="w-4 h-4 text-[#173A7C]" />
-                      </div>
-                      <span className="text-[11px] text-slate-400 font-medium uppercase">متدرب</span>
-                    </div>
-                    <div className="w-[1px] h-8 bg-slate-100/80"></div>
-                    <div className="flex flex-col items-center gap-1">
-                      <div className="flex items-center gap-1.5 text-slate-800 font-extrabold text-lg">
-                        <span>{trainer.stats.courses}</span>
-                        <BookOpen className="w-4 h-4 text-[#5CB07C]" />
-                      </div>
-                      <span className="text-[11px] text-slate-400 font-medium uppercase">برنامج</span>
-                    </div>
+                  {/* Courses Tags */}
+                  <div className="flex flex-wrap justify-center gap-2 w-full mb-5">
+                    {trainer.courses?.map((course, idx) => (
+                      <span key={idx} className="bg-slate-100 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-md border border-slate-200">
+                        {course}
+                      </span>
+                    ))}
                   </div>
 
-                  <p className="text-slate-500 text-[14.5px] font-medium leading-[1.8] mb-8 flex-1">
+                  <p className="text-slate-600 text-[14.5px] font-medium leading-[1.8] mb-5 flex-1 border-t border-b border-slate-100 py-4">
                     {trainer.description}
                   </p>
+
+                  {/* Features */}
+                  <div className="flex flex-wrap justify-center gap-3 w-full mb-6">
+                    {trainer.features?.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-1.5 text-sm font-bold text-[#173A7C]">
+                        <CheckCircle2 className="w-4 h-4 text-[#5CB07C]" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
 
                   {/* 4. Footer Actions */}
                   <div className="w-full flex items-center justify-between mt-auto">
