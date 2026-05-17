@@ -27,14 +27,13 @@ export default function BookingPage() {
       </section>
 
       {/* Booking Widget */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
-        <div className="w-full min-h-[700px] flex justify-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="w-full">
           <iframe
             src="https://link.digitalsolution.vip/widget/booking/wjLw0LIzohqnw41l2sxs"
-            style={{ width: "100%", border: "none", overflow: "hidden" }}
+            style={{ width: "100%", minHeight: "1100px", border: "none", overflow: "hidden" }}
             scrolling="no"
             id="wjLw0LIzohqnw41l2sxs_1736932483849"
-            className="w-full min-h-[800px]"
             title="Booking Calendar"
           ></iframe>
           {/* GHL Widget Script to handle resizing automatically */}
