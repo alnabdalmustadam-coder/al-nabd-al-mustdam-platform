@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { stmtRegistered, storeStatement } from "@/lib/xapi";
 
 /**
- * GHL Webhook — Enrollment
+ * GHL Webhook — Enrollment + xAPI Tracking
  * يستقبل webhook من GHL Workflow عند "Offer Access Granted" أو شراء كورس
+ * ويسجل الحدث في xAPI للاعتماد NELC
  *
  * Webhook URL: https://nabdtraining.com/api/webhooks/ghl/enrollment
  *
@@ -99,8 +101,39 @@ export async function POST(req: NextRequest) {
 
     console.log(`✅ Enrollment saved: ${email} → ${courseTitle} (${courseId})`);
 
+    // 3. Generate xAPI "registered" statement for NELC compliance
+    try {
+      // Fetch learner profile for national ID
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, national_id")
+        .eq("email", email)
+        .maybeSingle();
+
+      const learnerName = profile?.full_name || fullName || email.split("@")[0];
+      const nationalId = profile?.national_id || "";
+
+      const xapiStatement = stmtRegistered({
+        email,
+        name: learnerName,
+        nationalId,
+        courseId,
+        courseName: courseTitle,
+        courseNameAr: courseTitle,
+      });
+
+      const xapiResult = await storeStatement(xapiStatement);
+      if (xapiResult.success) {
+        console.log(`📋 xAPI registered statement stored for ${email} → ${courseId}`);
+      } else {
+        console.error("⚠️ xAPI store failed (non-fatal):", xapiResult.error);
+      }
+    } catch (xapiErr) {
+      console.error("⚠️ xAPI generation failed (non-fatal):", xapiErr);
+    }
+
     return NextResponse.json(
-      { success: true, message: "Enrollment recorded" },
+      { success: true, message: "Enrollment recorded + xAPI tracked" },
       { headers: CORS }
     );
   } catch (err: any) {

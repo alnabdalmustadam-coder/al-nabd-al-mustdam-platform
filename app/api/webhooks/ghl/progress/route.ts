@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { stmtProgressed, stmtCompleted, storeStatement } from "@/lib/xapi";
 
 /**
- * GHL Webhook — Course Progress / Completion
+ * GHL Webhook — Course Progress / Completion + xAPI Tracking
  * يستقبل webhook من GHL Workflow عند إكمال كورس أو تحديث تقدم
+ * ويسجل الحدث في xAPI للاعتماد NELC
  *
  * Webhook URL: https://nabdtraining.com/api/webhooks/ghl/progress
  *
@@ -11,6 +13,7 @@ import { supabase } from "@/lib/supabase";
  * {
  *   "email": "{{contact.email}}",
  *   "courseId": "course-xxx",
+ *   "courseName": "اسم الكورس",       // اسم الكورس (مطلوب لـ xAPI)
  *   "progress": 100,              // نسبة التقدم (0-100)
  *   "completed": true             // هل أكمل الكورس
  * }
@@ -92,8 +95,57 @@ export async function POST(req: NextRequest) {
 
     console.log(`✅ Progress updated: ${email} → ${courseId} = ${progress}% ${completed ? "(COMPLETED)" : ""}`);
 
+    // ── Generate xAPI statement for NELC compliance ──────────────────
+    try {
+      // Fetch learner profile for national ID
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, national_id")
+        .eq("email", email)
+        .maybeSingle();
+
+      // Fetch course name from enrollment if not in payload
+      const courseName = payload.courseName || payload.course_name || null;
+      let courseTitle = courseName;
+      if (!courseTitle) {
+        const { data: enrollment } = await supabase
+          .from("enrollments")
+          .select("course_title")
+          .eq("email", email)
+          .eq("course_id", courseId)
+          .maybeSingle();
+        courseTitle = enrollment?.course_title || "دورة تدريبية";
+      }
+
+      const learnerName = profile?.full_name || email.split("@")[0];
+      const nationalId = profile?.national_id || "";
+
+      const xapiParams = {
+        email,
+        name: learnerName,
+        nationalId,
+        courseId,
+        courseName: courseTitle,
+        courseNameAr: courseTitle,
+      };
+
+      // Generate the appropriate xAPI statement
+      const xapiStatement = completed
+        ? stmtCompleted(xapiParams)
+        : stmtProgressed({ ...xapiParams, progress: progress || 0 });
+
+      const xapiResult = await storeStatement(xapiStatement);
+      if (xapiResult.success) {
+        console.log(`📋 xAPI ${completed ? "completed" : "progressed"} statement stored for ${email} → ${courseId}`);
+      } else {
+        console.error("⚠️ xAPI store failed (non-fatal):", xapiResult.error);
+      }
+    } catch (xapiErr) {
+      console.error("⚠️ xAPI generation failed (non-fatal):", xapiErr);
+    }
+
     return NextResponse.json(
-      { success: true, message: "Progress updated" },
+      { success: true, message: "Progress updated + xAPI tracked" },
       { headers: CORS }
     );
   } catch (err: any) {
