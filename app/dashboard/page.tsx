@@ -256,7 +256,7 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "https://members.nabdtraining.com/login";
+    window.location.href = "https://members.nabdtraining.com/login?nabd_logout=true";
   };
 
   // Loading state while checking auth
