@@ -51,7 +51,15 @@ export async function POST(req: NextRequest) {
     }
 
     const courseId = payload.courseId || payload.course_id || null;
-    const progress = typeof payload.progress === "number" ? Math.min(100, Math.max(0, payload.progress)) : null;
+    
+    // Parse progress safely handling both numbers and strings (e.g., "100" or "100%")
+    let parsedProgress = null;
+    if (payload.progress !== undefined && payload.progress !== null) {
+      const p = parseInt(String(payload.progress).replace(/\D/g, ''), 10);
+      if (!isNaN(p)) parsedProgress = Math.min(100, Math.max(0, p));
+    }
+    const progress = parsedProgress;
+    
     const completed = payload.completed === true || payload.completed === "true" || progress === 100;
 
     if (!courseId) {
@@ -105,7 +113,7 @@ export async function POST(req: NextRequest) {
         .maybeSingle();
 
       // Fetch course name from enrollment if not in payload
-      const courseName = payload.courseName || payload.course_name || null;
+      const courseName = payload.courseTitle || payload.courseName || payload.course_name || null;
       let courseTitle = courseName;
       if (!courseTitle) {
         const { data: enrollment } = await supabase
