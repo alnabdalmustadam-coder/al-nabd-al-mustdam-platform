@@ -68,31 +68,36 @@ export async function POST(req: NextRequest) {
     
     const completed = payload.completed === true || payload.completed === "true" || progress === 100;
 
-    // Build update object
-    const updateData: Record<string, any> = {};
-    if (progress !== null) updateData.progress = progress;
+    // Build upsert object
+    const upsertData: Record<string, any> = {
+      email,
+      course_id: courseId,
+      course_title: courseTitle,
+      updated_at: new Date().toISOString()
+    };
+    if (progress !== null) upsertData.progress = progress;
     if (completed) {
-      updateData.status = "completed";
-      updateData.completed_at = new Date().toISOString();
-      updateData.progress = 100;
+      upsertData.status = "completed";
+      upsertData.completed_at = new Date().toISOString();
+      upsertData.progress = 100;
+    } else {
+      upsertData.status = "active";
     }
 
-    if (Object.keys(updateData).length === 0) {
+    if (Object.keys(upsertData).length <= 4 && progress === null) {
       return NextResponse.json(
-        { success: true, message: "No updates needed" },
+        { success: true, message: "No progress updates needed" },
         { headers: CORS }
       );
     }
 
-    // Update enrollment record
+    // Upsert enrollment record (create if not exists, update if exists)
     const { error } = await supabase
       .from("enrollments")
-      .update(updateData)
-      .eq("email", email)
-      .eq("course_id", courseId);
+      .upsert(upsertData, { onConflict: "email,course_id" });
 
     if (error) {
-      console.error("❌ Progress update error:", error);
+      console.error("❌ Progress upsert error:", error);
       return NextResponse.json(
         { success: false, message: "Database error", error: error.message },
         { status: 200, headers: CORS }
