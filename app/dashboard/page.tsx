@@ -107,7 +107,7 @@ export default function DashboardPage() {
     setupSession();
   }, []);
 
-  // 2. Fetch profile when email is available
+  // 2. Fetch profile when email is available — auto-sync from GHL if missing
   useEffect(() => {
     if (!userEmail) return;
     async function fetchProfile() {
@@ -115,25 +115,42 @@ export default function DashboardPage() {
         const res = await fetch(`/api/auth/get-profile?email=${encodeURIComponent(userEmail!)}`);
         if (res.ok) {
           const data = await res.json();
-          if (data.profile) {
-            if (data.profile.full_name) {
-              setUserName(data.profile.full_name);
+          let profile = data.profile;
+
+          // If profile is missing or has no name, sync from GHL first
+          if (!profile || !profile.full_name) {
+            try {
+              const syncRes = await fetch(`/api/ghl/sync-contact?email=${encodeURIComponent(userEmail!)}`);
+              if (syncRes.ok) {
+                const syncData = await syncRes.json();
+                if (syncData.synced && syncData.profile) {
+                  profile = syncData.profile;
+                }
+              }
+            } catch (syncErr) {
+              console.error("GHL sync failed (non-fatal):", syncErr);
+            }
+          }
+
+          if (profile) {
+            if (profile.full_name) {
+              setUserName(profile.full_name);
               // Sync name back to session cookie
               await fetch("/api/auth/session", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: userEmail, name: data.profile.full_name }),
+                body: JSON.stringify({ email: userEmail, name: profile.full_name }),
               });
               window.dispatchEvent(new Event("nabd_user_updated"));
             }
-            if (data.profile.phone) setProfilePhone(data.profile.phone);
-            if (data.profile.national_id) {
-              setProfileNationalId(data.profile.national_id);
+            if (profile.phone) setProfilePhone(profile.phone);
+            if (profile.national_id) {
+              setProfileNationalId(profile.national_id);
             }
-            if (data.profile.professional_id) {
-              setProfileProfessionalId(data.profile.professional_id);
+            if (profile.professional_id) {
+              setProfileProfessionalId(profile.professional_id);
             }
-            if (data.profile.national_id) {
+            if (profile.national_id) {
               setShowIdentityGate(false);
             } else {
               setShowIdentityGate(true);
