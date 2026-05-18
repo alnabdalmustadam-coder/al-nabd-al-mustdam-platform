@@ -83,14 +83,27 @@ export async function POST(req: NextRequest) {
       upsertData.status = "active";
     }
 
-    if (Object.keys(upsertData).length <= 4 && progress === null) {
+    // Upsert enrollment record (create if not exists, update if exists)
+    // Smart Fallback: If GHL didn't send a specific progress percentage, auto-increment by 10%
+    if (progress === null && !completed) {
+      const { data: existing } = await supabase
+        .from("enrollments")
+        .select("progress")
+        .eq("email", email)
+        .eq("course_id", courseId)
+        .maybeSingle();
+      
+      const currentProg = existing?.progress || 0;
+      upsertData.progress = Math.min(95, currentProg + 10);
+    }
+
+    if (Object.keys(upsertData).length <= 4 && upsertData.progress === undefined) {
       return NextResponse.json(
         { success: true, message: "No progress updates needed" },
         { headers: CORS }
       );
     }
 
-    // Upsert enrollment record (create if not exists, update if exists)
     const { error } = await supabase
       .from("enrollments")
       .upsert(upsertData, { onConflict: "email,course_id" });
