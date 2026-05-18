@@ -72,8 +72,7 @@ export async function POST(req: NextRequest) {
     const upsertData: Record<string, any> = {
       email,
       course_id: courseId,
-      course_title: courseTitle,
-      updated_at: new Date().toISOString()
+      course_title: courseTitle
     };
     if (progress !== null) upsertData.progress = progress;
     if (completed) {
