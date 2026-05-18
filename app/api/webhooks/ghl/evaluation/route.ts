@@ -28,12 +28,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "No email in payload" }, { status: 200, headers: CORS });
     }
 
-    const courseId = payload.courseId || payload.course_id || null;
-    if (!courseId) {
-      return NextResponse.json({ success: false, message: "No courseId in payload" }, { status: 200, headers: CORS });
-    }
-
     const courseTitle = payload.courseTitle || payload.courseName || payload.course_name || "دورة تدريبية";
+    
+    let courseId = payload.courseId || payload.course_id || null;
+    if (!courseId) {
+      if (courseTitle !== "دورة تدريبية") {
+        courseId = `course-${courseTitle.replace(/\s+/g, '-').toLowerCase()}`;
+      } else {
+        return NextResponse.json({ success: false, message: "No courseId or courseTitle in payload" }, { status: 200, headers: CORS });
+      }
+    }
     
     // Parse rating/score
     let rating = 5; // Default rating if not provided or unparsable
