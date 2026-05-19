@@ -1,16 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { login } from '../actions'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import { createClient } from '@/utils/supabase/client'
 import { motion } from 'framer-motion'
+import { useSearchParams } from 'next/navigation'
 
-export default function LoginPage() {
+function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const searchParams = useSearchParams()
+  const message = searchParams.get('message')
 
   async function handleSubmit(formData: FormData) {
     setLoading(true)
@@ -64,10 +67,10 @@ export default function LoginPage() {
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4 16H9.5L12 7L16 25L19 13L21.5 16H28" stroke="url(#logo_grad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                   <defs>
-                    <linearGradient id="logo_grad" x1="4" y1="16" x2="28" y2="16" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#5CB07C" />
-                      <stop offset="1" stopColor="#3B82F6" />
-                    </linearGradient>
+                     <linearGradient id="logo_grad" x1="4" y1="16" x2="28" y2="16" gradientUnits="userSpaceOnUse">
+                       <stop stopColor="#5CB07C" />
+                       <stop offset="1" stopColor="#3B82F6" />
+                     </linearGradient>
                   </defs>
                 </svg>
               </div>
@@ -82,6 +85,18 @@ export default function LoginPage() {
         {/* Card */}
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl rounded-3xl p-8 sm:p-10">
           <form action={handleSubmit} className="space-y-5">
+            {message && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-emerald-400 text-sm font-bold text-center bg-emerald-950/40 border border-emerald-900/30 py-3.5 px-4 rounded-2xl"
+              >
+                {message === 'Check your email to confirm your account' 
+                  ? 'تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتأكيد الحساب وتفعيله قبل تسجيل الدخول.' 
+                  : message}
+              </motion.div>
+            )}
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-300 mb-2" htmlFor="email">
@@ -198,5 +213,17 @@ export default function LoginPage() {
         </p>
       </motion.div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-[#0A1128]">
+        <div className="w-10 h-10 border-4 border-[#5CB07C] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
