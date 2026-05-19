@@ -4,18 +4,19 @@ import { stmtProgressed, stmtCompleted, storeStatement } from "@/lib/xapi";
 
 /**
  * GHL Webhook — Course Progress / Completion + xAPI Tracking
- * يستقبل webhook من GHL Workflow عند إكمال كورس أو تحديث تقدم
+ * يستقبل webhook من GHL Workflow عند إكمال درس
  * ويسجل الحدث في xAPI للاعتماد NELC
  *
  * Webhook URL: https://nabdtraining.com/api/webhooks/ghl/progress
  *
- * Expected payload from GHL Workflow:
+ * Expected payload from GHL Workflow (as configured):
  * {
  *   "email": "{{contact.email}}",
- *   "courseId": "course-xxx",
- *   "courseName": "اسم الكورس",       // اسم الكورس (مطلوب لـ xAPI)
- *   "progress": 100,              // نسبة التقدم (0-100)
- *   "completed": true             // هل أكمل الكورس
+ *   "progress": "{{membership.percent_completed}}",
+ *   "courseTitle": "{{membership.product_title}}",
+ *   "courseId": "{{membership.offer_id}}",
+ *   "courseUrl": "https://members.nabdtraining.com/library/...",
+ *   "NationalID": "{{contact.national_id}}"
  * }
  */
 
@@ -33,8 +34,10 @@ export async function POST(req: NextRequest) {
   try {
     const payload = await req.json();
 
-    console.log("📊 GHL Progress Webhook received:", JSON.stringify(payload).slice(0, 500));
+    // ── Full payload logging for debugging ──────────────────────────
+    console.log("📊 GHL Progress Webhook — FULL PAYLOAD:", JSON.stringify(payload, null, 2));
 
+    // ── Extract email ──────────────────────────────────────────────
     const email = (
       payload.email ||
       payload.contact?.email ||
@@ -50,70 +53,96 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const courseTitle = payload.courseTitle || payload.courseName || payload.course_name || "دورة جديدة";
-    let courseId = payload.courseId || payload.course_id || null;
-    
+    // ── Extract course info ────────────────────────────────────────
+    const courseTitle = payload.courseTitle || payload.courseName || payload.course_name || payload.product_title || "دورة جديدة";
+    let courseId = payload.courseId || payload.course_id || payload.offer_id || null;
+    const courseUrl = payload.courseUrl || payload.course_url || null;
+    const nationalIdFromPayload = payload.NationalID || payload.nationalID || payload.national_id || null;
+
     if (!courseId) {
-      // Deterministic ID fallback to match enrollment
       courseId = `course-${courseTitle.replace(/\s+/g, '-').toLowerCase()}`;
     }
 
-    // Parse progress safely handling both numbers and strings (e.g., "100" or "100%")
-    let parsedProgress = null;
-    if (payload.progress !== undefined && payload.progress !== null) {
-      const p = parseInt(String(payload.progress).replace(/\D/g, ''), 10);
-      if (!isNaN(p)) parsedProgress = Math.min(100, Math.max(0, p));
-    }
-    const progress = parsedProgress;
-    
-    const completed = payload.completed === true || payload.completed === "true" || progress === 100;
+    // ── Parse progress (handles numbers, strings, "80%", empty strings) ──
+    let parsedProgress: number | null = null;
+    const rawProgress = payload.progress;
+    console.log(`📊 Raw progress value: "${rawProgress}" (type: ${typeof rawProgress})`);
 
-    // Build upsert object
-    const upsertData: Record<string, any> = {
-      email,
-      course_id: courseId,
-      course_title: courseTitle
-    };
-    if (progress !== null) upsertData.progress = progress;
-    if (completed) {
-      upsertData.status = "completed";
-      upsertData.completed_at = new Date().toISOString();
-      upsertData.progress = 100;
-    } else {
-      upsertData.status = "active";
-    }
-
-    // Upsert enrollment record (create if not exists, update if exists)
-    // Smart Fallback: If GHL didn't send a specific progress percentage, auto-increment by 10%
-    // When progress reaches 90%+, the next event means the course is completed (100%)
-    if (progress === null && !completed) {
-      const { data: existing } = await supabase
-        .from("enrollments")
-        .select("progress")
-        .eq("email", email)
-        .eq("course_id", courseId)
-        .maybeSingle();
-      
-      const currentProg = existing?.progress || 0;
-      const newProgress = currentProg + 10;
-      
-      if (newProgress >= 100) {
-        // Student reached 100% — mark as completed
-        upsertData.progress = 100;
-        upsertData.status = "completed";
-        upsertData.completed_at = new Date().toISOString();
-      } else {
-        upsertData.progress = newProgress;
+    if (rawProgress !== undefined && rawProgress !== null && rawProgress !== "") {
+      const cleaned = String(rawProgress).replace(/[^0-9.]/g, '');
+      if (cleaned !== "") {
+        const p = parseFloat(cleaned);
+        if (!isNaN(p)) {
+          // Handle both 0-1 scale (0.8) and 0-100 scale (80)
+          parsedProgress = p <= 1 && p > 0 ? Math.round(p * 100) : Math.round(Math.min(100, Math.max(0, p)));
+        }
       }
     }
 
-    if (Object.keys(upsertData).length <= 4 && upsertData.progress === undefined) {
-      return NextResponse.json(
-        { success: true, message: "No progress updates needed" },
-        { headers: CORS }
-      );
+    console.log(`📊 Parsed progress: ${parsedProgress}% for ${email} → ${courseId}`);
+
+    const completed = payload.completed === true || payload.completed === "true" || parsedProgress === 100;
+
+    // ── Build upsert data ──────────────────────────────────────────
+    const upsertData: Record<string, any> = {
+      email,
+      course_id: courseId,
+      course_title: courseTitle,
+    };
+
+    if (courseUrl) upsertData.course_url = courseUrl;
+
+    if (parsedProgress !== null) {
+      // GHL sent real progress — use it directly
+      upsertData.progress = parsedProgress;
+      console.log(`✅ Using REAL progress from GHL: ${parsedProgress}%`);
     }
 
+    if (completed || parsedProgress === 100) {
+      upsertData.status = "completed";
+      upsertData.completed_at = new Date().toISOString();
+      upsertData.progress = 100;
+    } else if (parsedProgress !== null) {
+      upsertData.status = "active";
+    }
+
+    // ── Fallback: GHL didn't send progress — count lesson events ──
+    if (parsedProgress === null && !completed) {
+      console.log("⚠️ No progress from GHL — using lesson-count fallback");
+
+      // Count how many progress webhook calls we've received for this student+course
+      const { count: lessonCount } = await supabase
+        .from("xapi_statements")
+        .select("*", { count: "exact", head: true })
+        .eq("actor_email", email)
+        .eq("object_id", courseId)
+        .eq("verb_display", "progressed");
+
+      const completedLessons = (lessonCount || 0) + 1; // +1 for current event
+
+      // Try to get total lessons from enrollments metadata or use default
+      const { data: enrollment } = await supabase
+        .from("enrollments")
+        .select("progress, total_lessons")
+        .eq("email", email)
+        .eq("course_id", courseId)
+        .maybeSingle();
+
+      const totalLessons = enrollment?.total_lessons || 5; // Default 5 lessons per course
+      const calculatedProgress = Math.min(100, Math.round((completedLessons / totalLessons) * 100));
+
+      upsertData.progress = calculatedProgress;
+      console.log(`📊 Fallback progress: ${completedLessons}/${totalLessons} = ${calculatedProgress}%`);
+
+      if (calculatedProgress >= 100) {
+        upsertData.status = "completed";
+        upsertData.completed_at = new Date().toISOString();
+      } else {
+        upsertData.status = "active";
+      }
+    }
+
+    // ── Upsert enrollment ──────────────────────────────────────────
     const { error } = await supabase
       .from("enrollments")
       .upsert(upsertData, { onConflict: "email,course_id" });
@@ -126,32 +155,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log(`✅ Progress updated: ${email} → ${courseId} = ${progress}% ${completed ? "(COMPLETED)" : ""}`);
+    const finalProgress = upsertData.progress;
+    const isCompleted = upsertData.status === "completed";
+    console.log(`✅ Progress updated: ${email} → ${courseId} = ${finalProgress}% ${isCompleted ? "(COMPLETED)" : ""}`);
 
-    // ── Generate xAPI statement for NELC compliance ──────────────────
+    // ── Generate xAPI statement ────────────────────────────────────
     try {
-      // Fetch learner profile for national ID
       const { data: profile } = await supabase
         .from("profiles")
         .select("full_name, national_id")
         .eq("email", email)
         .maybeSingle();
 
-      // courseTitle is already extracted above
-      if (!courseTitle || courseTitle === "دورة جديدة") {
-        const { data: enrollment } = await supabase
-          .from("enrollments")
-          .select("course_title")
-          .eq("email", email)
-          .eq("course_id", courseId)
-          .maybeSingle();
-        if (enrollment?.course_title) {
-          // keep it
-        }
-      }
-
       const learnerName = profile?.full_name || email.split("@")[0];
-      const nationalId = profile?.national_id || "";
+      const nationalId = nationalIdFromPayload || profile?.national_id || "";
 
       const xapiParams = {
         email,
@@ -162,17 +179,13 @@ export async function POST(req: NextRequest) {
         courseNameAr: courseTitle,
       };
 
-      // Generate the appropriate xAPI statement
-      // Use upsertData.progress (the actual calculated value) instead of raw payload
-      const actualProgress = upsertData.progress || progress || 0;
-      const isCompleted = completed || upsertData.status === "completed";
       const xapiStatement = isCompleted
         ? stmtCompleted(xapiParams)
-        : stmtProgressed({ ...xapiParams, progress: actualProgress });
+        : stmtProgressed({ ...xapiParams, progress: finalProgress || 0 });
 
       const xapiResult = await storeStatement(xapiStatement);
       if (xapiResult.success) {
-        console.log(`📋 xAPI ${completed ? "completed" : "progressed"} statement stored for ${email} → ${courseId}`);
+        console.log(`📋 xAPI ${isCompleted ? "completed" : "progressed"} statement stored: ${finalProgress}%`);
       } else {
         console.error("⚠️ xAPI store failed (non-fatal):", xapiResult.error);
       }
@@ -181,7 +194,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: true, message: "Progress updated + xAPI tracked" },
+      { success: true, message: `Progress updated: ${finalProgress}%`, progress: finalProgress },
       { headers: CORS }
     );
   } catch (err: any) {
