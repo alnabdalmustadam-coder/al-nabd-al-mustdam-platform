@@ -98,6 +98,14 @@ export async function POST(req: NextRequest) {
               lastName: fullName?.split(" ").slice(1).join(" ") || "-",
               phone: phone || undefined,
               tags: nationalId ? ["website-registered", "nelc-eligible"] : ["website-registered"],
+              ...(nationalId ? {
+                customFields: [
+                  {
+                    key: "contact.national_id",
+                    field_value: nationalId
+                  }
+                ]
+              } : {})
             }),
           }
         );

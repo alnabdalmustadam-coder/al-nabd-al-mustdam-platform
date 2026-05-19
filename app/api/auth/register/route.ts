@@ -80,6 +80,14 @@ export async function POST(req: NextRequest) {
               "website-registered",
               nationalId ? "nelc-eligible" : "no-nelc",
             ],
+            ...(nationalId ? {
+              customFields: [
+                {
+                  key: "contact.national_id",
+                  field_value: nationalId
+                }
+              ]
+            } : {})
           }),
         }
       );

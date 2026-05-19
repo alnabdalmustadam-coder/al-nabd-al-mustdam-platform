@@ -536,7 +536,7 @@ export default function DashboardPage() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              window.open(courseUrl, '_blank');
+                              window.open("https://members.nabdtraining.com/account?activeTab=Certificates", '_blank');
                             }}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                               isCompleted
