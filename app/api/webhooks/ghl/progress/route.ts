@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { stmtProgressed, stmtCompleted, storeStatement } from "@/lib/xapi";
+import { courses } from "@/data/courses";
+
+/**
+ * Build a lookup map: courseId/ghlCourseId/slug → lessonsCount
+ * This ensures we use the REAL lesson count for each course
+ * instead of a hardcoded default.
+ */
+const COURSE_LESSONS_MAP: Record<string, number> = {};
+for (const c of courses) {
+  if (c.ghlCourseId) {
+    COURSE_LESSONS_MAP[c.ghlCourseId] = c.lessonsCount;
+  }
+  // Also map by slug and generated ID for flexibility
+  COURSE_LESSONS_MAP[c.slug] = c.lessonsCount;
+  COURSE_LESSONS_MAP[`course-${c.slug}`] = c.lessonsCount;
+}
 
 /**
  * GHL Webhook — Course Progress / Completion + xAPI Tracking
@@ -120,19 +136,22 @@ export async function POST(req: NextRequest) {
 
       const completedLessons = (lessonCount || 0) + 1; // +1 for current event
 
-      // Try to get total lessons from enrollments metadata or use default
+      // Try to get existing progress from enrollments
       const { data: enrollment } = await supabase
         .from("enrollments")
-        .select("progress, total_lessons")
+        .select("progress")
         .eq("email", email)
         .eq("course_id", courseId)
         .maybeSingle();
 
-      const totalLessons = enrollment?.total_lessons || 5; // Default 5 lessons per course
+      // Use REAL lesson count from course config, NOT hardcoded 5
+      const totalLessons = COURSE_LESSONS_MAP[courseId] || 10;
       const calculatedProgress = Math.min(100, Math.round((completedLessons / totalLessons) * 100));
 
-      upsertData.progress = calculatedProgress;
-      console.log(`📊 Fallback progress: ${completedLessons}/${totalLessons} = ${calculatedProgress}%`);
+      // Never go backwards — keep the higher value
+      const existingProgress = enrollment?.progress || 0;
+      upsertData.progress = Math.max(existingProgress, calculatedProgress);
+      console.log(`📊 Fallback progress: ${completedLessons}/${totalLessons} lessons = ${calculatedProgress}% (existing: ${existingProgress}%, using: ${upsertData.progress}%) [source: ${COURSE_LESSONS_MAP[courseId] ? 'course-config' : 'default-10'}]`);
 
       if (calculatedProgress >= 100) {
         upsertData.status = "completed";
