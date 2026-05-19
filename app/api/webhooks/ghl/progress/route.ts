@@ -163,9 +163,12 @@ export async function POST(req: NextRequest) {
       };
 
       // Generate the appropriate xAPI statement
-      const xapiStatement = completed
+      // Use upsertData.progress (the actual calculated value) instead of raw payload
+      const actualProgress = upsertData.progress || progress || 0;
+      const isCompleted = completed || upsertData.status === "completed";
+      const xapiStatement = isCompleted
         ? stmtCompleted(xapiParams)
-        : stmtProgressed({ ...xapiParams, progress: progress || 0 });
+        : stmtProgressed({ ...xapiParams, progress: actualProgress });
 
       const xapiResult = await storeStatement(xapiStatement);
       if (xapiResult.success) {
