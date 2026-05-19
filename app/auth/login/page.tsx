@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button'
 import { createClient } from '@/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSearchParams } from 'next/navigation'
+import { translateAuthError } from '../utils'
 
 function LoginForm() {
   const [error, setError] = useState<string | null>(null)
@@ -41,7 +42,7 @@ function LoginForm() {
         setEmail(emailVal)
         setShowOtpScreen(true)
       } else {
-        setError(result.error)
+        setError(translateAuthError(result.error))
       }
       setLoading(false)
     }
@@ -69,7 +70,7 @@ function LoginForm() {
       })
 
       if (verifyError) {
-        setError(verifyError.message)
+        setError(translateAuthError(verifyError.message))
         setOtpLoading(false)
         return
       }
@@ -111,7 +112,7 @@ function LoginForm() {
       })
 
       if (resendError) {
-        setError(resendError.message)
+        setError(translateAuthError(resendError.message))
       } else {
         setResendSuccess('تم إعادة إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني')
       }
@@ -134,7 +135,7 @@ function LoginForm() {
         },
       })
       if (error) {
-        setError(error.message)
+        setError(translateAuthError(error.message))
         setGoogleLoading(false)
       }
     } catch (err) {

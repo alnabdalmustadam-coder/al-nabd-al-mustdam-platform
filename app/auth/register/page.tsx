@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import { createClient } from '@/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
+import { translateAuthError } from '../utils'
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
@@ -47,7 +48,7 @@ export default function RegisterPage() {
 
     const result = await signup(formData)
     if (result?.error) {
-      setError(result.error)
+      setError(translateAuthError(result.error))
       setLoading(false)
     } else if (result?.success) {
       setShowOtpScreen(true)
@@ -77,7 +78,7 @@ export default function RegisterPage() {
       })
 
       if (verifyError) {
-        setError(verifyError.message)
+        setError(translateAuthError(verifyError.message))
         setOtpLoading(false)
         return
       }
@@ -112,7 +113,7 @@ export default function RegisterPage() {
       })
 
       if (resendError) {
-        setError(resendError.message)
+        setError(translateAuthError(resendError.message))
       } else {
         setResendSuccess('تم إعادة إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني')
       }
@@ -135,7 +136,7 @@ export default function RegisterPage() {
         },
       })
       if (error) {
-        setError(error.message)
+        setError(translateAuthError(error.message))
         setGoogleLoading(false)
       }
     } catch (err) {
