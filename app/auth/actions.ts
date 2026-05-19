@@ -48,9 +48,7 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  // Usually sign up requires email confirmation in Supabase. 
-  // Depending on your settings, we might redirect to a success page or dashboard.
-  redirect('/auth/login?message=Check your email to confirm your account')
+  return { success: true, email }
 }
 
 export async function signout() {
