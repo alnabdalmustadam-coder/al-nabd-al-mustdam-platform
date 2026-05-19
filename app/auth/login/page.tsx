@@ -5,7 +5,7 @@ import { login } from '../actions'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import { createClient } from '@/utils/supabase/client'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useSearchParams } from 'next/navigation'
 
 function LoginForm() {
@@ -15,13 +15,107 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const message = searchParams.get('message')
 
+  // OTP screen state for unconfirmed email login attempts
+  const [showOtpScreen, setShowOtpScreen] = useState(false)
+  const [email, setEmail] = useState('')
+  const [otpToken, setOtpToken] = useState('')
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [resendSuccess, setResendSuccess] = useState<string | null>(null)
+
   async function handleSubmit(formData: FormData) {
     setLoading(true)
     setError(null)
+    setResendSuccess(null)
+    const emailVal = formData.get('email') as string
+
     const result = await login(formData)
     if (result?.error) {
-      setError(result.error)
+      // If error is related to unconfirmed email, show OTP screen
+      if (
+        result.error.toLowerCase().includes('confirm') || 
+        result.error.toLowerCase().includes('verify')
+      ) {
+        setEmail(emailVal)
+        setShowOtpScreen(true)
+      } else {
+        setError(result.error)
+      }
       setLoading(false)
+    }
+  }
+
+  const handleOtpVerify = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setOtpLoading(true)
+    setError(null)
+    setResendSuccess(null)
+
+    const tokenClean = otpToken.trim()
+    if (tokenClean.length !== 6 || !/^\d+$/.test(tokenClean)) {
+      setError('الرجاء إدخال رمز التحقق المكون من 6 أرقام')
+      setOtpLoading(false)
+      return
+    }
+
+    try {
+      const supabase = createClient()
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: tokenClean,
+        type: 'signup'
+      })
+
+      if (verifyError) {
+        setError(verifyError.message)
+        setOtpLoading(false)
+        return
+      }
+
+      // Fetch user's profile to get their name
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', data.user?.id)
+        .single()
+
+      // Establish HTTP-Only session cookies
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name: profile?.full_name || data.user?.email?.split('@')[0] || '' })
+      })
+
+      // Trigger custom auth update event (for navbar)
+      window.dispatchEvent(new Event('nabd_user_updated'))
+
+      // Redirect to dashboard
+      window.location.href = '/dashboard'
+    } catch (err) {
+      setError('حدث خطأ غير متوقع أثناء تفعيل الحساب')
+      setOtpLoading(false)
+    }
+  }
+
+  const handleResendOtp = async () => {
+    setOtpLoading(true)
+    setError(null)
+    setResendSuccess(null)
+    try {
+      const supabase = createClient()
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
+        email: email
+      })
+
+      if (resendError) {
+        setError(resendError.message)
+      } else {
+        setResendSuccess('تم إعادة إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني')
+      }
+    } catch (err) {
+      setError('حدث خطأ أثناء محاولة إعادة إرسال الرمز')
+    } finally {
+      setOtpLoading(false)
     }
   }
 
@@ -63,7 +157,6 @@ function LoginForm() {
           <Link href="/" className="inline-block">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-tr from-[#5CB07C] to-[#173A7C] p-0.5 shadow-xl shadow-[#173A7C]/20 mx-auto mb-4 hover:scale-105 transition-transform duration-300">
               <div className="flex h-full w-full items-center justify-center rounded-[22px] bg-[#0A1128]">
-                {/* Custom Pulse Wave SVG */}
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4 16H9.5L12 7L16 25L19 13L21.5 16H28" stroke="url(#logo_grad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                   <defs>
@@ -76,132 +169,223 @@ function LoginForm() {
               </div>
             </div>
           </Link>
-          <h2 className="text-3xl font-black tracking-tight text-white font-[family-name:var(--font-cairo)]">تسجيل الدخول</h2>
+          <h2 className="text-3xl font-black tracking-tight text-white font-[family-name:var(--font-cairo)]">
+            {showOtpScreen ? 'تأكيد الحساب' : 'تسجيل الدخول'}
+          </h2>
           <p className="mt-2.5 text-sm font-medium text-slate-400">
-            أهلاً بك مجدداً في منصة النبض المستدام
+            {showOtpScreen ? 'أدخل رمز التحقق لتفعيل حسابك البدء' : 'أهلاً بك مجدداً في منصة النبض المستدام'}
           </p>
         </div>
 
         {/* Card */}
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl rounded-3xl p-8 sm:p-10">
-          <form action={handleSubmit} className="space-y-5">
-            {message && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-emerald-400 text-sm font-bold text-center bg-emerald-950/40 border border-emerald-900/30 py-3.5 px-4 rounded-2xl"
+          <AnimatePresence mode="wait">
+            {!showOtpScreen ? (
+              <motion.div
+                key="login-form-panel"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
               >
-                {message === 'Check your email to confirm your account' 
-                  ? 'تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتأكيد الحساب وتفعيله قبل تسجيل الدخول.' 
-                  : message}
-              </motion.div>
-            )}
+                <form action={handleSubmit} className="space-y-5">
+                  {message && (
+                    <div className="text-emerald-400 text-sm font-bold text-center bg-emerald-950/40 border border-emerald-900/30 py-3.5 px-4 rounded-2xl">
+                      {message === 'Check your email to confirm your account' 
+                        ? 'تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتأكيد الحساب وتفعيله قبل تسجيل الدخول.' 
+                        : message}
+                    </div>
+                  )}
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-slate-300 mb-2" htmlFor="email">
-                  البريد الإلكتروني
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="block w-full rounded-2xl border border-white/10 bg-white/5 py-3.5 px-4 text-white placeholder-slate-500 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none text-base font-medium transition-all duration-200"
-                  placeholder="name@example.com"
-                />
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-bold text-slate-300" htmlFor="password">
-                    كلمة المرور
-                  </label>
-                  <Link href="/auth/reset-password" className="text-xs font-semibold text-[#5CB07C] hover:underline">
-                    نسيت كلمة المرور؟
-                  </Link>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2" htmlFor="email">
+                        البريد الإلكتروني
+                      </label>
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        required
+                        className="block w-full rounded-2xl border border-white/10 bg-white/5 py-3.5 px-4 text-white placeholder-slate-500 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none text-base font-medium transition-all duration-200"
+                        placeholder="name@example.com"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-bold text-slate-300" htmlFor="password">
+                          كلمة المرور
+                        </label>
+                        <Link href="/auth/reset-password" className="text-xs font-semibold text-[#5CB07C] hover:underline">
+                          نسيت كلمة المرور؟
+                        </Link>
+                      </div>
+                      <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autoComplete="current-password"
+                        required
+                        className="block w-full rounded-2xl border border-white/10 bg-white/5 py-3.5 px-4 text-white placeholder-slate-500 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none text-base font-medium transition-all duration-200"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="text-red-400 text-sm font-bold text-center bg-red-950/40 border border-red-900/30 py-3 px-4 rounded-2xl">
+                      {error}
+                    </div>
+                  )}
+
+                  <div>
+                    <Button
+                      type="submit"
+                      disabled={loading || googleLoading}
+                      className="w-full bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] hover:from-[#4EA06E] hover:to-[#5CB07C] text-white py-3.5 rounded-2xl transition-all font-black text-base shadow-lg shadow-[#5CB07C]/20 border-0 flex items-center justify-center gap-2"
+                    >
+                      {loading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          جاري تسجيل الدخول...
+                        </>
+                      ) : (
+                        'تسجيل الدخول'
+                      )}
+                    </Button>
+                  </div>
+                </form>
+
+                {/* Separator */}
+                <div className="relative my-7">
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div className="w-full border-t border-white/10"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm font-bold">
+                    <span className="bg-[#0f1837] px-4 text-slate-400">أو من خلال</span>
+                  </div>
                 </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="block w-full rounded-2xl border border-white/10 bg-white/5 py-3.5 px-4 text-white placeholder-slate-500 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none text-base font-medium transition-all duration-200"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
 
-            {error && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-red-400 text-sm font-bold text-center bg-red-950/40 border border-red-900/30 py-3 px-4 rounded-2xl"
+                {/* Google Login Button */}
+                <button
+                  onClick={handleGoogleLogin}
+                  disabled={loading || googleLoading}
+                  className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-900 font-bold border border-slate-200 shadow-sm transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-50"
+                  type="button"
+                >
+                  {googleLoading ? (
+                    <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                      <path
+                        fill="#EA4335"
+                        d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.98 1 12 1 7.35 1 3.37 3.67 1.39 7.56l3.85 2.99c.92-2.77 3.5-4.81 6.76-4.81Z"
+                      />
+                      <path
+                        fill="#4285F4"
+                        d="M23.49 12.27c0-.81-.07-1.59-.2-2.35H12v4.51h6.48c-.29 1.48-1.14 2.73-2.42 3.57l3.77 2.92c2.2-2.03 3.46-5.02 3.46-8.65Z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M5.24 14.75a7.82 7.82 0 0 1 0-4.5l-3.85-2.99a11.92 11.92 0 0 0 0 10.49l3.85-3Z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 23c3.24 0 5.97-1.07 7.96-2.92l-3.77-2.92c-1.1.74-2.52 1.19-4.19 1.19-3.26 0-5.84-2.04-6.76-4.81l-3.85 2.99C3.37 20.33 7.35 23 12 23Z"
+                      />
+                    </svg>
+                  )}
+                  <span className="text-base">متابعة باستخدام Google</span>
+                </button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="otp-verification-panel"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
               >
-                {error}
+                <form onSubmit={handleOtpVerify} className="space-y-6">
+                  <div className="text-center space-y-2">
+                    <p className="text-sm text-slate-300">
+                      حسابك غير مفعل بعد. تم إرسال رمز تحقق مكون من 6 أرقام إلى بريدك الإلكتروني:
+                    </p>
+                    <span className="block text-base font-bold text-white bg-white/5 py-2 px-3 rounded-xl border border-white/5 select-all">
+                      {email}
+                    </span>
+                    <p className="text-xs text-slate-400">
+                      يرجى التحقق من صندوق البريد وكتابة الرمز لتفعيل الحساب وتسجيل الدخول.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label htmlFor="otp" className="block text-sm font-bold text-slate-300 mb-2 text-center">رمز التحقق</label>
+                    <input
+                      id="otp"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      required
+                      value={otpToken}
+                      onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, ''))}
+                      className="block w-full text-center tracking-[0.5em] font-mono text-2xl rounded-2xl border border-white/10 bg-white/5 py-3.5 px-4 text-white placeholder-slate-600 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none transition-all duration-200"
+                      placeholder="000000"
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="text-red-400 text-sm font-bold text-center bg-red-950/40 border border-red-900/30 py-3 px-4 rounded-2xl">
+                      {error}
+                    </div>
+                  )}
+
+                  {resendSuccess && (
+                    <div className="text-emerald-400 text-sm font-bold text-center bg-emerald-950/40 border border-emerald-900/30 py-3 px-4 rounded-2xl">
+                      {resendSuccess}
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    <Button
+                      type="submit"
+                      disabled={otpLoading}
+                      className="w-full bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] hover:from-[#4EA06E] hover:to-[#5CB07C] text-white py-3.5 rounded-2xl transition-all font-black text-base shadow-lg shadow-[#5CB07C]/20 border-0 flex items-center justify-center gap-2"
+                    >
+                      {otpLoading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          جاري تأكيد الرمز...
+                        </>
+                      ) : (
+                        'تأكيد وتفعيل الحساب'
+                      )}
+                    </Button>
+
+                    <div className="flex justify-between text-sm pt-2">
+                      <button
+                        type="button"
+                        onClick={handleResendOtp}
+                        disabled={otpLoading}
+                        className="font-bold text-[#5CB07C] hover:underline"
+                      >
+                        إعادة إرسال الرمز
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowOtpScreen(false)}
+                        className="font-bold text-slate-400 hover:text-white transition-colors"
+                      >
+                        الرجوع لتسجيل الدخول
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </motion.div>
             )}
-
-            <div>
-              <Button
-                type="submit"
-                disabled={loading || googleLoading}
-                className="w-full bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] hover:from-[#4EA06E] hover:to-[#5CB07C] text-white py-3.5 rounded-2xl transition-all font-black text-base shadow-lg shadow-[#5CB07C]/20 border-0 flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    جاري تسجيل الدخول...
-                  </>
-                ) : (
-                  'تسجيل الدخول'
-                )}
-              </Button>
-            </div>
-          </form>
-
-          {/* Separator */}
-          <div className="relative my-7">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-white/10"></div>
-            </div>
-            <div className="relative flex justify-center text-sm font-bold">
-              <span className="bg-[#0f1837] px-4 text-slate-400">أو من خلال</span>
-            </div>
-          </div>
-
-          {/* Google Login Button */}
-          <button
-            onClick={handleGoogleLogin}
-            disabled={loading || googleLoading}
-            className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-900 font-bold border border-slate-200 shadow-sm transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-50"
-            type="button"
-          >
-            {googleLoading ? (
-              <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-                <path
-                  fill="#EA4335"
-                  d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.98 1 12 1 7.35 1 3.37 3.67 1.39 7.56l3.85 2.99c.92-2.77 3.5-4.81 6.76-4.81Z"
-                />
-                <path
-                  fill="#4285F4"
-                  d="M23.49 12.27c0-.81-.07-1.59-.2-2.35H12v4.51h6.48c-.29 1.48-1.14 2.73-2.42 3.57l3.77 2.92c2.2-2.03 3.46-5.02 3.46-8.65Z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.24 14.75a7.82 7.82 0 0 1 0-4.5l-3.85-2.99a11.92 11.92 0 0 0 0 10.49l3.85-3Z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c3.24 0 5.97-1.07 7.96-2.92l-3.77-2.92c-1.1.74-2.52 1.19-4.19 1.19-3.26 0-5.84-2.04-6.76-4.81l-3.85 2.99C3.37 20.33 7.35 23 12 23Z"
-                />
-              </svg>
-            )}
-            <span className="text-base">متابعة باستخدام Google</span>
-          </button>
+          </AnimatePresence>
         </div>
 
         {/* Register Footer */}
