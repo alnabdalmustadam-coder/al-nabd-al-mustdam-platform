@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
               ...(nationalId ? {
                 customFields: [
                   {
+                    id: "pJyAoTaiWlxLe5vf64c1",
                     key: "contact.national_id",
                     field_value: nationalId
                   }
