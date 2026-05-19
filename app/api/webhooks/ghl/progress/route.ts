@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
         .from("xapi_statements")
         .select("*", { count: "exact", head: true })
         .eq("actor_email", email)
-        .eq("object_id", courseId)
+        .ilike("object_id", `%${courseId}%`)
         .eq("verb_display", "progressed");
 
       const completedLessons = (lessonCount || 0) + 1; // +1 for current event

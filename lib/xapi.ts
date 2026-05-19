@@ -322,6 +322,12 @@ export function stmtProgressed(params: {
       courseNameAr: params.courseNameAr,
     }),
     result: {
+      score: {
+        scaled: params.progress / 100, // 0-1 scale for xAPI
+        raw: params.progress,
+        min: 0,
+        max: 100,
+      },
       extensions: {
         [`${PLATFORM_IRI}/extensions/progress`]: params.progress,
       },
