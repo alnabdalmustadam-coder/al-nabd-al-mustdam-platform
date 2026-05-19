@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
 
     // Upsert enrollment record (create if not exists, update if exists)
     // Smart Fallback: If GHL didn't send a specific progress percentage, auto-increment by 10%
+    // When progress reaches 90%+, the next event means the course is completed (100%)
     if (progress === null && !completed) {
       const { data: existing } = await supabase
         .from("enrollments")
@@ -94,7 +95,16 @@ export async function POST(req: NextRequest) {
         .maybeSingle();
       
       const currentProg = existing?.progress || 0;
-      upsertData.progress = Math.min(95, currentProg + 10);
+      const newProgress = currentProg + 10;
+      
+      if (newProgress >= 100) {
+        // Student reached 100% — mark as completed
+        upsertData.progress = 100;
+        upsertData.status = "completed";
+        upsertData.completed_at = new Date().toISOString();
+      } else {
+        upsertData.progress = newProgress;
+      }
     }
 
     if (Object.keys(upsertData).length <= 4 && upsertData.progress === undefined) {
