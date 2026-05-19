@@ -217,13 +217,18 @@ export default function DashboardPage() {
   const handleUpdateProfile = async () => {
     if (!userEmail) return;
 
+    if (!userName || userName.trim().split(" ").length < 3) {
+      setSaveMessage("يرجى إدخال الاسم الثلاثي باللغة العربية كما يظهر في الهوية الوطنية");
+      return;
+    }
+
     if (!profileNationalId || profileNationalId.trim() === "") {
       setSaveMessage("يرجى إدخال رقم الهوية الوطنية أولاً");
       return;
     }
 
     if (!/^[124]\d{9}$/.test(profileNationalId.trim())) {
-      setSaveMessage("رقم الهوية الوطنية غير صالح. يجب أن يتكون من 10 أرقام ويبدأ بـ 1 أو 2 أو 4");
+      setSaveMessage("رقم الهوية الوطنية/الإقامة غير صالح. يجب أن يتكون من 10 أرقام ويبدأ بـ 1 أو 2 أو 4");
       return;
     }
 
@@ -251,6 +256,11 @@ export default function DashboardPage() {
           body: JSON.stringify({ email: userEmail, name: userName }),
         });
         window.dispatchEvent(new Event("nabd_user_updated"));
+        
+        // Reload to sync profile data completely
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
         setSaveMessage(data.message || "حدث خطأ أثناء الحفظ");
       }
@@ -882,6 +892,99 @@ export default function DashboardPage() {
                   {isSubmittingEval ? "جاري الإرسال..." : "إرسال التقييم"}
                 </button>
               </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Global Identity Verification Modal */}
+      {showIdentityGate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0A1128]/85 backdrop-blur-md dir-rtl" dir="rtl">
+          {/* Background Radial Glows inside modal */}
+          <div className="absolute top-[-10%] left-[-10%] h-[300px] w-[300px] rounded-full bg-[#173A7C]/20 blur-[80px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] h-[300px] w-[300px] rounded-full bg-[#5CB07C]/10 blur-[80px]" />
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="relative z-10 bg-[#0A1128]/95 border border-white/10 rounded-[32px] p-8 max-w-lg w-full shadow-2xl overflow-hidden text-right"
+          >
+            {/* Header info */}
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-[#5CB07C]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#5CB07C]/20">
+                <Award className="w-8 h-8 text-[#5CB07C]" />
+              </div>
+              <h3 className="text-2xl font-black text-white font-[family-name:var(--font-cairo)]">توثيق الهوية الوطنية مطلوب</h3>
+              <p className="text-sm text-slate-300 mt-3 font-medium leading-relaxed">
+                بناءً على تعليمات المركز الوطني للتعلم الإلكتروني (NELC)، يجب توثيق رقم الهوية الوطنية أو الإقامة لتفعيل حسابك والتمكن من حضور الدورات والحصول على الشهادات المعتمدة.
+              </p>
+            </div>
+
+            {/* Error / Status Messages */}
+            {saveMessage && (
+              <div className={`p-4 rounded-2xl text-sm font-bold mb-5 text-center border ${
+                saveMessage.includes('بنجاح') 
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                  : 'bg-red-500/10 text-red-400 border-red-500/20'
+              }`}>
+                {saveMessage}
+              </div>
+            )}
+
+            {/* Form Fields */}
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-bold text-slate-300 block mb-2">الاسم الكامل (ثلاثي باللغة العربية)</label>
+                <input
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder="أدخل اسمك الثلاثي باللغة العربية"
+                  className="w-full px-5 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] outline-none text-base font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-bold text-slate-300 block mb-2">رقم الهوية الوطنية / الإقامة</label>
+                <input
+                  type="text"
+                  value={profileNationalId}
+                  onChange={(e) => setProfileNationalId(e.target.value)}
+                  placeholder="مثال: 1XXXXXXXXX"
+                  className="w-full px-5 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] outline-none text-base font-medium"
+                  dir="ltr"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-bold text-slate-300 block mb-2">رقم الجوال (اختياري)</label>
+                <input
+                  type="text"
+                  value={profilePhone}
+                  onChange={(e) => setProfilePhone(e.target.value)}
+                  placeholder="05XXXXXXXX"
+                  className="w-full px-5 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] outline-none text-base font-medium"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-6 mt-2">
+              <button
+                onClick={handleLogout}
+                className="order-2 sm:order-1 flex-1 py-3.5 px-4 rounded-2xl text-slate-300 font-bold bg-white/5 hover:bg-white/10 border border-white/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <LogOut className="w-5 h-5" />
+                تسجيل الخروج
+              </button>
+              <button
+                onClick={handleUpdateProfile}
+                disabled={isSaving}
+                className="order-1 sm:order-2 flex-1 py-3.5 px-4 rounded-2xl text-white font-bold bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] hover:from-[#4EA06E] hover:to-[#5CB07C] transition-all shadow-lg shadow-[#5CB07C]/20 border-0 disabled:opacity-70 cursor-pointer"
+              >
+                {isSaving ? "جاري الحفظ..." : "حفظ وتفعيل الحساب"}
+              </button>
             </div>
           </motion.div>
         </div>

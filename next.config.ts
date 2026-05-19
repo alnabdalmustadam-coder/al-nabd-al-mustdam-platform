@@ -4,18 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   async redirects() {
-    return [
-      {
-        source: "/auth/login",
-        destination: "https://members.nabdtraining.com/login",
-        permanent: true,
-      },
-      {
-        source: "/auth/register",
-        destination: "https://members.nabdtraining.com/login",
-        permanent: true,
-      },
-    ];
+    return [];
   },
   async headers() {
     return [

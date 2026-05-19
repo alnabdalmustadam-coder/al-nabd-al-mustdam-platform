@@ -8,7 +8,6 @@ import {
   Users, UserCheck, Phone, ChevronDown, FileText, ChevronLeft, User
 } from "lucide-react";
 import Button from "@/components/ui/Button";
-import { useSession } from "next-auth/react";
 
 const megaMenuItems = [
   { label: "تقييم مستوى اللغة الانجليزية", href: "/english-evaluation", icon: FileText },
@@ -45,7 +44,6 @@ export default function Navbar() {
   const [mobileMegaMenuOpen, setMobileMegaMenuOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
   const pathname = usePathname();
-  const { data: session } = useSession();
 
   const [localUserEmail, setLocalUserEmail] = useState<string | null>(null);
   const [localUserName, setLocalUserName] = useState<string | null>(null);
@@ -88,13 +86,20 @@ export default function Navbar() {
     setMobileMegaMenuOpen(false);
   }, [pathname]);
 
-  return (
+    const isDarkPage = pathname?.startsWith('/auth/');
+
+    return (
     <>
       <nav
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${scrolled
-          ? "py-3 bg-white/90 backdrop-blur-3xl border-b border-white/60 shadow-[0_20px_40px_-15px_rgba(23,58,124,0.15),inset_0_-1px_0_rgba(255,255,255,0.5)]"
-          : "py-5 bg-transparent"
-          }`}
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
+          isDarkPage
+            ? scrolled
+              ? "py-3 bg-[#0A1128]/95 backdrop-blur-3xl border-b border-white/10 shadow-lg"
+              : "py-5 bg-transparent"
+            : scrolled
+              ? "py-3 bg-white/90 backdrop-blur-3xl border-b border-white/60 shadow-[0_20px_40px_-15px_rgba(23,58,124,0.15),inset_0_-1px_0_rgba(255,255,255,0.5)]"
+              : "py-5 bg-transparent"
+        }`}
       >
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-4 xl:px-12 flex items-center justify-between">
           {/* Logo */}
@@ -118,8 +123,12 @@ export default function Navbar() {
                   >
                     <button
                       className={`flex items-center gap-1 lg:gap-1.5 px-1.5 lg:px-2 xl:px-3 py-6 -my-4 rounded-xl text-[13px] lg:text-[13px] xl:text-[15px] font-bold transition-all duration-300 whitespace-nowrap ${isActive || megaMenuOpen
-                        ? "text-[#173A7C] bg-[#173A7C]/5"
-                        : "text-slate-700 hover:text-[#173A7C] hover:bg-slate-50"
+                        ? isDarkPage
+                          ? "text-[#5CB07C] bg-white/10"
+                          : "text-[#173A7C] bg-[#173A7C]/5"
+                        : isDarkPage
+                          ? "text-slate-300 hover:text-white hover:bg-white/5"
+                          : "text-slate-700 hover:text-[#173A7C] hover:bg-slate-50"
                         }`}
                     >
                       <Icon className="w-4 h-4" strokeWidth={2.5} />
@@ -159,8 +168,12 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`flex items-center gap-1 lg:gap-1.5 px-1.5 lg:px-2 xl:px-3 py-2 rounded-xl text-[13px] lg:text-[13px] xl:text-[15px] font-bold transition-all duration-300 whitespace-nowrap ${isActive
-                    ? "text-[#173A7C] bg-[#173A7C]/5"
-                    : "text-slate-700 hover:text-[#173A7C] hover:bg-slate-50"
+                    ? isDarkPage
+                      ? "text-[#5CB07C] bg-white/10"
+                      : "text-[#173A7C] bg-[#173A7C]/5"
+                    : isDarkPage
+                      ? "text-slate-300 hover:text-white hover:bg-white/5"
+                      : "text-slate-700 hover:text-[#173A7C] hover:bg-slate-50"
                     }`}
                 >
                   <Icon className="w-4 h-4" strokeWidth={2.5} />
@@ -172,28 +185,36 @@ export default function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
-            {(session || localUserEmail) ? (
-              <Link href="/dashboard" className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 rounded-full transition-colors border border-transparent hover:border-slate-200">
-                {session?.user?.image && !imgError ? (
-                  <img src={session.user.image} onError={() => setImgError(true)} alt={session?.user?.name || "User"} className="w-8 h-8 rounded-full border border-slate-200" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-[#173A7C]/10 border border-[#173A7C]/20 flex items-center justify-center text-[#173A7C]">
-                    <User className="w-4 h-4" />
-                  </div>
-                )}
-                <span className="text-sm font-bold text-slate-700">
-                  {session?.user?.name?.split(" ")[0] || localUserName?.split(' ')[0] || localUserEmail?.split('@')[0]}
+            {localUserEmail ? (
+              <Link href="/dashboard" className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border border-transparent ${
+                isDarkPage
+                  ? "hover:bg-white/5 hover:border-white/10"
+                  : "hover:bg-slate-50 hover:border-slate-200"
+              }`}>
+                <div className={`w-8 h-8 rounded-full border flex items-center justify-center ${
+                  isDarkPage
+                    ? "bg-white/10 border-white/20 text-[#5CB07C]"
+                    : "bg-[#173A7C]/10 border-[#173A7C]/20 text-[#173A7C]"
+                }`}>
+                  <User className="w-4 h-4" />
+                </div>
+                <span className={`text-sm font-bold ${isDarkPage ? "text-slate-200" : "text-slate-700"}`}>
+                  {localUserName?.split(' ')[0] || localUserEmail.split('@')[0]}
                 </span>
               </Link>
             ) : (
               <>
-                <a
-                  href="https://members.nabdtraining.com/login"
-                  className="text-xs xl:text-sm font-bold text-slate-700 hover:text-[#173A7C] transition-colors px-2 xl:px-4 py-2 whitespace-nowrap"
+                <Link
+                  href="/auth/login"
+                  className={`text-xs xl:text-sm font-bold transition-colors px-2 xl:px-4 py-2 whitespace-nowrap ${
+                    isDarkPage
+                      ? "text-slate-300 hover:text-white"
+                      : "text-slate-700 hover:text-[#173A7C]"
+                  }`}
                 >
                   تسجيل دخول
-                </a>
-                <Button href="https://members.nabdtraining.com/login" size="sm" className="hidden lg:flex text-xs xl:text-sm px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap">
+                </Link>
+                <Button href="/auth/register" size="sm" className="hidden lg:flex text-xs xl:text-sm px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap">
                   سجّل الآن
                 </Button>
               </>
@@ -203,7 +224,11 @@ export default function Navbar() {
           {/* Mobile Toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className={`lg:hidden p-2 text-slate-800 hover:text-[#173A7C]`}
+            className={`lg:hidden p-2 transition-colors ${
+              isDarkPage
+                ? "text-slate-300 hover:text-white"
+                : "text-slate-800 hover:text-[#173A7C]"
+            }`}
             aria-label="القائمة"
           >
             {mobileOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
@@ -290,30 +315,26 @@ export default function Navbar() {
             })}
 
             <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col gap-3">
-              {(session || localUserEmail) ? (
+              {localUserEmail ? (
                 <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                  {session?.user?.image && !imgError ? (
-                    <img src={session.user.image} onError={() => setImgError(true)} alt={session?.user?.name || "User"} className="w-10 h-10 rounded-full border border-slate-200" />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-[#173A7C]/10 border border-[#173A7C]/20 flex items-center justify-center text-[#173A7C]">
-                      <User className="w-5 h-5" />
-                    </div>
-                  )}
+                  <div className="w-10 h-10 rounded-full bg-[#173A7C]/10 border border-[#173A7C]/20 flex items-center justify-center text-[#173A7C]">
+                    <User className="w-5 h-5" />
+                  </div>
                   <div>
                     <strong className="block text-sm text-slate-900 font-bold">
-                      {session?.user?.name || localUserName || localUserEmail?.split('@')[0]}
+                      {localUserName || localUserEmail.split('@')[0]}
                     </strong>
                     <span className="text-xs text-slate-500 line-clamp-1">
-                      {session?.user?.email || localUserEmail}
+                      {localUserEmail}
                     </span>
                   </div>
                 </Link>
               ) : (
                 <>
-                  <Button href="https://members.nabdtraining.com/login" variant="secondary" size="lg" className="w-full justify-center">
+                  <Button href="/auth/login" variant="secondary" size="lg" className="w-full justify-center">
                     تسجيل دخول
                   </Button>
-                  <Button href="https://members.nabdtraining.com/login" size="lg" className="w-full justify-center">
+                  <Button href="/auth/register" size="lg" className="w-full justify-center">
                     سجّل الآن
                   </Button>
                 </>

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (name) {
-      response.cookies.set("nabd_session_name", name, {
+      response.cookies.set("nabd_session_name", encodeURIComponent(name), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
