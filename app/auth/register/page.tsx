@@ -20,16 +20,17 @@ export default function RegisterPage() {
   const [otpLoading, setOtpLoading] = useState(false)
   const [resendSuccess, setResendSuccess] = useState<string | null>(null)
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
     setLoading(true)
     setError(null)
 
-    // Form Validation
-    const fullNameVal = formData.get('fullName') as string
-    const nationalIdVal = formData.get('nationalId') as string
-    const emailVal = formData.get('email') as string
+    const formData = new FormData(e.currentTarget)
+    const fullNameVal = (formData.get('fullName') as string) || ''
+    const nationalIdVal = (formData.get('nationalId') as string) || ''
+    const emailVal = (formData.get('email') as string) || ''
 
-    if (fullNameVal.trim().split(' ').length < 3) {
+    if (fullNameVal.trim().split(/\s+/).filter(Boolean).length < 3) {
       setError('يرجى إدخال الاسم الثلاثي كاملاً كما يظهر في الهوية الوطنية')
       setLoading(false)
       return
@@ -191,7 +192,7 @@ export default function RegisterPage() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <form action={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-4">
                     <div>
                       <label htmlFor="fullName" className="block text-sm font-bold text-slate-300 mb-2">الاسم الثلاثي</label>

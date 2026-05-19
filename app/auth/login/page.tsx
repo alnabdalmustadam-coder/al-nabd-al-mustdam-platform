@@ -22,11 +22,14 @@ function LoginForm() {
   const [otpLoading, setOtpLoading] = useState(false)
   const [resendSuccess, setResendSuccess] = useState<string | null>(null)
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
     setLoading(true)
     setError(null)
     setResendSuccess(null)
-    const emailVal = formData.get('email') as string
+    
+    const formData = new FormData(e.currentTarget)
+    const emailVal = (formData.get('email') as string) || ''
 
     const result = await login(formData)
     if (result?.error) {
@@ -188,7 +191,7 @@ function LoginForm() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <form action={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-5">
                   {message && (
                     <div className="text-emerald-400 text-sm font-bold text-center bg-emerald-950/40 border border-emerald-900/30 py-3.5 px-4 rounded-2xl">
                       {message === 'Check your email to confirm your account' 
