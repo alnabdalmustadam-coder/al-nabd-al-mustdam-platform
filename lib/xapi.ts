@@ -430,6 +430,44 @@ export function stmtAttended(params: {
   });
 }
 
+/**
+ * Statement: Learner evaluated a course
+ */
+export function stmtEvaluated(params: {
+  email: string;
+  name: string;
+  nationalId?: string;
+  courseId: string;
+  courseName: string;
+  courseNameAr?: string;
+  rating: number; // 1 to 5
+  feedback?: string;
+  registrationId?: string;
+}): XAPIStatement {
+  return buildStatement({
+    actor: buildActor(params),
+    verb: XAPI_VERBS.evaluated,
+    object: buildActivity({
+      courseId: params.courseId,
+      courseName: params.courseName,
+      courseNameAr: params.courseNameAr,
+    }),
+    result: {
+      completion: true,
+      score: {
+        raw: params.rating,
+        min: 1,
+        max: 5,
+        scaled: params.rating / 5,
+      },
+      extensions: {
+        [`${PLATFORM_IRI}/extensions/feedback`]: params.feedback || "",
+      },
+    },
+    registrationId: params.registrationId,
+  });
+}
+
 // ─── LRS Storage (Supabase) ─────────────────────────────────────────────────
 
 import { supabase } from "@/lib/supabase";

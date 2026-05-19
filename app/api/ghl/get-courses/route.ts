@@ -103,6 +103,27 @@ export async function GET(req: NextRequest) {
     // Add GHL tag courses that aren't already in enrollments
     const newFromGhl = ghlTagCourses.filter((c) => !enrolledIds.has(c.course_id));
 
+    // ========== 3.5 Check Evaluations in xAPI ==========
+    let evaluatedCourseIds = new Set<string>();
+    try {
+      const { data: evalStatements, error: evalErr } = await supabase
+        .from("xapi_statements")
+        .select("object_id")
+        .eq("actor_email", normalizedEmail)
+        .eq("verb_id", "http://adlnet.gov/expapi/verbs/evaluated");
+
+      if (!evalErr && evalStatements) {
+        evalStatements.forEach(stmt => {
+          // object_id is like "https://nabdtraining.com/courses/course-id"
+          const idParts = stmt.object_id.split("/");
+          const extractedId = idParts[idParts.length - 1];
+          evaluatedCourseIds.add(extractedId);
+        });
+      }
+    } catch (evalCatchErr) {
+      console.error("Evaluation check error:", evalCatchErr);
+    }
+
     const allCourses = [
       ...enrollments.map((e) => ({
         course_id: e.course_id,
@@ -113,8 +134,12 @@ export async function GET(req: NextRequest) {
         enrolled_at: e.enrolled_at,
         completed_at: e.completed_at,
         source: "enrollment",
+        is_evaluated: evaluatedCourseIds.has(e.course_id),
       })),
-      ...newFromGhl,
+      ...newFromGhl.map((c) => ({
+        ...c,
+        is_evaluated: evaluatedCourseIds.has(c.course_id),
+      })),
     ];
 
     return NextResponse.json({

@@ -63,6 +63,12 @@ export default function DashboardPage() {
   const [xapiStatements, setXapiStatements] = useState<any[]>([]);
   const [isLoadingXapi, setIsLoadingXapi] = useState(false);
 
+  // Evaluation states
+  const [courseToEvaluate, setCourseToEvaluate] = useState<any>(null);
+  const [evalRating, setEvalRating] = useState(5);
+  const [evalFeedback, setEvalFeedback] = useState("");
+  const [isSubmittingEval, setIsSubmittingEval] = useState(false);
+
   // 1. Check for email and name on mount (from URL param or cookies)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -258,6 +264,45 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     window.location.href = "https://members.nabdtraining.com/login?nabd_logout=true";
+  };
+
+  const handleEvaluate = async () => {
+    if (!userEmail || !courseToEvaluate) return;
+    setIsSubmittingEval(true);
+    try {
+      const res = await fetch("/api/evaluations/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          courseId: courseToEvaluate.course_id,
+          courseTitle: courseToEvaluate.title,
+          rating: evalRating,
+          feedback: evalFeedback
+        }),
+      });
+      if (res.ok) {
+        setEnrolledCourses(prev => prev.map(c => 
+          c.course_id === courseToEvaluate.course_id ? { ...c, is_evaluated: true } : c
+        ));
+        setCourseToEvaluate(null);
+        setEvalRating(5);
+        setEvalFeedback("");
+        
+        // Refresh xAPI logs
+        const xapiRes = await fetch(`/api/xapi/statements?agent=${encodeURIComponent(userEmail)}&limit=30`);
+        if (xapiRes.ok) {
+          const data = await xapiRes.json();
+          setXapiStatements(data.statements || []);
+        }
+      } else {
+        alert("حدث خطأ أثناء إرسال التقييم");
+      }
+    } catch (e) {
+      alert("تعذر الاتصال بالخادم");
+    } finally {
+      setIsSubmittingEval(false);
+    }
   };
 
   // Loading state while checking auth
@@ -475,26 +520,39 @@ export default function DashboardPage() {
                           <div className="text-xs font-bold text-slate-400">مكتمل</div>
                         </div>
 
-                        {/* Action Button */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(courseUrl, '_blank');
-                          }}
-                          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer shrink-0 ${
-                            isCompleted
-                              ? "border border-emerald-200 text-emerald-600 hover:bg-emerald-50"
-                              : "bg-[#173A7C] text-white hover:bg-[#1E4D9D] shadow-md shadow-[#173A7C]/20"
-                          }`}
-                        >
-                          {isCompleted ? (
-                            <><Award className="w-4 h-4" /> عرض الشهادة</>
-                          ) : progress > 0 ? (
-                            <><ExternalLink className="w-4 h-4" /> استكمال</>
-                          ) : (
-                            <><Play className="w-4 h-4" /> ابدأ</>
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap justify-end">
+                          {isCompleted && !c.is_evaluated && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCourseToEvaluate(c);
+                              }}
+                              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border border-orange-200 text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all shadow-sm"
+                            >
+                              <Star className="w-4 h-4 fill-current" /> قيّم الدورة
+                            </button>
                           )}
-                        </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(courseUrl, '_blank');
+                            }}
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                              isCompleted
+                                ? "border border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                                : "bg-[#173A7C] text-white hover:bg-[#1E4D9D] shadow-md shadow-[#173A7C]/20"
+                            }`}
+                          >
+                            {isCompleted ? (
+                              <><Award className="w-4 h-4" /> عرض الشهادة</>
+                            ) : progress > 0 ? (
+                              <><ExternalLink className="w-4 h-4" /> استكمال</>
+                            ) : (
+                              <><Play className="w-4 h-4" /> ابدأ</>
+                            )}
+                          </button>
+                        </div>
                       </motion.div>
                     );
                   })
@@ -761,6 +819,71 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Evaluation Modal */}
+      {courseToEvaluate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative"
+          >
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Star className="w-8 h-8 text-orange-500 fill-orange-500" />
+              </div>
+              <h3 className="text-xl font-black text-slate-900">تقييم الدورة</h3>
+              <p className="text-sm text-slate-500 mt-2 font-medium">{courseToEvaluate.title}</p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <p className="text-sm font-bold text-slate-700 text-center mb-3">ما هو تقييمك العام للدورة؟</p>
+                <div className="flex justify-center gap-2 flex-row-reverse">
+                  {[5, 4, 3, 2, 1].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setEvalRating(star)}
+                      className={`p-2 transition-transform hover:scale-110 focus:outline-none`}
+                    >
+                      <Star 
+                        className={`w-8 h-8 ${evalRating >= star ? 'text-orange-500 fill-orange-500' : 'text-slate-200 fill-slate-200'}`} 
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-bold text-slate-700 block mb-2">تعليقك (اختياري)</label>
+                <textarea
+                  value={evalFeedback}
+                  onChange={(e) => setEvalFeedback(e.target.value)}
+                  placeholder="أخبرنا برأيك في الدورة..."
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none resize-none text-sm font-medium"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setCourseToEvaluate(null)}
+                  className="flex-1 py-3.5 px-4 rounded-xl text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 transition-colors"
+                >
+                  إلغاء
+                </button>
+                <button
+                  onClick={handleEvaluate}
+                  disabled={isSubmittingEval}
+                  className="flex-1 py-3.5 px-4 rounded-xl text-white font-bold bg-[#173A7C] hover:bg-[#1E4D9D] transition-colors shadow-md shadow-[#173A7C]/20 disabled:opacity-70"
+                >
+                  {isSubmittingEval ? "جاري الإرسال..." : "إرسال التقييم"}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
