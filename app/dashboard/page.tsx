@@ -844,6 +844,8 @@ export default function DashboardPage() {
                     <button
                       key={star}
                       onClick={() => setEvalRating(star)}
+                      aria-label={`تقييم ${star} نجوم`}
+                      title={`تقييم ${star} نجوم`}
                       className={`p-2 transition-transform hover:scale-110 focus:outline-none`}
                     >
                       <Star 
