@@ -57,32 +57,6 @@ export async function updateSession(request: NextRequest) {
       url.pathname = '/auth/login'
       return NextResponse.redirect(url)
     }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    const role = profile?.role || 'TRAINEE'
-
-    if (pathname.startsWith('/dashboard/admin') && role !== 'ADMIN') {
-      const url = request.nextUrl.clone()
-      url.pathname = `/dashboard/${role.toLowerCase()}`
-      return NextResponse.redirect(url)
-    }
-
-    if (pathname.startsWith('/dashboard/trainer') && role !== 'TRAINER' && role !== 'ADMIN') {
-      const url = request.nextUrl.clone()
-      url.pathname = `/dashboard/${role.toLowerCase()}`
-      return NextResponse.redirect(url)
-    }
-    
-    if (pathname === '/dashboard') {
-      const url = request.nextUrl.clone()
-      url.pathname = `/dashboard/${role.toLowerCase()}`
-      return NextResponse.redirect(url)
-    }
   }
 
   if (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register')) {
