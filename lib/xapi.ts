@@ -474,17 +474,101 @@ export function stmtEvaluated(params: {
   });
 }
 
-// ─── LRS Storage (Supabase) ─────────────────────────────────────────────────
+// ─── LRS Storage (Supabase + NELC) ──────────────────────────────────────────
 
 import { supabase } from "@/lib/supabase";
 
+// ─── NELC LRS Configuration ─────────────────────────────────────────────────
+
+const NELC_LRS_ENDPOINT = process.env.NELC_LRS_ENDPOINT || "";
+const NELC_LRS_USERNAME = process.env.NELC_LRS_USERNAME || "";
+const NELC_LRS_PASSWORD = process.env.NELC_LRS_PASSWORD || "";
+
 /**
- * Store an xAPI statement in Supabase (internal LRS)
+ * Send an xAPI statement to NELC's external LRS
+ * Uses Basic Auth as specified in NELC accreditation requirements
+ */
+export async function sendToNelcLRS(
+  statement: XAPIStatement
+): Promise<{ success: boolean; error?: string; statusCode?: number }> {
+  if (!NELC_LRS_ENDPOINT || !NELC_LRS_USERNAME || !NELC_LRS_PASSWORD) {
+    console.warn("⚠️ NELC LRS credentials not configured — skipping NELC send");
+    return { success: false, error: "NELC LRS not configured" };
+  }
+
+  try {
+    // Basic Auth: base64(username:password)
+    const credentials = Buffer.from(`${NELC_LRS_USERNAME}:${NELC_LRS_PASSWORD}`).toString("base64");
+
+    const response = await fetch(NELC_LRS_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Basic ${credentials}`,
+        "X-Experience-API-Version": "1.0.3",
+      },
+      body: JSON.stringify(statement),
+    });
+
+    const statusCode = response.status;
+
+    if (response.ok) {
+      console.log(`✅ NELC LRS: Statement sent successfully (HTTP ${statusCode})`);
+      return { success: true, statusCode };
+    } else {
+      const errorText = await response.text().catch(() => "Unknown error");
+      console.error(`❌ NELC LRS Error (HTTP ${statusCode}):`, errorText);
+      return { success: false, error: `HTTP ${statusCode}: ${errorText}`, statusCode };
+    }
+  } catch (err: any) {
+    console.error("❌ NELC LRS Connection Error:", err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Send multiple xAPI statements to NELC's external LRS as a batch
+ */
+export async function sendBatchToNelcLRS(
+  statements: XAPIStatement[]
+): Promise<{ success: boolean; sent: number; errors: string[] }> {
+  if (!NELC_LRS_ENDPOINT || !NELC_LRS_USERNAME || !NELC_LRS_PASSWORD) {
+    return { success: false, sent: 0, errors: ["NELC LRS not configured"] };
+  }
+
+  try {
+    const credentials = Buffer.from(`${NELC_LRS_USERNAME}:${NELC_LRS_PASSWORD}`).toString("base64");
+
+    const response = await fetch(NELC_LRS_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Basic ${credentials}`,
+        "X-Experience-API-Version": "1.0.3",
+      },
+      body: JSON.stringify(statements),
+    });
+
+    if (response.ok) {
+      console.log(`✅ NELC LRS: Batch of ${statements.length} statements sent successfully`);
+      return { success: true, sent: statements.length, errors: [] };
+    } else {
+      const errorText = await response.text().catch(() => "Unknown error");
+      return { success: false, sent: 0, errors: [`HTTP ${response.status}: ${errorText}`] };
+    }
+  } catch (err: any) {
+    return { success: false, sent: 0, errors: [err.message] };
+  }
+}
+
+/**
+ * Store an xAPI statement in Supabase (internal LRS) AND forward to NELC LRS
  */
 export async function storeStatement(
   statement: XAPIStatement
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; nelcResult?: { success: boolean; error?: string } }> {
   try {
+    // 1. Save to Supabase (internal LRS backup)
     const { error } = await supabase.from("xapi_statements").insert({
       statement_id: statement.id,
       actor_email: statement.actor.mbox.replace("mailto:", ""),
@@ -511,11 +595,14 @@ export async function storeStatement(
     });
 
     if (error) {
-      console.error("xAPI Store Error:", error);
+      console.error("xAPI Store Error (Supabase):", error);
       return { success: false, error: error.message };
     }
 
-    return { success: true };
+    // 2. Forward to NELC LRS (non-blocking — don't fail if NELC is down)
+    const nelcResult = await sendToNelcLRS(statement);
+
+    return { success: true, nelcResult };
   } catch (err: any) {
     console.error("xAPI Store Exception:", err);
     return { success: false, error: err.message };
