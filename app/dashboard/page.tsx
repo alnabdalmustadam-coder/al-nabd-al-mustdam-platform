@@ -502,9 +502,9 @@ export default function DashboardPage() {
 
   if (activeCoursePlayer && activeLesson) {
     return (
-      <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-slate-50 via-blue-50/10 to-slate-100/30 flex flex-col dir-rtl font-[family-name:var(--font-cairo)] overflow-hidden" dir="rtl">
+      <div className="fixed inset-0 z-[9999] bg-slate-50 bg-gradient-to-br from-slate-50 via-blue-50/10 to-slate-100/30 flex flex-col dir-rtl font-[family-name:var(--font-cairo)] overflow-hidden" dir="rtl">
         {/* Sticky Full Page Player Header */}
-        <header className="w-full bg-white/85 backdrop-blur-md border-b border-slate-200/60 shadow-[0_2px_20px_rgba(0,0,0,0.01)] px-6 py-4 flex items-center justify-between shrink-0">
+        <header className="w-full bg-white border-b border-slate-200/60 shadow-[0_2px_20px_rgba(0,0,0,0.01)] px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setActiveCoursePlayer(null)}
@@ -623,8 +623,8 @@ export default function DashboardPage() {
           {/* LEFT COLUMN: Main Content Area */}
           <div className="flex-1 flex flex-col h-full bg-slate-50/40 overflow-hidden relative">
             {/* Scrollable content wrapper */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 custom-scrollbar">
-              <div className="max-w-5xl w-full mx-auto">
+            <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar">
+              <div className="max-w-5xl w-full mx-auto space-y-12 pb-20">
               {/* Current Lesson Header */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
                 <div>
@@ -820,18 +820,15 @@ export default function DashboardPage() {
             </div>
 
             {/* Sticky Bottom Actions Bar */}
-            <div className="bg-white/90 backdrop-blur-md border-t border-slate-200/60 px-6 py-4 flex items-center justify-between gap-4 z-10 shadow-lg shadow-slate-100 shrink-0">
-              <div className="text-slate-500 text-xs font-bold bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-100">
-                تقدمك في الدورة: {Math.round((completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100)}%
-              </div>
-
-              <div className="flex items-center gap-2">
+            <div className="bg-white border-t border-slate-200/60 px-8 py-5 flex items-center justify-between gap-4 z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.03)] shrink-0">
+              {/* Action buttons (renders on the right in RTL) */}
+              <div className="flex items-center gap-3">
                 <button
                   onClick={handleCompleteLesson}
                   disabled={isCompletingLesson || completedLessonIds.includes(activeLesson.id)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer border-0 ${
+                  className={`flex items-center gap-2 px-6 py-3.5 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer border border-transparent ${
                     completedLessonIds.includes(activeLesson.id)
-                      ? "bg-slate-100 text-emerald-600 border border-emerald-200/50"
+                      ? "bg-slate-100 text-emerald-600 border-emerald-200/50"
                       : "bg-emerald-600 text-white hover:bg-emerald-500 shadow-md shadow-emerald-600/10"
                   }`}
                 >
@@ -850,10 +847,15 @@ export default function DashboardPage() {
                     }
                   }}
                   disabled={activeCoursePlayer.curriculum.findIndex((l: any) => l.id === activeLesson.id) === activeCoursePlayer.curriculum.length - 1}
-                  className="px-5 py-3 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs md:text-sm font-bold transition-all border-0 disabled:opacity-50 cursor-pointer shadow-md shadow-[#173A7C]/10"
+                  className="px-6 py-3.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs md:text-sm font-bold transition-all border-0 disabled:opacity-50 cursor-pointer shadow-md shadow-[#173A7C]/10"
                 >
                   الدرس التالي
                 </button>
+              </div>
+
+              {/* Progress info (renders on the left in RTL) */}
+              <div className="text-slate-500 text-xs font-bold bg-slate-50/80 px-4 py-2.5 rounded-xl border border-slate-100/80">
+                تقدمك في الدورة: {Math.round((completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100)}%
               </div>
             </div>
           </div>
