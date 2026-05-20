@@ -874,48 +874,73 @@ export default function DashboardPage() {
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Sidebar */}
           <aside className="w-full lg:w-72 shrink-0">
-            <div className="bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] rounded-[28px] p-6 sticky top-28">
-              <div className="flex items-center gap-4 mb-6 border-b border-slate-100 pb-6">
-                <div className="w-14 h-14 rounded-2xl bg-[#173A7C]/5 border border-[#173A7C]/10 flex items-center justify-center text-[#173A7C] shrink-0">
-                  <User className="w-7 h-7" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-base font-extrabold text-slate-800 truncate">{userName}</h3>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <p className="text-xs font-bold text-slate-400">متدرب نشط</p>
+            <div className="bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] rounded-[28px] p-6 sticky top-28 lg:h-[80vh] lg:flex lg:flex-col lg:justify-between">
+              
+              {/* Top part of sidebar */}
+              <div className="lg:flex lg:flex-col lg:flex-1 lg:overflow-y-auto no-scrollbar">
+                <div className="flex items-center gap-4 mb-6 border-b border-slate-100 pb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-[#173A7C]/5 border border-[#173A7C]/10 flex items-center justify-center text-[#173A7C] shrink-0">
+                    <User className="w-7 h-7" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-extrabold text-slate-800 truncate">{userName}</h3>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <p className="text-xs font-bold text-slate-400">متدرب نشط</p>
+                    </div>
                   </div>
                 </div>
+
+                <nav className="space-y-1">
+                  {sidebarLinks.map((link) => {
+                    const Icon = link.icon;
+                    const isActive = activeSection === link.key;
+                    return (
+                      <motion.button
+                        key={link.key}
+                        onClick={() => setActiveSection(link.key)}
+                        whileHover={{ x: -4 }}
+                        whileTap={{ scale: 0.98 }}
+                        className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-[14px] font-[family-name:var(--font-cairo)] font-black transition-all cursor-pointer border-r-4 ${
+                          isActive
+                            ? "bg-gradient-to-r from-transparent to-[#173A7C]/5 border-r-[#173A7C] text-[#173A7C]"
+                            : "border-r-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                        }`}
+                      >
+                        <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? "scale-105" : "group-hover:scale-105"}`} />
+                        {link.label}
+                      </motion.button>
+                    );
+                  })}
+                </nav>
+
+                {/* Mobile Logout Button (Hidden on Desktop) */}
+                <button
+                  onClick={handleLogout}
+                  className="lg:hidden w-full mt-6 flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl border border-red-100 text-red-600 bg-red-50/50 hover:bg-red-50 text-[13px] font-bold transition-all cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  تسجيل الخروج
+                </button>
               </div>
-              <nav className="space-y-1">
-                {sidebarLinks.map((link) => {
-                  const Icon = link.icon;
-                  const isActive = activeSection === link.key;
-                  return (
-                    <motion.button
-                      key={link.key}
-                      onClick={() => setActiveSection(link.key)}
-                      whileHover={{ x: -4 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-[14px] font-extrabold transition-all cursor-pointer border-r-4 ${
-                        isActive
-                          ? "bg-gradient-to-r from-transparent to-[#173A7C]/5 border-r-[#173A7C] text-[#173A7C]"
-                          : "border-r-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-                      }`}
-                    >
-                      <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? "scale-105" : "group-hover:scale-105"}`} />
-                      {link.label}
-                    </motion.button>
-                  );
-                })}
-              </nav>
-              <button
-                onClick={handleLogout}
-                className="w-full mt-6 flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl border border-red-100 text-red-600 bg-red-50/50 hover:bg-red-50 text-[13px] font-bold transition-all cursor-pointer"
-              >
-                <LogOut className="w-4 h-4" />
-                تسجيل الخروج
-              </button>
+
+              {/* Desktop Bottom Section (Logo + Logout Button) */}
+              <div className="hidden lg:flex flex-col items-center gap-4 mt-auto pt-6 border-t border-slate-100/80 w-full">
+                {/* Logo wrapper */}
+                <div className="relative group/logo py-3 px-6 bg-slate-50/60 rounded-2xl border border-slate-100 w-full flex items-center justify-center transition-all duration-300 hover:bg-[#173A7C]/5 hover:border-[#173A7C]/10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
+                  <img src="/logo.svg" alt="TTi Logo" className="h-10 w-auto object-contain transition-transform duration-500 group-hover/logo:scale-105" />
+                  <div className="absolute inset-0 border border-[#173A7C]/10 rounded-2xl opacity-0 group-hover/logo:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl border border-red-100 text-red-600 bg-red-50/50 hover:bg-red-50 text-[13px] font-black transition-all cursor-pointer font-[family-name:var(--font-cairo)]"
+                >
+                  <LogOut className="w-4 h-4" />
+                  تسجيل الخروج
+                </button>
+              </div>
+
             </div>
           </aside>
 
