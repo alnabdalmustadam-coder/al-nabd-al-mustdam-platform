@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   BookOpen, 
   Award, 
@@ -354,8 +354,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-20 bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen pt-28 pb-20 bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-100/70 relative overflow-hidden">
+      {/* Soft Premium Background Blobs */}
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[#173A7C]/5 rounded-full blur-[100px] pointer-events-none -z-10" />
+      <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-blue-100/30 rounded-full blur-[100px] pointer-events-none -z-10" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Sidebar */}
           <aside className="w-full lg:w-72 shrink-0">
@@ -377,9 +381,11 @@ export default function DashboardPage() {
                   const Icon = link.icon;
                   const isActive = activeSection === link.key;
                   return (
-                    <button
+                    <motion.button
                       key={link.key}
                       onClick={() => setActiveSection(link.key)}
+                      whileHover={{ x: -4 }}
+                      whileTap={{ scale: 0.98 }}
                       className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-[14px] font-extrabold transition-all cursor-pointer border-r-4 ${
                         isActive
                           ? "bg-gradient-to-r from-transparent to-[#173A7C]/5 border-r-[#173A7C] text-[#173A7C]"
@@ -388,7 +394,7 @@ export default function DashboardPage() {
                     >
                       <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? "scale-105" : "group-hover:scale-105"}`} />
                       {link.label}
-                    </button>
+                    </motion.button>
                   );
                 })}
               </nav>
@@ -431,33 +437,55 @@ export default function DashboardPage() {
                 
                 {/* Stats row */}
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 shrink-0">
-                  <div className="bg-white/10 border border-white/10 rounded-2xl p-4 min-w-[90px] sm:min-w-[110px] text-center flex flex-col items-center justify-center">
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    className="bg-white/10 border border-white/10 rounded-2xl p-4 min-w-[90px] sm:min-w-[110px] text-center flex flex-col items-center justify-center cursor-pointer"
+                  >
                     <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-2">
                       <BookOpen className="w-4 h-4 text-white" />
                     </div>
                     <div className="text-2xl sm:text-3xl font-black text-white font-sora leading-none mb-1">{enrolledCourses.length}</div>
                     <div className="text-[11px] sm:text-xs font-bold text-white/70">دورات مسجلة</div>
-                  </div>
-                  <div className="bg-white/10 border border-white/10 rounded-2xl p-4 min-w-[90px] sm:min-w-[110px] text-center flex flex-col items-center justify-center">
+                  </motion.div>
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    className="bg-white/10 border border-white/10 rounded-2xl p-4 min-w-[90px] sm:min-w-[110px] text-center flex flex-col items-center justify-center cursor-pointer"
+                  >
                     <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-300" />
                     </div>
                     <div className="text-2xl sm:text-3xl font-black text-white font-sora leading-none mb-1">{completedCount}</div>
                     <div className="text-[11px] sm:text-xs font-bold text-white/70">مكتملة</div>
-                  </div>
-                  <div className="bg-white/10 border border-white/10 rounded-2xl p-4 min-w-[90px] sm:min-w-[110px] text-center flex flex-col items-center justify-center">
+                  </motion.div>
+                  <motion.div 
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    className="bg-white/10 border border-white/10 rounded-2xl p-4 min-w-[90px] sm:min-w-[110px] text-center flex flex-col items-center justify-center cursor-pointer"
+                  >
                     <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-2">
                       <Award className="w-4 h-4 text-amber-300" />
                     </div>
                     <div className="text-2xl sm:text-3xl font-black text-white font-sora leading-none mb-1">{certificates.length}</div>
                     <div className="text-[11px] sm:text-xs font-bold text-white/70">شهادات</div>
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
 
-            {/* Courses Section */}
-            {activeSection === "courses" && (
+            {/* Active Sections Container with Page-level Micro-Animations */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSection}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.22, ease: "easeInOut" }}
+                className="space-y-6"
+              >
+                {/* Courses Section */}
+                {activeSection === "courses" && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-black text-slate-900">دوراتي المسجلة</h2>
@@ -539,8 +567,10 @@ export default function DashboardPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {allAvailableCourses.slice(0, 3).map((course, idx) => {
                           return (
-                            <div 
+                            <motion.div 
                               key={course.id}
+                              whileHover={{ scale: 1.02, y: -4 }}
+                              transition={{ type: "spring", stiffness: 300, damping: 20 }}
                               className="bg-white border border-slate-100 rounded-3xl overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full shadow-[0_8px_30px_rgba(0,0,0,0.02)]"
                             >
                               {/* Top Bar Decoration */}
@@ -597,7 +627,7 @@ export default function DashboardPage() {
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            </motion.div>
                           );
                         })}
                       </div>
@@ -726,7 +756,11 @@ export default function DashboardPage() {
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                     {/* Certificate Preview Card Mockup */}
                     <div className="lg:col-span-6 flex flex-col">
-                      <div className="border border-slate-100 bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex-1 flex flex-col justify-center">
+                      <motion.div 
+                        whileHover={{ scale: 1.02, rotate: -0.5, y: -4 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                        className="border border-slate-100 bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex-1 flex flex-col justify-center cursor-default"
+                      >
                         <div className="border-2 border-amber-100 bg-amber-50/5 rounded-2xl p-6 sm:p-8 relative overflow-hidden flex flex-col justify-between aspect-[1.414/1] text-center">
                           {/* Top corner accents */}
                           <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-amber-200" />
@@ -763,12 +797,16 @@ export default function DashboardPage() {
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
 
                     {/* How to acquire */}
                     <div className="lg:col-span-6 flex flex-col justify-between">
-                      <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.02)] space-y-6 flex-1 flex flex-col justify-between">
+                      <motion.div 
+                        whileHover={{ scale: 1.02, y: -4 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                        className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.02)] space-y-6 flex-1 flex flex-col justify-between cursor-default"
+                      >
                         <div className="space-y-4">
                           <h3 className="text-lg font-black text-slate-800">كيف أحصل على شهادتي المعتمدة؟</h3>
                           <p className="text-slate-400 text-xs font-semibold leading-relaxed">
@@ -818,13 +856,18 @@ export default function DashboardPage() {
                             ابدأ التعلم الآن
                           </button>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {certificates.map((cert, i) => (
-                      <div key={i} className="bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <motion.div 
+                        key={i} 
+                        whileHover={{ scale: 1.01, y: -2 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        className="bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 cursor-default"
+                      >
                         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-right">
                           <div className="w-16 h-16 rounded-[20px] bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
                             <Award className="w-8 h-8 text-emerald-600" />
@@ -838,7 +881,7 @@ export default function DashboardPage() {
                           <Download className="w-4 h-4" />
                           تحميل PDF
                         </button>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 )}
@@ -1167,6 +1210,8 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
+              </motion.div>
+            </AnimatePresence>
 
             {/* Recent Activity Feed */}
             <div className="mt-14">
