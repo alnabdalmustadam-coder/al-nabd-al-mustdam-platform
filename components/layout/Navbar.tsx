@@ -90,7 +90,7 @@ export default function Navbar() {
     return (
     <>
       <nav
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 font-[family-name:var(--font-cairo)] ${
           isDarkPage
             ? scrolled
               ? "py-3 bg-[#0A1128]/95 backdrop-blur-md border-b border-white/10 shadow-lg"
@@ -109,6 +109,7 @@ export default function Navbar() {
           {/* Desktop Links */}
           <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 justify-center flex-1 mx-4 lg:mx-2 xl:mx-8 relative">
             {navLinks.map((link) => {
+              const Icon = link.icon;
               const isActive = pathname === link.href || (link.hasMegaMenu && pathname.startsWith('/trainees'));
 
               if (link.hasMegaMenu) {
@@ -120,7 +121,7 @@ export default function Navbar() {
                     onMouseLeave={() => setMegaMenuOpen(false)}
                   >
                     <button
-                      className={`flex items-center gap-1 px-2.5 py-6 -my-4 rounded-xl text-[14px] xl:text-[15px] font-bold transition-all duration-300 whitespace-nowrap ${isActive || megaMenuOpen
+                      className={`flex items-center gap-1.5 px-3 py-6 -my-4 rounded-xl text-[14px] xl:text-[15px] font-black font-[family-name:var(--font-cairo)] transition-all duration-300 whitespace-nowrap group ${isActive || megaMenuOpen
                         ? isDarkPage
                           ? "text-[#5CB07C] bg-white/10"
                           : "text-[#173A7C] bg-[#173A7C]/5"
@@ -129,8 +130,13 @@ export default function Navbar() {
                           : "text-slate-600 hover:text-[#173A7C] hover:bg-slate-50/80"
                         }`}
                     >
+                      <Icon className={`w-4 h-4 transition-colors duration-300 ${
+                        isActive || megaMenuOpen
+                          ? isDarkPage ? "text-[#5CB07C]" : "text-[#173A7C]"
+                          : isDarkPage ? "text-slate-400" : "text-slate-400 group-hover:text-[#173A7C]"
+                      }`} strokeWidth={2.5} />
                       {link.label}
-                      <ChevronDown className={`w-3.5 h-3.5 mr-1.5 transition-transform duration-300 ${megaMenuOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-3.5 h-3.5 mr-0.5 transition-transform duration-300 ${megaMenuOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {/* Desktop Mega Menu Dropdown */}
@@ -161,12 +167,12 @@ export default function Navbar() {
                               <item.icon className="w-5.5 h-5.5" />
                             </div>
                             <div>
-                              <strong className={`block text-[14.5px] font-extrabold transition-colors ${
+                              <strong className={`block text-[15px] font-black font-[family-name:var(--font-cairo)] transition-colors ${
                                 isDarkPage
                                   ? "text-white group-hover:text-[#5CB07C]"
                                   : "text-slate-800 group-hover:text-[#173A7C]"
                               }`}>{item.label}</strong>
-                              <span className={`text-xs mt-1 block line-clamp-1 ${
+                              <span className={`text-[12px] mt-1 block line-clamp-1 font-bold font-[family-name:var(--font-cairo)] ${
                                 isDarkPage ? "text-slate-400" : "text-slate-500"
                               }`}>انقر للوصول إلى النموذج الخاص بـ {item.label}</span>
                             </div>
@@ -182,7 +188,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 rounded-xl text-[14px] xl:text-[15px] font-bold transition-all duration-300 whitespace-nowrap ${isActive
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[14px] xl:text-[15px] font-black font-[family-name:var(--font-cairo)] transition-all duration-300 whitespace-nowrap group ${isActive
                     ? isDarkPage
                       ? "text-[#5CB07C] bg-white/10"
                       : "text-[#173A7C] bg-[#173A7C]/5"
@@ -191,6 +197,11 @@ export default function Navbar() {
                       : "text-slate-600 hover:text-[#173A7C] hover:bg-slate-50/80"
                     }`}
                 >
+                  <Icon className={`w-4 h-4 transition-colors duration-300 ${
+                    isActive
+                      ? isDarkPage ? "text-[#5CB07C]" : "text-[#173A7C]"
+                      : isDarkPage ? "text-slate-400" : "text-slate-400 group-hover:text-[#173A7C]"
+                  }`} strokeWidth={2.5} />
                   {link.label}
                 </Link>
               );
@@ -250,7 +261,7 @@ export default function Navbar() {
 
         <div
           className={`absolute top-0 right-0 h-full w-[85%] max-w-sm bg-white shadow-2xl
-            transform transition-transform duration-500 flex flex-col ${mobileOpen ? "translate-x-0" : "translate-x-full"
+            transform transition-transform duration-500 flex flex-col font-[family-name:var(--font-cairo)] ${mobileOpen ? "translate-x-0" : "translate-x-full"
             }`}
         >
           <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
@@ -270,13 +281,13 @@ export default function Navbar() {
                   <div key={link.label} className="flex flex-col border-b border-slate-100 pb-2 mb-2">
                     <button
                       onClick={() => setMobileMegaMenuOpen(!mobileMegaMenuOpen)}
-                      className={`flex items-center justify-between px-4 py-3 rounded-xl text-base font-bold transition-all w-full ${isActive || mobileMegaMenuOpen
+                      className={`flex items-center justify-between px-4 py-3 rounded-xl text-base font-black transition-all w-full ${isActive || mobileMegaMenuOpen
                         ? "text-[#173A7C] bg-[#173A7C]/5"
                         : "text-slate-700 hover:bg-slate-50"
                         }`}
                     >
                       <span className="flex items-center gap-3">
-                        <Icon className="w-5 h-5 text-slate-400" />
+                        <Icon className={`w-5 h-5 ${isActive || mobileMegaMenuOpen ? "text-[#173A7C]" : "text-slate-400"}`} />
                         {link.label}
                       </span>
                       <ChevronLeft className={`w-5 h-5 transition-transform duration-300 ${mobileMegaMenuOpen ? '-rotate-90 text-[#173A7C]' : 'text-slate-400'}`} />
@@ -289,9 +300,9 @@ export default function Navbar() {
                           <Link
                             key={idx}
                             href={item.href}
-                            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-[#173A7C] hover:bg-slate-50 transition-colors"
+                            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-extrabold text-slate-700 hover:text-[#173A7C] hover:bg-slate-50 transition-colors"
                           >
-                            <item.icon className="w-4 h-4 shrink-0" />
+                            <item.icon className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-[#173A7C]" />
                             <span className="truncate">{item.label}</span>
                           </Link>
                         ))}
@@ -305,12 +316,12 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold transition-all mb-2 ${isActive
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-black transition-all mb-2 ${isActive
                     ? "text-[#173A7C] bg-[#173A7C]/5"
                     : "text-slate-700 hover:text-[#173A7C] hover:bg-slate-50"
                     }`}
                 >
-                  <Icon className="w-5 h-5 text-slate-400" />
+                  <Icon className={`w-5 h-5 ${isActive ? "text-[#173A7C]" : "text-slate-400"}`} />
                   {link.label}
                 </Link>
               );
