@@ -15,6 +15,7 @@ function LoginForm() {
   const [googleLoading, setGoogleLoading] = useState(false)
   const searchParams = useSearchParams()
   const message = searchParams.get('message')
+  const redirectParam = searchParams.get('redirect') || '/dashboard'
 
   // OTP screen state for unconfirmed email login attempts
   const [showOtpScreen, setShowOtpScreen] = useState(false)
@@ -92,8 +93,8 @@ function LoginForm() {
       // Trigger custom auth update event (for navbar)
       window.dispatchEvent(new Event('nabd_user_updated'))
 
-      // Redirect to dashboard
-      window.location.href = '/dashboard'
+      // Redirect to dynamic target redirect
+      window.location.href = redirectParam
     } catch (err) {
       setError('حدث خطأ غير متوقع أثناء تفعيل الحساب')
       setOtpLoading(false)
@@ -192,7 +193,8 @@ function LoginForm() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <input type="hidden" name="redirect" value={redirectParam} />
                   {message && (
                     <div className="text-emerald-400 text-sm font-bold text-center bg-emerald-950/40 border border-emerald-900/30 py-3.5 px-4 rounded-2xl">
                       {message === 'Check your email to confirm your account' 
@@ -395,7 +397,7 @@ function LoginForm() {
         {/* Register Footer */}
         <p className="mt-8 text-center text-sm font-medium text-slate-400">
           ليس لديك حساب؟{' '}
-          <Link href="/auth/register" className="font-bold text-[#5CB07C] hover:underline">
+          <Link href={`/auth/register?redirect=${encodeURIComponent(redirectParam)}`} className="font-bold text-[#5CB07C] hover:underline">
             سجل الآن كمتدرب
           </Link>
         </p>

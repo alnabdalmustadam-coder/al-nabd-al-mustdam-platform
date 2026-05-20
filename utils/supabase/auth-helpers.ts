@@ -2,13 +2,12 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
-  const cleanHeaders = new Headers(request.headers)
-  const rawCookie = cleanHeaders.get('cookie')
-  if (rawCookie) {
-    // Safely encode any non-ASCII characters in the cookie header to prevent ByteString crashes
-    const cleanCookie = rawCookie.replace(/[^\x00-\x7F]/g, (char) => encodeURIComponent(char))
-    cleanHeaders.set('cookie', cleanCookie)
-  }
+  const cleanHeaders = new Headers()
+  request.headers.forEach((value, key) => {
+    // Safely encode any non-ASCII characters in all headers (e.g., referer, cookie) to prevent ByteString crashes
+    const cleanValue = value.replace(/[^\x00-\x7F]/g, (char) => encodeURIComponent(char))
+    cleanHeaders.set(key, cleanValue)
+  })
 
   let supabaseResponse = NextResponse.next({
     request: {

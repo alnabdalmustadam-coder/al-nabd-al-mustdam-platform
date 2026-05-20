@@ -1,22 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { signup } from '../actions'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import { createClient } from '@/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
 import { translateAuthError } from '../utils'
+import { useSearchParams } from 'next/navigation'
 
-export default function RegisterPage() {
+function RegisterContent() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const searchParams = useSearchParams()
+  const redirectParam = searchParams.get('redirect') || '/dashboard'
   
   // OTP Verification flow states
   const [showOtpScreen, setShowOtpScreen] = useState(false)
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
   const [otpToken, setOtpToken] = useState('')
   const [otpLoading, setOtpLoading] = useState(false)
   const [resendSuccess, setResendSuccess] = useState<string | null>(null)
@@ -30,6 +34,7 @@ export default function RegisterPage() {
     const fullNameVal = (formData.get('fullName') as string) || ''
     const nationalIdVal = (formData.get('nationalId') as string) || ''
     const emailVal = (formData.get('email') as string) || ''
+    const phoneVal = (formData.get('phone') as string) || ''
 
     if (fullNameVal.trim().split(/\s+/).filter(Boolean).length < 3) {
       setError('يرجى إدخال الاسم الثلاثي كاملاً كما يظهر في الهوية الوطنية')
@@ -43,8 +48,15 @@ export default function RegisterPage() {
       return
     }
 
+    if (!phoneVal.trim()) {
+      setError('رقم الجوال مطلوب')
+      setLoading(false)
+      return
+    }
+
     setEmail(emailVal)
     setFullName(fullNameVal)
+    setPhone(phoneVal)
 
     const result = await signup(formData)
     if (result?.error) {
@@ -83,6 +95,14 @@ export default function RegisterPage() {
         return
       }
 
+      // Explicitly update the profile record in database with the phone number
+      if (data.user?.id) {
+        await supabase
+          .from('profiles')
+          .update({ phone: phone })
+          .eq('id', data.user.id)
+      }
+
       // Establish HTTP-Only session cookies
       await fetch('/api/auth/session', {
         method: 'POST',
@@ -93,8 +113,8 @@ export default function RegisterPage() {
       // Trigger custom auth update event (for navbar)
       window.dispatchEvent(new Event('nabd_user_updated'))
 
-      // Redirect to dashboard
-      window.location.href = '/dashboard'
+      // Redirect to target redirect URL
+      window.location.href = redirectParam
     } catch (err) {
       setError('حدث خطأ غير متوقع أثناء تفعيل الحساب')
       setOtpLoading(false)
@@ -216,6 +236,19 @@ export default function RegisterPage() {
                         required
                         className="block w-full rounded-2xl border border-white/10 bg-white/5 py-3 px-4 text-white placeholder-slate-500 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none text-base font-medium transition-all duration-200"
                         placeholder="مطلوب لاعتماد الشهادة من NELC"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-bold text-slate-300 mb-2">رقم الجوال *</label>
+                      <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        required
+                        className="block w-full rounded-2xl border border-white/10 bg-[#white]/5 bg-white/5 py-3 px-4 text-white placeholder-slate-500 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none text-base font-medium transition-all duration-200"
+                        placeholder="+966 5X XXX XXXX"
+                        dir="ltr"
                       />
                     </div>
 
@@ -405,11 +438,23 @@ export default function RegisterPage() {
         {/* Login Footer */}
         <p className="mt-8 text-center text-sm font-medium text-slate-400">
           لديك حساب بالفعل؟{' '}
-          <Link href="/auth/login" className="font-bold text-[#5CB07C] hover:underline">
+          <Link href={`/auth/login?redirect=${encodeURIComponent(redirectParam)}`} className="font-bold text-[#5CB07C] hover:underline">
             تسجيل الدخول
           </Link>
         </p>
       </motion.div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-[#0A1128]">
+        <div className="w-10 h-10 border-4 border-[#5CB07C] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <RegisterContent />
+    </Suspense>
   )
 }
