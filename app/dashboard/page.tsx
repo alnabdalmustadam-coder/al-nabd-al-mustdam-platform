@@ -600,92 +600,28 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Profile */}
-            {activeSection === "profile" && (
-              <div className="bg-white border border-slate-200 shadow-sm p-8 rounded-[24px]">
-                <h2 className="text-2xl font-black text-slate-900 mb-8 border-b border-slate-100 pb-4">الملف الشخصي</h2>
-                <div className="space-y-6 max-w-xl">
-                  {saveMessage && (
-                    <div className={`p-4 rounded-xl text-sm font-bold ${saveMessage.includes('بنجاح') ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                      {saveMessage}
-                    </div>
-                  )}
-                  <div>
-                    <label htmlFor="profile-name" className="text-sm font-bold text-slate-700 block mb-2">الاسم الكامل</label>
-                    <input id="profile-name" value={userName} onChange={(e) => setUserName(e.target.value)} className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" />
-                  </div>
-                  <div>
-                    <label htmlFor="profile-email" className="text-sm font-bold text-slate-700 block mb-2">البريد الإلكتروني</label>
-                    <input id="profile-email" defaultValue={userEmail || ""} readOnly disabled className="w-full px-5 py-3.5 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 focus:outline-none text-base font-medium cursor-not-allowed" dir="ltr" />
-                  </div>
-                  <div>
-                    <label htmlFor="profile-phone" className="text-sm font-bold text-slate-700 block mb-2">رقم الجوال <span className="text-slate-400 font-normal">(اختياري)</span></label>
-                    <input id="profile-phone" value={profilePhone} onChange={(e) => setProfilePhone(e.target.value)} placeholder="05XXXXXXXX" className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" dir="ltr" />
-                  </div>
-                  <div className={`p-5 rounded-2xl border transition-all ${showIdentityGate ? 'bg-amber-50 border-amber-200 animate-pulse' : 'bg-blue-50/50 border-blue-100'}`}>
-                    <label htmlFor="profile-national-id" className={`text-sm font-bold block mb-2 ${showIdentityGate ? 'text-amber-700' : 'text-[#173A7C]'}`}>رقم الهوية الوطنية / الإقامة <span className="text-red-500">*</span></label>
-                    <input
-                      id="profile-national-id"
-                      value={profileNationalId}
-                      onChange={(e) => setProfileNationalId(e.target.value)}
-                      placeholder="1XXXXXXXXX"
-                      className={`w-full px-5 py-3.5 rounded-xl bg-white border outline-none text-base font-medium mb-2 ${showIdentityGate ? 'border-amber-300 focus:border-amber-500' : 'border-blue-200 focus:border-[#173A7C]'}`}
-                      dir="ltr"
-                    />
-                    <p className={`text-xs font-medium leading-relaxed ${showIdentityGate ? 'text-amber-600' : 'text-slate-500'}`}>
-                      * إدخال رقم الهوية الوطنية <strong className="text-slate-900">إلزامي</strong> وفقاً لمتطلبات المركز الوطني للتعلم الإلكتروني (NELC) لاعتماد شهادتك.
-                    </p>
-                  </div>
-                  <div>
-                    <label htmlFor="profile-professional-id" className="text-sm font-bold text-slate-700 block mb-2">رقم التصنيف المهني <span className="text-slate-400 font-normal">(اختياري - لساعات التعليم المستمر)</span></label>
-                    <input id="profile-professional-id" value={profileProfessionalId} onChange={(e) => setProfileProfessionalId(e.target.value)} placeholder="رقم التصنيف (إن وجد)" className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-medium" dir="ltr" />
-                  </div>
-                  <button onClick={handleUpdateProfile} disabled={isSaving} className="px-8 py-3.5 rounded-2xl bg-[#173A7C] text-white text-base font-bold cursor-pointer hover:bg-[#1E4D9D] transition-all shadow-md shadow-[#173A7C]/20 mt-4 disabled:opacity-70">
-                    {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
-                  </button>
-                </div>
-              </div>
-            )}
 
-            {/* Settings */}
-            {activeSection === "settings" && (
-              <div className="bg-white border border-slate-200 shadow-sm p-8 rounded-[24px]">
-                <h2 className="text-2xl font-black text-slate-900 mb-8 border-b border-slate-100 pb-4">الإعدادات</h2>
-                <div className="space-y-4 max-w-xl">
-                  <label className="flex items-center justify-between p-5 rounded-2xl border border-slate-200 bg-slate-50 cursor-pointer hover:bg-white hover:shadow-sm transition-all">
-                    <span className="text-base font-bold text-slate-700">إشعارات البريد الإلكتروني</span>
-                    <input type="checkbox" defaultChecked className="accent-[#173A7C] w-5 h-5 cursor-pointer" />
-                  </label>
-                  <label className="flex items-center justify-between p-5 rounded-2xl border border-slate-200 bg-slate-50 cursor-pointer hover:bg-white hover:shadow-sm transition-all">
-                    <span className="text-base font-bold text-slate-700">إشعارات واتساب</span>
-                    <input type="checkbox" className="accent-[#173A7C] w-5 h-5 cursor-pointer" />
-                  </label>
-                </div>
-              </div>
-            )}
-
-            {/* xAPI Learning Records */}
+            {/* xAPI Section */}
             {activeSection === "xapi" && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <h2 className="text-2xl font-black text-slate-800 flex items-center gap-3">
                     <Activity className="w-7 h-7 text-[#173A7C]" />
                     سجل التعلم (xAPI)
                   </h2>
                   <div className="flex items-center gap-2">
-                    <span className="px-3 py-1.5 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full border border-emerald-100 flex items-center gap-1.5">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full border border-emerald-100 flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                       xAPI 1.0.3 متوافق
                     </span>
-                    <span className="px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-bold rounded-full border border-blue-100">
+                    <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full border border-blue-100">
                       NELC معتمد
                     </span>
                   </div>
                 </div>
 
-                {/* xAPI Info Banner */}
-                <div className="bg-gradient-to-r from-[#173A7C]/5 to-[#1E4D9D]/5 border border-[#173A7C]/10 rounded-2xl p-5 mb-6">
-                  <p className="text-sm font-medium text-slate-700 leading-relaxed">
+                <div className="bg-gradient-to-r from-[#173A7C]/5 to-[#1E4D9D]/5 border border-[#173A7C]/10 rounded-2xl p-5">
+                  <p className="text-sm font-semibold text-slate-700 leading-relaxed">
                     يتم تتبع جميع أنشطة التعلم الخاصة بك وفقاً لمعيار <strong className="text-[#173A7C]">xAPI (Experience API)</strong> المطلوب من المركز الوطني للتعلم الإلكتروني (NELC). يشمل التتبع: التسجيل، بدء الدورة، التقدم، والإكمال.
                   </p>
                 </div>
@@ -693,7 +629,7 @@ export default function DashboardPage() {
                 {isLoadingXapi ? (
                   <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="bg-white border border-slate-200 p-5 rounded-[20px] animate-pulse">
+                      <div key={i} className="bg-white/80 border border-slate-100 p-5 rounded-[20px] animate-pulse">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-slate-100 rounded-xl" />
                           <div className="flex-1">
@@ -705,15 +641,15 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 ) : xapiStatements.length === 0 ? (
-                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-[24px] p-16 text-center">
+                  <div className="bg-white/80 border border-slate-100 rounded-[28px] p-16 text-center shadow-sm">
                     <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                       <Activity className="w-10 h-10 text-slate-300" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد سجلات تعلم بعد</h3>
+                    <h3 className="text-xl font-bold text-slate-800 mb-2">لا توجد سجلات تعلم بعد</h3>
                     <p className="text-slate-500 font-medium">ستظهر سجلات xAPI هنا عند بدء أي نشاط تعليمي.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="relative border-r-2 border-slate-100 mr-4 pr-6 space-y-8 py-2">
                     {xapiStatements.map((stmt: any, i: number) => {
                       const verbKey = stmt.verb?.display?.["en-US"] || "unknown";
                       const verbInfo = VERB_AR[verbKey] || { label: verbKey, color: "text-slate-600 bg-slate-50 border-slate-100", icon: Activity };
@@ -726,53 +662,61 @@ export default function DashboardPage() {
                       return (
                         <motion.div
                           key={stmt.id || i}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: i * 0.05 }}
-                          className="bg-white border border-slate-200 shadow-sm p-5 rounded-[20px] hover:shadow-md transition-shadow"
+                          className="relative group"
                         >
-                          <div className="flex items-center gap-4">
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${verbInfo.color}`}>
-                              <VerbIcon className="w-6 h-6" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${verbInfo.color}`}>
-                                  {verbInfo.label}
-                                </span>
-                                <h4 className="font-bold text-slate-900 text-sm truncate">{objectName}</h4>
+                          <div className={`absolute right-[-33px] top-1.5 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center shadow-sm ${
+                            verbKey === "completed" || verbKey === "passed"
+                              ? "bg-emerald-500 shadow-emerald-200"
+                              : verbKey === "launched" || verbKey === "initialized"
+                              ? "bg-blue-500 shadow-blue-200"
+                              : "bg-slate-400 shadow-slate-200"
+                          }`} />
+
+                          <div className="bg-white/80 backdrop-blur-md border border-slate-100 shadow-sm p-5 rounded-[22px] hover:shadow-md transition-shadow duration-300">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+                              <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${verbInfo.color} shadow-sm`}>
+                                  <VerbIcon className="w-5 h-5" />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${verbInfo.color}`}>
+                                      {verbInfo.label}
+                                    </span>
+                                    <h4 className="font-bold text-slate-800 text-sm">{objectName}</h4>
+                                  </div>
+                                  <div className="flex items-center gap-3 text-xs text-slate-400 font-semibold">
+                                    <span className="flex items-center gap-1">
+                                      <Clock className="w-3.5 h-3.5" />
+                                      {timeAgo}
+                                    </span>
+                                    {progress !== undefined && (
+                                      <span className="flex items-center gap-1 text-amber-500">
+                                        <TrendingUp className="w-3.5 h-3.5" />
+                                        {progress}%
+                                      </span>
+                                    )}
+                                    {stmt.result?.completion && (
+                                      <span className="flex items-center gap-1 text-emerald-600">
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        مكتمل
+                                      </span>
+                                    )}
+                                    {stmt.result?.score && (
+                                      <span className="flex items-center gap-1 text-blue-600">
+                                        <Award className="w-3.5 h-3.5" />
+                                        {Math.round(stmt.result.score.scaled * 100)}%
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
-                                <span className="flex items-center gap-1">
-                                  <Clock className="w-3.5 h-3.5" />
-                                  {timeAgo}
-                                </span>
-                                {progress !== undefined && (
-                                  <span className="flex items-center gap-1 text-amber-600">
-                                    <TrendingUp className="w-3.5 h-3.5" />
-                                    {progress}%
-                                  </span>
-                                )}
-                                {stmt.result?.completion && (
-                                  <span className="flex items-center gap-1 text-emerald-600">
-                                    <CheckCircle2 className="w-3.5 h-3.5" />
-                                    مكتمل
-                                  </span>
-                                )}
-                                {stmt.result?.score && (
-                                  <span className="flex items-center gap-1 text-blue-600">
-                                    <Award className="w-3.5 h-3.5" />
-                                    {Math.round(stmt.result.score.scaled * 100)}%
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <div className="text-left shrink-0">
-                              <div className="text-xs font-medium text-slate-400 font-sora">
-                                {timestamp.toLocaleDateString("ar-SA", { month: "short", day: "numeric" })}
-                              </div>
-                              <div className="text-xs font-medium text-slate-300 font-sora">
-                                {timestamp.toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}
+                              <div className="sm:text-left text-slate-400 shrink-0 text-xs font-bold font-sora mt-2 sm:mt-0 border-t border-slate-50 sm:border-0 pt-2 sm:pt-0">
+                                <div>{timestamp.toLocaleDateString("ar-SA", { month: "short", day: "numeric" })}</div>
+                                <div className="text-slate-300 font-normal">{timestamp.toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}</div>
                               </div>
                             </div>
                           </div>
@@ -784,21 +728,133 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Activity Timeline (now uses xAPI data) */}
+            {/* Profile Section */}
+            {activeSection === "profile" && (
+              <div className="bg-white/80 backdrop-blur-md border border-slate-100 shadow-[0_12px_40px_rgba(23,58,124,0.04)] p-8 rounded-[28px]">
+                <h2 className="text-2xl font-black text-slate-800 mb-6 border-b border-slate-100/80 pb-4">الملف الشخصي</h2>
+                <div className="space-y-6 max-w-xl">
+                  {saveMessage && (
+                    <div className={`p-4 rounded-2xl text-sm font-bold border ${
+                      saveMessage.includes('بنجاح') 
+                        ? 'bg-emerald-50 border-emerald-100 text-emerald-600' 
+                        : 'bg-red-50 border-red-100 text-red-600'
+                    }`}>
+                      {saveMessage}
+                    </div>
+                  )}
+                  <div>
+                    <label htmlFor="profile-name" className="text-sm font-bold text-slate-600 block mb-2">الاسم الكامل (ثلاثي باللغة العربية)</label>
+                    <input 
+                      id="profile-name" 
+                      value={userName} 
+                      onChange={(e) => setUserName(e.target.value)} 
+                      className="w-full px-5 py-3.5 rounded-2xl bg-slate-50/50 border border-slate-200/80 text-slate-800 focus:border-[#173A7C] focus:bg-white focus:ring-1 focus:ring-[#173A7C] outline-none text-base font-semibold transition-all" 
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="profile-email" className="text-sm font-bold text-slate-600 block mb-2">البريد الإلكتروني</label>
+                    <input 
+                      id="profile-email" 
+                      defaultValue={userEmail || ""} 
+                      readOnly 
+                      disabled 
+                      className="w-full px-5 py-3.5 rounded-2xl bg-slate-100/50 border border-slate-200/40 text-slate-400 focus:outline-none text-base font-semibold cursor-not-allowed" 
+                      dir="ltr" 
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="profile-phone" className="text-sm font-bold text-slate-600 block mb-2">رقم الجوال <span className="text-slate-400 font-normal">(اختياري)</span></label>
+                    <input 
+                      id="profile-phone" 
+                      value={profilePhone} 
+                      onChange={(e) => setProfilePhone(e.target.value)} 
+                      placeholder="05XXXXXXXX" 
+                      className="w-full px-5 py-3.5 rounded-2xl bg-slate-50/50 border border-slate-200/80 text-slate-800 focus:border-[#173A7C] focus:bg-white focus:ring-1 focus:ring-[#173A7C] outline-none text-base font-semibold transition-all" 
+                      dir="ltr" 
+                    />
+                  </div>
+                  
+                  <div className={`p-6 rounded-2xl border transition-all ${
+                    showIdentityGate 
+                      ? 'bg-amber-50/70 border-amber-200' 
+                      : 'bg-blue-50/30 border-blue-100'
+                  }`}>
+                    <label htmlFor="profile-national-id" className={`text-sm font-bold block mb-2 ${showIdentityGate ? 'text-amber-700' : 'text-[#173A7C]'}`}>رقم الهوية الوطنية / الإقامة <span className="text-red-500">*</span></label>
+                    <input
+                      id="profile-national-id"
+                      value={profileNationalId}
+                      onChange={(e) => setProfileNationalId(e.target.value)}
+                      placeholder="1XXXXXXXXX"
+                      className={`w-full px-5 py-3.5 rounded-xl border outline-none text-base font-semibold mb-3 ${
+                        showIdentityGate 
+                          ? 'border-amber-300 bg-white focus:border-amber-500' 
+                          : 'border-blue-100 bg-white focus:border-[#173A7C]'
+                      }`}
+                      dir="ltr"
+                    />
+                    <p className={`text-xs font-semibold leading-relaxed ${showIdentityGate ? 'text-amber-600' : 'text-slate-500'}`}>
+                      * إدخال رقم الهوية الوطنية <strong className="text-slate-700">إلزامي</strong> وفقاً لمتطلبات المركز الوطني للتعلم الإلكتروني (NELC) لاعتماد شهادتك.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="profile-professional-id" className="text-sm font-bold text-slate-600 block mb-2">رقم التصنيف المهني <span className="text-slate-400 font-normal">(اختياري - لساعات التعليم المستمر)</span></label>
+                    <input 
+                      id="profile-professional-id" 
+                      value={profileProfessionalId} 
+                      onChange={(e) => setProfileProfessionalId(e.target.value)} 
+                      placeholder="رقم التصنيف (إن وجد)" 
+                      className="w-full px-5 py-3.5 rounded-2xl bg-slate-50/50 border border-slate-200/80 text-slate-800 focus:border-[#173A7C] focus:bg-white focus:ring-1 focus:ring-[#173A7C] outline-none text-base font-semibold transition-all" 
+                      dir="ltr" 
+                    />
+                  </div>
+                  <button 
+                    onClick={handleUpdateProfile} 
+                    disabled={isSaving} 
+                    className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-base font-bold cursor-pointer hover:shadow-lg hover:shadow-[#173A7C]/15 transition-all mt-4 disabled:opacity-70 border-0"
+                  >
+                    {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Settings Section */}
+            {activeSection === "settings" && (
+              <div className="bg-white/80 backdrop-blur-md border border-slate-100 shadow-[0_12px_40px_rgba(23,58,124,0.04)] p-8 rounded-[28px]">
+                <h2 className="text-2xl font-black text-slate-800 mb-6 border-b border-slate-100/80 pb-4">الإعدادات</h2>
+                <div className="space-y-4 max-w-xl">
+                  <label className="flex items-center justify-between p-5 rounded-2xl border border-slate-200/60 bg-slate-50/50 cursor-pointer hover:bg-white hover:shadow-sm transition-all duration-300">
+                    <span className="text-base font-bold text-slate-700">إشعارات البريد الإلكتروني</span>
+                    <div className="relative">
+                      <input type="checkbox" defaultChecked className="accent-[#173A7C] w-5 h-5 cursor-pointer" />
+                    </div>
+                  </label>
+                  <label className="flex items-center justify-between p-5 rounded-2xl border border-slate-200/60 bg-slate-50/50 cursor-pointer hover:bg-white hover:shadow-sm transition-all duration-300">
+                    <span className="text-base font-bold text-slate-700">إشعارات واتساب</span>
+                    <div className="relative">
+                      <input type="checkbox" className="accent-[#173A7C] w-5 h-5 cursor-pointer" />
+                    </div>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Recent Activity Feed */}
             <div className="mt-14">
-              <h2 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+              <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
                 <TrendingUp className="w-7 h-7 text-[#173A7C]" />
                 نشاط التعلم الأخير
               </h2>
               {xapiStatements.length === 0 ? (
-                <div className="bg-white border border-slate-200 shadow-sm p-12 rounded-[24px] text-center">
+                <div className="bg-white/80 backdrop-blur-md border border-slate-100 shadow-sm p-12 rounded-[28px] text-center">
                   <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <TrendingUp className="w-8 h-8 text-slate-300" />
                   </div>
                   <p className="text-slate-500 font-medium">لا يوجد نشاط تعلم أخير حتى الآن.</p>
                 </div>
               ) : (
-                <div className="bg-white border border-slate-200 shadow-sm p-6 rounded-[24px]">
+                <div className="bg-white/80 backdrop-blur-md border border-slate-100 shadow-sm p-6 rounded-[28px]">
                   <div className="space-y-4">
                     {xapiStatements.slice(0, 5).map((stmt: any, i: number) => {
                       const verbKey = stmt.verb?.display?.["en-US"] || "unknown";
@@ -807,16 +863,16 @@ export default function DashboardPage() {
                       const timestamp = stmt.timestamp ? new Date(stmt.timestamp) : new Date();
 
                       return (
-                        <div key={stmt.id || i} className="flex items-center gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${verbInfo.color}`}>
+                        <div key={stmt.id || i} className="flex items-center gap-4 p-3 rounded-2xl bg-slate-50/50 border border-slate-100/50 hover:bg-slate-50 transition-colors duration-200">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${verbInfo.color} shadow-sm`}>
                             <Activity className="w-4 h-4" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-slate-900 truncate">
+                            <p className="text-sm font-bold text-slate-800 truncate">
                               {verbInfo.label} — {objectName}
                             </p>
                           </div>
-                          <p className="text-xs font-medium text-slate-400 shrink-0">
+                          <p className="text-xs font-semibold text-slate-400 shrink-0 font-sora">
                             {timestamp.toLocaleDateString("ar-SA", { month: "short", day: "numeric" })}
                           </p>
                         </div>
@@ -826,6 +882,7 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
+
           </div>
         </div>
       </div>
@@ -836,7 +893,7 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative"
+            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative border border-slate-100"
           >
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -899,71 +956,64 @@ export default function DashboardPage() {
 
       {/* Global Identity Verification Modal */}
       {showIdentityGate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0A1128]/85 backdrop-blur-md dir-rtl" dir="rtl">
-          {/* Background Radial Glows inside modal */}
-          <div className="absolute top-[-10%] left-[-10%] h-[300px] w-[300px] rounded-full bg-[#173A7C]/20 blur-[80px]" />
-          <div className="absolute bottom-[-10%] right-[-10%] h-[300px] w-[300px] rounded-full bg-[#5CB07C]/10 blur-[80px]" />
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm dir-rtl" dir="rtl">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="relative z-10 bg-[#0A1128]/95 border border-white/10 rounded-[32px] p-8 max-w-lg w-full shadow-2xl overflow-hidden text-right"
+            className="relative z-10 bg-white border border-slate-100 rounded-[32px] p-8 max-w-lg w-full shadow-2xl overflow-hidden text-right"
           >
-            {/* Header info */}
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-[#5CB07C]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#5CB07C]/20">
-                <Award className="w-8 h-8 text-[#5CB07C]" />
+              <div className="w-16 h-16 bg-[#173A7C]/5 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#173A7C]/10">
+                <Award className="w-8 h-8 text-[#173A7C]" />
               </div>
-              <h3 className="text-2xl font-black text-white font-[family-name:var(--font-cairo)]">توثيق الهوية الوطنية مطلوب</h3>
-              <p className="text-sm text-slate-300 mt-3 font-medium leading-relaxed">
+              <h3 className="text-2xl font-black text-slate-800 font-[family-name:var(--font-cairo)]">توثيق الهوية الوطنية مطلوب</h3>
+              <p className="text-sm text-slate-500 mt-3 font-semibold leading-relaxed">
                 بناءً على تعليمات المركز الوطني للتعلم الإلكتروني (NELC)، يجب توثيق رقم الهوية الوطنية أو الإقامة لتفعيل حسابك والتمكن من حضور الدورات والحصول على الشهادات المعتمدة.
               </p>
             </div>
 
-            {/* Error / Status Messages */}
             {saveMessage && (
               <div className={`p-4 rounded-2xl text-sm font-bold mb-5 text-center border ${
                 saveMessage.includes('بنجاح') 
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                  : 'bg-red-500/10 text-red-400 border-red-500/20'
+                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+                  : 'bg-red-50 text-red-600 border-red-100'
               }`}>
                 {saveMessage}
               </div>
             )}
 
-            {/* Form Fields */}
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-bold text-slate-300 block mb-2">الاسم الكامل (ثلاثي باللغة العربية)</label>
+                <label className="text-sm font-bold text-slate-600 block mb-2">الاسم الكامل (ثلاثي باللغة العربية)</label>
                 <input
                   type="text"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                   placeholder="أدخل اسمك الثلاثي باللغة العربية"
-                  className="w-full px-5 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] outline-none text-base font-medium"
+                  className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] outline-none text-base font-semibold"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-bold text-slate-300 block mb-2">رقم الهوية الوطنية / الإقامة</label>
+                <label className="text-sm font-bold text-slate-600 block mb-2">رقم الهوية الوطنية / الإقامة</label>
                 <input
                   type="text"
                   value={profileNationalId}
                   onChange={(e) => setProfileNationalId(e.target.value)}
                   placeholder="مثال: 1XXXXXXXXX"
-                  className="w-full px-5 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] outline-none text-base font-medium"
+                  className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] outline-none text-base font-semibold"
                   dir="ltr"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-bold text-slate-300 block mb-2">رقم الجوال (اختياري)</label>
+                <label className="text-sm font-bold text-slate-600 block mb-2">رقم الجوال (اختياري)</label>
                 <input
                   type="text"
                   value={profilePhone}
                   onChange={(e) => setProfilePhone(e.target.value)}
                   placeholder="05XXXXXXXX"
-                  className="w-full px-5 py-3.5 rounded-2xl bg-white/5 border border-white/10 text-white focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] outline-none text-base font-medium"
+                  className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] outline-none text-base font-semibold"
                   dir="ltr"
                 />
               </div>
@@ -973,7 +1023,7 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row gap-3 pt-6 mt-2">
               <button
                 onClick={handleLogout}
-                className="order-2 sm:order-1 flex-1 py-3.5 px-4 rounded-2xl text-slate-300 font-bold bg-white/5 hover:bg-white/10 border border-white/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+                className="order-2 sm:order-1 flex-1 py-3.5 px-4 rounded-2xl text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 transition-all border border-slate-200 cursor-pointer flex items-center justify-center gap-2"
               >
                 <LogOut className="w-5 h-5" />
                 تسجيل الخروج
@@ -981,7 +1031,7 @@ export default function DashboardPage() {
               <button
                 onClick={handleUpdateProfile}
                 disabled={isSaving}
-                className="order-1 sm:order-2 flex-1 py-3.5 px-4 rounded-2xl text-white font-bold bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] hover:from-[#4EA06E] hover:to-[#5CB07C] transition-all shadow-lg shadow-[#5CB07C]/20 border-0 disabled:opacity-70 cursor-pointer"
+                className="order-1 sm:order-2 flex-1 py-3.5 px-4 rounded-2xl text-white font-bold bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] transition-all shadow-lg shadow-[#173A7C]/20 border-0 disabled:opacity-70 cursor-pointer"
               >
                 {isSaving ? "جاري الحفظ..." : "حفظ وتفعيل الحساب"}
               </button>
