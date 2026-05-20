@@ -286,11 +286,11 @@ export default function DashboardPage() {
               setUserName(data.user.name);
             }
           } else {
-            window.location.href = "/login";
+            window.location.href = "/auth/login";
             return;
           }
         } catch (e) {
-          window.location.href = "/login";
+          window.location.href = "/auth/login";
           return;
         }
         setIsCheckingAuth(false);
@@ -446,7 +446,7 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/login?nabd_logout=true";
+    window.location.href = "/auth/login?nabd_logout=true";
   };
 
   const handleEvaluate = async () => {
