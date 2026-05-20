@@ -502,9 +502,9 @@ export default function DashboardPage() {
 
   if (activeCoursePlayer && activeLesson) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/10 to-slate-100/30 flex flex-col dir-rtl font-[family-name:var(--font-cairo)]" dir="rtl">
+      <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-slate-50 via-blue-50/10 to-slate-100/30 flex flex-col dir-rtl font-[family-name:var(--font-cairo)] overflow-hidden" dir="rtl">
         {/* Sticky Full Page Player Header */}
-        <header className="sticky top-0 z-30 w-full bg-white/85 backdrop-blur-md border-b border-slate-200/60 shadow-[0_2px_20px_rgba(0,0,0,0.01)] px-6 py-4 flex items-center justify-between">
+        <header className="w-full bg-white/85 backdrop-blur-md border-b border-slate-200/60 shadow-[0_2px_20px_rgba(0,0,0,0.01)] px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setActiveCoursePlayer(null)}
@@ -533,9 +533,9 @@ export default function DashboardPage() {
         </header>
 
         {/* Dynamic Full Screen Player Layout */}
-        <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-73px)] overflow-hidden">
+        <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
           {/* RIGHT COLUMN: Curriculum Sidebar */}
-          <div className="w-full lg:w-[400px] shrink-0 bg-white border-l border-slate-200/60 flex flex-col h-full z-20 shadow-[8px_0_30px_rgba(0,0,0,0.015)]">
+          <div className="w-full lg:w-[400px] shrink-0 bg-white border-l border-slate-200/60 flex flex-col h-full z-20 shadow-[8px_0_30px_rgba(0,0,0,0.015)] overflow-hidden">
             {/* Sidebar Header */}
             <div className="p-6 border-b border-slate-200/60 bg-slate-50/50 space-y-4">
               <div>
@@ -621,8 +621,10 @@ export default function DashboardPage() {
           </div>
 
           {/* LEFT COLUMN: Main Content Area */}
-          <div className="flex-1 flex flex-col h-full bg-slate-50/40 overflow-y-auto custom-scrollbar relative">
-            <div className="flex-1 p-6 md:p-8 space-y-8 max-w-5xl w-full mx-auto pb-32">
+          <div className="flex-1 flex flex-col h-full bg-slate-50/40 overflow-hidden relative">
+            {/* Scrollable content wrapper */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 custom-scrollbar">
+              <div className="max-w-5xl w-full mx-auto">
               {/* Current Lesson Header */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
                 <div>
@@ -815,9 +817,10 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+            </div>
 
             {/* Sticky Bottom Actions Bar */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200/60 px-6 py-4 flex items-center justify-between gap-4 z-10 shadow-lg shadow-slate-100">
+            <div className="bg-white/90 backdrop-blur-md border-t border-slate-200/60 px-6 py-4 flex items-center justify-between gap-4 z-10 shadow-lg shadow-slate-100 shrink-0">
               <div className="text-slate-500 text-xs font-bold bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-100">
                 تقدمك في الدورة: {Math.round((completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100)}%
               </div>
