@@ -1,12 +1,96 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { getCourseBySlug, courses } from "@/data/courses";
 import Button from "@/components/ui/Button";
-import { CreditCard, Shield, CheckCircle, ArrowLeft, BookOpen } from "lucide-react";
+import { CreditCard, Shield, CheckCircle, ArrowLeft, BookOpen, Loader2 } from "lucide-react";
 
-export default function CheckoutPage() {
+function CheckoutContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const slug = searchParams.get("slug") || "computer-basics-office";
+  
+  // Find selected course
+  const course = getCourseBySlug(slug) || courses[0];
+
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Form states
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+
+  // Prefill profile if logged in
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            setEmail(data.user.email || "");
+            const nameParts = (data.profile?.full_name || "").split(" ");
+            if (nameParts.length > 0) {
+              setFirstName(nameParts[0]);
+              setLastName(nameParts.slice(1).join(" "));
+            }
+            setPhone(data.profile?.phone || "");
+          }
+        }
+      } catch (err) {
+        console.error("Failed to prefill user session:", err);
+      }
+    }
+    loadProfile();
+  }, []);
+
+  const handleCheckout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setErrorMessage("البريد الإلكتروني مطلوب لإتمام التسجيل");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      // 1. Trigger local direct enrollment API
+      const enrollRes = await fetch("/api/courses/enroll", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          courseId: course.ghlCourseId || `course-${course.slug}`,
+          courseTitle: course.title,
+          courseUrl: `/courses/${course.slug}`,
+        }),
+      });
+
+      if (!enrollRes.ok) {
+        const errData = await enrollRes.json();
+        throw new Error(errData.message || "فشل تسجيل الدورة محلياً");
+      }
+
+      // 2. Redirect to Student Dashboard
+      router.push("/dashboard?enrollSuccess=true");
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      setErrorMessage(err.message || "حدث خطأ غير متوقع أثناء إتمام التسجيل");
+      setIsSubmitting(false);
+    }
+  };
+
+  const coursePrice = course.price;
+  const vat = parseFloat((coursePrice * 0.15).toFixed(2));
+  const total = parseFloat((coursePrice + vat).toFixed(2));
 
   return (
     <div className="min-h-screen pt-28 pb-20 bg-slate-50">
@@ -19,7 +103,13 @@ export default function CheckoutPage() {
           <p className="text-slate-500 text-base font-medium max-w-xl">أكمل بيانات الدفع بأمان لتأكيد تسجيلك في الدورة والبدء في التعلم فوراً.</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {errorMessage && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-sm font-bold text-center">
+            {errorMessage}
+          </motion.div>
+        )}
+
+        <form onSubmit={handleCheckout} className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           {/* Form */}
           <div className="lg:col-span-2 space-y-8">
             {/* Billing Info */}
@@ -28,19 +118,47 @@ export default function CheckoutPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-bold text-slate-700 block mb-2">الاسم الأول</label>
-                  <input className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base" placeholder="الاسم" />
+                  <input
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base"
+                    placeholder="الاسم"
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-bold text-slate-700 block mb-2">اسم العائلة</label>
-                  <input className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base" placeholder="العائلة" />
+                  <input
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base"
+                    placeholder="العائلة"
+                  />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="text-sm font-bold text-slate-700 block mb-2">البريد الإلكتروني</label>
-                  <input type="email" className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base" placeholder="example@email.com" dir="ltr" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base"
+                    placeholder="example@email.com"
+                    dir="ltr"
+                  />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="text-sm font-bold text-slate-700 block mb-2">رقم الجوال</label>
-                  <input type="tel" className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base" placeholder="+966 5X XXX XXXX" dir="ltr" />
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                    className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base"
+                    placeholder="+966 5X XXX XXXX"
+                    dir="ltr"
+                  />
                 </div>
               </div>
             </div>
@@ -55,6 +173,7 @@ export default function CheckoutPage() {
                   { key: "apple", label: "Apple Pay", icon: "🍎" },
                 ].map((m) => (
                   <button
+                    type="button"
                     key={m.key}
                     onClick={() => setPaymentMethod(m.key)}
                     className={`p-5 rounded-2xl border text-center transition-all cursor-pointer shadow-sm ${
@@ -75,17 +194,17 @@ export default function CheckoutPage() {
                     <label className="text-sm font-bold text-slate-700 block mb-2">رقم البطاقة</label>
                     <div className="relative">
                       <CreditCard className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input className="w-full pr-12 pl-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-sora" placeholder="XXXX XXXX XXXX XXXX" dir="ltr" />
+                      <input type="text" pattern="\d*" maxLength={16} className="w-full pr-12 pl-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-sora" placeholder="XXXX XXXX XXXX XXXX" dir="ltr" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <label className="text-sm font-bold text-slate-700 block mb-2">تاريخ الانتهاء</label>
-                      <input className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-sora" placeholder="MM/YY" dir="ltr" />
+                      <input type="text" maxLength={5} className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-sora" placeholder="MM/YY" dir="ltr" />
                     </div>
                     <div>
                       <label className="text-sm font-bold text-slate-700 block mb-2">CVV</label>
-                      <input className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-sora" placeholder="***" dir="ltr" />
+                      <input type="password" maxLength={3} className="w-full px-5 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-1 focus:ring-[#173A7C] focus:bg-white outline-none text-base font-sora" placeholder="***" dir="ltr" />
                     </div>
                   </div>
                 </div>
@@ -110,8 +229,8 @@ export default function CheckoutPage() {
                     <BookOpen className="w-6 h-6 text-[#173A7C]" />
                   </div>
                   <div className="flex-1 min-w-0 pt-0.5">
-                    <h4 className="text-sm font-bold text-slate-900 mb-1">استخدام الحاسب الآلي في الأعمال المكتبية</h4>
-                    <p className="text-xs font-semibold text-slate-500">40 ساعة · 32 درس تفاعلي</p>
+                    <h4 className="text-sm font-bold text-slate-900 mb-1 leading-normal truncate">{course.title}</h4>
+                    <p className="text-xs font-semibold text-slate-500">{course.duration} · {course.lessonsCount} درس تفاعلي</p>
                   </div>
                 </div>
               </div>
@@ -119,21 +238,35 @@ export default function CheckoutPage() {
               <div className="space-y-4 pt-4 border-t border-slate-100 mb-8">
                 <div className="flex items-center justify-between text-sm font-bold text-slate-600">
                   <span>سعر الدورة</span>
-                  <span className="text-slate-900">100.00 ر.س</span>
+                  <span className="text-slate-900">{coursePrice.toFixed(2)} ر.س</span>
                 </div>
                 <div className="flex items-center justify-between text-sm font-bold text-slate-600">
                   <span>ضريبة القيمة المضافة (15%)</span>
-                  <span className="text-slate-900">15.00 ر.س</span>
+                  <span className="text-slate-900">{vat.toFixed(2)} ر.س</span>
                 </div>
                 <div className="flex items-center justify-between text-xl font-black pt-4 border-t border-slate-100 text-slate-900">
                   <span>الإجمالي</span>
-                  <span className="text-[#173A7C] flex items-center gap-1">115.00 <span className="text-sm text-slate-500">ر.س</span></span>
+                  <span className="text-[#173A7C] flex items-center gap-1">{total.toFixed(2)} <span className="text-sm text-slate-500">ر.س</span></span>
                 </div>
               </div>
 
-              <Button size="lg" className="w-full text-lg py-4 shadow-xl shadow-[#173A7C]/10">
-                <CheckCircle className="w-5 h-5 rtl:mirror" />
-                تأكيد الدفع والتسجيل
+              <Button
+                type="submit"
+                size="lg"
+                disabled={isSubmitting}
+                className="w-full text-lg py-4 shadow-xl shadow-[#173A7C]/10 flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    جاري إتمام التسجيل...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5 rtl:mirror" />
+                    تأكيد الدفع والتسجيل
+                  </>
+                )}
               </Button>
 
               <p className="text-center text-sm font-medium text-slate-400 mt-6">
@@ -141,8 +274,20 @@ export default function CheckoutPage() {
               </p>
             </div>
           </aside>
-        </div>
+        </form>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-10 h-10 animate-spin text-[#173A7C]" />
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
   );
 }

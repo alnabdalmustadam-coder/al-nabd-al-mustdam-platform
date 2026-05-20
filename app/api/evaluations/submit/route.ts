@@ -42,6 +42,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "حدث خطأ أثناء حفظ التقييم في السجل" }, { status: 500 });
     }
 
+    // Update enrollment locally
+    const { error: updateError } = await supabase
+      .from("enrollments")
+      .update({ is_evaluated: true })
+      .eq("email", normalizedEmail)
+      .eq("course_id", courseId);
+
+    if (updateError) {
+      console.error("Failed to update enrollment is_evaluated status:", updateError);
+    }
+
     return NextResponse.json({ success: true, message: "تم حفظ التقييم بنجاح" });
   } catch (error: any) {
     console.error("Submit evaluation error:", error);

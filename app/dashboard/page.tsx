@@ -25,7 +25,10 @@ import {
   Lock,
   Share2,
   Calendar,
-  ShieldAlert
+  ShieldAlert,
+  X,
+  Printer,
+  Check
 } from "lucide-react";
 import { courses as allAvailableCourses } from "@/data/courses";
 
@@ -37,7 +40,7 @@ const sidebarLinks = [
   { key: "settings", label: "الإعدادات", icon: Settings },
 ];
 
-const certificates: any[] = [];
+// Dynamic certificates array derived from enrolledCourses state inside the component
 
 // xAPI verb display mapping
 const VERB_AR: Record<string, { label: string; color: string; icon: any }> = {
@@ -95,6 +98,144 @@ export default function DashboardPage() {
   const [evalFeedback, setEvalFeedback] = useState("");
   const [isSubmittingEval, setIsSubmittingEval] = useState(false);
 
+  // Local Course Player States
+  const [activeCoursePlayer, setActiveCoursePlayer] = useState<any | null>(null);
+  const [activeLesson, setActiveLesson] = useState<any | null>(null);
+  const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
+  const [isCompletingLesson, setIsCompletingLesson] = useState(false);
+  const [previewingCertificate, setPreviewingCertificate] = useState<any | null>(null);
+
+  // Derived certificates list
+  const certificates = enrolledCourses
+    .filter((c) => c.status === "completed" || c.progress === 100)
+    .map((c) => ({
+      id: c.course_id,
+      title: c.title,
+      date: c.completed_at ? new Date(c.completed_at).toLocaleDateString("ar-SA") : new Date().toLocaleDateString("ar-SA"),
+      completedAt: c.completed_at || new Date().toISOString(),
+      course_id: c.course_id,
+    }));
+
+  const startCoursePlayer = async (course: any) => {
+    // Find the full course data to get curriculum
+    const fullCourse = allAvailableCourses.find(c => c.ghlCourseId === course.course_id || c.slug === course.course_id.replace("course-", ""));
+    const selectedCourse = fullCourse || allAvailableCourses[0];
+    
+    // Fallback curriculum if empty
+    const curriculum = selectedCourse.curriculum && selectedCourse.curriculum.length > 0
+      ? selectedCourse.curriculum
+      : [{ id: "intro", title: "مقدمة عامة في البرنامج التدريبي", isLocked: false, duration: "10 دقائق", type: "video" }];
+
+    setActiveCoursePlayer({
+      ...course,
+      curriculum,
+      slug: selectedCourse.slug,
+    });
+
+    // Set first lesson as active
+    setActiveLesson(curriculum[0]);
+
+    // Fetch completed lessons from xAPI statements
+    try {
+      const res = await fetch(`/api/xapi/statements?agent=${encodeURIComponent(userEmail!)}&verb=completed&limit=100`);
+      if (res.ok) {
+        const data = await res.json();
+        const completedIds = (data.statements || [])
+          .map((stmt: any) => {
+            const objectId = stmt.object?.id || "";
+            const parts = objectId.split("/lessons/");
+            return parts.length > 1 ? parts[1] : null;
+          })
+          .filter(Boolean);
+        setCompletedLessonIds(completedIds);
+      }
+    } catch (err) {
+      console.error("Failed to fetch completed lessons:", err);
+    }
+
+    // Fire xAPI 'launched' statement for the course
+    try {
+      await fetch("/api/xapi/statements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          verb: "launched",
+          courseId: course.course_id,
+          courseName: course.title,
+          courseNameAr: course.title,
+        }),
+      });
+    } catch (xapiErr) {
+      console.error("Failed to store xAPI launched statement:", xapiErr);
+    }
+  };
+
+  const handleCompleteLesson = async () => {
+    if (!activeCoursePlayer || !activeLesson || isCompletingLesson) return;
+    setIsCompletingLesson(true);
+
+    try {
+      const res = await fetch("/api/courses/complete-lesson", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          courseId: activeCoursePlayer.course_id,
+          courseTitle: activeCoursePlayer.title,
+          lessonId: activeLesson.id,
+          lessonTitle: activeLesson.title,
+          totalLessons: activeCoursePlayer.curriculum.length,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        
+        // Add to completed lessons state
+        setCompletedLessonIds(prev => [...new Set([...prev, activeLesson.id])]);
+
+        // Refresh courses list in dashboard
+        const coursesRes = await fetch(`/api/courses/my-courses?email=${encodeURIComponent(userEmail!)}`);
+        if (coursesRes.ok) {
+          const coursesData = await coursesRes.json();
+          setEnrolledCourses(coursesData.courses || []);
+          setCompletedCount(coursesData.completedCount || 0);
+
+          // Update active course progress locally too
+          const updatedCourse = (coursesData.courses || []).find((c: any) => c.course_id === activeCoursePlayer.course_id);
+          if (updatedCourse) {
+            setActiveCoursePlayer((prev: any) => {
+              if (!prev) return null;
+              return {
+                ...prev,
+                progress: updatedCourse.progress,
+                status: updatedCourse.status,
+              };
+            });
+          }
+        }
+
+        // Refresh xAPI logs
+        const xapiRes = await fetch(`/api/xapi/statements?agent=${encodeURIComponent(userEmail!)}&limit=30`);
+        if (xapiRes.ok) {
+          const xapiData = await xapiRes.json();
+          setXapiStatements(xapiData.statements || []);
+        }
+
+        // Move to the next lesson automatically
+        const currentIndex = activeCoursePlayer.curriculum.findIndex((l: any) => l.id === activeLesson.id);
+        if (currentIndex !== -1 && currentIndex < activeCoursePlayer.curriculum.length - 1) {
+          setActiveLesson(activeCoursePlayer.curriculum[currentIndex + 1]);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to complete lesson:", err);
+    } finally {
+      setIsCompletingLesson(false);
+    }
+  };
+
   // 1. Check for email and name on mount (from URL param or cookies)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -126,11 +267,11 @@ export default function DashboardPage() {
               setUserName(data.user.name);
             }
           } else {
-            window.location.href = "https://members.nabdtraining.com/login";
+            window.location.href = "/login";
             return;
           }
         } catch (e) {
-          window.location.href = "https://members.nabdtraining.com/login";
+          window.location.href = "/login";
           return;
         }
         setIsCheckingAuth(false);
@@ -150,20 +291,7 @@ export default function DashboardPage() {
           const data = await res.json();
           let profile = data.profile;
 
-          // If profile is missing or has no name, sync from GHL first
-          if (!profile || !profile.full_name) {
-            try {
-              const syncRes = await fetch(`/api/ghl/sync-contact?email=${encodeURIComponent(userEmail!)}`);
-              if (syncRes.ok) {
-                const syncData = await syncRes.json();
-                if (syncData.synced && syncData.profile) {
-                  profile = syncData.profile;
-                }
-              }
-            } catch (syncErr) {
-              console.error("GHL sync failed (non-fatal):", syncErr);
-            }
-          }
+          // Maintain local profile fallback only
 
           if (profile) {
             if (profile.full_name) {
@@ -205,7 +333,7 @@ export default function DashboardPage() {
     async function fetchCourses() {
       setIsLoadingCourses(true);
       try {
-        const res = await fetch(`/api/ghl/get-courses?email=${encodeURIComponent(userEmail!)}`);
+        const res = await fetch(`/api/courses/my-courses?email=${encodeURIComponent(userEmail!)}`);
         if (res.ok) {
           const data = await res.json();
           setEnrolledCourses(data.courses || []);
@@ -299,7 +427,7 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "https://members.nabdtraining.com/login?nabd_logout=true";
+    window.location.href = "/login?nabd_logout=true";
   };
 
   const handleEvaluate = async () => {
@@ -717,7 +845,11 @@ export default function DashboardPage() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              window.open("https://members.nabdtraining.com/account?activeTab=Certificates", '_blank');
+                              if (isCompleted) {
+                                setPreviewingCertificate(c);
+                              } else {
+                                startCoursePlayer(c);
+                              }
                             }}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                               isCompleted
@@ -877,7 +1009,10 @@ export default function DashboardPage() {
                             <p className="text-xs font-bold text-slate-400">تاريخ الإصدار: {cert.date} · رقم: {cert.id}</p>
                           </div>
                         </div>
-                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-100 hover:border-slate-200 text-xs font-bold text-slate-600 hover:text-[#173A7C] hover:bg-slate-50 transition-all cursor-pointer shadow-sm">
+                        <button 
+                          onClick={() => setPreviewingCertificate(cert)}
+                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-100 hover:border-slate-200 text-xs font-bold text-slate-600 hover:text-[#173A7C] hover:bg-slate-50 transition-all cursor-pointer shadow-sm"
+                        >
                           <Download className="w-4 h-4" />
                           تحميل PDF
                         </button>
@@ -1408,6 +1543,390 @@ export default function DashboardPage() {
               >
                 {isSaving ? "جاري الحفظ..." : "حفظ وتفعيل الحساب"}
               </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Course Player Modal */}
+      {activeCoursePlayer && activeLesson && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 bg-slate-900/60 backdrop-blur-md transition-all duration-300">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-900 md:rounded-3xl w-full h-full md:h-[90vh] md:max-w-6xl shadow-2xl flex flex-col md:flex-row overflow-hidden border border-slate-800 text-right dir-rtl font-[family-name:var(--font-cairo)]"
+            dir="rtl"
+          >
+            {/* Main Content Area: Video Player & Controls */}
+            <div className="flex-1 flex flex-col h-2/3 md:h-full bg-slate-950">
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md z-10">
+                <div>
+                  <h3 className="text-white text-base md:text-lg font-black truncate max-w-[250px] md:max-w-lg">
+                    {activeCoursePlayer.title}
+                  </h3>
+                  <p className="text-slate-400 text-xs mt-0.5 font-bold">
+                    الدرس الحالي: {activeLesson.title}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setActiveCoursePlayer(null)}
+                  className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all cursor-pointer border-0"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Simulated Video Player */}
+              <div className="flex-1 relative flex items-center justify-center bg-slate-950 overflow-hidden">
+                <div className="absolute inset-0 bg-radial-gradient from-slate-900 to-black opacity-60" />
+                
+                {/* Visual simulator with placeholder/premium design */}
+                <div className="z-10 text-center px-4 max-w-md">
+                  <div className="w-20 h-20 bg-[#173A7C]/20 border border-[#173A7C]/30 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-[#173A7C]/10 animate-pulse">
+                    <Play className="w-10 h-10 text-white fill-white" />
+                  </div>
+                  <h4 className="text-white text-lg font-black mb-2">{activeLesson.title}</h4>
+                  <p className="text-slate-400 text-sm leading-relaxed font-semibold">
+                    محاكاة تشغيل المحتوى التعليمي التفاعلي المعتمد. يمكنك قراءة المادة وتتبع إنجازك.
+                  </p>
+                </div>
+
+                {/* Progress bar overlay */}
+                <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-slate-800">
+                  <div 
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
+                    style={{ 
+                      width: `${(completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100}%` 
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Bottom Navigation */}
+              <div className="px-6 py-4 bg-slate-900 border-t border-slate-800/80 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-slate-400 text-xs font-bold bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700/50">
+                    تقدمك: {Math.round((completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100)}%
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleCompleteLesson}
+                    disabled={isCompletingLesson || completedLessonIds.includes(activeLesson.id)}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer border-0 ${
+                      completedLessonIds.includes(activeLesson.id)
+                        ? "bg-slate-800 text-emerald-500 border border-emerald-950/20"
+                        : "bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-600/10"
+                    }`}
+                  >
+                    {completedLessonIds.includes(activeLesson.id) ? (
+                      <><Check className="w-4 h-4" /> تم إنجاز الدرس</>
+                    ) : (
+                      <>{isCompletingLesson ? "جاري الحفظ..." : "تأكيد إكمال الدرس"}</>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const idx = activeCoursePlayer.curriculum.findIndex((l: any) => l.id === activeLesson.id);
+                      if (idx < activeCoursePlayer.curriculum.length - 1) {
+                        setActiveLesson(activeCoursePlayer.curriculum[idx + 1]);
+                      }
+                    }}
+                    disabled={activeCoursePlayer.curriculum.findIndex((l: any) => l.id === activeLesson.id) === activeCoursePlayer.curriculum.length - 1}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs md:text-sm font-bold transition-all border-0 disabled:opacity-50 cursor-pointer"
+                  >
+                    الدرس التالي
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Curriculum Sidebar */}
+            <div className="w-full md:w-80 h-1/3 md:h-full border-t md:border-t-0 md:border-r border-slate-800 bg-slate-900/40 flex flex-col">
+              <div className="p-4 border-b border-slate-800 bg-slate-900/60">
+                <h4 className="text-white text-sm font-bold mb-1">منهج البرنامج التدريبي</h4>
+                <p className="text-slate-400 text-[11px] font-bold">
+                  تصفح الدروس والوحدات التعليمية المعتمدة
+                </p>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                {activeCoursePlayer.curriculum.map((lesson: any, i: number) => {
+                  const isActive = lesson.id === activeLesson.id;
+                  const isDone = completedLessonIds.includes(lesson.id);
+
+                  return (
+                    <button
+                      key={lesson.id || i}
+                      onClick={() => setActiveLesson(lesson)}
+                      className={`w-full text-right p-3 rounded-xl border flex items-center justify-between gap-3 transition-all cursor-pointer ${
+                        isActive
+                          ? "bg-[#173A7C]/20 border-[#173A7C]/40 text-white"
+                          : "bg-slate-900/40 border-slate-800/60 text-slate-300 hover:bg-slate-800/50"
+                      }`}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="text-[10px] font-bold text-slate-400">
+                            الدرس {i + 1}
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-500">· {lesson.duration || "10 دقائق"}</span>
+                        </div>
+                        <h5 className="text-xs md:text-sm font-bold truncate">
+                          {lesson.title}
+                        </h5>
+                      </div>
+                      
+                      {isDone ? (
+                        <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        </div>
+                      ) : (
+                        <div className="w-5 h-5 rounded-full bg-slate-800 border border-slate-700/60" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Certificate Preview Modal */}
+      {previewingCertificate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col border border-slate-100 text-right dir-rtl font-[family-name:var(--font-cairo)]"
+            dir="rtl"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                  <Award className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-slate-800 text-base md:text-lg font-black">
+                    معاينة الشهادة المعتمدة
+                  </h3>
+                  <p className="text-slate-400 text-xs font-bold">
+                    معتمدة من المركز الوطني للتعلم الإلكتروني (NELC)
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPreviewingCertificate(null)}
+                className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition-all cursor-pointer border-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Certificate Template Body */}
+            <div className="flex-1 p-6 md:p-12 overflow-x-auto bg-slate-50 flex justify-center items-center">
+              <div 
+                id="certificate-print-area" 
+                className="print-certificate-area w-[800px] h-[560px] bg-white border-[16px] border-double border-[#173A7C] p-12 relative flex flex-col justify-between shadow-lg text-slate-800 shrink-0 font-serif"
+                style={{
+                  backgroundImage: "radial-gradient(#f8fafc 1px, transparent 0), radial-gradient(#f8fafc 1px, transparent 0)",
+                  backgroundSize: "20px 20px",
+                  backgroundPosition: "0 0, 10px 10px",
+                }}
+              >
+                {/* Gold corner borders */}
+                <div className="absolute top-4 left-4 w-12 h-12 border-t-4 border-l-4 border-amber-500" />
+                <div className="absolute top-4 right-4 w-12 h-12 border-t-4 border-r-4 border-amber-500" />
+                <div className="absolute bottom-4 left-4 w-12 h-12 border-b-4 border-l-4 border-amber-500" />
+                <div className="absolute bottom-4 right-4 w-12 h-12 border-b-4 border-r-4 border-amber-500" />
+
+                {/* Top Headers */}
+                <div className="flex justify-between items-start text-xs font-sans font-bold text-slate-500">
+                  <div className="text-right">
+                    <p className="text-slate-800 font-extrabold mb-1">النبض المستدام للتعليم المستمر</p>
+                    <p>ترخيص المركز الوطني: 4000459223</p>
+                  </div>
+                  <div className="text-center bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-emerald-600">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>شهادة معتمدة موثقة</span>
+                  </div>
+                </div>
+
+                {/* Body Content */}
+                <div className="text-center my-auto space-y-6">
+                  <div>
+                    <h1 className="text-3xl font-black text-[#173A7C] font-[family-name:var(--font-cairo)] tracking-wide mb-2">شهادة حضور واجتياز</h1>
+                    <p className="text-sm font-bold text-slate-400">يسر مركز النبض المستدام للتعليم الطبي والتدريب أن يشهد بأن:</p>
+                  </div>
+
+                  <div className="py-2 border-b-2 border-dashed border-amber-400/40 max-w-md mx-auto">
+                    <h2 className="text-2xl font-black text-slate-800 font-[family-name:var(--font-cairo)]">{userName}</h2>
+                  </div>
+
+                  <div className="max-w-xl mx-auto text-sm leading-relaxed text-slate-600 font-sans font-medium">
+                    قد حضر واجتاز بنجاح البرنامج التدريبي الإلكتروني بعنوان:
+                    <p className="text-lg font-black text-[#173A7C] font-[family-name:var(--font-cairo)] mt-2">{previewingCertificate.title}</p>
+                    <p className="text-xs text-slate-400 mt-1">بمعدل الساعات المعتمدة للبرنامج التدريبي المستمر.</p>
+                  </div>
+                </div>
+
+                {/* Footer Signatures / Verification */}
+                <div className="flex justify-between items-end border-t border-slate-100 pt-6 mt-6">
+                  <div className="text-right text-xs text-slate-500 font-sans">
+                    <p>تاريخ الإصدار: <span className="font-mono font-bold text-slate-700">{previewingCertificate.date}</span></p>
+                    <p>رقم الشهادة: <span className="font-mono font-bold text-slate-700">{previewingCertificate.id}</span></p>
+                    <p className="mt-1 text-emerald-600 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      حالة الاعتماد: موثق ومرتبط بالمنصة الوطنية للتعلم الإلكتروني
+                    </p>
+                  </div>
+
+                  <div className="flex gap-8 items-center">
+                    <div className="text-center font-sans">
+                      <div className="h-10 flex items-center justify-center opacity-70 mb-1">
+                        <span className="font-serif italic text-slate-400 font-bold">K. Salem</span>
+                      </div>
+                      <p className="text-[10px] font-bold text-slate-700">المدير العام للمركز</p>
+                    </div>
+                    <div className="w-14 h-14 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center font-bold text-[8px] text-slate-400 text-center font-sans p-1 leading-tight">
+                      ختم مركز النبض المستدام
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer actions */}
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
+              <div className="text-slate-500 text-xs font-bold">
+                * يمكنك طباعة هذه الشهادة أو حفظها كملف PDF مباشرة من متصفحك.
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const printContents = document.getElementById("certificate-print-area")?.innerHTML;
+                    if (printContents) {
+                      const printWindow = window.open("", "_blank");
+                      if (printWindow) {
+                        printWindow.document.write(`
+                          <html>
+                            <head>
+                              <title>طباعة الشهادة</title>
+                              <style>
+                                @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+                                body {
+                                  margin: 0;
+                                  padding: 0;
+                                  display: flex;
+                                  justify-content: center;
+                                  align-items: center;
+                                  height: 100vh;
+                                  background-color: #ffffff;
+                                  direction: rtl;
+                                  font-family: 'Cairo', sans-serif;
+                                }
+                                .print-certificate-area {
+                                  width: 800px;
+                                  height: 560px;
+                                  background-color: white;
+                                  border: 16px double #173A7C;
+                                  padding: 48px;
+                                  box-sizing: border-box;
+                                  position: relative;
+                                  display: flex;
+                                  flex-direction: column;
+                                  justify-content: space-between;
+                                  box-shadow: none;
+                                }
+                                .absolute { position: absolute; }
+                                .top-4 { top: 16px; }
+                                .left-4 { left: 16px; }
+                                .right-4 { right: 16px; }
+                                .bottom-4 { bottom: 16px; }
+                                .w-12 { width: 48px; }
+                                .h-12 { height: 48px; }
+                                .border-t-4 { border-top-width: 4px; }
+                                .border-b-4 { border-bottom-width: 4px; }
+                                .border-l-4 { border-left-width: 4px; }
+                                .border-r-4 { border-right-width: 4px; }
+                                .border-amber-500 { border-color: #f59e0b; }
+                                .flex { display: flex; }
+                                .justify-between { justify-content: space-between; }
+                                .items-start { align-items: flex-start; }
+                                .items-end { align-items: flex-end; }
+                                .text-xs { font-size: 12px; }
+                                .text-sm { font-size: 14px; }
+                                .text-lg { font-size: 18px; }
+                                .text-2xl { font-size: 24px; }
+                                .text-3xl { font-size: 30px; }
+                                .font-bold { font-weight: bold; }
+                                .font-black { font-weight: 900; }
+                                .text-slate-500 { color: #64748b; }
+                                .text-slate-800 { color: #1e293b; }
+                                .text-[#173A7C] { color: #173A7C; }
+                                .text-emerald-600 { color: #059669; }
+                                .text-center { text-align: center; }
+                                .my-auto { margin-top: auto; margin-bottom: auto; }
+                                .space-y-6 > * + * { margin-top: 24px; }
+                                .py-2 { padding-top: 8px; padding-bottom: 8px; }
+                                .border-b-2 { border-bottom-width: 2px; }
+                                .border-dashed { border-style: dashed; }
+                                .border-amber-400\\/40 { border-color: rgba(251, 191, 36, 0.4); }
+                                .max-w-md { max-w: 28rem; }
+                                .max-w-xl { max-w: 36rem; }
+                                .mx-auto { margin-left: auto; margin-right: auto; }
+                                .leading-relaxed { line-height: 1.625; }
+                                .mt-2 { margin-top: 8px; }
+                                .mt-1 { margin-top: 4px; }
+                                .border-t { border-top-width: 1px; }
+                                .border-slate-100 { border-color: #f1f5f9; }
+                                .pt-6 { padding-top: 24px; }
+                                .mt-6 { margin-top: 24px; }
+                                .gap-8 { gap: 32px; }
+                                .opacity-70 { opacity: 0.7; }
+                                .italic { font-style: italic; }
+                                .text-\\[10px\\] { font-size: 10px; }
+                                .w-14 { width: 56px; }
+                                .h-14 { height: 56px; }
+                                .bg-slate-50 { background-color: #f8fafc; }
+                                .border-slate-200 { border-color: #e2e8f0; }
+                                .rounded-xl { border-radius: 12px; }
+                                .p-1 { padding: 4px; }
+                                .leading-tight { line-height: 1.25; }
+                                @media print {
+                                  body { background-color: white; }
+                                  @page { size: landscape; margin: 0; }
+                                }
+                              </style>
+                            </head>
+                            <body>
+                              <div class="print-certificate-area">
+                                ${printContents}
+                              </div>
+                              <script>
+                                window.onload = function() {
+                                  window.print();
+                                  setTimeout(function() { window.close(); }, 500);
+                                };
+                              </script>
+                            </body>
+                          </html>
+                        `);
+                        printWindow.document.close();
+                      }
+                    }
+                  }}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-sm font-bold shadow-lg shadow-[#173A7C]/20 transition-all border-0 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  طباعة الشهادة
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>
