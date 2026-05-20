@@ -86,7 +86,7 @@ export default function Navbar() {
     setMobileMegaMenuOpen(false);
   }, [pathname]);
 
-    const isDarkPage = pathname?.startsWith('/auth/');
+    const isDarkPage = pathname?.startsWith('/auth/') || pathname?.startsWith('/dashboard');
 
     return (
     <>
