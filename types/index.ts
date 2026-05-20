@@ -36,6 +36,7 @@ export interface CurriculumSection {
   duration: string;
   isLocked?: boolean;
   type?: string;
+  videoUrl?: string;
 }
 
 export type CourseCategory = 'tech' | 'languages' | 'security' | 'corporate' | 'management' | 'design' | 'admin' | 'data';

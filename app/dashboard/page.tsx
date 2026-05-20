@@ -104,6 +104,24 @@ export default function DashboardPage() {
   const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
   const [isCompletingLesson, setIsCompletingLesson] = useState(false);
   const [previewingCertificate, setPreviewingCertificate] = useState<any | null>(null);
+  const [playerTab, setPlayerTab] = useState<"about" | "notes" | "resources">("about");
+  const [noteText, setNoteText] = useState("");
+
+  // Load saved notes when lesson changes
+  useEffect(() => {
+    if (activeLesson && activeCoursePlayer) {
+      const savedNote = localStorage.getItem(`note_${activeCoursePlayer.course_id}_${activeLesson.id}`);
+      setNoteText(savedNote || "");
+    }
+  }, [activeLesson, activeCoursePlayer]);
+
+  // Handle note saving
+  const handleSaveNote = (text: string) => {
+    setNoteText(text);
+    if (activeLesson && activeCoursePlayer) {
+      localStorage.setItem(`note_${activeCoursePlayer.course_id}_${activeLesson.id}`, text);
+    }
+  };
 
   // Derived certificates list
   const certificates = enrolledCourses
@@ -1550,64 +1568,227 @@ export default function DashboardPage() {
 
       {/* Course Player Modal */}
       {activeCoursePlayer && activeLesson && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 bg-slate-900/60 backdrop-blur-md transition-all duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4 bg-slate-950/85 backdrop-blur-lg transition-all duration-300">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-900 md:rounded-3xl w-full h-full md:h-[90vh] md:max-w-6xl shadow-2xl flex flex-col md:flex-row overflow-hidden border border-slate-800 text-right dir-rtl font-[family-name:var(--font-cairo)]"
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="bg-slate-900 md:rounded-3xl w-full h-full md:h-[92vh] md:max-w-6xl shadow-2xl flex flex-col md:flex-row overflow-hidden border border-slate-800 text-right dir-rtl font-[family-name:var(--font-cairo)]"
             dir="rtl"
           >
-            {/* Main Content Area: Video Player & Controls */}
-            <div className="flex-1 flex flex-col h-2/3 md:h-full bg-slate-950">
+            {/* Main Content Area: Video Player & Tabs */}
+            <div className="flex-1 flex flex-col h-[65vh] md:h-full bg-slate-950 overflow-y-auto custom-scrollbar">
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md z-10">
-                <div>
-                  <h3 className="text-white text-base md:text-lg font-black truncate max-w-[250px] md:max-w-lg">
-                    {activeCoursePlayer.title}
-                  </h3>
-                  <p className="text-slate-400 text-xs mt-0.5 font-bold">
-                    الدرس الحالي: {activeLesson.title}
-                  </p>
+              <div className="sticky top-0 flex items-center justify-between px-6 py-4 border-b border-slate-800/60 bg-slate-900/90 backdrop-blur-md z-30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#173A7C]/20 to-[#173A7C]/10 border border-[#173A7C]/30 flex items-center justify-center shadow-lg shadow-[#173A7C]/5">
+                    <GraduationCap className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-white text-sm md:text-base font-black truncate max-w-[200px] md:max-w-md">
+                        {activeCoursePlayer.title}
+                      </h3>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        منهج معتمد
+                      </span>
+                    </div>
+                    <p className="text-slate-400 text-[11px] mt-0.5 font-semibold">
+                      المحاضرة الحالية: {activeLesson.title}
+                    </p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setActiveCoursePlayer(null)}
-                  className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all cursor-pointer border-0"
+                  className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all cursor-pointer border-0 shadow-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Simulated Video Player */}
-              <div className="flex-1 relative flex items-center justify-center bg-slate-950 overflow-hidden">
-                <div className="absolute inset-0 bg-radial-gradient from-slate-900 to-black opacity-60" />
-                
-                {/* Visual simulator with placeholder/premium design */}
-                <div className="z-10 text-center px-4 max-w-md">
-                  <div className="w-20 h-20 bg-[#173A7C]/20 border border-[#173A7C]/30 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-[#173A7C]/10 animate-pulse">
-                    <Play className="w-10 h-10 text-white fill-white" />
-                  </div>
-                  <h4 className="text-white text-lg font-black mb-2">{activeLesson.title}</h4>
-                  <p className="text-slate-400 text-sm leading-relaxed font-semibold">
-                    محاكاة تشغيل المحتوى التعليمي التفاعلي المعتمد. يمكنك قراءة المادة وتتبع إنجازك.
-                  </p>
+              {/* Video Player */}
+              <div className="relative aspect-video w-full bg-black shrink-0 z-20 shadow-2xl border-b border-slate-900">
+                <iframe
+                  className="w-full h-full absolute inset-0 border-0"
+                  src={`https://www.youtube.com/embed/${activeLesson.videoUrl || 'MmHWTPJMzbQ'}?autoplay=1&rel=0&modestbranding=1&showinfo=0`}
+                  title={activeLesson.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+
+              {/* Ultra-Premium Tabs Navigation */}
+              <div className="flex-1 flex flex-col bg-gradient-to-b from-slate-900 to-slate-950 p-6 md:p-8 space-y-6">
+                <div className="flex items-center gap-1 p-1 bg-slate-950/60 border border-slate-800/80 rounded-2xl w-fit self-start">
+                  <button
+                    onClick={() => setPlayerTab("about")}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all border-0 cursor-pointer ${
+                      playerTab === "about"
+                        ? "bg-[#173A7C] text-white shadow-lg shadow-[#173A7C]/20"
+                        : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    <span>عن الدرس</span>
+                  </button>
+                  <button
+                    onClick={() => setPlayerTab("notes")}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all border-0 cursor-pointer ${
+                      playerTab === "notes"
+                        ? "bg-[#173A7C] text-white shadow-lg shadow-[#173A7C]/20"
+                        : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+                    }`}
+                  >
+                    <FileCheck className="w-4 h-4" />
+                    <span>ملاحظاتي الشخصية</span>
+                  </button>
+                  <button
+                    onClick={() => setPlayerTab("resources")}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all border-0 cursor-pointer ${
+                      playerTab === "resources"
+                        ? "bg-[#173A7C] text-white shadow-lg shadow-[#173A7C]/20"
+                        : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+                    }`}
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>الملفات والمصادر</span>
+                  </button>
                 </div>
 
-                {/* Progress bar overlay */}
-                <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-slate-800">
-                  <div 
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
-                    style={{ 
-                      width: `${(completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100}%` 
-                    }}
-                  />
+                {/* Tabs Content */}
+                <div className="flex-1 text-slate-300">
+                  {playerTab === "about" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-6"
+                    >
+                      <div>
+                        <h4 className="text-white text-lg font-black mb-2">{activeLesson.title}</h4>
+                        <div className="flex items-center gap-3 text-slate-400 text-xs">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5" />
+                            {activeLesson.duration || "30 دقيقة"}
+                          </span>
+                          <span>•</span>
+                          <span className="text-blue-400 font-bold">محتوى مرئي تفاعلي</span>
+                        </div>
+                      </div>
+
+                      {activeLesson.lessons && activeLesson.lessons.length > 0 && (
+                        <div className="space-y-3">
+                          <h5 className="text-white text-sm font-black flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-amber-400" />
+                            <span>المحاور والمهارات المغطاة في هذا الدرس:</span>
+                          </h5>
+                          <ul className="space-y-2.5 pr-1">
+                            {activeLesson.lessons.map((topic: string, idx: number) => (
+                              <li key={idx} className="flex items-start gap-2.5 text-slate-300 text-xs md:text-sm font-medium leading-relaxed">
+                                <span className="w-5 h-5 rounded-md bg-[#173A7C]/15 border border-[#173A7C]/30 text-blue-400 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                                  {idx + 1}
+                                </span>
+                                <span>{topic}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/20 to-slate-900/40 border border-blue-900/30 flex items-start gap-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                          <ShieldCheck className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <div>
+                          <h6 className="text-white text-xs md:text-sm font-black mb-1">
+                            اعتماد واستحقاق الساعات التعليمية
+                          </h6>
+                          <p className="text-slate-400 text-xs leading-relaxed font-medium">
+                            هذا البرنامج التدريبي مرخص ومعتمد بالكامل من المركز الوطني للتعلم الإلكتروني (NELC). سيتم رصد وإرسال حضورك وتتبع تقدمك تلقائياً لتوثيق شهادة الإتمام بمجرد نقرك على "تأكيد إكمال الدرس".
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {playerTab === "notes" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-white text-sm md:text-base font-black mb-1">المفكرة الذكية للمتدرب</h4>
+                          <p className="text-slate-400 text-[11px] font-bold">اكتب ملخصاتك ونقاطك الهامة أثناء المشاهدة</p>
+                        </div>
+                        <span className="text-[10px] px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                          تم الحفظ تلقائياً
+                        </span>
+                      </div>
+                      
+                      <textarea
+                        value={noteText}
+                        onChange={(e) => handleSaveNote(e.target.value)}
+                        placeholder="اكتب ملاحظاتك وتلخيصك الشخصي للدرس هنا... يتم تخزين البيانات بشكل آمن وتلقائي للرجوع إليها لاحقاً."
+                        className="w-full h-40 p-4 rounded-2xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 text-xs md:text-sm font-semibold focus:outline-none focus:border-[#173A7C]/85 transition-all resize-none shadow-inner leading-relaxed"
+                      />
+                    </motion.div>
+                  )}
+
+                  {playerTab === "resources" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-4"
+                    >
+                      <div>
+                        <h4 className="text-white text-sm md:text-base font-black mb-1">المرفقات والحقيبة التدريبية</h4>
+                        <p className="text-slate-400 text-[11px] font-bold">حمل الملفات الداعمة والمراجع الأساسية للدرس</p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between gap-4 hover:border-slate-700 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
+                              <FileCheck className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <h5 className="text-white text-xs md:text-sm font-bold">الحقيبة التدريبية والدليل التعريفي للبرنامج</h5>
+                              <p className="text-slate-500 text-[10px] font-bold">صيغة PDF · 4.8 ميجابايت</p>
+                            </div>
+                          </div>
+                          <button className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border-0 transition-colors cursor-pointer flex items-center gap-1.5">
+                            <Download className="w-3.5 h-3.5" />
+                            <span>تحميل</span>
+                          </button>
+                        </div>
+
+                        <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between gap-4 hover:border-slate-700 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                              <FileCheck className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <h5 className="text-white text-xs md:text-sm font-bold">ملخص المحاضرة وأهم الأسئلة التطبيقية</h5>
+                              <p className="text-slate-500 text-[10px] font-bold">صيغة PDF · 1.2 ميجابايت</p>
+                            </div>
+                          </div>
+                          <button className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border-0 transition-colors cursor-pointer flex items-center gap-1.5">
+                            <Download className="w-3.5 h-3.5" />
+                            <span>تحميل</span>
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               </div>
 
               {/* Bottom Navigation */}
-              <div className="px-6 py-4 bg-slate-900 border-t border-slate-800/80 flex items-center justify-between gap-4">
+              <div className="sticky bottom-0 px-6 py-4 bg-slate-900 border-t border-slate-800/80 flex items-center justify-between gap-4 z-10 shadow-inner">
                 <div className="flex items-center gap-3">
-                  <div className="text-slate-400 text-xs font-bold bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700/50">
-                    تقدمك: {Math.round((completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100)}%
+                  <div className="text-slate-400 text-xs font-bold bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                    تقدمك في الدورة: {Math.round((completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100)}%
                   </div>
                 </div>
 
@@ -1622,9 +1803,9 @@ export default function DashboardPage() {
                     }`}
                   >
                     {completedLessonIds.includes(activeLesson.id) ? (
-                      <><Check className="w-4 h-4" /> تم إنجاز الدرس</>
+                      <><Check className="w-4 h-4" /> تم إنجاز الدرس بنجاح</>
                     ) : (
-                      <>{isCompletingLesson ? "جاري الحفظ..." : "تأكيد إكمال الدرس"}</>
+                      <>{isCompletingLesson ? "جاري الحفظ والتحقق..." : "تأكيد إكمال الدرس"}</>
                     )}
                   </button>
 
@@ -1645,15 +1826,35 @@ export default function DashboardPage() {
             </div>
 
             {/* Curriculum Sidebar */}
-            <div className="w-full md:w-80 h-1/3 md:h-full border-t md:border-t-0 md:border-r border-slate-800 bg-slate-900/40 flex flex-col">
-              <div className="p-4 border-b border-slate-800 bg-slate-900/60">
-                <h4 className="text-white text-sm font-bold mb-1">منهج البرنامج التدريبي</h4>
-                <p className="text-slate-400 text-[11px] font-bold">
-                  تصفح الدروس والوحدات التعليمية المعتمدة
-                </p>
+            <div className="w-full md:w-80 h-[35vh] md:h-full border-t md:border-t-0 md:border-r border-slate-800 bg-slate-900/40 flex flex-col">
+              <div className="p-5 border-b border-slate-800 bg-slate-900/60 space-y-4">
+                <div>
+                  <h4 className="text-white text-sm font-bold mb-1">منهج البرنامج التدريبي</h4>
+                  <p className="text-slate-400 text-[10px] font-bold">
+                    تصفح المحتوى والدروس المعتمدة
+                  </p>
+                </div>
+                
+                {/* Circular/Linear progress bar on top of curriculum */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
+                    <span>نسبة إتمام المسار التدريبي</span>
+                    <span className="text-blue-400 font-extrabold">
+                      {Math.round((completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100)}%
+                    </span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800/80">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-700 rounded-full"
+                      style={{ 
+                        width: `${(completedLessonIds.filter(id => activeCoursePlayer.curriculum.some((l: any) => l.id === id)).length / activeCoursePlayer.curriculum.length) * 100}%` 
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
                 {activeCoursePlayer.curriculum.map((lesson: any, i: number) => {
                   const isActive = lesson.id === activeLesson.id;
                   const isDone = completedLessonIds.includes(lesson.id);
@@ -1662,30 +1863,42 @@ export default function DashboardPage() {
                     <button
                       key={lesson.id || i}
                       onClick={() => setActiveLesson(lesson)}
-                      className={`w-full text-right p-3 rounded-xl border flex items-center justify-between gap-3 transition-all cursor-pointer ${
+                      className={`w-full text-right p-3.5 rounded-2xl border flex items-center justify-between gap-3.5 transition-all cursor-pointer ${
                         isActive
-                          ? "bg-[#173A7C]/20 border-[#173A7C]/40 text-white"
-                          : "bg-slate-900/40 border-slate-800/60 text-slate-300 hover:bg-slate-800/50"
+                          ? "bg-gradient-to-r from-blue-950/40 via-slate-900/40 to-slate-900/10 border-blue-500/50 shadow-md shadow-blue-500/5"
+                          : "bg-slate-900/30 border-slate-800/60 hover:bg-slate-800/40"
                       }`}
                     >
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          <span className="text-[10px] font-bold text-slate-400">
-                            الدرس {i + 1}
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
+                            isActive 
+                              ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                              : "bg-slate-800 text-slate-400"
+                          }`}>
+                            محاضرة {i + 1}
                           </span>
-                          <span className="text-[10px] font-bold text-slate-500">· {lesson.duration || "10 دقائق"}</span>
+                          <span className="text-[10px] font-bold text-slate-500">{lesson.duration || "30 دقيقة"}</span>
                         </div>
-                        <h5 className="text-xs md:text-sm font-bold truncate">
+                        <h5 className={`text-xs md:text-sm font-bold truncate transition-colors ${
+                          isActive ? "text-white" : "text-slate-300"
+                        }`}>
                           {lesson.title}
                         </h5>
                       </div>
                       
                       {isDone ? (
-                        <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/30 shadow-inner">
                           <Check className="w-3.5 h-3.5 text-emerald-500" />
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded-full bg-slate-800 border border-slate-700/60" />
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all ${
+                          isActive 
+                            ? "bg-blue-500/10 border-blue-500/30 animate-pulse" 
+                            : "bg-slate-950 border-slate-800"
+                        }`}>
+                          <Play className={`w-2.5 h-2.5 ${isActive ? "text-blue-400 fill-blue-400" : "text-slate-600"}`} />
+                        </div>
                       )}
                     </button>
                   );

@@ -26,15 +26,37 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-1",
     curriculum: [
-      { id: "m1", title: "مقدمة وتعريف بالمنصة التفاعلية", isLocked: false, duration: "30 دقيقة", type: "video" },
-      { id: "m2", title: "كيفية استحقاق وإصدار شهادتك الرقمية المعتمدة", isLocked: true, duration: "30 دقيقة", type: "video" },
+      { 
+        id: "m1", 
+        title: "الدرس الأول: مقدمة وتعريف بالمنصة التفاعلية", 
+        isLocked: false, 
+        duration: "30 دقيقة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "جولة تعريفية في لوحة تحكم المتدرب والخدمات المتاحة",
+          "فهم آلية رصد وإرسال بيانات التعلم عبر سجل xAPI"
+        ]
+      },
+      { 
+        id: "m2", 
+        title: "الدرس الثاني: كيفية استحقاق وإصدار شهادتك الرقمية المعتمدة", 
+        isLocked: true, 
+        duration: "30 دقيقة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "شروط ومعايير اعتماد الساعات الدراسية والتحقق الذاتي",
+          "خطوات توليد وتحميل ملف الشهادة بصيغة PDF فوراً"
+        ]
+      },
     ],
     outcomes: [
       "فهم وتجربة محاكي مشغل الكورسات المحلي التفاعلي.",
       "تتبع التقدم الحقيقي وإتمام الدروس ومزامنتها محلياً.",
       "توليد شهادة إتمام معتمدة فورية قابلة للطباعة PDF بنقرة واحدة.",
     ],
-    requirements: "لا توجد متطلبات مسبقة. متاحة للجميع مجاناً.",
+    requirements: "لا توجد متطلبات مسبقة. الدورة مصممة ومتاحة للجميع مجاناً.",
     ghlCheckoutUrl: "/checkout?slug=free-trial-course",
     ghlCourseId: "course-free-trial",
   },
@@ -43,7 +65,7 @@ export const courses: Course[] = [
     title: "دورة استخدام الحاسب الالي في الاعمال المكتبية",
     slug: "computer-basics-office",
     description: "للمبتدئين والخريجين الجدد، تعلم اساسيات الحاسب الالي لرفع مستوى إنتاجيتك في الأعمال المكتبية. هذه الدورة تتضمن استخدام برامج إدارة البيانات مثل Microsoft Office. استعد للمنافسة في سوق العمل بكل ثقة.",
-    image: "/logo.webp", // We will use a placeholder or logo image to match the premium look
+    image: "/logo.webp",
     category: "admin",
     level: "beginner",
     price: 900,
@@ -54,14 +76,69 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-1",
     curriculum: [
-      { id: "m1", title: "مقدمة في الحاسب الآلي", isLocked: false, duration: "ساعتان", type: "video" },
-      { id: "m2", title: "احتراف Microsoft Word", isLocked: true, duration: "10 ساعات", type: "video" },
-      { id: "m3", title: "إدارة البيانات عبر Microsoft Excel", isLocked: true, duration: "15 ساعة", type: "video" },
-      { id: "m4", title: "العروض التقديمية Microsoft PowerPoint", isLocked: true, duration: "8 ساعات", type: "video" },
-      { id: "m5", title: "البريد الإلكتروني وإدارة الوقت", isLocked: true, duration: "5 ساعات", type: "video" },
+      { 
+        id: "h-m1", 
+        title: "الدرس الأول: مقدمة في الحاسب الآلي وأنظمة التشغيل", 
+        isLocked: false, 
+        duration: "ساعتان", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "التعرف على المكونات المادية والبرمجية للحاسب الآلي",
+          "إتقان أساسيات نظام التشغيل Windows وإدارة الملفات"
+        ]
+      },
+      { 
+        id: "h-m2", 
+        title: "الدرس الثاني: احتراف Microsoft Word وتنسيق النصوص", 
+        isLocked: true, 
+        duration: "10 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "إنشاء وتحرير المستندات والتقارير المكتبية الرسمية",
+          "تنسيق الجداول، وإدراج الصور، وضبط إعدادات الهوامش والطباعة"
+        ]
+      },
+      { 
+        id: "h-m3", 
+        title: "الدرس الثالث: إدارة البيانات وتحليلها عبر Microsoft Excel", 
+        isLocked: true, 
+        duration: "15 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "تصميم الجداول الحسابية وإدخال البيانات بكفاءة",
+          "استخدام الدوال الأساسية والمعادلات الرياضية والرسوم البيانية"
+        ]
+      },
+      { 
+        id: "h-m4", 
+        title: "الدرس الرابع: العروض التقديمية وتصميم الشرائح Microsoft PowerPoint", 
+        isLocked: true, 
+        duration: "8 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "بناء وتصميم عروض تقديمية تفاعلية جذابة",
+          "استخدام الانتقالات والرسوم المتحركة لعرض المشاريع بأسلوب مميز"
+        ]
+      },
+      { 
+        id: "h-m5", 
+        title: "الدرس الخامس: البريد الإلكتروني وإدارة الوقت وتنظيم المراسلات", 
+        isLocked: true, 
+        duration: "5 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "صياغة وإرسال رسائل البريد الإلكتروني المهنية",
+          "استخدام التقويم وتنظيم الاجتماعات وإدارة المهام اليومية"
+        ]
+      },
     ],
     outcomes: [
-      "إتقان استخدام نظام التشغيل Windows.",
+      "إتقان استخدام نظام التشغيل Windows وتطبيقاته.",
       "إنشاء وتنسيق المستندات الاحترافية باستخدام Word.",
       "إعداد وتصميم الجداول الإلكترونية وتحليل البيانات في Excel.",
       "تصميم العروض التقديمية الفعالة والجذابة في PowerPoint.",
@@ -87,10 +164,54 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-2",
     curriculum: [
-      { id: "m1", title: "أساسيات الكتابة السريعة", isLocked: false, duration: "3 ساعات", type: "video" },
-      { id: "m2", title: "معالجة النصوص المتقدمة", isLocked: true, duration: "10 ساعات", type: "video" },
-      { id: "m3", title: "دقة وجودة إدخال البيانات", isLocked: true, duration: "12 ساعة", type: "video" },
-      { id: "m4", title: "مشروع تطبيقي شامل", isLocked: true, duration: "5 ساعات", type: "quiz" },
+      { 
+        id: "d-m1", 
+        title: "الدرس الأول: أساسيات الكتابة السريعة ولوحة المفاتيح", 
+        isLocked: false, 
+        duration: "3 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "تقنيات وضعية الأصابع الصحيحة للكتابة دون النظر",
+          "تمارين مكثفة لزيادة سرعة الكتابة باللغتين العربية والإنجليزية"
+        ]
+      },
+      { 
+        id: "d-m2", 
+        title: "الدرس الثاني: معالجة النصوص المتقدمة وإعداد الخطابات", 
+        isLocked: true, 
+        duration: "10 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "إعداد الخطابات الإدارية والمعاملات الحكومية الرسمية",
+          "استخدام الأنماط الجاهزة والتحكم المتقدم في الفقرات والهوامش"
+        ]
+      },
+      { 
+        id: "d-m3", 
+        title: "الدرس الثالث: دقة وجودة إدخال البيانات وتدقيق المعاملات", 
+        isLocked: true, 
+        duration: "12 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "آليات إدخال السجلات وقواعد البيانات بطرق علمية دقيقة",
+          "فحص وتدقيق البيانات وتجنب الأخطاء الشائعة أثناء الرصد السريع"
+        ]
+      },
+      { 
+        id: "d-m4", 
+        title: "الدرس الرابع: مشروع تطبيقي شامل ومحاكاة بيئة العمل", 
+        isLocked: true, 
+        duration: "5 ساعات", 
+        type: "quiz",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "تنفيذ مشروع إدخال سجلات متكامل تحت ضغط الوقت",
+          "تقييم دقة وسرعة المتدرب وإعطائه تقرير فني بالأداء"
+        ]
+      },
     ],
     outcomes: [
       "رفع سرعة ودقة الكتابة على لوحة المفاتيح.",
@@ -118,11 +239,66 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-3",
     curriculum: [
-      { id: "m1", title: "مقدمة وتحديد المستوى", isLocked: false, duration: "ساعتان", type: "video" },
-      { id: "m2", title: "المحادثة اليومية للمبتدئين", isLocked: true, duration: "15 ساعة", type: "video" },
-      { id: "m3", title: "القواعد الأساسية في اللغة", isLocked: true, duration: "15 ساعة", type: "video" },
-      { id: "m4", title: "مهارات الكتابة والمراسلات", isLocked: true, duration: "15 ساعة", type: "video" },
-      { id: "m5", title: "تطوير مهارات الاستماع والفهم", isLocked: true, duration: "13 ساعة", type: "video" },
+      { 
+        id: "e-m1", 
+        title: "الدرس الأول: مقدمة وتحديد المستوى التفاعلي", 
+        isLocked: false, 
+        duration: "ساعتان", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "اختبار تحديد مستوى شامل لقياس المهارات اللغوية الأربعة",
+          "بناء خطة الدراسة المخصصة بناءً على نقاط القوة والضعف"
+        ]
+      },
+      { 
+        id: "e-m2", 
+        title: "الدرس الثاني: المحادثة اليومية والتركيبات الأساسية للمبتدئين", 
+        isLocked: true, 
+        duration: "15 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "التعرف على المفردات والجمل الشائعة في التعارف والمطاعم والتسوق",
+          "ممارسة النطق الصحيح وتجنب الأخطاء الصوتية الشائعة"
+        ]
+      },
+      { 
+        id: "e-m3", 
+        title: "الدرس الثالث: القواعد الأساسية والأزمنة في اللغة", 
+        isLocked: true, 
+        duration: "15 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "شرح مبسط للأزمنة الأساسية (المضارع، الماضي، المستقبل)",
+          "تطبيق القواعد في صياغة جمل صحيحة وتجنب الأخطاء النحوية"
+        ]
+      },
+      { 
+        id: "e-m4", 
+        title: "الدرس الرابع: مهارات الكتابة والمراسلات البريدية والمهنية", 
+        isLocked: true, 
+        duration: "15 hour", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "هيكلة البريد الإلكتروني والرسائل الإدارية باللغة الإنجليزية",
+          "اختيار الأسلوب المناسب للمراسلات الرسمية والمهنية"
+        ]
+      },
+      { 
+        id: "e-m5", 
+        title: "الدرس الخامس: تطوير مهارات الاستماع والفهم للغات المختلفة", 
+        isLocked: true, 
+        duration: "13 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "الاستماع لمقاطع صوتية بلهجات مختلفة (بريطانية، أمريكية)",
+          "تطوير تقنيات الاستخلاص والتلخيص وفهم سياق الحوار السريع"
+        ]
+      },
     ],
     outcomes: [
       "التحدث بطلاقة في مواقف الحياة اليومية والمهنية.",
@@ -138,7 +314,7 @@ export const courses: Course[] = [
     id: 4,
     title: "دورة الذكاء الاصطناعي",
     slug: "ai-course",
-    description: "استعد لمستقبل التكنولوجيا مع دورة الذكاء الاصطناعي. تعلم كيف يتم استخدام تقنيات الذكاء الاصطناعي في تطبيقات متعددة مثل التحليل والروبوتات. ستكتسب المهارات التي تؤهلك للعمل في هذا المجال المتقدم.",
+    description: "استعد لمستقبل التكنولوجيا مع دورة الذكاء الاصطناعي. تعلم كيف يتم استخدام تقنيات الذكاء الاصطناعي في تطبيقات متعددة مثل التحليل والروبوتات. ستكتسب المهارات التي تؤهلك للعمل في هذا مجال المتقدم.",
     image: "/logo.webp",
     category: "tech",
     level: "all",
@@ -150,11 +326,51 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-1",
     curriculum: [
-      { id: "m1", title: "مقدمة في الذكاء الاصطناعي", isLocked: false, duration: "4 ساعات", type: "video" },
+      { 
+        id: "a-m1", 
+        title: "الدرس الأول: مقدمة في الذكاء الاصطناعي وتاريخه", 
+        isLocked: false, 
+        duration: "4 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "التعرف على المفاهيم التأسيسية للذكاء الاصطناعي وتطورها التاريخي",
+          "فهم خوارزميات التعلم الآلي والشبكات العصبية والفرق بينها"
+        ]
+      },
+      { 
+        id: "a-m2", 
+        title: "الدرس الثاني: تطبيقات الذكاء الاصطناعي العملية في قطاع الأعمال", 
+        isLocked: true, 
+        duration: "20 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "كيفية توظيف أدوات الذكاء الاصطناعي لرفع الإنتاجية وصناعة المحتوى",
+          "استكشاف نماذج لغة التوليد التلقائي (Generative AI) وكتابة الأوامر الهندسية"
+        ]
+      },
+      { 
+        id: "a-m3", 
+        title: "الدرس الثالث: الأخلاقيات ومستقبل تقنيات الذكاء الاصطناعي", 
+        isLocked: true, 
+        duration: "21 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "دراسة قضايا التحيز والأمان الرقمي وحماية الملكية الفكرية",
+          "استعراض الفرص المستقبلية لوظائف الذكاء الاصطناعي وطرق التأهيل لها"
+        ]
+      },
     ],
-    outcomes: ["فهم أسس الذكاء الاصطناعي.", "تطبيقات الذكاء الاصطناعي العملية."],
+    outcomes: [
+      "فهم أسس الذكاء الاصطناعي والتعلم الآلي.",
+      "تطبيقات الذكاء الاصطناعي التوليدي العملية.",
+      "مبادئ وأخلاقيات هندسة الأوامر (Prompt Engineering)."
+    ],
     requirements: "أساسيات الحاسب الآلي.",
     ghlCheckoutUrl: "https://members.nabdtraining.com/login",
+    ghlCourseId: "course-ai",
   },
   {
     id: 5,
@@ -172,11 +388,47 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-2",
     curriculum: [
-      { id: "m1", title: "مبادئ الأمن السيبراني", isLocked: false, duration: "5 ساعات", type: "video" },
+      { 
+        id: "c-m1", 
+        title: "الدرس الأول: مبادئ الأمن السيبراني والمخاطر الشائعة", 
+        isLocked: false, 
+        duration: "5 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "فهم ركائز الأمان الثلاثة (السرية، السلامة، التوافرية)",
+          "التعرف على أساليب الهندسة الاجتماعية والبرمجيات الخبيثة وطرق التصدي لها"
+        ]
+      },
+      { 
+        id: "c-m2", 
+        title: "الدرس الثاني: تأمين الشبكات وحوكمة البيانات المؤسسية", 
+        isLocked: true, 
+        duration: "20 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "إعداد وضبط جدران الحماية وأنظمة الكشف عن التسلل (IDS/IPS)",
+          "مبادئ التشفير المتماثل وغير المتماثل وتأمين قنوات الاتصال"
+        ]
+      },
+      { 
+        id: "c-m3", 
+        title: "الدرس الثالث: الاستجابة للحوادث الأمنية والتحقيق الرقمي", 
+        isLocked: true, 
+        duration: "15 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "خطوات احتواء الهجمات الإلكترونية وتقليل الأضرار بعد الاختراق",
+          "أدوات جمع الأدلة الرقمية وكتابة تقارير الحوادث الفنية للإدارة"
+        ]
+      },
     ],
     outcomes: ["معرفة أنواع الهجمات الإلكترونية وطرق الحماية.", "تأمين الشبكات والبيانات المؤسسية."],
     requirements: "معرفة جيدة بالشبكات وأنظمة التشغيل.",
     ghlCheckoutUrl: "https://members.nabdtraining.com/login",
+    ghlCourseId: "course-cybersecurity",
   },
   {
     id: 6,
@@ -194,11 +446,59 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-3",
     curriculum: [
-      { id: "m1", title: "مبادئ الإلكترونيات والجوال", isLocked: false, duration: "6 ساعات", type: "video" },
+      { 
+        id: "mo-m1", 
+        title: "الدرس الأول: مبادئ الإلكترونيات وفحص القطع والعتاد", 
+        isLocked: false, 
+        duration: "6 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "التعرف على المكونات الداخلية للهاتف وأدوات الفحص والقياس",
+          "طرق تفكيك وتركيب الأجهزة الذكية وتحديد القطع التالفة بأمان"
+        ]
+      },
+      { 
+        id: "mo-m2", 
+        title: "الدرس الثاني: صيانة العتاد الصلب (Hardware) واستبدال الأجزاء", 
+        isLocked: true, 
+        duration: "24 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "مبادئ وتقنيات اللحام الدقيق (Micro-soldering) وإصلاح الدوائر",
+          "استبدال الشاشات، البطاريات، منافذ الشحن، والكاميرات التالفة"
+        ]
+      },
+      { 
+        id: "mo-m3", 
+        title: "الدرس الثالث: صيانة البرمجيات (Software) وحل المشاكل الفنية", 
+        isLocked: true, 
+        duration: "20 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "تثبيت وتحديث أنظمة التشغيل iOS و Android وحل تعليق النظام",
+          "طرق استرجاع البيانات المفقودة، وعمل النسخ الاحتياطي، وفك الأقفال البرمجية"
+        ]
+      },
+      { 
+        id: "mo-m4", 
+        title: "الدرس الرابع: دراسة السوق وتأسيس مشروع صيانة خاص بك", 
+        isLocked: true, 
+        duration: "10 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "مصادر شراء قطع الغيار الأصلية وأدوات الصيانة بأسعار اقتصادية",
+          "خطوات الترخيص وتجهيز المحل وجذب العملاء وتسعير الخدمات"
+        ]
+      },
     ],
     outcomes: ["تشخيص أعطال الهواتف بكفاءة.", "إصلاح المشاكل البرمجية والعتاد (Hardware/Software)."],
     requirements: "لا توجد متطلبات سابقة.",
     ghlCheckoutUrl: "https://members.nabdtraining.com/login",
+    ghlCourseId: "course-mobile",
   },
   {
     id: 7,
@@ -216,11 +516,47 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-1",
     curriculum: [
-      { id: "m1", title: "معايير الأوشا الأساسية", isLocked: false, duration: "5 ساعات", type: "video" },
+      { 
+        id: "os-m1", 
+        title: "الدرس الأول: معايير الأوشا الأساسية ومقدمة في السلامة المهنية", 
+        isLocked: false, 
+        duration: "5 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "تاريخ الأوشا وأهميتها والتعرف على الحقوق والمسؤوليات القانونية",
+          "تصنيف المخاطر المهنية في مكان العمل (فيزيائية، كيميائية، بيولوجية)"
+        ]
+      },
+      { 
+        id: "os-m2", 
+        title: "الدرس الثاني: المخاطر الهندسية وخطط الوقاية والحماية من السقوط", 
+        isLocked: true, 
+        duration: "15 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "معايير الحماية من السقوط والعمل بأمان في المرتفعات والسحالات",
+          "مبادئ السلامة الكهربائية، وسلامة الآلات، وخطوات العزل الميكانيكي والكهربائي"
+        ]
+      },
+      { 
+        id: "os-m3", 
+        title: "الدرس الثالث: إدارة الحرائق وخطط الإخلاء في الحالات الطارئة", 
+        isLocked: true, 
+        duration: "10 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "أنواع الحرائق واستخدام مطافئ الحريق المختلفة بمهارة",
+          "تصميم وتطبيق خطة طوارئ وإخلاء متكاملة للمنشأة"
+        ]
+      },
     ],
     outcomes: ["فهم معايير السلامة المهنية.", "تطبيق سياسات الأوشا في بيئة العمل."],
     requirements: "لا توجد متطلبات مسبقة.",
     ghlCheckoutUrl: "https://members.nabdtraining.com/login",
+    ghlCourseId: "course-osha",
   },
   {
     id: 8,
@@ -238,11 +574,47 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-2",
     curriculum: [
-      { id: "m1", title: "مقدمة عن النيبوش", isLocked: false, duration: "4 ساعات", type: "video" },
+      { 
+        id: "ne-m1", 
+        title: "الدرس الأول: مقدمة عن النيبوش ونظم إدارة السلامة العالمية", 
+        isLocked: false, 
+        duration: "4 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "هيكل وتصنيف شهادة النيبوش وأهميتها في الأسواق الدولية",
+          "كيفية بناء نظام إدارة أمان وصحة مهنية متكامل (OHSMS)"
+        ]
+      },
+      { 
+        id: "ne-m2", 
+        title: "الدرس الثاني: تقييم المخاطر المهنية والتحكم والسيطرة عليها", 
+        isLocked: true, 
+        duration: "20 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "خطوات وإعداد دراسات تقييم المخاطر (Risk Assessment)",
+          "تطبيق هرم إجراءات التحكم والسيطرة للحد من حوادث العمل"
+        ]
+      },
+      { 
+        id: "ne-m3", 
+        title: "الدرس الثالث: مراقبة وتقييم ومراجعة الأداء الأمني للمؤسسة", 
+        isLocked: true, 
+        duration: "16 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "أدوات التفتيش والتدقيق الداخلي على إجراءات السلامة",
+          "التحقيق في الحوادث واستخلاص الدروس وتحسين الخطط الوقائية"
+        ]
+      },
     ],
     outcomes: ["الحصول على التأهيل اللازم لشهادة النيبوش العالمية.", "إدارة المخاطر المهنية المتقدمة."],
     requirements: "يفضل خبرة سابقة في السلامة المهنية.",
     ghlCheckoutUrl: "https://members.nabdtraining.com/login",
+    ghlCourseId: "course-nebosh",
   },
   {
     id: 9,
@@ -260,18 +632,50 @@ export const courses: Course[] = [
     featured: true,
     trainerId: "tr-3",
     curriculum: [
-      { id: "m1", title: "استراتيجيات الحل السريع", isLocked: false, duration: "5 ساعات", type: "video" },
+      { 
+        id: "qu-m1", 
+        title: "الدرس الأول: استراتيجيات الحل السريع والمهارات الرياضية (الكمي)", 
+        isLocked: false, 
+        duration: "5 ساعات", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "قوانين الجذور، الأسس، والنسب المئوية وطرق الحل السريع بدون استخدام حاسبة",
+          "مهارات الهندسة والإحصاء وحل المسائل الحسابية والمنطقية المعقدة"
+        ]
+      },
+      { 
+        id: "qu-m2", 
+        title: "الدرس الثاني: استراتيجيات الفهم والتحليل واستيعاب المقروء (اللفظي)", 
+        isLocked: true, 
+        duration: "25 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "تقنيات حل التناظر اللفظي، إكمال الجمل، والخطأ السياقي",
+          "فهم وتحليل النصوص الطويلة واستنتاج المعاني والعلاقات الضمنية"
+        ]
+      },
+      { 
+        id: "qu-m3", 
+        title: "الدرس الثالث: اختبارات تجريبية شاملة وتحليل نقاط الضعف", 
+        isLocked: true, 
+        duration: "20 ساعة", 
+        type: "video",
+        videoUrl: "MmHWTPJMzbQ",
+        lessons: [
+          "محاكاة اختبار القدرات الفعلي تحت قيود زمنية محددة",
+          "مراجعة إجابات المتدرب وتحليل الأخطاء وتوفير شروحات مسجلة لها"
+        ]
+      },
     ],
     outcomes: ["إتقان المهارات الكمية واللفظية.", "تطوير سرعة الحل وفهم الأسئلة المعقدة."],
     requirements: "الاستعداد النفسي والالتزام بالتدريب.",
     ghlCheckoutUrl: "https://members.nabdtraining.com/login",
+    ghlCourseId: "course-qudurat",
   },
 ];
 
 export const getCourseBySlug = (slug: string): Course | undefined => {
   return courses.find(c => c.slug === slug);
 };
-
-
-
-
