@@ -33,7 +33,6 @@ const navLinks = [
     icon: Users,
     hasMegaMenu: true
   },
-  { label: "احجز استشارة", href: "/booking", icon: FileText },
   { label: "تواصل معنا", href: "/contact", icon: Phone },
 ];
 
@@ -94,10 +93,10 @@ export default function Navbar() {
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
           isDarkPage
             ? scrolled
-              ? "py-3 bg-[#0A1128]/95 backdrop-blur-3xl border-b border-white/10 shadow-lg"
+              ? "py-3 bg-[#0A1128]/95 backdrop-blur-md border-b border-white/10 shadow-lg"
               : "py-5 bg-transparent"
             : scrolled
-              ? "py-3 bg-white/90 backdrop-blur-3xl border-b border-white/60 shadow-[0_20px_40px_-15px_rgba(23,58,124,0.15),inset_0_-1px_0_rgba(255,255,255,0.5)]"
+              ? "py-3 bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-[0_10px_30px_-10px_rgba(23,58,124,0.08)]"
               : "py-5 bg-transparent"
         }`}
       >
@@ -110,7 +109,6 @@ export default function Navbar() {
           {/* Desktop Links */}
           <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 justify-center flex-1 mx-4 lg:mx-2 xl:mx-8 relative">
             {navLinks.map((link) => {
-              const Icon = link.icon;
               const isActive = pathname === link.href || (link.hasMegaMenu && pathname.startsWith('/trainees'));
 
               if (link.hasMegaMenu) {
@@ -122,38 +120,55 @@ export default function Navbar() {
                     onMouseLeave={() => setMegaMenuOpen(false)}
                   >
                     <button
-                      className={`flex items-center gap-1 lg:gap-1.5 px-1.5 lg:px-2 xl:px-3 py-6 -my-4 rounded-xl text-[13px] lg:text-[13px] xl:text-[15px] font-bold transition-all duration-300 whitespace-nowrap ${isActive || megaMenuOpen
+                      className={`flex items-center gap-1 px-2.5 py-6 -my-4 rounded-xl text-[14px] xl:text-[15px] font-bold transition-all duration-300 whitespace-nowrap ${isActive || megaMenuOpen
                         ? isDarkPage
                           ? "text-[#5CB07C] bg-white/10"
                           : "text-[#173A7C] bg-[#173A7C]/5"
                         : isDarkPage
                           ? "text-slate-300 hover:text-white hover:bg-white/5"
-                          : "text-slate-700 hover:text-[#173A7C] hover:bg-slate-50"
+                          : "text-slate-600 hover:text-[#173A7C] hover:bg-slate-50/80"
                         }`}
                     >
-                      <Icon className="w-4 h-4" strokeWidth={2.5} />
                       {link.label}
-                      <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${megaMenuOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-3.5 h-3.5 mr-1.5 transition-transform duration-300 ${megaMenuOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {/* Desktop Mega Menu Dropdown */}
                     <div
-                      className={`absolute top-full right-1/2 translate-x-1/2 pt-10 w-[800px] transition-all duration-300 transform origin-top ${megaMenuOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
+                      className={`absolute top-full right-1/2 translate-x-1/2 pt-6 w-[850px] transition-all duration-300 transform origin-top ${megaMenuOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                         }`}
                     >
-                      <div className="bg-gradient-to-br from-[#0A162B]/95 via-[#0E2242]/95 to-[#173A7C]/95 backdrop-blur-2xl rounded-2xl shadow-[0_30px_60px_-15px_rgba(23,58,124,0.5)] border border-white/10 ring-1 ring-white/5 p-8 grid grid-cols-2 gap-x-12 gap-y-4">
+                      <div className={`backdrop-blur-2xl rounded-3xl shadow-[0_30px_70px_rgba(23,58,124,0.12)] border p-8 grid grid-cols-2 gap-x-8 gap-y-4 ${
+                        isDarkPage
+                          ? "bg-gradient-to-br from-[#0A162B]/95 via-[#0E2242]/95 to-[#173A7C]/95 border-white/10 text-white"
+                          : "bg-white/98 border-slate-200/80 text-slate-800"
+                      }`}>
                         {megaMenuItems.map((item, idx) => (
                           <Link
                             key={idx}
                             href={item.href}
-                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/10 group border border-transparent hover:border-white/10 transition-all duration-300"
+                            className={`flex items-start gap-4.5 p-3 rounded-2xl border border-transparent transition-all duration-300 group ${
+                              isDarkPage
+                                ? "hover:bg-white/5 hover:border-white/10"
+                                : "hover:bg-[#173A7C]/5 hover:border-[#173A7C]/10"
+                            }`}
                           >
-                            <div className="w-10 h-10 rounded-lg bg-white/5 text-[#5CB07C] flex items-center justify-center shrink-0 group-hover:scale-110 shadow-sm transition-transform border border-white/5">
-                              <item.icon className="w-5 h-5" />
+                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 shadow-sm transition-all border ${
+                              isDarkPage
+                                ? "bg-white/5 border-white/5 text-[#5CB07C]"
+                                : "bg-[#173A7C]/5 border-[#173A7C]/5 text-[#173A7C]"
+                            }`}>
+                              <item.icon className="w-5.5 h-5.5" />
                             </div>
                             <div>
-                              <strong className="block text-sm text-white font-bold group-hover:text-[#5CB07C] transition-colors">{item.label}</strong>
-                              <span className="text-xs text-slate-300 mt-1 line-clamp-1">انقر للوصول إلى النموذج الخاص بـ {item.label}</span>
+                              <strong className={`block text-[14.5px] font-extrabold transition-colors ${
+                                isDarkPage
+                                  ? "text-white group-hover:text-[#5CB07C]"
+                                  : "text-slate-800 group-hover:text-[#173A7C]"
+                              }`}>{item.label}</strong>
+                              <span className={`text-xs mt-1 block line-clamp-1 ${
+                                isDarkPage ? "text-slate-400" : "text-slate-500"
+                              }`}>انقر للوصول إلى النموذج الخاص بـ {item.label}</span>
                             </div>
                           </Link>
                         ))}
@@ -167,16 +182,15 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-1 lg:gap-1.5 px-1.5 lg:px-2 xl:px-3 py-2 rounded-xl text-[13px] lg:text-[13px] xl:text-[15px] font-bold transition-all duration-300 whitespace-nowrap ${isActive
+                  className={`px-3 py-2 rounded-xl text-[14px] xl:text-[15px] font-bold transition-all duration-300 whitespace-nowrap ${isActive
                     ? isDarkPage
                       ? "text-[#5CB07C] bg-white/10"
                       : "text-[#173A7C] bg-[#173A7C]/5"
                     : isDarkPage
                       ? "text-slate-300 hover:text-white hover:bg-white/5"
-                      : "text-slate-700 hover:text-[#173A7C] hover:bg-slate-50"
+                      : "text-slate-600 hover:text-[#173A7C] hover:bg-slate-50/80"
                     }`}
                 >
-                  <Icon className="w-4 h-4" strokeWidth={2.5} />
                   {link.label}
                 </Link>
               );
@@ -203,21 +217,9 @@ export default function Navbar() {
                 </span>
               </Link>
             ) : (
-              <>
-                <Link
-                  href="/auth/login"
-                  className={`text-xs xl:text-sm font-bold transition-colors px-2 xl:px-4 py-2 whitespace-nowrap ${
-                    isDarkPage
-                      ? "text-slate-300 hover:text-white"
-                      : "text-slate-700 hover:text-[#173A7C]"
-                  }`}
-                >
-                  تسجيل دخول
-                </Link>
-                <Button href="/auth/register" size="sm" className="hidden lg:flex text-xs xl:text-sm px-3 xl:px-4 py-1.5 xl:py-2 whitespace-nowrap">
-                  سجّل الآن
-                </Button>
-              </>
+              <Button href="/auth/login" size="sm" className="text-xs xl:text-sm px-4 py-1.5 whitespace-nowrap">
+                تسجيل دخول
+              </Button>
             )}
           </div>
 
@@ -330,14 +332,9 @@ export default function Navbar() {
                   </div>
                 </Link>
               ) : (
-                <>
-                  <Button href="/auth/login" variant="secondary" size="lg" className="w-full justify-center">
-                    تسجيل دخول
-                  </Button>
-                  <Button href="/auth/register" size="lg" className="w-full justify-center">
-                    سجّل الآن
-                  </Button>
-                </>
+                <Button href="/auth/login" size="lg" className="w-full justify-center">
+                  تسجيل دخول
+                </Button>
               )}
             </div>
           </div>
