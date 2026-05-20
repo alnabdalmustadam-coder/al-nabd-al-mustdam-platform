@@ -224,6 +224,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 ghlCourseId={course.ghlCourseId} 
                 ghlCheckoutUrl={course.ghlCheckoutUrl} 
                 courseTitle={course.title} 
+                courseSlug={course.slug}
               />
               <Button variant="secondary" size="md" className="w-full font-bold">
                 تواصل للاستفسار

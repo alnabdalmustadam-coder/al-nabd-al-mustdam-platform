@@ -8,12 +8,13 @@ interface SmartCourseActionProps {
   ghlCourseId?: string;
   ghlCheckoutUrl?: string;
   courseTitle: string;
+  courseSlug?: string;
 }
 
-export default function SmartCourseAction({ ghlCourseId, ghlCheckoutUrl, courseTitle }: SmartCourseActionProps) {
+export default function SmartCourseAction({ ghlCourseId, ghlCheckoutUrl, courseTitle, courseSlug }: SmartCourseActionProps) {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<"guest" | "enrolled" | "not_enrolled">("guest");
-  const [courseUrl, setCourseUrl] = useState("https://members.nabdtraining.com");
+  const [courseUrl, setCourseUrl] = useState("/dashboard");
 
   useEffect(() => {
     async function checkStatus() {
@@ -28,8 +29,8 @@ export default function SmartCourseAction({ ghlCourseId, ghlCheckoutUrl, courseT
           return;
         }
 
-        // 2. Get enrollments for the user
-        const coursesRes = await fetch(`/api/ghl/get-courses?email=${encodeURIComponent(session.user.email)}`);
+        // 2. Get enrollments for the user from local API
+        const coursesRes = await fetch(`/api/courses/my-courses?email=${encodeURIComponent(session.user.email)}`);
         if (coursesRes.ok) {
           const data = await coursesRes.json();
           // Check if user has this course
@@ -41,7 +42,7 @@ export default function SmartCourseAction({ ghlCourseId, ghlCheckoutUrl, courseT
           
           if (enrolledCourse) {
             setStatus("enrolled");
-            if (enrolledCourse.course_url) setCourseUrl(enrolledCourse.course_url);
+            setCourseUrl("/dashboard");
           } else {
             setStatus("not_enrolled");
           }
@@ -65,17 +66,18 @@ export default function SmartCourseAction({ ghlCourseId, ghlCheckoutUrl, courseT
 
   if (status === "enrolled") {
     return (
-      <Button href={courseUrl} target="_blank" size="lg" className="w-full mb-3 text-lg py-4 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/30">
+      <Button href={courseUrl} size="lg" className="w-full mb-3 text-lg py-4 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/30">
         <span className="flex items-center gap-2">
-          متابعة التعلم <CheckCircle className="w-5 h-5" />
+          متابعة التعلم في لوحة التحكم <CheckCircle className="w-5 h-5" />
         </span>
       </Button>
     );
   }
 
-  // Not enrolled or guest -> go to checkout/registration
+  // Not enrolled or guest -> go to local checkout
+  const checkoutUrl = courseSlug ? `/checkout?slug=${courseSlug}` : "/checkout";
   return (
-    <Button href={ghlCheckoutUrl || "https://members.nabdtraining.com/login"} target="_blank" size="lg" className="w-full mb-3 text-lg py-4">
+    <Button href={checkoutUrl} size="lg" className="w-full mb-3 text-lg py-4">
       سجّل في الدورة الآن
     </Button>
   );
