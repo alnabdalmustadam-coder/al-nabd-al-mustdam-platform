@@ -791,8 +791,9 @@ export default function DashboardPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className={`bg-white border shadow-sm p-6 rounded-[24px] flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:shadow-md transition-shadow group ${
-                          isCompleted ? "border-emerald-200" : "border-slate-200"
+                        onClick={() => startCoursePlayer(c)}
+                        className={`bg-white border shadow-sm p-6 rounded-[24px] flex flex-col sm:flex-row items-start sm:items-center gap-6 hover:shadow-md hover:border-[#173A7C]/30 transition-all duration-300 group cursor-pointer ${
+                          isCompleted ? "border-emerald-100 hover:border-emerald-300" : "border-slate-200"
                         }`}
                       >
                         {/* Icon */}
@@ -848,18 +849,31 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap justify-end">
+                        <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap justify-end">
                           {isCompleted && !c.is_evaluated && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setCourseToEvaluate(c);
                               }}
-                              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border border-orange-200 text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all shadow-sm"
+                              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border border-orange-200 text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all shadow-sm cursor-pointer"
                             >
-                              <Star className="w-4 h-4 fill-current" /> قيّم الدورة
+                              <Star className="w-3.5 h-3.5 fill-current" /> قيّم الدورة
                             </button>
                           )}
+
+                          {isCompleted && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startCoursePlayer(c);
+                              }}
+                              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border border-blue-200 text-[#173A7C] bg-blue-50 hover:bg-blue-100 transition-all shadow-sm cursor-pointer"
+                            >
+                              <BookOpen className="w-3.5 h-3.5" /> مراجعة المحاضرات
+                            </button>
+                          )}
+
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -871,7 +885,7 @@ export default function DashboardPage() {
                             }}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                               isCompleted
-                                ? "border border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                                ? "bg-emerald-600 text-white hover:bg-emerald-500 shadow-md shadow-emerald-600/10"
                                 : "bg-[#173A7C] text-white hover:bg-[#1E4D9D] shadow-md shadow-[#173A7C]/20"
                             }`}
                           >
