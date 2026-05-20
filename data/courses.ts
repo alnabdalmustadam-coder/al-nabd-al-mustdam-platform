@@ -11,6 +11,34 @@ export const courseCategories: { key: string, label: string }[] = [
 
 export const courses: Course[] = [
   {
+    id: 10,
+    title: "الدورة التجريبية المجانية (تفعيل وتتبع فوري)",
+    slug: "free-trial-course",
+    description: "دورة تجريبية مجانية بالكامل للتحقق من مزايا المنصة المحلية. ابدأ التعلم فوراً، تتبع تقدمك، وأصدر شهادتك المعتمدة محلياً بمجرد إتمام الدروس.",
+    image: "/logo.webp",
+    category: "tech",
+    level: "beginner",
+    price: 0,
+    rating: 5.0,
+    enrollees: 1500,
+    duration: "1 ساعة",
+    lessonsCount: 2,
+    featured: true,
+    trainerId: "tr-1",
+    curriculum: [
+      { id: "m1", title: "مقدمة وتعريف بالمنصة التفاعلية", isLocked: false, duration: "30 دقيقة", type: "video" },
+      { id: "m2", title: "كيفية استحقاق وإصدار شهادتك الرقمية المعتمدة", isLocked: true, duration: "30 دقيقة", type: "video" },
+    ],
+    outcomes: [
+      "فهم وتجربة محاكي مشغل الكورسات المحلي التفاعلي.",
+      "تتبع التقدم الحقيقي وإتمام الدروس ومزامنتها محلياً.",
+      "توليد شهادة إتمام معتمدة فورية قابلة للطباعة PDF بنقرة واحدة.",
+    ],
+    requirements: "لا توجد متطلبات مسبقة. متاحة للجميع مجاناً.",
+    ghlCheckoutUrl: "/checkout?slug=free-trial-course",
+    ghlCourseId: "course-free-trial",
+  },
+  {
     id: 1,
     title: "دورة استخدام الحاسب الالي في الاعمال المكتبية",
     slug: "computer-basics-office",
