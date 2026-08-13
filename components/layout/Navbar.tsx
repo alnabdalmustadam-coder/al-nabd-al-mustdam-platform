@@ -211,7 +211,7 @@ export default function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
             {localUserEmail ? (
-              <Link href="/dashboard" className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border border-transparent ${
+              <Link href="/dashboard/student" className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border border-transparent ${
                 isDarkPage
                   ? "hover:bg-white/5 hover:border-white/10"
                   : "hover:bg-slate-50 hover:border-slate-200"
@@ -329,7 +329,7 @@ export default function Navbar() {
 
             <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col gap-3">
               {localUserEmail ? (
-                <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                <Link href="/dashboard/student" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
                   <div className="w-10 h-10 rounded-full bg-[#173A7C]/10 border border-[#173A7C]/20 flex items-center justify-center text-[#173A7C]">
                     <User className="w-5 h-5" />
                   </div>

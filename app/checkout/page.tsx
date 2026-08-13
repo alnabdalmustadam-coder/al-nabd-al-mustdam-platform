@@ -140,7 +140,7 @@ function CheckoutContent() {
       }
 
       // 2. Redirect to Student Dashboard
-      router.push("/dashboard?enrollSuccess=true");
+      router.push("/dashboard/student?enrollSuccess=true");
     } catch (err: any) {
       console.error("Checkout error:", err);
       setErrorMessage(err.message || "حدث خطأ غير متوقع أثناء إتمام التسجيل");

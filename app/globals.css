@@ -1,29 +1,93 @@
 @import "tailwindcss";
 
 /* ============================================
+   خط ثمانية الأصلي المحلي (Thmanyah Font Family)
+   ============================================ */
+@font-face {
+  font-family: 'Thmanyah';
+  src: url('/fonts/thmanyah/thmanyahsans-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thmanyah';
+  src: url('/fonts/thmanyah/thmanyahsans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thmanyah';
+  src: url('/fonts/thmanyah/thmanyahsans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thmanyah';
+  src: url('/fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thmanyah';
+  src: url('/fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thmanyah';
+  src: url('/fonts/thmanyah/thmanyahsans-Black.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thmanyah';
+  src: url('/fonts/thmanyah/thmanyahsans-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================
    النبض المستدام — Design Tokens (Tailwind v4 - Light Premium Theme)
    ============================================ */
 
 @theme inline {
   /* ---- Colors ---- */
-  --color-primary: #173A7C; /* Navy Blue from TTi Logo */
+  --color-primary: #173A7C;
+  /* Navy Blue from TTi Logo */
   --color-primary-light: #1E4D9D;
-  --color-secondary: #0F172A; /* Deep Slate/Navy */
+  --color-secondary: #0F172A;
+  /* Deep Slate/Navy */
   --color-secondary-light: #334155;
-  --color-accent: #5CB07C; /* Green from Logo */
+  --color-accent: #5CB07C;
+  /* Green from Logo */
   --color-accent-light: #7DD09D;
-  
+
   --color-surface: #FFFFFF;
   --color-surface-hover: #F8FAFC;
   --color-border-subtle: rgba(15, 23, 42, 0.06);
   --color-border-subtle-hover: rgba(15, 23, 42, 0.12);
 
   /* ---- Fonts ---- */
-  --font-cairo: "Cairo", sans-serif;
-  --font-sora: "Sora", sans-serif;
+  --font-cairo: var(--font-alexandria), "Alexandria", sans-serif;
+  --font-sora: var(--font-alexandria), "Alexandria", sans-serif;
+  --font-alexandria: var(--font-alexandria), "Alexandria", sans-serif;
 
   /* ---- Spacing / Radius ---- */
-  --radius-card: 20px; /* Slightly softer for premium feel */
+  --radius-card: 20px;
+  /* Slightly softer for premium feel */
   --radius-pill: 9999px;
   --radius-button: 12px;
 }
@@ -34,12 +98,15 @@
 
 :root {
   --hero-gradient: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
-  --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
-  --card-shadow-hover: 0 12px 40px rgba(15, 23, 42, 0.08);
+  --card-shadow: 0 10px 32px rgba(15, 23, 42, 0.09);
+  --card-shadow-hover: 0 18px 48px rgba(15, 23, 42, 0.15);
+  --font-cairo: 'Thmanyah', var(--font-cairo), sans-serif;
 }
 
 * {
   box-sizing: border-box;
+  font-synthesis: none !important;
+  -webkit-font-synthesis: none !important;
 }
 
 html {
@@ -49,34 +116,330 @@ html {
 }
 
 body {
-  font-family: var(--font-cairo);
-  background: #F8FAFC; /* Light slate-50 */
-  color: #0F172A; /* Dark slate-900 */
+  font-family: var(--font-alexandria), "Alexandria", sans-serif !important;
+  background: #F8FAFC;
+  /* Light slate-50 background */
+  color: #152C5B;
+  /* Premium Deep Royal Navy Text (No harsh black) */
   overflow-x: hidden;
+  font-synthesis: none !important;
+  -webkit-font-synthesis: none !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.012em;
+  line-height: 1.6;
 }
 
 /* ============================================
-   Light Premium Glassmorphism & Cards
+   Typography Defaults & Unified Student Design Architecture
+   ============================================ */
+
+/* Universal Engraved/Embossed Typography Architecture for ALL Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-cairo), sans-serif;
+  line-height: 1.35;
+  letter-spacing: -0.018em;
+  font-weight: 900;
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.35),
+    0 -1px 1px rgba(15, 23, 42, 0.15);
+}
+
+p, .subtext, .desc {
+  line-height: 1.6;
+}
+
+/* Global Student Typography Utility Classes - Ultra-Premium Liquid Engraved Contrast */
+.student-heading-h1 {
+  font-size: 0.9375rem; /* ~15px on mobile for single-line fit */
+  font-weight: 900;
+  color: #173A7C !important;
+  letter-spacing: -0.022em;
+  line-height: 1.25;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35), 0 -1px 1px rgba(23, 58, 124, 0.15);
+}
+@media (min-width: 640px) {
+  .student-heading-h1 {
+    font-size: 1.375rem;
+    line-height: 1.3;
+  }
+}
+@media (min-width: 768px) {
+  .student-heading-h1 {
+    font-size: 1.625rem;
+  }
+}
+
+.student-name-gradient {
+  background: linear-gradient(135deg, #173A7C 0%, #1E4D9D 45%, #059669 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-shadow: none !important;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.5)) !important;
+  font-weight: 900 !important;
+  display: inline-block;
+}
+
+.student-heading-h2 {
+  font-size: 0.8125rem; /* 13px on mobile for single-line fit */
+  font-weight: 900 !important;
+  color: #F8FAFC !important; /* Bright White for dark layout backdrop */
+  letter-spacing: -0.018em;
+  line-height: 1.3;
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.25),
+    0 -1px 2px rgba(0, 0, 0, 0.9),
+    0 2px 4px rgba(0, 0, 0, 0.6) !important; /* Ultra-Premium Engraved Backdrop Effect */
+}
+@media (min-width: 640px) {
+  .student-heading-h2 {
+    font-size: 1.0625rem;
+    line-height: 1.35;
+  }
+}
+@media (min-width: 768px) {
+  .student-heading-h2 {
+    font-size: 1.25rem;
+  }
+}
+
+.student-heading-h3 {
+  font-size: 0.78125rem; /* 12.5px on mobile for compact cards */
+  font-weight: 900 !important;
+  color: #173A7C !important; /* Royal Sapphire Blue for all card & section titles */
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.35),
+    0 -1px 1px rgba(23, 58, 124, 0.15) !important; /* Soft Premium Engraved Royal Blue Effect */
+}
+@media (min-width: 640px) {
+  .student-heading-h3 {
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+}
+
+.engraved-text-light {
+  color: #173A7C !important;
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.35),
+    0 -1px 1px rgba(23, 58, 124, 0.15) !important;
+}
+
+.engraved-text-dark {
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.35),
+    0 -1px 2px rgba(0, 0, 0, 0.9),
+    0 2px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.student-text-body {
+  font-size: 0.6875rem; /* 11px on mobile */
+  font-weight: 600;
+  color: #334155; /* Crisp Dark Slate for clear reading inside light glass cards */
+  line-height: 1.5;
+}
+@media (min-width: 640px) {
+  .student-text-body {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+}
+
+.student-badge-text {
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+@media (min-width: 640px) {
+  .student-badge-text {
+    font-size: 0.75rem;
+  }
+}
+
+/* Global Student Tag/Badge Utility Class */
+.student-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+@media (min-width: 640px) {
+  .student-tag-badge {
+    font-size: 0.8rem;
+    padding: 0.45rem 1.15rem;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+  }
+}
+
+/* ============================================
+   LIQUID GLASS ULTRA PREMIUM DESIGN SYSTEM
+   ============================================ */
+
+.liquid-glass-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86) 0%, rgba(241, 245, 249, 0.62) 50%, rgba(255, 255, 255, 0.82) 100%) !important;
+  backdrop-filter: blur(28px) saturate(2.1) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(2.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 
+    0 16px 40px -8px rgba(15, 23, 42, 0.07),
+    0 4px 12px -2px rgba(23, 58, 124, 0.04),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1.5px 1px 0 rgba(203, 213, 225, 0.3) !important;
+  border-radius: 24px;
+}
+
+.liquid-glass-hero {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(238, 244, 255, 0.7) 50%, rgba(245, 250, 247, 0.85) 100%) !important;
+  backdrop-filter: blur(32px) saturate(2.2) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(2.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 
+    0 20px 48px -10px rgba(23, 58, 124, 0.12),
+    0 6px 16px -4px rgba(15, 23, 42, 0.05),
+    inset 0 2px 2px 0 rgba(255, 255, 255, 1) !important;
+  border-radius: 28px;
+}
+
+.liquid-glass-inner {
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.75) 0%, rgba(241, 245, 249, 0.5) 100%) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.85) !important;
+  box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.03), inset 0 -1px 2px rgba(255, 255, 255, 0.85) !important;
+  border-radius: 16px;
+}
+
+.liquid-glass-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.liquid-dashboard-backdrop {
+  background: 
+    radial-gradient(at 85% 15%, rgba(30, 77, 157, 0.4) 0px, transparent 55%),
+    radial-gradient(at 15% 85%, rgba(92, 176, 124, 0.3) 0px, transparent 55%),
+    radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.15) 0px, transparent 70%),
+    linear-gradient(135deg, #1B365D 0%, #122543 45%, #0B172B 100%) !important;
+}
+.liquid-glass-hover:hover {
+  transform: translateY(-4px) scale(1.003) !important;
+  box-shadow: 
+    0 24px 52px -12px rgba(23, 58, 124, 0.15),
+    0 8px 24px -4px rgba(15, 23, 42, 0.08),
+    inset 0 2px 2px 0 rgba(255, 255, 255, 1) !important;
+  border-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+/* Student Card Accent — thick right gradient strip for RTL cards */
+@layer utilities {
+  .student-card-accent {
+    position: relative;
+  }
+  .course-card-accent {
+    position: relative;
+  }
+}
+.student-card-accent::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 20px !important;
+  bottom: 20px !important;
+  right: 0 !important;
+  width: 5px !important;
+  background: linear-gradient(to bottom, #173A7C 0%, #5CB07C 100%) !important;
+  border-radius: 9999px 0 0 9999px !important;
+  z-index: 20 !important;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .student-card-accent::after {
+    top: 20px !important;
+    bottom: 20px !important;
+    width: 10px !important;
+  }
+}
+
+/* Course Card Accent — thick BOTTOM gradient strip ONLY for course cards */
+.course-card-accent::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 24px !important;
+  left: 24px !important;
+  height: 5px !important;
+  background: linear-gradient(to left, #173A7C 0%, #1E4D9D 50%, #5CB07C 100%) !important;
+  border-radius: 9999px 9999px 0 0 !important;
+  z-index: 20 !important;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .course-card-accent::after {
+    right: 28px !important;
+    left: 28px !important;
+    height: 6px !important;
+  }
+}
+
+/* ============================================
+   Light Premium Glassmorphism & Cards (Enhanced Crisp Shadows)
    ============================================ */
 
 .glass {
   backdrop-filter: blur(20px) saturate(1.8);
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.04);
+  border: none;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.09), 0 2px 6px rgba(15, 23, 42, 0.04);
   border-radius: var(--radius-card);
 }
 
-.glass-dark {
-  /* Used for dark contrast sections if needed, but redesigned for light theme */
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+.glass-saudi {
+  backdrop-filter: blur(24px) saturate(2);
+  -webkit-backdrop-filter: blur(24px) saturate(2);
+  background: linear-gradient(135deg, rgba(15, 45, 30, 0.85) 0%, rgba(10, 25, 40, 0.9) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-card);
   color: #FFFFFF;
+}
+
+.glass-panel {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.88);
+  border: none;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.09);
+  border-radius: var(--radius-card);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  color: #F8FAFC;
+}
+
+.glass-badge {
+  backdrop-filter: blur(10px);
+  background: rgba(23, 58, 124, 0.08);
+  border: 1px solid rgba(23, 58, 124, 0.15);
+  border-radius: var(--radius-pill);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
+}
+
+.glow-gold {
+  box-shadow: 0 0 30px rgba(234, 179, 8, 0.25);
 }
 
 .glass-card {
@@ -106,15 +469,51 @@ body {
 .particles-grid {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(15,23,42,0.06) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(15, 23, 42, 0.06) 1px, transparent 1px);
   background-size: 40px 40px;
   animation: particlesFloat 30s linear infinite;
 }
 
 @keyframes particlesFloat {
-  0% { transform: translate(0, 0); }
-  50% { transform: translate(-20px, -20px); }
-  100% { transform: translate(0, 0); }
+  0% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-20px, -20px);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* ============================================
+   Ultra-Premium Animations & Effects
+   ============================================ */
+
+@keyframes fadeInUpSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUpSmooth 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.ultra-card-hover {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ultra-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(23, 58, 124, 0.08) !important;
 }
 
 /* ============================================
@@ -122,20 +521,23 @@ body {
    ============================================ */
 
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #F1F5F9 25%,
-    #E2E8F0 50%,
-    #F1F5F9 75%
-  );
+  background: linear-gradient(90deg,
+      #F1F5F9 25%,
+      #E2E8F0 50%,
+      #F1F5F9 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 8px;
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ============================================
@@ -151,7 +553,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.4) 10%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 10%, transparent 70%);
   transform: scale(0);
   opacity: 0;
   transition: transform 0.5s, opacity 0.3s;
@@ -173,8 +575,15 @@ body {
 }
 
 @keyframes scrollBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(8px);
+  }
 }
 
 /* ============================================
@@ -203,13 +612,23 @@ body {
 }
 
 @keyframes marquee {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(33.33%); }
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(33.33%);
+  }
 }
 
 @keyframes marquee-reverse {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-33.33%); }
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-33.33%);
+  }
 }
 
 /* ============================================
@@ -236,7 +655,7 @@ body {
 
 .section-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(15,23,42,0.06), transparent);
+  background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.06), transparent);
 }
 
 /* ============================================
@@ -276,4 +695,31 @@ body {
 ::selection {
   background: rgba(23, 58, 124, 0.15);
   color: #173A7C;
+}
+
+/* ============================================
+   Ultra Mesh Background & Dot Grid Patterns
+   ============================================ */
+
+.bg-mesh-ultra {
+  background-color: #F8FAFC;
+  background-image:
+    radial-gradient(at 90% 0%, rgba(23, 58, 124, 0.07) 0px, transparent 50%),
+    radial-gradient(at 10% 25%, rgba(92, 176, 124, 0.08) 0px, transparent 50%),
+    radial-gradient(at 85% 75%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+    radial-gradient(at 15% 90%, rgba(30, 77, 157, 0.06) 0px, transparent 50%);
+}
+
+/* ============================================
+   Hide Scrollbar Utility (Scrollable without visible scrollbar)
+   ============================================ */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }

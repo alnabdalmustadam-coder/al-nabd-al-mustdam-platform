@@ -1,0 +1,413 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { motion, Variants } from 'framer-motion';
+import {
+  Radio,
+  Video,
+  Calendar,
+  Clock,
+  User,
+  ExternalLink,
+  PlayCircle,
+  GraduationCap,
+  Send,
+  MessageSquare,
+  Eye,
+} from 'lucide-react';
+
+interface ChatMessage {
+  id: string;
+  sender: string;
+  role: 'student' | 'instructor' | 'admin';
+  text: string;
+  time: string;
+}
+
+const staggerContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.06,
+    },
+  },
+};
+
+const textFadeVariants: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+export default function StudentLivePage() {
+  const [filter, setFilter] = useState<'upcoming' | 'past'>('upcoming');
+  const [liveChatMessages, setLiveChatMessages] = useState<ChatMessage[]>([
+    { id: '1', sender: 'أ. د. سارة العتيبي', role: 'instructor', text: 'أهلاً بكم جميعاً في الورشة المباشرة! سنبدأ خلال دقائق معدودة.', time: '08:02 م' },
+    { id: '2', sender: 'عبدالله الشمري', role: 'student', text: 'السلام عليكم ورحمة الله، الصوت والصورة واضحان تماماً بحمد الله.', time: '08:03 م' },
+    { id: '3', sender: 'م. خالد الدوسري', role: 'student', text: 'هل سيتم رفع العرض التقديمي للورشة بعد انتهاء البث الحقيقي؟', time: '08:05 م' },
+  ]);
+  const [newChatMessage, setNewChatMessage] = useState('');
+
+  const handleSendMessage = () => {
+    if (!newChatMessage.trim()) return;
+    const msg: ChatMessage = {
+      id: `chat-${Date.now()}`,
+      sender: 'عبدالله الشمري (أنت)',
+      role: 'student',
+      text: newChatMessage.trim(),
+      time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+    };
+    setLiveChatMessages((prev) => [...prev, msg]);
+    setNewChatMessage('');
+  };
+
+  const upcomingSessions = [
+    {
+      id: 'live-1',
+      title: 'ورشة عمل تفاعلية: تطبيقات الحوار الإيجابي وتجنب النزاعات المؤسسية',
+      courseName: 'دبلوم التسامح والسلام والمواطنة الصالحة',
+      instructor: 'د. محمد القحطاني',
+      date: 'الأربعاء، 29 يوليو 2026',
+      time: '08:00 مساءً - 09:30 مساءً (بتوقيت مكة)',
+      status: 'upcoming',
+      isLiveNow: true,
+      joinUrl: 'https://www.youtube.com/embed/1BEWMhAuBd4',
+      platform: 'البث الحي المباشر HD',
+    },
+    {
+      id: 'live-2',
+      title: 'ندوة حوارية مفتوحة: الحوكمة والتميز في المؤسسات الحديثة',
+      courseName: 'شهادة التميز المؤسسي والجودة الحوكمية',
+      instructor: 'د. خالد الدوسري',
+      date: 'الأحد، 2 أغسطس 2026',
+      time: '07:00 مساءً - 08:30 مساءً (بتوقيت مكة)',
+      status: 'scheduled',
+      isLiveNow: false,
+      joinUrl: 'https://zoom.us',
+      platform: 'Microsoft Teams',
+    },
+  ];
+
+  const pastRecordings = [
+    {
+      id: 'rec-1',
+      title: 'المحاضرة المباشرة الأولى: مدخل في استراتيجيات القيادة المستدامة',
+      courseName: 'برنامج القيادة المستدامة والمسؤولية المجتمعية',
+      instructor: 'أ. د. سارة العتيبي',
+      date: '20 يوليو 2026',
+      duration: 'ساعة و 20 دقيقة',
+      recordingUrl: '/dashboard/student/courses/sustainable-leadership/lessons/lesson-1',
+    },
+    {
+      id: 'rec-2',
+      title: 'ورشة التحليل البيئي والتقييم الذاتي للمؤسسات',
+      courseName: 'شهادة التميز المؤسسي والجودة الحوكمية',
+      instructor: 'د. خالد الدوسري',
+      date: '15 يوليو 2026',
+      duration: 'ساعة و 45 دقيقة',
+      recordingUrl: '/dashboard/student/courses/institutional-excellence/lessons/lesson-1',
+    },
+  ];
+
+  return (
+    <div className="space-y-3 sm:space-y-4 lg:space-y-3 font-[family-name:var(--font-cairo)]" dir="rtl">
+
+      {/* Header Banner Ultra Premium */}
+      <motion.div
+        variants={staggerContainerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-20 liquid-glass-hero p-5 sm:p-7 md:p-8 space-y-3.5 liquid-glass-hover overflow-hidden student-card-accent rounded-2xl sm:rounded-3xl"
+      >
+        {/* Ambient Liquid Glowing Orbs */}
+        <div className="absolute -top-16 -right-16 w-56 h-56 bg-gradient-to-br from-emerald-400/20 to-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-gradient-to-br from-blue-600/15 to-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
+          <div className="space-y-2.5 sm:space-y-3 pr-1">
+            <motion.div variants={textFadeVariants} className="student-tag-badge bg-red-50/90 text-red-700 border border-red-200/80 shadow-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+              <span>اللقاءات والتغطية المباشرة (Live Classroom)</span>
+            </motion.div>
+
+            <motion.h1 variants={textFadeVariants} className="student-heading-h1 !text-base sm:!text-xl lg:!text-2xl">
+              القاعة المباشرة و<span className="student-name-gradient">الورش التفاعلية</span> 🔴
+            </motion.h1>
+
+            <motion.p variants={textFadeVariants} className="student-text-body !text-xs sm:!text-sm max-w-xl pr-0.5 pt-1.5 sm:pt-2 leading-relaxed">
+              انضم للبث الحي التفاعلي، شارك بالتساؤلات في الشات الفوري، واستعرض التسجيلات الموثقة.
+            </motion.p>
+          </div>
+
+          {/* Filter Tabs */}
+          <motion.div variants={textFadeVariants} className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 p-1.5 rounded-2xl border border-white/80 bg-white/90 backdrop-blur-md shadow-sm w-full sm:w-auto shrink-0">
+            <button
+              onClick={() => setFilter('upcoming')}
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer text-center flex-1 sm:flex-none ${filter === 'upcoming'
+                  ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
+                  : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60 bg-slate-50/60 sm:bg-transparent'
+                }`}
+            >
+              الجلسات القادمة ({upcomingSessions.length})
+            </button>
+            <button
+              onClick={() => setFilter('past')}
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer text-center flex-1 sm:flex-none ${filter === 'past'
+                  ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
+                  : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60 bg-slate-50/60 sm:bg-transparent'
+                }`}
+            >
+              أرشيف التسجيلات ({pastRecordings.length})
+            </button>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Active Live Session Viewport & Clean Live Chat Box (100% Desktop Viewport Fit) */}
+      {filter === 'upcoming' && (
+        <motion.div
+          variants={staggerContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 sm:gap-4 items-stretch"
+        >
+          {/* Live Video Player Stream */}
+          <motion.div variants={textFadeVariants} className="lg:col-span-2 flex flex-col justify-between gap-2.5">
+            <div className="rounded-2xl sm:rounded-[24px] overflow-hidden border border-slate-300/80 shadow-xl relative bg-slate-950 flex-1">
+              {/* Floating Live Indicator Badge */}
+              <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white shadow-xl">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                </span>
+                <span className="text-[10px] font-black text-red-400 tracking-wide">مباشر الآن</span>
+              </div>
+
+              {/* Floating Viewers Count */}
+              <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-emerald-300 shadow-xl text-[10px] font-black">
+                <Eye className="w-3 h-3 text-emerald-400 shrink-0" />
+                <span>142 يتابع الآن</span>
+              </div>
+
+              {/* Video Player - No Autoplay */}
+              <div className="relative aspect-video w-full">
+                <iframe
+                  src="https://www.youtube.com/embed/1BEWMhAuBd4?autoplay=0&controls=1&modestbranding=1"
+                  className="w-full h-full border-0"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+
+            {/* Video Title Pill Card Below Video (Liquid Glass, Compact on Desktop) */}
+            <div className="p-4 sm:p-5 rounded-2xl relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 liquid-glass-card liquid-glass-hover student-card-accent">
+              <div className="space-y-0.5 min-w-0">
+                <div className="flex items-center gap-1.5 text-xs font-black text-emerald-700">
+                  <Video className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>ورشة تدريبية تفاعلية حية</span>
+                </div>
+                <h2 className="student-heading-h3 !text-xs sm:!text-sm leading-snug">
+                  ورشة عمل: تطبيقات الحوار الإيجابي وتجنب النزاعات
+                </h2>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100/90 px-3.5 py-1.5 rounded-xl border border-slate-200/80 shrink-0 self-start sm:self-auto">
+                <Radio className="w-3.5 h-3.5 text-[#173A7C]" />
+                <span>بث عالي الدقة Full HD</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Real-time Student Chat Box */}
+          <motion.div
+            variants={textFadeVariants}
+            className="p-4 sm:p-5 flex flex-col h-[380px] lg:h-full rounded-2xl sm:rounded-[24px] relative overflow-hidden liquid-glass-card liquid-glass-hover student-card-accent"
+          >
+            <div className="pb-3 border-b border-slate-200/60 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-xs">
+                  <MessageSquare className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h3 className="student-heading-h3 !text-xs sm:!text-sm">الشات المباشر والتساؤلات</h3>
+                  <p className="text-[10px] text-slate-500 font-bold">تفاعل لحظي مع الأستاذ والمتدربين</p>
+                </div>
+              </div>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+            </div>
+
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto py-2.5 space-y-2 min-h-0 no-scrollbar">
+              {liveChatMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`p-3 rounded-xl border text-xs space-y-1 ${msg.role === 'instructor'
+                      ? 'bg-blue-50/90 border-blue-200/80 text-blue-900 shadow-2xs'
+                      : 'bg-white/90 border-slate-200/80 text-slate-800 shadow-2xs'
+                    }`}
+                >
+                  <div className="flex items-center justify-between font-black">
+                    <span className="flex items-center gap-1 text-xs">
+                      {msg.role === 'instructor' && <GraduationCap className="w-3.5 h-3.5 text-[#173A7C]" />}
+                      {msg.sender}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400">{msg.time}</span>
+                  </div>
+                  <p className="text-xs font-bold leading-relaxed text-slate-700">{msg.text}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Send Input */}
+            <div className="pt-2.5 border-t border-slate-200/60 flex items-center gap-2 shrink-0">
+              <input
+                type="text"
+                value={newChatMessage}
+                onChange={(e) => setNewChatMessage(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="اكتب استفسارك المباشر هنا..."
+                className="flex-1 px-3.5 py-2.5 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C] shadow-xs"
+              />
+              <button
+                onClick={handleSendMessage}
+                className="p-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white hover:opacity-90 transition-opacity cursor-pointer shrink-0 shadow-xs active:scale-95"
+                title="إرسال"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Main Sessions Grid List - Taller Cards & Spaced Layout */}
+      {filter === 'upcoming' ? (
+        <motion.div
+          variants={staggerContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-4 pt-2"
+        >
+          <motion.h2 variants={textFadeVariants} className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-emerald-400 !text-sm sm:!text-base">
+            <Calendar className="w-4 h-4 text-emerald-400" />
+            <span>جدول الجلسات والندوات القادمة</span>
+          </motion.h2>
+
+          <div className="grid grid-cols-1 gap-4 sm:gap-5">
+            {upcomingSessions.map((session) => (
+              <motion.div
+                key={session.id}
+                variants={textFadeVariants}
+                whileHover={{ y: -2 }}
+                className="relative overflow-hidden rounded-2xl sm:rounded-[24px] p-6 sm:p-7 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all duration-300 liquid-glass-card liquid-glass-hover student-card-accent"
+              >
+                <div className="space-y-3 flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2.5 text-xs">
+                    {session.isLiveNow ? (
+                      <span className="px-4 py-1.5 rounded-full bg-red-600 text-white font-black flex items-center gap-1.5 animate-pulse shadow-md shadow-red-500/20 text-xs">
+                        <Radio className="w-3.5 h-3.5" />
+                        مباشر الآن Live
+                      </span>
+                    ) : (
+                      <span className="px-4 py-1.5 rounded-full bg-blue-50 text-[#173A7C] font-black border border-blue-200/80 shadow-2xs text-xs">
+                        مجدولة قريباً
+                      </span>
+                    )}
+                    <span className="text-slate-600 font-extrabold text-xs">{session.courseName}</span>
+                  </div>
+
+                  <h3 className="student-heading-h3 !text-xs sm:!text-base pt-0.5">
+                    {session.title}
+                  </h3>
+
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-bold text-slate-700 pt-0.5">
+                    <div className="flex items-center gap-1.5 bg-slate-100/90 px-3.5 py-1.5 rounded-xl border border-slate-200/80 text-xs">
+                      <User className="w-3.5 h-3.5 text-[#173A7C]" />
+                      <span>{session.instructor}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-emerald-50/90 px-3.5 py-1.5 rounded-xl border border-emerald-200/80 text-emerald-800 text-xs">
+                      <Calendar className="w-3.5 h-3.5 text-[#5CB07C]" />
+                      <span>{session.date}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-amber-50/90 px-3.5 py-1.5 rounded-xl border border-amber-200/80 text-amber-800 text-xs">
+                      <Clock className="w-3.5 h-3.5 text-amber-600" />
+                      <span>{session.time}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="shrink-0 flex flex-col items-stretch sm:items-end gap-2 w-full sm:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-slate-200/60">
+                  <span className="text-[11px] font-extrabold text-slate-500 text-center sm:text-left">
+                    المنصة: <strong className="text-[#173A7C]">{session.platform}</strong>
+                  </span>
+                  <a
+                    href={session.joinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`px-5 py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-95 ${session.isLiveNow
+                        ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white shadow-red-500/25 animate-pulse'
+                        : 'bg-[#173A7C] hover:bg-[#1E4D9D] text-white shadow-[#173A7C]/20'
+                      }`}
+                  >
+                    <Video className="w-3.5 h-3.5" />
+                    <span>{session.isLiveNow ? 'الانضمام للبث التفاعلي 🔴' : 'رابط القاعة'}</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div
+          variants={staggerContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-3.5"
+        >
+          {pastRecordings.map((rec) => (
+            <motion.div
+              key={rec.id}
+              variants={textFadeVariants}
+              whileHover={{ y: -2 }}
+              className="relative overflow-hidden rounded-2xl sm:rounded-[24px] p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 liquid-glass-card liquid-glass-hover student-card-accent"
+            >
+              <div className="space-y-2 flex-1 min-w-0">
+                <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#0D5C3A] mb-0.5" style={{ textShadow: '0 1px 0px rgba(255,255,255,0.6)' }}>
+                  <Video className="w-3.5 h-3.5 text-[#0D5C3A]" />
+                  <span>تسجيل مسجل HD</span>
+                </span>
+                <h3 className="student-heading-h3 !text-xs sm:!text-sm">
+                  {rec.title}
+                </h3>
+                <div className="flex flex-wrap items-center gap-3 text-[11px] font-bold text-slate-600 pt-0.5">
+                  <span>المساق: {rec.courseName}</span>
+                  <span>المحاضر: {rec.instructor}</span>
+                  <span>تاريخ البث: {rec.date}</span>
+                  <span>المدة: {rec.duration}</span>
+                </div>
+              </div>
+
+              <Link
+                href={rec.recordingUrl}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer shadow-md shadow-[#173A7C]/20 active:scale-95"
+              >
+                <PlayCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <span>مشاهدة التسجيل</span>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </div>
+  );
+}

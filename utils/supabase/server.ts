@@ -1,6 +1,14 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
+function safeDecode(val: string): string {
+  try {
+    return decodeURIComponent(val);
+  } catch {
+    return val;
+  }
+}
+
 export async function createClient() {
   const cookieStore = await cookies()
 
@@ -12,7 +20,7 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll().map(c => ({
             ...c,
-            value: decodeURIComponent(c.value)
+            value: safeDecode(c.value)
           }))
         },
         setAll(cookiesToSet) {
@@ -22,8 +30,6 @@ export async function createClient() {
             )
           } catch {
             // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
           }
         },
       },

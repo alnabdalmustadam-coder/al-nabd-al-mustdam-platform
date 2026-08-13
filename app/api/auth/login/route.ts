@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     // 3. توجيه المستخدم للداشبورد مباشرة
-    let redirectUrl = "/dashboard";
+    let redirectUrl = "/dashboard/student";
 
     return NextResponse.json(
       { success: true, redirectUrl },

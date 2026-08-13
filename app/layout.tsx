@@ -1,23 +1,16 @@
 import type { Metadata } from "next";
-import { Cairo, Sora } from "next/font/google";
+import { Alexandria } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
+import ClientLayoutWrapper from "@/components/layout/ClientLayoutWrapper";
 import Script from "next/script";
 import { Providers } from "./providers";
 
-const cairo = Cairo({
-  variable: "--font-cairo",
+const alexandria = Alexandria({
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  display: "swap",
-});
-
-const sora = Sora({
-  variable: "--font-sora",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-alexandria",
   display: "swap",
 });
 
@@ -70,19 +63,16 @@ export default function RootLayout({
       lang="ar"
       dir="rtl"
       suppressHydrationWarning
-      className={`${cairo.variable} ${sora.variable}`}
+      className={`${alexandria.variable} ${alexandria.className}`}
       data-scroll-behavior="smooth"
     >
-      <body className="min-h-screen flex flex-col font-[family-name:var(--font-cairo)]">
+      <body className="min-h-screen flex flex-col font-[family-name:var(--font-alexandria)]">
         <Providers>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <WhatsAppFloat />
+          <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
         </Providers>
-        <Script 
-          src="https://beta.leadconnectorhq.com/loader.js"  
-          data-resources-url="https://beta.leadconnectorhq.com/chat-widget/loader.js" 
+        <Script
+          src="https://beta.leadconnectorhq.com/loader.js"
+          data-resources-url="https://beta.leadconnectorhq.com/chat-widget/loader.js"
           data-widget-id="73hS2pnWQWKCJaCEjUqq"
           strategy="lazyOnload"
         />

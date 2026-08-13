@@ -4,6 +4,22 @@
   ],
   "hints": {
     "css-prefix-order": "off",
-    "no-inline-styles": "off"
-  }
+    "no-inline-styles": "off",
+    "compat-api/css": [
+      "default",
+      {
+        "ignore": [
+          "backdrop-filter"
+        ]
+      }
+    ]
+  },
+  "browserslist": [
+    "defaults",
+    "not ie 11",
+    "not chrome <= 112",
+    "not ios_saf <= 26.4",
+    "not safari <= 26.4",
+    "not samsung <= 29"
+  ]
 }

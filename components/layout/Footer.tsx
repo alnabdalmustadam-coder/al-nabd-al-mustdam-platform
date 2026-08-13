@@ -39,9 +39,6 @@ export default function Footer() {
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#5CB07C]/10 rounded-full blur-[150px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1a4490]/20 rounded-full blur-[150px] pointer-events-none translate-y-1/2 -translate-x-1/3" />
 
-      {/* Noise Texture */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
-
       {/* Top Spline/Gradient Glow Line */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#5CB07C]/40 to-transparent shadow-[0_0_20px_rgba(92,176,124,0.3)]" />
 
@@ -53,7 +50,7 @@ export default function Footer() {
             <Link href="/" className="inline-flex mb-8 group">
               <img src="/logo.svg" alt="TTi Logo" className="h-14 w-auto object-contain brightness-0 invert group-hover:scale-105 transition-transform duration-500" />
             </Link>
-            <p className="text-[14px] text-white/60 leading-relaxed max-w-sm mb-8 font-medium">
+            <p className="text-[14px] text-[#94A3B8] leading-relaxed max-w-sm mb-8 font-medium">
               منصة تعليمية رائدة تقدم دورات مهنية وتقنية معتمدة باللغة العربية. نسعى لتمكين الأفراد والمؤسسات من تحقيق التميز المهني في بيئة تواكب المستقبل وتلبي احتياجات سوق العمل بأحدث المنهجيات.
             </p>
 
@@ -131,11 +128,10 @@ export default function Footer() {
               السياسات والادلة
               <span className="absolute bottom-0 right-0 w-8 h-[3px] bg-gradient-to-r from-[#5CB07C] to-[#173A7C] rounded-full" />
             </h3>
-            <ul className="space-y-3.5 flex flex-col items-start pr-0">
+            <ul className="space-y-3 flex flex-col items-start pr-0">
               {policiesAndGuides.map((item, idx) => (
                 <li key={idx} className="group relative inline-flex">
-                  <span className="absolute right-0 top-[6px] w-[5px] h-[5px] rounded-full bg-[#5CB07C] opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_10px_rgba(92,176,124,0.8)]" />
-                  <Link href={item.href} className="text-[13.5px] text-white/50 font-medium hover:text-white hover:pr-4 hover:font-bold transition-all duration-300 inline-block">
+                  <Link href={item.href} className="text-[13.5px] text-[#CBD5E1] font-semibold hover:text-white transition-colors duration-200 inline-block">
                     {item.label}
                   </Link>
                 </li>
@@ -149,11 +145,10 @@ export default function Footer() {
               روابط الدعم
               <span className="absolute bottom-0 right-0 w-8 h-[3px] bg-gradient-to-r from-[#5CB07C] to-[#173A7C] rounded-full" />
             </h3>
-            <ul className="space-y-3.5 flex flex-col items-start pr-0">
+            <ul className="space-y-3 flex flex-col items-start pr-0">
               {supportLinks.map((item, idx) => (
                 <li key={idx} className="group relative inline-flex">
-                  <span className="absolute right-0 top-[6px] w-[5px] h-[5px] rounded-full bg-[#5CB07C] opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_10px_rgba(92,176,124,0.8)]" />
-                  <Link href={item.href} className="text-[13.5px] text-white/50 font-medium hover:text-white hover:pr-4 hover:font-bold transition-all duration-300 inline-block">
+                  <Link href={item.href} className="text-[13.5px] text-[#CBD5E1] font-semibold hover:text-white transition-colors duration-200 inline-block">
                     {item.label}
                   </Link>
                 </li>
@@ -168,12 +163,12 @@ export default function Footer() {
               <span className="absolute bottom-0 right-0 w-8 h-[3px] bg-gradient-to-r from-[#5CB07C] to-[#173A7C] rounded-full" />
             </h3>
 
-            <ul className="space-y-5">
+            <ul className="space-y-4">
               <li className="flex items-start gap-3.5 group">
                 <div className="w-9 h-9 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-[#5CB07C] transition-colors duration-300 mt-0.5">
                   <MapPin className="w-4 h-4 text-white/80 group-hover:text-white transition-colors" />
                 </div>
-                <div className="text-[13.5px] text-white/60 font-medium leading-[1.8] flex-1 group-hover:text-white transition-colors duration-300">
+                <div className="text-[13.5px] text-[#CBD5E1] font-medium leading-[1.8] flex-1 group-hover:text-white transition-colors duration-300">
                   المملكة العربية السعودية - جدة - حي الربوة - شارع السبعين - مركز العلى للأعمال - مقابل اكسترا
                 </div>
               </li>
@@ -183,13 +178,13 @@ export default function Footer() {
                   <Mail className="w-4 h-4 text-white/80 group-hover:text-white transition-colors" />
                 </div>
                 <div className="flex flex-col gap-1.5 flex-1 items-start">
-                  <a href="mailto:alnabdalmustadam@gmail.com" className="text-[13.5px] text-white/60 font-medium hover:text-white hover:font-bold transition-colors duration-300 font-sans group-hover:text-white text-right w-fit">
+                  <a href="mailto:alnabdalmustadam@gmail.com" className="text-[13.5px] text-[#CBD5E1] font-medium hover:text-white transition-colors duration-300 text-right w-fit">
                     alnabdalmustadam@gmail.com
                   </a>
-                  <a href="mailto:nabdtraining@gmail.com" className="text-[13.5px] text-white/60 font-medium hover:text-white hover:font-bold transition-colors duration-300 font-sans group-hover:text-white text-right w-fit">
+                  <a href="mailto:nabdtraining@gmail.com" className="text-[13.5px] text-[#CBD5E1] font-medium hover:text-white transition-colors duration-300 text-right w-fit">
                     nabdtraining@gmail.com
                   </a>
-                  <a href="mailto:support@support.nabdtraining.com" className="text-[13.5px] text-white/60 font-medium hover:text-white hover:font-bold transition-colors duration-300 font-sans group-hover:text-white text-right w-fit">
+                  <a href="mailto:support@support.nabdtraining.com" className="text-[13.5px] text-[#CBD5E1] font-medium hover:text-white transition-colors duration-300 text-right w-fit">
                     support@support.nabdtraining.com
                   </a>
                 </div>
@@ -199,7 +194,7 @@ export default function Footer() {
                 <div className="w-9 h-9 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-[#5CB07C] transition-colors duration-300">
                   <Phone className="w-4 h-4 text-white/80 group-hover:text-white transition-colors" />
                 </div>
-                <div className="text-[14px] text-white/60 font-bold leading-relaxed flex items-center flex-wrap font-sans group-hover:text-white transition-colors duration-300" dir="ltr">
+                <div className="text-[14px] text-[#CBD5E1] font-bold leading-relaxed flex items-center flex-wrap group-hover:text-white transition-colors duration-300" dir="ltr">
                   <span>0559924441</span>
                 </div>
               </li>
@@ -208,7 +203,7 @@ export default function Footer() {
                 <div className="w-9 h-9 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-[#5CB07C] transition-colors duration-300">
                   <Clock className="w-4 h-4 text-white/80 group-hover:text-white transition-colors" />
                 </div>
-                <div className="text-[13.5px] text-white/60 font-medium font-sans group-hover:text-white transition-colors duration-300" dir="ltr">
+                <div className="text-[13.5px] text-[#CBD5E1] font-medium group-hover:text-white transition-colors duration-300" dir="ltr">
                   <span className="font-bold text-white/80 pr-2">Mon-Sat:</span> 05:00 AM - 08:00 PM
                 </div>
               </li>
@@ -221,7 +216,7 @@ export default function Footer() {
           {/* Partners Section */}
           <div className="mb-10">
             <h3 className="text-[15px] font-black text-white/80 mb-8 text-center relative">
-              <span className="relative z-10 px-4 bg-gradient-to-br from-[#0A162B] via-[#0E2242] to-[#173A7C] inline-block">شركاؤنا المعتمدون</span>
+              <span className="relative z-10 px-4 bg-[#0E2242] inline-block">شركاؤنا المعتمدون</span>
               <span className="absolute top-1/2 left-0 w-full h-[1px] bg-white/10 -translate-y-1/2" />
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
@@ -232,11 +227,10 @@ export default function Footer() {
               ].map((partner, idx) => (
                 <div key={idx} className="group relative rounded-[1.5rem] p-[1px] bg-gradient-to-b from-white/20 via-white/5 to-transparent hover:-translate-y-1.5 transition-all duration-500">
                   <div className="rounded-[1.5rem] bg-[#0E1F3D] p-6 flex flex-col items-center gap-4 h-full relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: `radial-gradient(circle at 50% 30%, ${partner.glow}, transparent 70%)` }} />
                     <div className="w-[72px] h-[72px] rounded-xl bg-white shadow-lg shadow-black/10 flex items-center justify-center p-2.5 relative z-10 group-hover:scale-105 transition-transform duration-300">
                       <img src={partner.src} alt={partner.alt} className="w-full h-full object-contain" />
                     </div>
-                    <span className="text-[12px] font-bold text-white/50 text-center leading-relaxed relative z-10 group-hover:text-white/80 transition-colors duration-300">{partner.name}</span>
+                    <span className="text-[12px] font-bold text-[#CBD5E1] text-center leading-relaxed relative z-10 group-hover:text-white transition-colors duration-300">{partner.name}</span>
                   </div>
                 </div>
               ))}
@@ -246,7 +240,7 @@ export default function Footer() {
           {/* License Numbers Strip */}
           <div className="mb-8">
             <h3 className="text-[15px] font-black text-white/80 mb-6 text-center relative">
-              <span className="relative z-10 px-4 bg-gradient-to-br from-[#0A162B] via-[#0E2242] to-[#173A7C] inline-block">التراخيص والاعتمادات الرسمية</span>
+              <span className="relative z-10 px-4 bg-[#0E2242] inline-block">التراخيص والاعتمادات الرسمية</span>
               <span className="absolute top-1/2 left-0 w-full h-[1px] bg-white/10 -translate-y-1/2" />
             </h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -257,9 +251,9 @@ export default function Footer() {
                 { label: "ترخيص السلامة", number: "47-06312100-1", org: "الدفاع المدني", color: "#E3A832" },
               ].map((license, idx) => (
                 <div key={idx} className="bg-white/[0.04] backdrop-blur-sm border border-white/[0.07] rounded-2xl p-4 sm:p-5 text-center hover:bg-white/[0.08] hover:border-white/15 transition-all duration-300 group">
-                  <p className="text-[11px] font-bold text-white/40 mb-1.5 group-hover:text-white/60 transition-colors">{license.org}</p>
-                  <h4 className="text-[13px] font-black text-white/80 mb-2">{license.label}</h4>
-                  <span className="text-[13px] font-black tracking-wider font-sans" dir="ltr" style={{ color: license.color }}>{license.number}</span>
+                  <p className="text-[11px] font-bold text-[#94A3B8] mb-1.5 group-hover:text-white transition-colors">{license.org}</p>
+                  <h4 className="text-[13px] font-black text-white/90 mb-2">{license.label}</h4>
+                  <span className="text-[13px] font-black text-white" dir="ltr" style={{ color: license.color }}>{license.number}</span>
                 </div>
               ))}
             </div>
@@ -273,15 +267,15 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 pb-4">
-          <p className="text-sm text-white/40 font-medium">
+          <p className="text-sm text-[#94A3B8] font-medium">
             © {new Date().getFullYear()} جميع الحقوق محفوظة لـ <span className="font-black text-white">النبض المستدام</span>
           </p>
           <div className="flex items-center gap-4">
-            <Link href="/privacy" className="text-[12px] text-white/40 hover:text-[#5CB07C] transition-colors">
+            <Link href="/privacy" className="text-[12px] text-[#94A3B8] hover:text-[#5CB07C] transition-colors">
               سياسة الخصوصية
             </Link>
             <span className="w-1 h-1 rounded-full bg-white/20" />
-            <Link href="#" className="text-[12px] text-white/40 hover:text-[#5CB07C] transition-colors">
+            <Link href="#" className="text-[12px] text-[#94A3B8] hover:text-[#5CB07C] transition-colors">
               الشروط والأحكام
             </Link>
           </div>

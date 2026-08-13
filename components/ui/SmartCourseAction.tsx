@@ -14,7 +14,7 @@ interface SmartCourseActionProps {
 export default function SmartCourseAction({ ghlCourseId, ghlCheckoutUrl, courseTitle, courseSlug }: SmartCourseActionProps) {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<"guest" | "enrolled" | "not_enrolled">("guest");
-  const [courseUrl, setCourseUrl] = useState("/dashboard");
+  const [courseUrl, setCourseUrl] = useState("/dashboard/student");
 
   useEffect(() => {
     async function checkStatus() {
@@ -42,7 +42,7 @@ export default function SmartCourseAction({ ghlCourseId, ghlCheckoutUrl, courseT
           
           if (enrolledCourse) {
             setStatus("enrolled");
-            setCourseUrl("/dashboard");
+            setCourseUrl("/dashboard/student");
           } else {
             setStatus("not_enrolled");
           }

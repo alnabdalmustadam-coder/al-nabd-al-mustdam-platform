@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      redirectUrl: "/dashboard",
+      redirectUrl: "/dashboard/student",
     });
   } catch (e) {
     console.error(e);

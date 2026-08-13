@@ -15,7 +15,7 @@ function LoginForm() {
   const [googleLoading, setGoogleLoading] = useState(false)
   const searchParams = useSearchParams()
   const message = searchParams.get('message')
-  const redirectParam = searchParams.get('redirect') || '/dashboard'
+  const redirectParam = searchParams.get('redirect') || '/dashboard/student'
 
   // OTP screen state for unconfirmed email login attempts
   const [showOtpScreen, setShowOtpScreen] = useState(false)

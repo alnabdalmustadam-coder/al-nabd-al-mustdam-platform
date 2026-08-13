@@ -14,7 +14,7 @@ function RegisterContent() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const searchParams = useSearchParams()
-  const redirectParam = searchParams.get('redirect') || '/dashboard'
+  const redirectParam = searchParams.get('redirect') || '/dashboard/student'
   
   // OTP Verification flow states
   const [showOtpScreen, setShowOtpScreen] = useState(false)
