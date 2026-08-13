@@ -149,10 +149,15 @@ function RegisterContent() {
     setError(null)
     try {
       const supabase = createClient()
+      const callbackUrl = new URL('/auth/callback', window.location.origin)
+      if (redirectParam && redirectParam !== '/dashboard/student') {
+        callbackUrl.searchParams.set('next', redirectParam)
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: callbackUrl.toString(),
         },
       })
       if (error) {
