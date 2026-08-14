@@ -16,26 +16,30 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       <div className="fixed bottom-10 left-10 w-[550px] h-[550px] bg-[#5CB07C]/20 rounded-full blur-[160px] pointer-events-none -z-10" />
       <div className="fixed top-1/2 left-1/3 w-[450px] h-[450px] bg-indigo-600/15 rounded-full blur-[170px] pointer-events-none -z-10" />
 
-      {/* Full-Width 100% Executive Topbar Header */}
-      <AdminHeader
-        isSidebarCollapsed={isSidebarCollapsed}
-        onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      {/* 100% Full Height Sidebar (Fixed top-0 right-0 bottom-0, No Curves) */}
+      <AdminSidebar
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        isMobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
-      {/* Main Admin Workspace Layout */}
-      <div className="w-full px-3 sm:px-6 lg:px-8 pt-1 pb-6 flex items-start gap-8">
-        {/* Collapsible Neumorphic Glass Sidebar (Desktop & Mobile Drawer) */}
-        <AdminSidebar
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          isMobileOpen={isMobileMenuOpen}
-          onCloseMobile={() => setIsMobileMenuOpen(false)}
+      {/* Main Viewport Container (Margin right matches fixed sidebar width) */}
+      <div
+        className={`flex flex-col min-h-screen transition-all duration-300 ${
+          isSidebarCollapsed ? 'lg:mr-20' : 'lg:mr-72'
+        }`}
+      >
+        {/* Header (Top-0, No gap, No outer curves) */}
+        <AdminHeader
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
 
-        {/* Dynamic Admin Viewport - Pushed Down 5vh from top */}
-        <main className="flex-1 min-w-0 transition-all duration-300 pt-[5vh]">
-          <div className="max-w-7xl mx-auto pt-0 pb-10 space-y-8">
+        {/* Workspace Content (Responsive: p-2 on mobile, lg:p-[5vh] on desktop) */}
+        <main className="flex-1 min-w-0 p-2 sm:p-5 lg:p-[5vh]">
+          <div className="max-w-7xl mx-auto space-y-6">
             {children}
           </div>
         </main>

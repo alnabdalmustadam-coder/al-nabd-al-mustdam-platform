@@ -1,31 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   Search,
-  Bell,
-  Crown,
-  Sparkles,
-  ShieldCheck,
-  Globe,
-  ExternalLink,
-  ChevronDown,
+  Home,
   User,
   LogOut,
   Settings,
   PanelLeftClose,
   PanelLeftOpen,
-  Award,
-  BookOpen,
   Menu,
   X,
-  Wand2,
+  Sparkles,
+  Bell,
+  ChevronDown,
+  ShieldCheck,
+  Crown,
+  GraduationCap,
   Bot,
-  Send,
-  FileText,
-  TrendingUp,
 } from 'lucide-react';
-import Link from 'next/link';
 
 interface AdminHeaderProps {
   isSidebarCollapsed?: boolean;
@@ -38,169 +32,166 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   onToggleSidebar,
   onToggleMobileMenu,
 }) => {
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [showAiAssistant, setShowAiAssistant] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState('');
-  const [aiResponse, setAiResponse] = useState<string | null>(null);
-
-  const handleGenerateAiReport = (promptText: string) => {
-    setAiResponse('جاري تحليل بيانات المنصة بواسطة الذكاء الاصطناعي...');
-    setTimeout(() => {
-      setAiResponse(
-        `🤖 تقرير الذكاء الاصطناعي الإداري:\n• إجمالي الطلاب النشطين: 1,420 متدرباً (بنسبة رضا 98.4%).\n• أكثر المساقات مبيعاً: "دبلوم التسامح والسلام والمواطنة الصالحة" بإيرادات بلغت 45,000 ر.س.\n• توصية النظام: ينصح بجدولة ورشة عمل مباشرة ثانية في الاستدامة البيئية لارتفاع الإقبال.`
-      );
-    }, 800);
-  };
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const notifications = [
     {
       id: '1',
-      title: 'طلب إصدار شهادة جديدة',
-      desc: 'اجتاز الطالب عبدالله الشمري برنامج القيادة المستدامة بنجاح 98%',
-      time: 'منذ 5 دقائق',
+      title: 'إصدار شهادة معتمدة بنجاح ⚡',
+      desc: 'تم إصدار وتوثيق شهادة (القيادة المستدامة) للمتدرب عبدالله الشمري بنسبة 98%',
+      time: 'منذ 4 دقائق',
       unread: true,
     },
     {
       id: '2',
-      title: 'عملية دفع جديدة (تمارا)',
-      desc: 'تم استلام مبلغ 1,250 ر.س للاشتراك في دبلوم المواطنة الصالحة',
-      time: 'منذ 18 دقيقة',
+      title: 'عملية دفع جديدة مؤكدة',
+      desc: 'سداد القسط الأول 625 ر.س لدبلوم التسامح والمواطنة عبر (تمارا)',
+      time: 'منذ 14 دقيقة',
       unread: true,
     },
     {
       id: '3',
       title: 'تسجيل متدرب جديد',
-      desc: 'سجل المتدرب سارة العتيبي في مساق إدارة الاستدامة البيئية',
+      desc: 'انضم المتدرب د. خالد العتيبي إلى مساق إدارة الاستدامة البيئية',
+      time: 'منذ 35 دقيقة',
+      unread: false,
+    },
+    {
+      id: '4',
+      title: 'تذكرة دعم فني جديدة',
+      desc: 'استفسار بشأن الاسترداد المالي من المتدربة ريم الجهني',
       time: 'منذ ساعة',
       unread: false,
     },
   ];
 
   return (
-    <header className="sticky top-0 z-[100] w-full font-[family-name:var(--font-cairo)] px-2 sm:px-6 lg:px-8 pt-3 pb-2" dir="rtl">
-      {/* Full-Width Executive Glass-Neumorphism Topbar Container */}
+    <header className="sticky top-0 z-[30] w-full font-[family-name:var(--font-cairo)] m-0 p-0" dir="rtl">
+      {/* Sleek 100% Flush Header with Platform Logo & Glass Backdrop */}
       <div
-        className="w-full rounded-[24px] p-2.5 sm:p-4 border flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 relative z-50"
+        className="w-full rounded-none px-3.5 sm:px-6 py-[calc(0.75rem+1vh)] min-h-[calc(3.75rem+2vh)] flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 relative z-30"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(241,245,249,0.85) 100%)',
-          backdropFilter: 'blur(28px) saturate(1.9)',
-          WebkitBackdropFilter: 'blur(28px) saturate(1.9)',
-          boxShadow: '0 10px 32px -4px rgba(0, 0, 0, 0.22), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9)',
-          border: '1px solid rgba(255, 255, 255, 0.65)',
+          background: 'rgba(255, 255, 255, 0.88)',
+          backdropFilter: 'blur(28px) saturate(1.8)',
+          WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.60)',
         }}
       >
-        {/* Left Side: Sidebar Toggle / Mobile Menu & Responsive Search */}
-        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 max-w-xl">
-          {/* Mobile Menu Button (Visible on mobile only < lg) */}
+        {/* RIGHT SIDE (RTL): Mobile Sidebar Toggle, Desktop Collapse & Platform Logo */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Mobile Menu Button */}
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="lg:hidden p-2 rounded-xl text-slate-700 hover:text-[#173A7C] hover:bg-slate-100/80 transition-all cursor-pointer border border-slate-200/80 shadow-xs"
-              title="القائمة الرئيسية"
+              className="lg:hidden w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
+              title="القائمة الجانبية"
             >
-              <Menu className="w-5 h-5 text-[#173A7C]" />
+              <Menu className="w-5 h-5" />
             </button>
           )}
 
-          {/* Desktop Sidebar Toggle Collapse Button */}
+          {/* Desktop Sidebar Collapse Button */}
           {onToggleSidebar && (
             <button
               onClick={onToggleSidebar}
-              className="hidden lg:flex p-2 rounded-xl text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/80 transition-all cursor-pointer border border-slate-200/80 shadow-xs"
-              title={isSidebarCollapsed ? 'توسيع القائمة' : 'طَي القائمة'}
+              title={isSidebarCollapsed ? 'توسيع القائمة الجانبية' : 'طي القائمة الجانبية'}
+              className="hidden lg:flex w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer items-center justify-center"
             >
-              {isSidebarCollapsed ? (
-                <PanelLeftOpen className="w-5 h-5 text-[#173A7C]" />
-              ) : (
-                <PanelLeftClose className="w-5 h-5 text-[#173A7C]" />
-              )}
+              {isSidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
             </button>
           )}
 
-          {/* Quick Search */}
-          <div className="relative flex-1 min-w-0">
-            <Search className="w-4 h-4 text-slate-400 absolute top-3 right-3" />
+          {/* Platform Logo */}
+          <Link
+            href="/dashboard/admin"
+            className="flex items-center gap-2 shrink-0 transition-transform hover:scale-105"
+            title="لوحة الإدارة - منصة النبض المستدام"
+          >
+            <img src="/logo.svg" alt="شعار منصة النبض المستدام" className="h-8 sm:h-9 w-auto object-contain" />
+          </Link>
+        </div>
+
+        {/* CENTER: Desktop Search Bar (Hidden on Mobile) */}
+        <div className="hidden md:flex flex-1 min-w-0 max-w-md mx-4">
+          <div className="w-full relative flex items-center px-3.5 rounded-xl border border-slate-200/80 overflow-hidden transition-all focus-within:border-[#173A7C] bg-slate-50/80 shadow-xs">
+            <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
             <input
               type="text"
               placeholder="البحث في النظام والإشعارات والطلاب..."
-              className="w-full py-2 pr-9 pl-4 text-xs font-bold text-slate-800 bg-white/80 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
+              className="w-full py-2 text-xs font-bold text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
             />
+            <kbd className="inline-flex items-center gap-1 mr-2 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-400 bg-white rounded border border-slate-200 shrink-0">
+              Ctrl + K
+            </kbd>
           </div>
         </div>
 
-        {/* Right Side: AI Assistant, Notifications & Admin Profile */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* LEFT SIDE (RTL): Mobile Search, Home Link, AI Assistant, Notifications, Admin Profile */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Mobile Search Button Toggle */}
+          <button
+            onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+            className="md:hidden w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
+            title="البحث بالنظام"
+          >
+            {isMobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+          </button>
+
+          {/* Go to Home Link (Uniform size matching student portal) */}
+          <Link
+            href="/"
+            className="w-9 h-9 sm:w-auto sm:px-3 sm:py-1.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-[#173A7C] hover:text-[#1E4D9D] transition-all cursor-pointer border border-slate-200/60 flex items-center justify-center gap-1.5 shrink-0 text-xs font-black"
+            title="الذهاب للرئيسية"
+          >
+            <Home className="w-4 h-4 text-[#173A7C] shrink-0" />
+            <span className="hidden sm:inline">الرئيسية</span>
+          </Link>
 
           {/* AI Assistant Button */}
           <button
             onClick={() => setShowAiAssistant(true)}
-            className="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 via-[#5CB07C] to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all cursor-pointer border border-emerald-300/40"
+            className="h-9 px-3 rounded-xl bg-gradient-to-r from-emerald-500 via-[#5CB07C] to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 transition-all cursor-pointer border border-emerald-300/40 shrink-0"
+            title="المساعد الذكي AI"
           >
-            <Sparkles className="w-4 h-4 text-slate-950" />
-            <span className="hidden sm:inline">المساعد الذكي AI</span>
+            <Sparkles className="w-4 h-4 text-slate-950 shrink-0" />
+            <span className="hidden md:inline">المساعد الذكي AI</span>
           </button>
 
-          {/* Notifications Button */}
+          {/* Notifications Button & Dropdown */}
           <div className="relative">
             <button
               onClick={() => {
                 setShowNotifications(!showNotifications);
                 setShowProfileMenu(false);
               }}
-              className="p-2 rounded-xl text-slate-700 hover:bg-slate-100/80 transition-all relative cursor-pointer border border-slate-200/80 shadow-xs"
+              className="w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center relative"
               title="الإشعارات"
             >
-              <Bell className="w-5 h-5 text-[#173A7C]" />
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse border-2 border-white" />
+              <Bell className="w-4 h-4 text-[#173A7C]" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 animate-pulse ring-2 ring-white" />
             </button>
 
-            {/* Notifications Panel */}
+            {/* Notifications Dropdown Panel */}
             {showNotifications && (
               <>
-                {/* Click-away backdrop overlay */}
                 <div
                   className="fixed inset-0 z-[990]"
                   onClick={() => setShowNotifications(false)}
                 />
-
-                {/* Mobile Full-Screen Overlay Starting Below Topbar */}
-                <div className="sm:hidden fixed inset-x-3 top-[96px] z-[1220] p-0 shadow-2xl">
-                  <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xl space-y-3">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                      <h4 className="font-black text-xs text-slate-900 flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-amber-500" />
-                        <span>إشعارات العمليات اللحظية</span>
-                      </h4>
-                      <button onClick={() => setShowNotifications(false)} className="text-slate-400">
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-
-                    <div className="space-y-2">
-                      {notifications.map((n) => (
-                        <div key={n.id} className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
-                          <div className="flex items-center justify-between font-black text-slate-900">
-                            <span>{n.title}</span>
-                            <span className="text-[10px] text-slate-400">{n.time}</span>
-                          </div>
-                          <p className="text-[11px] text-slate-600 font-bold leading-relaxed">{n.desc}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Desktop Dropdown Panel */}
-                <div className="hidden sm:block absolute top-full mt-6 left-0 w-96 rounded-2xl border border-slate-200 p-4 shadow-2xl z-[1000] text-right space-y-3 bg-white"
-                  style={{ background: '#ffffff', boxShadow: '0 25px 60px rgba(15, 23, 42, 0.25)' }}
+                <div
+                  className="absolute top-full mt-2 left-0 w-80 sm:w-96 rounded-2xl border border-slate-200 p-4 shadow-2xl z-[1000] text-right space-y-3 bg-white text-slate-800"
+                  style={{ boxShadow: '0 20px 50px rgba(15, 23, 42, 0.15)' }}
                 >
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-200/60">
-                    <h4 className="font-black text-xs text-slate-900 flex items-center gap-2">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h4 className="font-extrabold text-xs text-slate-900 flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-amber-500" />
                       <span>إشعارات العمليات اللحظية</span>
                     </h4>
-                    <span className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+                    <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                       2 جديد
                     </span>
                   </div>
@@ -217,7 +208,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                           <span className="text-xs">{n.title}</span>
                           <span className="text-[9px] font-bold text-slate-400">{n.time}</span>
                         </div>
-                        <p className="text-[11px] text-slate-600 font-bold leading-relaxed">{n.desc}</p>
+                        <p className="text-[11px] text-slate-600 font-medium leading-relaxed">{n.desc}</p>
                       </div>
                     ))}
                   </div>
@@ -233,138 +224,141 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 setShowProfileMenu(!showProfileMenu);
                 setShowNotifications(false);
               }}
-              className="flex items-center gap-2.5 p-1.5 pr-3 rounded-xl border border-white/80 transition-all cursor-pointer"
-              style={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(241,245,249,0.7) 100%)',
-                boxShadow: '4px 4px 10px rgba(15,23,42,0.04), -4px -4px 10px rgba(255,255,255,0.9)',
-              }}
+              className="h-9 px-2 sm:px-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 flex items-center gap-2 cursor-pointer"
+              title="حساب الإدارة"
             >
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-xs shadow-sm">
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-[11px] shadow-xs">
                 A
               </div>
-              <div className="hidden sm:block text-right text-xs">
-                <span className="font-black text-slate-900 block leading-none">مدير المنصة</span>
-                <span className="text-[9px] text-slate-500 font-bold leading-tight">سعود القحطاني</span>
+              <div className="hidden sm:block text-right">
+                <span className="font-extrabold text-[11px] text-slate-900 block leading-tight">سعود القحطاني</span>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
 
-            {/* Profile Menu */}
+            {/* Profile Dropdown Menu */}
             {showProfileMenu && (
-              <div 
-                className="absolute top-full mt-3 left-0 w-56 rounded-2xl border border-white/80 p-2 shadow-2xl z-[1000] text-right space-y-1 font-[family-name:var(--font-cairo)]"
-                style={{
-                  background: 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.95) 100%)',
-                  backdropFilter: 'blur(28px)',
-                  boxShadow: '0 20px 50px rgba(15, 23, 42, 0.18)',
-                }}
-              >
-                <Link
-                  href="/dashboard/admin/settings"
-                  className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-100/80 transition-colors"
+              <>
+                <div
+                  className="fixed inset-0 z-[990]"
+                  onClick={() => setShowProfileMenu(false)}
+                />
+                <div
+                  className="absolute top-full mt-2 left-0 w-60 rounded-2xl border border-slate-200 p-2 shadow-2xl z-[1000] text-right space-y-1 bg-white text-slate-800"
+                  style={{ boxShadow: '0 20px 50px rgba(15, 23, 42, 0.15)' }}
                 >
-                  <Settings className="w-4 h-4 text-slate-500" />
-                  <span>إعدادات النظام</span>
-                </Link>
-                <Link
-                  href="/dashboard/student"
-                  className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-100/80 transition-colors"
-                >
-                  <User className="w-4 h-4 text-blue-600" />
-                  <span>التبديل إلى لوحة الطالب</span>
-                </Link>
-                <div className="pt-1 border-t border-slate-200/60">
-                  <button
-                    onClick={async () => {
-                      try {
-                        await fetch('/api/auth/logout', { method: 'POST' });
-                      } catch (e) {
-                        console.error('Logout error:', e);
-                      }
-                      window.location.href = '/auth/login';
-                    }}
-                    className="w-full flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                  <div className="p-2.5 pb-3 border-b border-slate-100">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-xs">
+                        A
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          <h4 className="font-black text-xs text-slate-900 truncate">سعود القحطاني</h4>
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        </div>
+                        <p className="text-[10px] text-slate-500 font-bold truncate">مدير المنصة الرئيسي</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/dashboard/admin/settings"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span>تسجيل الخروج</span>
-                  </button>
+                    <Settings className="w-4 h-4 text-slate-500" />
+                    <span>إعدادات النظام</span>
+                  </Link>
+
+                  <Link
+                    href="/dashboard/student"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+                  >
+                    <GraduationCap className="w-4 h-4 text-[#173A7C]" />
+                    <span>الانتقال للوحة الطالب</span>
+                  </Link>
+
+                  <div className="border-t border-slate-100 my-1 pt-1">
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setShowProfileMenu(false)}
+                      className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 text-red-500" />
+                      <span>تسجيل الخروج</span>
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
-
         </div>
       </div>
 
-      {/* AI ASSISTANT SLIDE-OVER DRAWER */}
+      {/* Mobile Search Overlay Bar (Expands beneath Header) */}
+      {isMobileSearchOpen && (
+        <div className="md:hidden px-3.5 py-2.5 bg-white/95 border-b border-slate-200/80 shadow-md">
+          <div className="w-full relative flex items-center px-3 rounded-xl border border-slate-200 bg-slate-50">
+            <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
+            <input
+              type="text"
+              placeholder="البحث في النظام..."
+              autoFocus
+              className="w-full py-2 text-xs font-bold text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* AI Assistant Modal */}
       {showAiAssistant && (
-        <div className="fixed inset-0 z-[1300] bg-slate-950/70 backdrop-blur-md flex justify-start">
-          <div className="w-full max-w-md bg-white text-slate-900 h-full p-6 space-y-5 shadow-2xl flex flex-col justify-between overflow-y-auto" dir="rtl">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white">
-                    <Bot className="w-6 h-6 text-emerald-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-base text-slate-900">المساعد الذكي للأدمن (AI Intelligence)</h3>
-                    <p className="text-xs text-slate-500 font-bold">توليد تقارير وتحليلات فورية للمنصة</p>
-                  </div>
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+          <div
+            className="w-full max-w-lg rounded-3xl border border-slate-200 p-6 shadow-2xl bg-white text-slate-800 space-y-4 animate-fade-in-up"
+            style={{ boxShadow: '0 25px 60px rgba(15, 23, 42, 0.3)' }}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-[#5CB07C] text-white">
+                  <Bot className="w-5 h-5" />
                 </div>
-                <button onClick={() => setShowAiAssistant(false)} className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Quick AI Action Buttons */}
-              <div className="space-y-2">
-                <span className="text-xs font-black text-slate-700">اختيارات التقارير السريعة:</span>
-                <div className="grid grid-cols-1 gap-2">
-                  {[
-                    'توليد تقرير المبيعات والإيرادات المالية 📊',
-                    'تحليل مؤشرات حضور الطلاب والتفاعل 🎓',
-                    'استخراج توصيات تحسين المناهج والورش 💡',
-                  ].map((btnText, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleGenerateAiReport(btnText)}
-                      className="p-3 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 text-right text-xs font-black text-slate-800 transition-colors flex items-center justify-between cursor-pointer"
-                    >
-                      <span>{btnText}</span>
-                      <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
-                    </button>
-                  ))}
+                <div>
+                  <h3 className="font-extrabold text-sm text-slate-900">المساعد الذكي لإدارة المنصة (AI)</h3>
+                  <p className="text-[11px] text-slate-500">تحليل لحظي للأداء المالي، معدلات التحويل واقتراح القرارات</p>
                 </div>
               </div>
-
-              {/* AI Output Response Area */}
-              {aiResponse && (
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 text-white text-xs font-semibold leading-relaxed border border-emerald-500/30 whitespace-pre-line space-y-2">
-                  <div className="flex items-center gap-2 text-emerald-400 font-black text-xs pb-2 border-b border-white/10">
-                    <Sparkles className="w-4 h-4" />
-                    <span>تحليل الذكاء الاصطناعي المباشر:</span>
-                  </div>
-                  <p>{aiResponse}</p>
-                </div>
-              )}
+              <button
+                onClick={() => setShowAiAssistant(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Custom AI Prompt Input */}
-            <div className="pt-3 border-t border-slate-200 flex items-center gap-2">
-              <input
-                type="text"
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleGenerateAiReport(aiPrompt)}
-                placeholder="اكتب استفسارك الإداري المباشر..."
-                className="flex-1 p-3 text-xs font-bold bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-              />
+            <div className="space-y-3 py-2">
+              <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-xs space-y-1.5">
+                <span className="font-extrabold text-emerald-900 block">💡 توصية ذكية فورية:</span>
+                <p className="text-emerald-800 font-medium leading-relaxed">
+                  لوحظ ارتفاع معدل التسجيل بنسبة 24% في مساق (القيادة المستدامة) خلال عطلة نهاية الأسبوع. يُنصح بإطلاق كوبون خصم ترويجي إضافي عبر الرسائل التفاعلية لزيادة نسبة الدفع المباشر.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
+                <span className="font-extrabold text-slate-900 block">📊 حالة البث والشهادات:</span>
+                <p className="text-slate-600 font-medium leading-relaxed">
+                  تم توثيق 9,840 شهادة في المركز الوطني بنجاح بدون أي أخطاء أو تأخير في الاستجابة.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
               <button
-                onClick={() => handleGenerateAiReport(aiPrompt)}
-                className="p-3 rounded-xl bg-[#173A7C] text-white cursor-pointer"
-                title="إرسال"
+                onClick={() => setShowAiAssistant(false)}
+                className="px-5 py-2 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs transition-colors cursor-pointer"
               >
-                <Send className="w-4 h-4" />
+                إغلاق
               </button>
             </div>
           </div>
