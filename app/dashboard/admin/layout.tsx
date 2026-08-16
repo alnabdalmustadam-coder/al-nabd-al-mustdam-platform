@@ -37,11 +37,9 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
 
-        {/* Workspace Content (Responsive: p-2 on mobile, lg:p-[5vh] on desktop) */}
-        <main className="flex-1 min-w-0 p-2 sm:p-5 lg:p-[5vh]">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {children}
-          </div>
+        {/* Workspace Content (Compact, balanced padding to prevent vertical cut-offs) */}
+        <main className="flex-1 min-w-0 p-3 sm:p-4 lg:p-5 xl:p-6">
+          {children}
         </main>
       </div>
     </div>

@@ -52,14 +52,14 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
         variants={cardItemVariants}
         whileHover={{ y: -3 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="relative overflow-hidden rounded-xl sm:rounded-2xl p-3.5 sm:p-6 min-h-[76px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3 sm:gap-4 group cursor-default"
+        className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4.5 sm:p-6 min-h-[92px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3.5 sm:gap-4 group cursor-default"
       >
         <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#5CB07C] to-emerald-400" />
-        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#5CB07C] to-emerald-600 text-white shadow-md shadow-emerald-500/20 border border-white/30">
-          <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#5CB07C] to-emerald-600 text-white shadow-md shadow-emerald-500/20 border border-white/30">
+          <TrendingUp className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
         </div>
 
-        <div className="space-y-0.5 sm:space-y-1 relative z-10 min-w-0 flex-1">
+        <div className="space-y-1 sm:space-y-1 relative z-10 min-w-0 flex-1">
           <div className="flex items-baseline gap-1.5 sm:gap-2">
             <span className="text-xl sm:text-3xl font-black text-[#173A7C] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
               %{overallProgressPercent}
@@ -80,14 +80,14 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
         variants={cardItemVariants}
         whileHover={{ y: -3 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="relative overflow-hidden rounded-xl sm:rounded-2xl p-3.5 sm:p-6 min-h-[76px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3 sm:gap-4 group cursor-default"
+        className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4.5 sm:p-6 min-h-[92px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3.5 sm:gap-4 group cursor-default"
       >
         <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#173A7C] to-[#1E4D9D]" />
-        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-white/30">
-          <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-white/30">
+          <BookOpen className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
         </div>
 
-        <div className="space-y-0.5 sm:space-y-1 relative z-10 min-w-0 flex-1">
+        <div className="space-y-1 sm:space-y-1 relative z-10 min-w-0 flex-1">
           <div className="flex items-baseline gap-1.5 sm:gap-2">
             <span className="text-xl sm:text-3xl font-black text-[#173A7C] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
               {enrolledCoursesCount}
@@ -107,14 +107,14 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
         variants={cardItemVariants}
         whileHover={{ y: -3 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="relative overflow-hidden rounded-xl sm:rounded-2xl p-3.5 sm:p-6 min-h-[76px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3 sm:gap-4 group cursor-default"
+        className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4.5 sm:p-6 min-h-[92px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3.5 sm:gap-4 group cursor-default"
       >
         <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-blue-500 to-indigo-600" />
-        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 border border-white/30">
-          <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 border border-white/30">
+          <Clock className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
         </div>
 
-        <div className="space-y-0.5 sm:space-y-1 relative z-10 min-w-0 flex-1">
+        <div className="space-y-1 sm:space-y-1 relative z-10 min-w-0 flex-1">
           <div className="flex items-baseline gap-1.5 sm:gap-2">
             <span className="text-xl sm:text-3xl font-black text-[#173A7C] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
               {completedCoursesCount}
@@ -134,14 +134,14 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
         variants={cardItemVariants}
         whileHover={{ y: -3 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="relative overflow-hidden rounded-xl sm:rounded-2xl p-3.5 sm:p-6 min-h-[76px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3 sm:gap-4 group cursor-default"
+        className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4.5 sm:p-6 min-h-[92px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3.5 sm:gap-4 group cursor-default"
       >
         <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-amber-400 to-yellow-500" />
-        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-md shadow-amber-500/20 border border-white/30">
-          <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-md shadow-amber-500/20 border border-white/30">
+          <Award className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
         </div>
 
-        <div className="space-y-0.5 sm:space-y-1 relative z-10 min-w-0 flex-1">
+        <div className="space-y-1 sm:space-y-1 relative z-10 min-w-0 flex-1">
           <div className="flex items-baseline gap-1.5 sm:gap-2">
             <span className="text-xl sm:text-3xl font-black text-[#173A7C] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
               {certificatesCount}

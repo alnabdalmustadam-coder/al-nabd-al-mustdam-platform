@@ -33,7 +33,11 @@ export async function updateSession(request: NextRequest) {
         cookies: {
           getAll() {
             try {
-              return request.cookies.getAll()
+              const all = request.cookies.getAll();
+              return all.map(c => ({
+                name: safeEncode(c.name),
+                value: safeEncode(c.value)
+              }));
             } catch {
               return []
             }
@@ -41,13 +45,13 @@ export async function updateSession(request: NextRequest) {
           setAll(cookiesToSet) {
             try {
               cookiesToSet.forEach(({ name, value }) => {
-                request.cookies.set(name, safeEncode(value))
+                request.cookies.set(safeEncode(name), safeEncode(value))
               })
               supabaseResponse = NextResponse.next({
                 request,
               })
               cookiesToSet.forEach(({ name, value, options }) => {
-                supabaseResponse.cookies.set(name, safeEncode(value), options)
+                supabaseResponse.cookies.set(safeEncode(name), safeEncode(value), options)
               })
             } catch {
               // Ignore component render cookie errors

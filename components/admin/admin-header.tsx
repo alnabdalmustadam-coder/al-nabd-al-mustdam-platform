@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   Search,
   Home,
-  User,
   LogOut,
   Settings,
   PanelLeftClose,
@@ -16,9 +15,6 @@ import {
   Bell,
   ChevronDown,
   ShieldCheck,
-  Crown,
-  GraduationCap,
-  Bot,
 } from 'lucide-react';
 
 interface AdminHeaderProps {
@@ -34,7 +30,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showAiAssistant, setShowAiAssistant] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const notifications = [
@@ -72,7 +67,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     <header className="sticky top-0 z-[30] w-full font-[family-name:var(--font-cairo)] m-0 p-0" dir="rtl">
       {/* Sleek 100% Flush Header with Platform Logo & Glass Backdrop */}
       <div
-        className="w-full rounded-none px-3.5 sm:px-6 py-[calc(0.75rem+1vh)] min-h-[calc(3.75rem+2vh)] flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 relative z-30"
+        className="w-full rounded-none px-3.5 sm:px-6 py-3 sm:py-3.5 min-h-[3.75rem] flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 relative z-30"
         style={{
           background: 'rgba(255, 255, 255, 0.88)',
           backdropFilter: 'blur(28px) saturate(1.8)',
@@ -130,7 +125,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           </div>
         </div>
 
-        {/* LEFT SIDE (RTL): Mobile Search, Home Link, AI Assistant, Notifications, Admin Profile */}
+        {/* LEFT SIDE (RTL): Mobile Search, Home Link, Notifications, Admin Profile */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Mobile Search Button Toggle */}
           <button
@@ -150,16 +145,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <Home className="w-4 h-4 text-[#173A7C] shrink-0" />
             <span className="hidden sm:inline">الرئيسية</span>
           </Link>
-
-          {/* AI Assistant Button */}
-          <button
-            onClick={() => setShowAiAssistant(true)}
-            className="h-9 px-3 rounded-xl bg-gradient-to-r from-emerald-500 via-[#5CB07C] to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 transition-all cursor-pointer border border-emerald-300/40 shrink-0"
-            title="المساعد الذكي AI"
-          >
-            <Sparkles className="w-4 h-4 text-slate-950 shrink-0" />
-            <span className="hidden md:inline">المساعد الذكي AI</span>
-          </button>
 
           {/* Notifications Button & Dropdown */}
           <div className="relative">
@@ -271,15 +256,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                     <span>إعدادات النظام</span>
                   </Link>
 
-                  <Link
-                    href="/dashboard/student"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
-                  >
-                    <GraduationCap className="w-4 h-4 text-[#173A7C]" />
-                    <span>الانتقال للوحة الطالب</span>
-                  </Link>
-
                   <div className="border-t border-slate-100 my-1 pt-1">
                     <Link
                       href="/auth/login"
@@ -308,59 +284,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               autoFocus
               className="w-full py-2 text-xs font-bold text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
             />
-          </div>
-        </div>
-      )}
-
-      {/* AI Assistant Modal */}
-      {showAiAssistant && (
-        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
-          <div
-            className="w-full max-w-lg rounded-3xl border border-slate-200 p-6 shadow-2xl bg-white text-slate-800 space-y-4 animate-fade-in-up"
-            style={{ boxShadow: '0 25px 60px rgba(15, 23, 42, 0.3)' }}
-          >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-[#5CB07C] text-white">
-                  <Bot className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-sm text-slate-900">المساعد الذكي لإدارة المنصة (AI)</h3>
-                  <p className="text-[11px] text-slate-500">تحليل لحظي للأداء المالي، معدلات التحويل واقتراح القرارات</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowAiAssistant(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 py-2">
-              <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-xs space-y-1.5">
-                <span className="font-extrabold text-emerald-900 block">💡 توصية ذكية فورية:</span>
-                <p className="text-emerald-800 font-medium leading-relaxed">
-                  لوحظ ارتفاع معدل التسجيل بنسبة 24% في مساق (القيادة المستدامة) خلال عطلة نهاية الأسبوع. يُنصح بإطلاق كوبون خصم ترويجي إضافي عبر الرسائل التفاعلية لزيادة نسبة الدفع المباشر.
-                </p>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
-                <span className="font-extrabold text-slate-900 block">📊 حالة البث والشهادات:</span>
-                <p className="text-slate-600 font-medium leading-relaxed">
-                  تم توثيق 9,840 شهادة في المركز الوطني بنجاح بدون أي أخطاء أو تأخير في الاستجابة.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end">
-              <button
-                onClick={() => setShowAiAssistant(false)}
-                className="px-5 py-2 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs transition-colors cursor-pointer"
-              >
-                إغلاق
-              </button>
-            </div>
           </div>
         </div>
       )}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings,
   ShieldCheck,
@@ -12,6 +13,10 @@ import {
   Sparkles,
   Award,
   Key,
+  Video,
+  FileCheck,
+  Server,
+  Layers,
 } from 'lucide-react';
 
 export default function AdminSettingsPage() {
@@ -31,174 +36,215 @@ export default function AdminSettingsPage() {
 
   const handleSave = () => {
     setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
-  };
-
-  const glassCard = {
-    background: 'linear-gradient(145deg, rgba(255,255,255,0.75) 0%, rgba(248,250,252,0.6) 100%)',
-    backdropFilter: 'blur(24px) saturate(1.8)',
-    WebkitBackdropFilter: 'blur(24px) saturate(1.8)',
-    boxShadow: '0 10px 40px rgba(23, 58, 124, 0.06), 0 1px 0 rgba(255,255,255,0.9) inset',
-    border: '1px solid rgba(255, 255, 255, 0.6)',
-  };
-
-  const glassInner = {
-    background: 'rgba(248,250,252,0.55)',
-    backdropFilter: 'blur(10px)',
+    setTimeout(() => setSavedSuccess(false), 3500);
   };
 
   return (
     <div className="space-y-6" dir="rtl">
+      {/* Background Ambient Glows */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-20 right-10 w-96 h-96 bg-[#173A7C]/8 rounded-full blur-[140px]" />
+        <div className="absolute bottom-20 left-10 w-[30rem] h-[30rem] bg-[#5CB07C]/8 rounded-full blur-[160px]" />
+      </div>
 
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 text-white border border-white/20"
-        style={{
-          background: 'linear-gradient(135deg, #173A7C 0%, #1E4D9D 60%, #15346E 100%)',
-          boxShadow: '0 20px 50px rgba(23, 58, 124, 0.25)',
-        }}
+      {/* Header Banner - Liquid Glass Hero */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="relative overflow-hidden rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-7 liquid-glass-hero border border-white/80 student-card-accent"
       >
-        <div className="absolute top-0 left-0 w-80 h-80 bg-[#5CB07C]/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-60 h-60 bg-blue-400/10 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black text-emerald-300 border border-emerald-400/30"
-              style={{ background: 'rgba(92,176,124,0.15)' }}
-            >
-              <Settings className="w-3.5 h-3.5" />
-              <span>إعدادات وتكاملات منصة النبض المستدام</span>
+        <div className="specular-card-reflection" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
+          <div className="space-y-3 sm:space-y-3.5">
+            <div className="flex flex-col items-start">
+              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#173A7C]/10 text-[#173A7C] text-[10px] sm:text-xs font-black border border-[#173A7C]/15 shrink-0 whitespace-nowrap mb-3 sm:mb-4">
+                <Settings className="w-3.5 h-3.5 text-[#173A7C] shrink-0" />
+                <span>إعدادات وتكاملات منصة النبض المستدام</span>
+              </div>
+              <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">
+                إعدادات النظام <span className="inline-block whitespace-nowrap">والهوية والتكاملات ⚙️</span>
+              </h1>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">إعدادات النظام والهوية</h1>
-            <p className="text-sm text-slate-200/90 font-bold max-w-xl leading-relaxed">
-              إدارة الهوية البصرية، تراخيص المركز الوطني (NELC)، ربط الـ xAPI، وقواعد البيانات.
+            <p className="text-[11px] sm:text-xs lg:text-sm text-slate-600 font-medium max-w-xl leading-relaxed">
+              إدارة الهوية البصرية الرسمية، تراخيص المركز الوطني للتعليم الإلكتروني (NELC)، ربط الـ xAPI، وقواعد البيانات السحابية.
             </p>
           </div>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleSave}
-            className="px-7 py-3 rounded-2xl bg-gradient-to-r from-[#5CB07C] to-emerald-600 hover:from-emerald-600 hover:to-[#5CB07C] text-white font-black text-xs flex items-center gap-2 shadow-xl shadow-emerald-600/30 transition-all hover:-translate-y-0.5 shrink-0"
+            className="w-full sm:w-auto px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-[#173A7C]/20 cursor-pointer border border-white/25 transition-all shrink-0 whitespace-nowrap"
           >
-            <Save className="w-4 h-4 stroke-[3]" />
-            <span>حفظ الإعدادات</span>
-          </button>
+            <Save className="w-4 h-4 stroke-[2.5] shrink-0" />
+            <span>حفظ الإعدادات والتكاملات ⚡</span>
+          </motion.button>
         </div>
-      </div>
 
-      {savedSuccess && (
-        <div className="p-4 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-2 font-black text-xs">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          <span>تم حفظ تحديثات المنصة وتطبيقات التكامل بنجاح!</span>
+        {/* Quick KPI stats strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-[#173A7C]/10">
+          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">ترخيص NELC</p>
+            <p className="text-sm sm:text-base lg:text-lg font-black text-emerald-700">ساري ونشط 🟢</p>
+          </div>
+          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">محرك xAPI LRS</p>
+            <p className="text-sm sm:text-base lg:text-lg font-black text-[#173A7C]">متصل 24/7</p>
+          </div>
+          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">حماية الفيديوهات</p>
+            <p className="text-sm sm:text-base lg:text-lg font-black text-emerald-700">تشفير + وسم مائي</p>
+          </div>
+          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">حالة النظام</p>
+            <p className="text-xs sm:text-sm lg:text-base font-black text-emerald-700">مستقر بنسبة 99.9%</p>
+          </div>
         </div>
-      )}
+      </motion.div>
+
+      {/* Success Notification */}
+      <AnimatePresence>
+        {savedSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="p-3.5 sm:p-4 rounded-lg sm:rounded-xl bg-emerald-500/10 text-emerald-900 border border-emerald-500/25 flex items-center gap-2.5 font-bold text-xs shadow-sm"
+          >
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>تم حفظ كافة إعدادات المنصة، ترخيص NELC، وتطبيقات التكامل السحابية بنجاح!</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Basic Platform Settings */}
-      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-white/60 space-y-5" style={glassCard}>
-        <h3 className="text-base font-black text-slate-800 flex items-center gap-2 border-b border-slate-200/40 pb-3">
-          <Globe className="w-4 h-4 text-[#173A7C]" />
-          <span>هوية المنصة والبيانات الأساسية</span>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="liquid-glass-card rounded-lg sm:rounded-xl p-4 sm:p-7 border border-white/70 space-y-5 sm:space-y-6 student-card-accent relative"
+      >
+        <div className="specular-card-reflection" />
+        <h3 className="text-base font-extrabold text-[#152C5B] student-heading-h3 flex items-center gap-2.5 border-b border-[#173A7C]/10 pb-3 [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+          <Globe className="w-4.5 h-4.5 text-[#173A7C]" />
+          <span>هوية المنصة والبيانات الرسمية الأساسية</span>
         </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs font-bold">
           <div className="space-y-1.5">
-            <label className="text-slate-700">اسم المنصة المعتمد</label>
+            <label className="text-slate-700 block">اسم المنصة المعتمد</label>
             <input
               type="text"
               value={platformSettings.siteName}
               onChange={(e) => setPlatformSettings({ ...platformSettings, siteName: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-200/60 focus:outline-none focus:border-[#173A7C]"
-              style={glassInner}
+              className="w-full p-3.5 rounded-xl bg-white/90 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all shadow-sm"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-slate-700">بريد الدعم والتواصل الرسمي</label>
+            <label className="text-slate-700 block">بريد الدعم والتواصل الرسمي</label>
             <input
               type="email"
               value={platformSettings.contactEmail}
               onChange={(e) => setPlatformSettings({ ...platformSettings, contactEmail: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-200/60 focus:outline-none focus:border-[#173A7C]"
-              style={glassInner}
+              className="w-full p-3.5 rounded-xl bg-white/90 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all shadow-sm"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-slate-700">رقم الترخيص من المركز الوطني (NELC)</label>
+            <label className="text-slate-700 block">رقم الترخيص من المركز الوطني (NELC)</label>
             <input
               type="text"
               value={platformSettings.nelcLicense}
               onChange={(e) => setPlatformSettings({ ...platformSettings, nelcLicense: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-200/60 focus:outline-none focus:border-[#173A7C]"
-              style={glassInner}
+              className="w-full p-3.5 rounded-xl bg-white/90 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all shadow-sm font-mono"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-slate-700">هاتف الدعم الموحد</label>
+            <label className="text-slate-700 block">هاتف الدعم الموحد</label>
             <input
               type="text"
               value={platformSettings.supportPhone}
               onChange={(e) => setPlatformSettings({ ...platformSettings, supportPhone: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-200/60 focus:outline-none focus:border-[#173A7C]"
-              style={glassInner}
+              className="w-full p-3.5 rounded-xl bg-white/90 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all shadow-sm"
+              dir="ltr"
             />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Integrations Settings */}
-      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-white/60 space-y-5" style={glassCard}>
-        <h3 className="text-base font-black text-slate-800 flex items-center gap-2 border-b border-slate-200/40 pb-3">
-          <Database className="w-4 h-4 text-[#173A7C]" />
-          <span>إعدادات خوادم البيانات والتكاملات (xAPI / Supabase / GHL)</span>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+        className="liquid-glass-card rounded-lg sm:rounded-xl p-4 sm:p-7 border border-white/70 space-y-5 sm:space-y-6 student-card-accent relative"
+      >
+        <div className="specular-card-reflection" />
+        <h3 className="text-base font-extrabold text-[#152C5B] student-heading-h3 flex items-center gap-2.5 border-b border-[#173A7C]/10 pb-3 [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+          <Database className="w-4.5 h-4.5 text-[#173A7C]" />
+          <span>إعدادات خوادم البيانات والتكاملات السحابية (xAPI / Supabase / Video DRM)</span>
         </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs font-bold">
           <div className="space-y-1.5">
-            <label className="text-slate-700">عنوان خادم xAPI LRS Endpoint</label>
+            <label className="text-slate-700 block">عنوان خادم xAPI LRS Endpoint</label>
             <input
               type="text"
               value={platformSettings.xapiEndpoint}
               onChange={(e) => setPlatformSettings({ ...platformSettings, xapiEndpoint: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-200/60 focus:outline-none focus:border-[#173A7C] font-mono text-[11px]"
-              style={glassInner}
+              className="w-full p-3.5 rounded-xl bg-white/90 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all shadow-sm font-mono text-[11px]"
+              dir="ltr"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-slate-700">عنوان Supabase Database URL</label>
+            <label className="text-slate-700 block">عنوان Supabase Database Endpoint</label>
             <input
               type="text"
               value={platformSettings.supabaseUrl}
               disabled
-              className="w-full p-3 rounded-xl border border-slate-200/60 bg-slate-100 text-slate-400 font-mono text-[11px] cursor-not-allowed"
+              className="w-full p-3.5 rounded-xl bg-slate-100/80 border border-slate-200 text-slate-400 font-mono text-[11px] cursor-not-allowed shadow-inner"
+              dir="ltr"
             />
           </div>
         </div>
 
-        {/* Toggles */}
-        <div className="space-y-3 pt-3 border-t border-slate-200/40 text-xs font-bold">
-          <label className="flex items-center gap-3 cursor-pointer">
+        {/* Security & Automation Toggles */}
+        <div className="space-y-3.5 pt-4 border-t border-[#173A7C]/10 text-xs font-bold">
+          <label className="flex items-center gap-3 p-3.5 rounded-xl liquid-glass-inset border border-white/70 cursor-pointer hover:bg-white/80 transition-all">
             <input
               type="checkbox"
               checked={platformSettings.autoCertificates}
               onChange={(e) => setPlatformSettings({ ...platformSettings, autoCertificates: e.target.checked })}
-              className="w-4 h-4 rounded text-[#173A7C] focus:ring-[#173A7C]"
+              className="w-4.5 h-4.5 rounded text-[#173A7C] accent-[#173A7C] cursor-pointer"
             />
-            <span className="text-slate-800 font-black">إصدار الشهادات وتوثيقها تلقائياً فور إكمال الدورة واستيفاء نسبة 100%</span>
+            <div className="flex items-center gap-2">
+              <Award className="w-4 h-4 text-[#173A7C]" />
+              <span className="text-[#152C5B] font-extrabold">
+                إصدار الشهادات وتوثيقها تلقائياً بالباركود فور إكمال الدورة واستيفاء نسبة 100%
+              </span>
+            </div>
           </label>
 
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label className="flex items-center gap-3 p-3.5 rounded-xl liquid-glass-inset border border-white/70 cursor-pointer hover:bg-white/80 transition-all">
             <input
               type="checkbox"
               checked={platformSettings.watermarkEnabled}
               onChange={(e) => setPlatformSettings({ ...platformSettings, watermarkEnabled: e.target.checked })}
-              className="w-4 h-4 rounded text-[#173A7C] focus:ring-[#173A7C]"
+              className="w-4.5 h-4.5 rounded text-[#173A7C] accent-[#173A7C] cursor-pointer"
             />
-            <span className="text-slate-800 font-black">تفعيل العلامة المائية الآمنة لحماية مشغل الفيديوهات ضد التسريب</span>
+            <div className="flex items-center gap-2">
+              <Video className="w-4 h-4 text-emerald-600" />
+              <span className="text-[#152C5B] font-extrabold">
+                تفعيل العلامة المائية الديناميكية الآمنة (اسم ورقم المتدرب) لحماية الفيديو ضد التسريب
+              </span>
+            </div>
           </label>
         </div>
-      </div>
-
+      </motion.div>
     </div>
   );
 }
