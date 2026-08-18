@@ -79,7 +79,13 @@ const parseEmbedUrl = (url: string): string => {
     return trimmed;
   }
 
-  // 6. Any other full HTTPS URL
+  // 6. Raw Bunny GUID string (36-char uuid)
+  const rawGuid = extractBunnyGuid(trimmed);
+  if (rawGuid && !trimmed.startsWith('http')) {
+    return `https://iframe.mediadelivery.net/embed/729792/${rawGuid}?autoplay=false&preload=true`;
+  }
+
+  // 7. Any other full HTTPS URL
   if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
     return trimmed;
   }

@@ -68,6 +68,15 @@ interface LessonItem {
   subLessons?: string[];
 }
 
+interface FormLessonItem {
+  id: string;
+  title: string;
+  duration: string;
+  videoUrl: string;
+  type: string;
+  isLocked: boolean;
+}
+
 export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,16 +95,23 @@ export default function AdminCoursesPage() {
   const [formHours, setFormHours] = useState('30');
   const [formDescription, setFormDescription] = useState('');
   const [formImage, setFormImage] = useState('/logo.webp');
+  const [formLessons, setFormLessons] = useState<FormLessonItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const courseImageInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Lessons Studio Modal State
+  // Lesson Video Uploading State within Course Form
+  const [uploadingLessonIndex, setUploadingLessonIndex] = useState<number | null>(null);
+  const [lessonUploadProgress, setLessonUploadProgress] = useState<number>(0);
+  const [activeUploadLessonIndex, setActiveUploadLessonIndex] = useState<number | null>(null);
+  const formLessonVideoInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Lessons Studio Modal State (For standalone studio editing)
   const [selectedCourseForLessons, setSelectedCourseForLessons] = useState<CourseItem | null>(null);
   const [courseLessons, setCourseLessons] = useState<LessonItem[]>([]);
   const [lessonsLoading, setLessonsLoading] = useState(false);
 
-  // New Lesson Form
+  // New Lesson Form for Standalone Studio
   const [newLessonTitle, setNewLessonTitle] = useState('');
   const [newLessonDuration, setNewLessonDuration] = useState('20 دقيقة');
   const [newLessonUrl, setNewLessonUrl] = useState('');
@@ -115,11 +131,17 @@ export default function AdminCoursesPage() {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  // Fetch Courses from Server
+  // Fetch Courses from Server with Cache Busting
   const loadCourses = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/courses', { cache: 'no-store' });
+      const res = await fetch(`/api/admin/courses?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Pragma': 'no-cache',
+          'Cache-Control': 'no-cache',
+        },
+      });
       const data = await res.json();
       if (data.success && Array.isArray(data.courses)) {
         setCourses(data.courses);
@@ -136,7 +158,7 @@ export default function AdminCoursesPage() {
     loadCourses();
   }, []);
 
-  // Fetch Lessons for Selected Course
+  // Fetch Lessons for Selected Course in Standalone Studio
   const openLessonsManager = async (course: CourseItem) => {
     setSelectedCourseForLessons(course);
     setLessonsLoading(true);
@@ -146,7 +168,7 @@ export default function AdminCoursesPage() {
     setNewLessonUrl('');
 
     try {
-      const res = await fetch(`/api/admin/courses/${course.slug}/lessons`, { cache: 'no-store' });
+      const res = await fetch(`/api/admin/courses/${course.slug}/lessons?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success && Array.isArray(data.curriculum)) {
         const formatted = data.curriculum.map((c: any, idx: number) => ({
@@ -170,7 +192,7 @@ export default function AdminCoursesPage() {
     }
   };
 
-  // Open Create Modal
+  // Open Create Modal with default initial lesson ready
   const openCreateModal = () => {
     setEditingCourse(null);
     setFormTitle('');
@@ -182,10 +204,20 @@ export default function AdminCoursesPage() {
     setFormHours('30');
     setFormDescription('');
     setFormImage('/logo.webp');
+    setFormLessons([
+      {
+        id: `les-${Date.now()}-1`,
+        title: 'الدرس الأول: مقدمة تمهيدية وأهداف البرنامج',
+        duration: '20 دقيقة',
+        videoUrl: 'MmHWTPJMzbQ',
+        type: 'video',
+        isLocked: false,
+      },
+    ]);
     setIsModalOpen(true);
   };
 
-  // Open Edit Modal
+  // Open Edit Modal and load existing curriculum
   const openEditModal = (course: CourseItem) => {
     setEditingCourse(course);
     setFormTitle(course.title);
@@ -196,7 +228,108 @@ export default function AdminCoursesPage() {
     setFormHours(String(course.hours ?? 30));
     setFormDescription(course.description || '');
     setFormImage(course.image || '/logo.webp');
+
+    if (Array.isArray(course.curriculum) && course.curriculum.length > 0) {
+      setFormLessons(
+        course.curriculum.map((c: any, idx: number) => ({
+          id: c.id || `les-${Date.now()}-${idx + 1}`,
+          title: c.title || `الدرس ${idx + 1}`,
+          duration: c.duration || '20 دقيقة',
+          videoUrl: c.videoUrl || '',
+          type: c.type || 'video',
+          isLocked: c.isLocked ?? false,
+        }))
+      );
+    } else {
+      setFormLessons([
+        {
+          id: `les-${Date.now()}-1`,
+          title: 'الدرس الأول: مقدمة تمهيدية وأهداف البرنامج',
+          duration: '20 دقيقة',
+          videoUrl: 'MmHWTPJMzbQ',
+          type: 'video',
+          isLocked: false,
+        },
+      ]);
+    }
     setIsModalOpen(true);
+  };
+
+  // Methods for In-Modal Lesson Management
+  const handleAddLessonToForm = () => {
+    const nextNum = formLessons.length + 1;
+    setFormLessons((prev) => [
+      ...prev,
+      {
+        id: `les-${Date.now()}-${nextNum}`,
+        title: `الدرس ${nextNum}: `,
+        duration: '25 دقيقة',
+        videoUrl: '',
+        type: 'video',
+        isLocked: false,
+      },
+    ]);
+  };
+
+  const handleUpdateLessonInForm = (index: number, field: keyof FormLessonItem, value: any) => {
+    setFormLessons((prev) => {
+      const updated = [...prev];
+      if (updated[index]) {
+        updated[index] = { ...updated[index], [field]: value };
+      }
+      return updated;
+    });
+  };
+
+  const handleRemoveLessonFromForm = (index: number) => {
+    setFormLessons((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const triggerLessonVideoUpload = (index: number) => {
+    setActiveUploadLessonIndex(index);
+    formLessonVideoInputRef.current?.click();
+  };
+
+  const handleFormLessonVideoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || activeUploadLessonIndex === null) return;
+
+    const lessonIdx = activeUploadLessonIndex;
+    setUploadingLessonIndex(lessonIdx);
+    setLessonUploadProgress(20);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('title', formLessons[lessonIdx]?.title || file.name.replace(/\.[^/.]+$/, ''));
+      formData.append('courseSlug', formSlug || 'new-course');
+
+      setLessonUploadProgress(50);
+
+      const res = await fetch('/api/videos/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      setLessonUploadProgress(85);
+
+      const data = await res.json();
+      if (res.ok && data.success && data.videoId) {
+        setLessonUploadProgress(100);
+        handleUpdateLessonInForm(lessonIdx, 'videoUrl', data.videoId);
+        showToast(`تم رفع الفيديو إلى Bunny Stream بنجاح! (${data.videoId})`);
+      } else {
+        throw new Error(data.error || 'فشل رفع الفيديو إلى خادم Bunny.net');
+      }
+    } catch (err: any) {
+      console.error('Lesson video upload error:', err);
+      showToast(err.message || 'حدث خطأ أثناء رفع الفيديو', 'error');
+    } finally {
+      setUploadingLessonIndex(null);
+      setLessonUploadProgress(0);
+      setActiveUploadLessonIndex(null);
+      if (e.target) e.target.value = '';
+    }
   };
 
   // Handle Upload Course Image
@@ -229,7 +362,7 @@ export default function AdminCoursesPage() {
     }
   };
 
-  // Handle Save Course (Create or Edit)
+  // Handle Save Course (Create or Edit with All Lessons Included)
   const handleSaveCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formTitle.trim()) {
@@ -242,6 +375,18 @@ export default function AdminCoursesPage() {
       const priceNum = parseFloat(formPrice.replace(/[^\d.]/g, '')) || 0;
       const hoursNum = parseInt(formHours.replace(/[^\d]/g, ''), 10) || 20;
 
+      const formattedCurriculum = formLessons
+        .filter((l) => l.title.trim().length > 0)
+        .map((l, index) => ({
+          id: l.id || `les-${Date.now()}-${index + 1}`,
+          title: l.title.trim(),
+          duration: l.duration.trim() || '20 دقيقة',
+          videoUrl: l.videoUrl.trim() || 'MmHWTPJMzbQ',
+          type: l.type || 'video',
+          isLocked: l.isLocked ?? false,
+          lessons: [l.title.trim()],
+        }));
+
       const payload: any = {
         title: formTitle.trim(),
         slug: formSlug.trim() || undefined,
@@ -252,6 +397,8 @@ export default function AdminCoursesPage() {
         duration: `${hoursNum} ساعة`,
         description: formDescription.trim() || 'برنامج تدريبي معتمد وشامل.',
         image: formImage.trim() || '/logo.webp',
+        curriculum: formattedCurriculum.length > 0 ? formattedCurriculum : undefined,
+        lessonsCount: formattedCurriculum.length,
       };
 
       if (editingCourse) {
@@ -266,13 +413,55 @@ export default function AdminCoursesPage() {
       });
 
       const data = await res.json();
-      if (res.ok && data.success) {
-        showToast(editingCourse ? 'تم تحديث بيانات وغلاف الدورة بنجاح' : 'تم إضافة الدورة الجديدة بنجاح للمنصة');
+      if (res.ok && data.success && data.course) {
+        showToast(editingCourse ? 'تم تحديث بيانات وغلاف ودروس الدورة بنجاح' : 'تم إضافة الدورة الجديدة مع دروسها بنجاح');
         setIsModalOpen(false);
+
+        // Reset category filter & search to 'all' so new course is guaranteed immediately visible
+        setSelectedCategory('all');
+        setSearchQuery('');
+
+        // Optimistic UI state update so it renders in 0ms
+        const savedC = data.course;
+        let categoryLabel = 'تقنية وحاسب';
+        const cat = String(savedC.category || '');
+        if (cat === 'admin' || cat === 'office') categoryLabel = 'أعمال مكتبية';
+        else if (cat === 'data') categoryLabel = 'إدخال بيانات';
+        else if (cat === 'languages' || cat === 'english') categoryLabel = 'لغات';
+        else if (cat === 'corporate' || cat === 'management' || cat === 'finance') categoryLabel = 'إدارة وأعمال';
+        else if (cat === 'safety' || cat === 'osha' || cat === 'nebosh') categoryLabel = 'سلامة مهنية';
+        else if (cat === 'qudurat' || cat === 'aptitude') categoryLabel = 'تأهيل واختبارات';
+        else if (cat) categoryLabel = cat;
+
+        const optimisticItem: CourseItem = {
+          id: String(savedC.id),
+          slug: savedC.slug,
+          title: savedC.title,
+          category: categoryLabel,
+          rawCategory: savedC.category,
+          type: 'online',
+          trainer: savedC.instructor || formTrainer.trim(),
+          price: savedC.price > 0 ? `${savedC.price.toLocaleString('en-US')} ر.س` : 'مجانية',
+          rawPrice: savedC.price,
+          students: savedC.enrollees || 0,
+          lessonsCount: savedC.curriculum ? savedC.curriculum.length : formattedCurriculum.length,
+          hours: hoursNum,
+          status: 'published',
+          description: savedC.description || formDescription,
+          curriculum: savedC.curriculum || formattedCurriculum,
+          image: savedC.image || formImage,
+        };
+
+        setCourses((prev) => {
+          const filtered = prev.filter((c) => c.slug !== optimisticItem.slug && c.id !== optimisticItem.id);
+          return [optimisticItem, ...filtered];
+        });
+
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new Event('nabd_courses_updated'));
           localStorage.setItem('nabd_courses_timestamp', String(Date.now()));
         }
+
         await loadCourses();
       } else {
         throw new Error(data.error || 'فشل حفظ الدورة');
@@ -687,7 +876,6 @@ export default function AdminCoursesPage() {
                     <span className="text-slate-800 font-black">{course.trainer}</span>
                   </div>
                 </div>
-
                 {/* 4. Action Buttons Footer */}
                 <div className="flex items-center justify-between gap-2 pt-1">
                   <button
@@ -719,113 +907,116 @@ export default function AdminCoursesPage() {
         </div>
       )}
 
-      {/* ═════════════════════════════════════════════════════════════════════════════ */}
-      {/* 1. CREATE / EDIT COURSE MODAL WITH IMAGE UPLOAD & LIVE PREVIEW */}
-      {/* ═════════════════════════════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]"
-            >
-              <div className="p-6 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] text-white flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center border border-white/15">
-                    <BookOpen className="w-5 h-5 text-emerald-300" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-black">{editingCourse ? 'تعديل بيانات وغلاف الدورة' : 'إضافة دورة تدريبية جديدة'}</h3>
-                    <p className="text-xs text-blue-100">تظهر الدورة فوراً في صفحة الدورات الرئيسية ولدى الطلاب</p>
-                  </div>
+    {/* ═════════════════════════════════════════════════════════════════════════════ */}
+    {/* 1. CREATE / EDIT COURSE MODAL WITH INLINE LESSONS & BUNNY STREAM BUILDER */}
+    {/* ═════════════════════════════════════════════════════════════════════════════ */}
+    <AnimatePresence>
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]"
+          >
+            {/* Modal Header */}
+            <div className="p-6 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/15">
+                  <BookOpen className="w-6 h-6 text-emerald-300" />
                 </div>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <div>
+                  <h3 className="text-lg font-black">{editingCourse ? 'تعديل بيانات ومنهج وغلاف الدورة' : 'إضافة دورة تدريبية جديدة مع دروسها'}</h3>
+                  <p className="text-xs text-blue-100">تظهر الدورة فوراً في صفحة الدورات الرئيسية ولدى الطلاب مع كافة المحاضرات ⚡</p>
+                </div>
               </div>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-              <form onSubmit={handleSaveCourse} className="p-6 overflow-y-auto space-y-4">
-                {/* Course Cover Image Section */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-                  <label className="block text-xs font-black text-slate-800 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <ImageIcon className="w-4 h-4 text-[#173A7C]" />
-                      <span>صورة وغلاف الدورة التدريبية (Thumbnail)</span>
-                    </span>
-                    <span className="text-[10px] text-slate-500 font-medium">يتم الحفظ في Supabase والموقع فوراً</span>
-                  </label>
+            <form onSubmit={handleSaveCourse} className="p-6 overflow-y-auto space-y-6 flex-1">
+              {/* Course Cover Image Section */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+                <label className="block text-xs font-black text-slate-800 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <ImageIcon className="w-4 h-4 text-[#173A7C]" />
+                    <span>صورة وغلاف الدورة التدريبية (Thumbnail)</span>
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium">يتم الحفظ في Supabase والموقع فوراً</span>
+                </label>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-4">
-                    {/* Live Preview Box */}
-                    <div className="w-32 h-24 rounded-2xl bg-gradient-to-br from-[#0c234b] to-[#173A7C] p-2 flex items-center justify-center shrink-0 border border-slate-200 shadow-xs relative overflow-hidden">
-                      <img
-                        src={formImage || '/logo.webp'}
-                        alt="Preview"
-                        className="max-h-20 max-w-full object-contain drop-shadow-md"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/logo.webp';
-                        }}
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  {/* Live Preview Box */}
+                  <div className="w-32 h-24 rounded-2xl bg-gradient-to-br from-[#0c234b] to-[#173A7C] p-2 flex items-center justify-center shrink-0 border border-slate-200 shadow-xs relative overflow-hidden">
+                    <img
+                      src={formImage || '/logo.webp'}
+                      alt="Preview"
+                      className="max-h-20 max-w-full object-contain drop-shadow-md"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/logo.webp';
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex-1 w-full space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={formImage}
+                        onChange={(e) => setFormImage(e.target.value)}
+                        placeholder="رابط الصورة (URL) أو اختر ملف من جهازك..."
+                        className="flex-1 px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => courseImageInputRef.current?.click()}
+                        disabled={isUploadingImage}
+                        className="px-4 py-2 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                      >
+                        {isUploadingImage ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <UploadCloud className="w-4 h-4" />
+                        )}
+                        <span>رفع صورة</span>
+                      </button>
+                      <input
+                        ref={courseImageInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCourseImageUpload}
+                        className="hidden"
                       />
                     </div>
 
-                    <div className="flex-1 w-full space-y-2">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={formImage}
-                          onChange={(e) => setFormImage(e.target.value)}
-                          placeholder="رابط الصورة (URL) أو اختر ملف من جهازك..."
-                          className="flex-1 px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                        />
+                    {/* Presets */}
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-bold">
+                      <span>أغلفة جاهزة:</span>
+                      {['/logo.webp', '/1.png', '/2.png'].map((preset) => (
                         <button
+                          key={preset}
                           type="button"
-                          onClick={() => courseImageInputRef.current?.click()}
-                          disabled={isUploadingImage}
-                          className="px-4 py-2 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                          onClick={() => setFormImage(preset)}
+                          className={`px-2 py-0.5 rounded-lg border text-[10px] transition-colors cursor-pointer ${
+                            formImage === preset
+                              ? 'bg-blue-50 border-blue-300 text-[#173A7C] font-black'
+                              : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-600'
+                          }`}
                         >
-                          {isUploadingImage ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <UploadCloud className="w-4 h-4" />
-                          )}
-                          <span>رفع صورة</span>
+                          {preset === '/logo.webp' ? 'شعار المعهد' : preset === '/1.png' ? 'نموذج 1' : 'نموذج 2'}
                         </button>
-                        <input
-                          ref={courseImageInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleCourseImageUpload}
-                          className="hidden"
-                        />
-                      </div>
-
-                      {/* Presets */}
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-bold">
-                        <span>أغلفة جاهزة:</span>
-                        {['/logo.webp', '/1.png', '/2.png'].map((preset) => (
-                          <button
-                            key={preset}
-                            type="button"
-                            onClick={() => setFormImage(preset)}
-                            className={`px-2 py-0.5 rounded-lg border text-[10px] transition-colors cursor-pointer ${
-                              formImage === preset
-                                ? 'bg-blue-50 border-blue-300 text-[#173A7C] font-black'
-                                : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-600'
-                            }`}
-                          >
-                            {preset === '/logo.webp' ? 'شعار المعهد' : preset === '/1.png' ? 'نموذج 1' : 'نموذج 2'}
-                          </button>
-                        ))}
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>
+              </div>
 
+              {/* Course Core Details */}
+              <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-black text-slate-700 mb-1.5">عنوان الدورة التدريبية *</label>
                   <input
@@ -893,13 +1084,191 @@ export default function AdminCoursesPage() {
                 <div>
                   <label className="block text-xs font-black text-slate-700 mb-1.5">نبذة ووصف الدورة</label>
                   <textarea
-                    rows={3}
+                    rows={2}
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder="اكتب وصفاً مفصلاً يوضح أهداف البرنامج والمخرجات التعليمية..."
                     className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
                   />
                 </div>
+              </div>
+
+              {/* ═══════════════════════════════════════════════════════════════ */}
+              {/* INLINE LESSONS & CURRICULUM BUILDER */}
+              {/* ═══════════════════════════════════════════════════════════════ */}
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 border-2 border-blue-200/70 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-[#173A7C] text-white flex items-center justify-center shadow-xs">
+                        <Video className="w-4 h-4 text-emerald-300" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs sm:text-sm font-black text-slate-900 flex items-center gap-2">
+                          <span>منهج ومحاضرات الدورة التدريبية (الفيديوهات والدروس)</span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-[#173A7C] font-black">
+                            {formLessons.length} دروس
+                          </span>
+                        </h4>
+                        <p className="text-[11px] text-slate-500 font-medium">
+                          أضف الدروس فوراً وارفع الفيديوهات لخادم Bunny Stream مباشرة مع الدورة 🎬
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleAddLessonToForm}
+                      className="px-3.5 py-1.5 rounded-xl bg-[#0D5C3A] hover:bg-[#117349] text-white text-xs font-black flex items-center gap-1.5 shadow-xs transition-all cursor-pointer self-start sm:self-auto"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>إضافة درس جديد</span>
+                    </button>
+                  </div>
+
+                  {/* Lessons Rows */}
+                  <div className="space-y-3">
+                    {formLessons.map((lesson, idx) => (
+                      <div
+                        key={lesson.id || idx}
+                        className="p-4 rounded-xl bg-white border border-slate-200/90 shadow-xs space-y-3 transition-all hover:border-blue-300"
+                      >
+                        {/* Lesson Row Header */}
+                        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-lg bg-blue-50 text-[#173A7C] font-black text-xs flex items-center justify-center border border-blue-100">
+                              #{idx + 1}
+                            </span>
+                            <span className="text-xs font-black text-slate-700">بيانات الدرس والمحاضرة</span>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            {/* Free Preview Toggle */}
+                            <label className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={!lesson.isLocked}
+                                onChange={(e) => handleUpdateLessonInForm(idx, 'isLocked', !e.target.checked)}
+                                className="w-3.5 h-3.5 text-[#173A7C] rounded focus:ring-0 cursor-pointer"
+                              />
+                              <span>معاينة مجانية</span>
+                            </label>
+
+                            {/* Delete Lesson Button */}
+                            {formLessons.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveLessonFromForm(idx)}
+                                className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                title="حذف هذا الدرس"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Lesson Inputs */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="sm:col-span-2">
+                            <label className="block text-[11px] font-black text-slate-600 mb-1">
+                              عنوان الدرس / المحاضرة *
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={lesson.title}
+                              onChange={(e) => handleUpdateLessonInForm(idx, 'title', e.target.value)}
+                              placeholder="مثال: مدخل إلى أساسيات المسار"
+                              className="w-full px-3 py-2 text-xs font-bold text-slate-800 bg-slate-50 rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C] focus:bg-white"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-black text-slate-600 mb-1">
+                              المدة التقديرية
+                            </label>
+                            <input
+                              type="text"
+                              value={lesson.duration}
+                              onChange={(e) => handleUpdateLessonInForm(idx, 'duration', e.target.value)}
+                              placeholder="مثال: 25 دقيقة"
+                              className="w-full px-3 py-2 text-xs font-bold text-slate-800 bg-slate-50 rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C] focus:bg-white"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Video URL or Direct Bunny Upload */}
+                        <div>
+                          <label className="block text-[11px] font-black text-slate-600 mb-1 flex items-center justify-between">
+                            <span>رابط أو معرف الفيديو (Bunny Stream ID أو YouTube)</span>
+                            {lesson.videoUrl && (
+                              <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" />
+                                <span>تم ربط الفيديو بنجاح</span>
+                              </span>
+                            )}
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={lesson.videoUrl}
+                              onChange={(e) => handleUpdateLessonInForm(idx, 'videoUrl', e.target.value)}
+                              placeholder="معرف فيديو Bunny (GUID) أو رابط YouTube أو رابط MP4 مباشر..."
+                              className="flex-1 px-3 py-2 text-xs font-mono text-slate-800 bg-slate-50 rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C] focus:bg-white"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() => triggerLessonVideoUpload(idx)}
+                              disabled={uploadingLessonIndex === idx}
+                              className="px-3 py-2 rounded-lg bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0 disabled:opacity-50"
+                            >
+                              {uploadingLessonIndex === idx ? (
+                                <>
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  <span>{lessonUploadProgress}%</span>
+                                </>
+                              ) : (
+                                <>
+                                  <UploadCloud className="w-3.5 h-3.5" />
+                                  <span>رفع فيديو Bunny</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          {uploadingLessonIndex === idx && (
+                            <div className="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                              <div
+                                className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+                                style={{ width: `${lessonUploadProgress}%` }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add Lesson Button at Bottom */}
+                  <button
+                    type="button"
+                    onClick={handleAddLessonToForm}
+                    className="w-full py-2.5 rounded-xl border-2 border-dashed border-blue-300 hover:border-[#173A7C] bg-white hover:bg-blue-50 text-[#173A7C] font-black text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>➕ إضافة درس أو محاضرة أخرى للمنهج</span>
+                  </button>
+                </div>
+
+                {/* Hidden Global Input for Form Lesson Video Upload */}
+                <input
+                  ref={formLessonVideoInputRef}
+                  type="file"
+                  accept="video/*"
+                  onChange={handleFormLessonVideoFile}
+                  className="hidden"
+                />
 
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                   <button
@@ -917,10 +1286,10 @@ export default function AdminCoursesPage() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>جاري الحفظ...</span>
+                        <span>جاري حفظ ونشر الدورة والدروس...</span>
                       </>
                     ) : (
-                      <span>{editingCourse ? 'تحديث الدورة والصورة' : 'حفظ ونشر الدورة'}</span>
+                      <span>{editingCourse ? 'تحديث الدورة والدروس والصورة' : 'حفظ ونشر الدورة والدروس فوراً ⚡'}</span>
                     )}
                   </button>
                 </div>

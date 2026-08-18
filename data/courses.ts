@@ -634,7 +634,11 @@ export const INITIAL_9_COURSES: Course[] = [
   }
 ];
 
-export const courses: Course[] = INITIAL_9_COURSES;
+import coursesDb from './courses-db.json';
+
+export const courses: Course[] = (Array.isArray(coursesDb) && coursesDb.length > 0) 
+  ? (coursesDb as Course[]) 
+  : INITIAL_9_COURSES;
 
 export function getCourseBySlug(slug: string): Course | undefined {
   if (!slug) return undefined;

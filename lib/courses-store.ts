@@ -70,17 +70,38 @@ export function saveCourse(courseData: Partial<Course> & { title: string }): Cou
   const all = getAllCourses();
   
   // Generate slug if not present
-  const baseSlug = courseData.slug 
-    ? courseData.slug.trim().toLowerCase().replace(/\s+/g, '-')
-    : `course-${Date.now()}`;
+  let baseSlug = courseData.slug ? courseData.slug.trim().toLowerCase().replace(/[\s_]+/g, '-') : '';
+  if (!baseSlug) {
+    // Generate safe alphanumeric slug or timestamp
+    const safeTitle = courseData.title
+      .replace(/[^\w\s\u0600-\u06FF-]/g, '')
+      .trim()
+      .replace(/[\s_]+/g, '-');
+    baseSlug = safeTitle ? `${safeTitle}-${Date.now().toString().slice(-4)}` : `course-${Date.now()}`;
+  }
 
   const existingIndex = all.findIndex(
     (c) =>
       (courseData.id && (c.id === Number(courseData.id) || String(c.id) === String(courseData.id))) ||
-      (courseData.slug && (c.slug === courseData.slug || c.slug.toLowerCase().trim() === courseData.slug.toLowerCase().trim()))
+      (courseData.slug && (c.slug === courseData.slug || c.slug.toLowerCase().trim() === courseData.slug.toLowerCase().trim())) ||
+      (c.slug === baseSlug)
   );
 
   let updatedCourse: Course;
+
+  const curriculum = Array.isArray(courseData.curriculum) && courseData.curriculum.length > 0 
+    ? courseData.curriculum 
+    : [
+      {
+        id: `sec-1`,
+        title: 'الوحدة الأولى: مدخل ومقدمة عامة',
+        duration: '30 دقيقة',
+        isLocked: false,
+        type: 'video',
+        videoUrl: 'MmHWTPJMzbQ',
+        lessons: ['مقدمة تمهيدية وأهداف البرنامج']
+      }
+    ];
 
   if (existingIndex >= 0) {
     // Update existing course
@@ -89,7 +110,8 @@ export function saveCourse(courseData: Partial<Course> & { title: string }): Cou
       ...existing,
       ...courseData,
       id: existing.id,
-      slug: courseData.slug || existing.slug,
+      slug: courseData.slug || existing.slug || baseSlug,
+      title: courseData.title || existing.title,
       image: courseData.image || existing.image || '/logo.webp',
       instructor: courseData.instructor || existing.instructor || 'مدرب معتمد',
       category: courseData.category || existing.category || 'tech',
@@ -97,7 +119,8 @@ export function saveCourse(courseData: Partial<Course> & { title: string }): Cou
       price: typeof courseData.price === 'number' ? courseData.price : (existing.price || 0),
       duration: courseData.duration || existing.duration || '20 ساعة',
       description: courseData.description || existing.description || '',
-      curriculum: courseData.curriculum || existing.curriculum || [],
+      curriculum: courseData.curriculum !== undefined ? courseData.curriculum : (existing.curriculum || curriculum),
+      lessonsCount: courseData.curriculum !== undefined ? courseData.curriculum.length : (existing.curriculum ? existing.curriculum.length : (existing.lessonsCount || curriculum.length)),
       outcomes: courseData.outcomes || existing.outcomes || [],
     };
     all[existingIndex] = updatedCourse;
@@ -115,28 +138,18 @@ export function saveCourse(courseData: Partial<Course> & { title: string }): Cou
       rating: courseData.rating || 5.0,
       enrollees: courseData.enrollees || 0,
       duration: courseData.duration || '20 ساعة',
-      lessonsCount: courseData.curriculum ? courseData.curriculum.length : (courseData.lessonsCount || 0),
+      lessonsCount: curriculum.length,
       featured: courseData.featured ?? true,
       image: courseData.image || '/logo.webp',
       instructor: courseData.instructor || 'مدرب معتمد',
       trainerId: courseData.trainerId || 'tr-1',
-      curriculum: courseData.curriculum || [
-        {
-          id: `sec-1`,
-          title: 'الوحدة الأولى: مدخل ومقدمة عامة',
-          duration: '30 دقيقة',
-          isLocked: false,
-          type: 'video',
-          videoUrl: 'MmHWTPJMzbQ',
-          lessons: ['مقدمة تمهيدية وأهداف البرنامج']
-        }
-      ],
+      curriculum: curriculum,
       outcomes: courseData.outcomes || ['اكتساب المعارف والمهارات الأساسية للمسار.'],
       requirements: courseData.requirements || 'لا توجد متطلبات مسبقة.',
       ghlCheckoutUrl: courseData.ghlCheckoutUrl || `/checkout?slug=${baseSlug}`,
       ghlCourseId: courseData.ghlCourseId || `course-${baseSlug}`,
     };
-    all.push(updatedCourse);
+    all.unshift(updatedCourse);
   }
 
   writeDbFile(all);

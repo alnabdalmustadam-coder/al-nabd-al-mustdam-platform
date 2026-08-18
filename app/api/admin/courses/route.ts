@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAllCourses, saveCourse, deleteCourse } from '@/lib/courses-store';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
   try {
@@ -43,7 +44,16 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ success: true, courses: formatted });
+    return NextResponse.json(
+      { success: true, courses: formatted },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
+    );
   } catch (err: any) {
     console.error('Admin GET courses error:', err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -58,7 +68,14 @@ export async function POST(req: Request) {
     }
 
     const saved = saveCourse(body);
-    return NextResponse.json({ success: true, course: saved });
+    return NextResponse.json(
+      { success: true, course: saved },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
+    );
   } catch (err: any) {
     console.error('Admin POST course error:', err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

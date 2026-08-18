@@ -8,9 +8,9 @@ export class BunnyStreamProvider implements IVideoProvider {
   private embedHost: string;
 
   constructor() {
-    this.libraryId = process.env.BUNNY_STREAM_LIBRARY_ID || '';
-    this.apiKey = process.env.BUNNY_STREAM_API_KEY || '';
-    this.tokenKey = process.env.BUNNY_STREAM_TOKEN_KEY || '';
+    this.libraryId = process.env.BUNNY_STREAM_LIBRARY_ID || '729792';
+    this.apiKey = process.env.BUNNY_STREAM_API_KEY || '6887d568-bc32-4e3a-94e34bab80e6-2cd2-450d';
+    this.tokenKey = process.env.BUNNY_STREAM_TOKEN_KEY || 'c12446aa-69f3-4f18-b607-dd9d2b7c4865';
     this.embedHost = process.env.BUNNY_STREAM_EMBED_HOST || 'https://iframe.mediadelivery.net';
   }
 

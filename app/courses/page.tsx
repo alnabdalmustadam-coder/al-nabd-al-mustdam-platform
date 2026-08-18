@@ -29,8 +29,8 @@ export default function CoursesPage() {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  useEffect(() => {
-    fetch('/api/courses')
+  const fetchLiveCourses = () => {
+    fetch(`/api/courses?t=${Date.now()}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
@@ -38,6 +38,14 @@ export default function CoursesPage() {
         }
       })
       .catch((err) => console.error('Error fetching live courses:', err));
+  };
+
+  useEffect(() => {
+    fetchLiveCourses();
+
+    const handleUpdate = () => fetchLiveCourses();
+    window.addEventListener('nabd_courses_updated', handleUpdate);
+    return () => window.removeEventListener('nabd_courses_updated', handleUpdate);
   }, []);
 
   let filtered = courseList.filter((c) => {
@@ -84,7 +92,7 @@ export default function CoursesPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5CB07C] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-[#5CB07C]"></span>
               </span>
-              <span className="text-sm font-bold text-slate-700 tracking-wide">أكثر من {courses.length} دورة تدريبية</span>
+              <span className="text-sm font-bold text-slate-700 tracking-wide">أكثر من {courseList.length} دورة تدريبية</span>
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-[4rem] font-black text-slate-900 mb-6 leading-[1.15] tracking-tight">

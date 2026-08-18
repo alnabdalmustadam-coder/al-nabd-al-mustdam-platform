@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { use } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { getCourseBySlug, courses } from "@/data/courses";
+import { Course } from "@/types";
 import CourseCard from "@/components/ui/CourseCard";
 import Badge from "@/components/ui/Badge";
 import SmartCourseAction from "@/components/ui/SmartCourseAction";
@@ -59,8 +60,28 @@ const tabs = [
 
 export default function CourseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const course = getCourseBySlug(slug);
+  const initialCourse = getCourseBySlug(slug);
+  const [liveCourse, setLiveCourse] = useState<Course | null>(initialCourse || null);
 
+  useEffect(() => {
+    if (!initialCourse) {
+      fetch(`/api/courses?t=${Date.now()}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && Array.isArray(data.courses)) {
+            const target = slug.replace(/^course-/, "").toLowerCase().trim();
+            const found = data.courses.find((c: any) => {
+              const clean = (c.slug || "").replace(/^course-/, "").toLowerCase().trim();
+              return clean === target || c.slug === slug || String(c.id) === target;
+            });
+            if (found) setLiveCourse(found);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [slug, initialCourse]);
+
+  const course = liveCourse || initialCourse;
   if (!course) notFound();
 
   const [activeTab, setActiveTab] = useState("overview");
