@@ -9,12 +9,12 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen liquid-dashboard-backdrop text-slate-100 font-[family-name:var(--font-cairo)] relative overflow-x-clip" dir="rtl">
+    <div className="min-h-screen liquid-dashboard-backdrop text-slate-800 font-[family-name:var(--font-cairo)] relative overflow-x-clip" dir="rtl">
 
-      {/* Ambient Glowing Orbs Background for Deep Contrast */}
-      <div className="fixed top-24 right-10 w-[600px] h-[600px] bg-[#173A7C]/25 rounded-full blur-[160px] pointer-events-none -z-10 animate-pulse" />
-      <div className="fixed bottom-10 left-10 w-[550px] h-[550px] bg-[#5CB07C]/20 rounded-full blur-[160px] pointer-events-none -z-10" />
-      <div className="fixed top-1/2 left-1/3 w-[450px] h-[450px] bg-indigo-600/15 rounded-full blur-[170px] pointer-events-none -z-10" />
+      {/* Ambient Glowing Orbs Background for Balanced Depth */}
+      <div className="fixed top-12 right-10 w-[500px] h-[500px] bg-[#173A7C]/8 rounded-full blur-[140px] pointer-events-none -z-10 animate-pulse" />
+      <div className="fixed bottom-10 left-10 w-[500px] h-[500px] bg-[#5CB07C]/8 rounded-full blur-[140px] pointer-events-none -z-10" />
+      <div className="fixed top-1/2 left-1/3 w-[400px] h-[400px] bg-sky-500/6 rounded-full blur-[150px] pointer-events-none -z-10" />
 
       {/* 100% Full Height Sidebar (Fixed top-0 right-0 bottom-0, No Curves) */}
       <AdminSidebar

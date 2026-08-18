@@ -9,673 +9,641 @@ export const courseCategories: { key: string, label: string }[] = [
   { key: "corporate", label: "إدارة وأعمال" },
 ];
 
-export const courses: Course[] = [
+export const INITIAL_9_COURSES: Course[] = [
   {
-    id: 10,
-    title: "الدورة التجريبية المجانية (تفعيل وتتبع فوري)",
-    slug: "free-trial-course",
-    description: "دورة تجريبية مجانية بالكامل للتحقق من مزايا المنصة المحلية. ابدأ التعلم فوراً، تتبع تقدمك، وأصدر شهادتك المعتمدة محلياً بمجرد إتمام الدروس.",
-    image: "/logo.webp",
-    category: "tech",
-    level: "beginner",
-    price: 0,
-    rating: 5.0,
-    enrollees: 1500,
-    duration: "1 ساعة",
-    lessonsCount: 2,
-    featured: true,
-    trainerId: "tr-1",
-    curriculum: [
-      { 
-        id: "m1", 
-        title: "الدرس الأول: مقدمة وتعريف بالمنصة التفاعلية", 
-        isLocked: false, 
-        duration: "30 دقيقة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
-          "جولة تعريفية في لوحة تحكم المتدرب والخدمات المتاحة",
-          "فهم آلية رصد وإرسال بيانات التعلم عبر سجل xAPI"
+    "id": 1,
+    "title": "دورة استخدام الحاسب الالي في الاعمال المكتبية",
+    "slug": "computer-basics-office",
+    "description": "للمبتدئين والخريجين الجدد، تعلم اساسيات الحاسب الالي لرفع مستوى إنتاجيتك في الأعمال المكتبية. هذه الدورة تتضمن استخدام برامج إدارة البيانات مثل Microsoft Office. استعد للمنافسة في سوق العمل بكل ثقة.",
+    "image": "/logo.webp",
+    "category": "admin",
+    "level": "all",
+    "price": 900,
+    "rating": 4.9,
+    "enrollees": 1250,
+    "duration": "1 ساعة",
+    "lessonsCount": 4,
+    "featured": true,
+    "trainerId": "tr-1",
+    "instructor": "د. محمد القحطاني",
+    "curriculum": [
+      {
+        "id": "les-1786932338476",
+        "title": "1",
+        "duration": "20 دقيقة",
+        "isLocked": false,
+        "type": "video",
+        "videoUrl": "https://player.mediadelivery.net/play/729792/efdbb993-f2f4-4ddb-9553-00629191a155",
+        "lessons": [
+          "1"
         ]
       },
-      { 
-        id: "m2", 
-        title: "الدرس الثاني: كيفية استحقاق وإصدار شهادتك الرقمية المعتمدة", 
-        isLocked: true, 
-        duration: "30 دقيقة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
-          "شروط ومعايير اعتماد الساعات الدراسية والتحقق الذاتي",
-          "خطوات توليد وتحميل ملف الشهادة بصيغة PDF فوراً"
+      {
+        "id": "les-1786932368573",
+        "title": "2",
+        "duration": "20 دقيقة",
+        "isLocked": false,
+        "type": "video",
+        "videoUrl": "https://player.mediadelivery.net/play/729792/952ec222-1a76-4909-ad47-ddbb30cd2239",
+        "lessons": [
+          "2"
         ]
       },
+      {
+        "id": "les-1786932387065",
+        "title": "3",
+        "duration": "20 دقيقة",
+        "isLocked": false,
+        "type": "video",
+        "videoUrl": "https://player.mediadelivery.net/play/729792/edc0bc68-2d67-4bd9-ab87-7b4c6d16532b",
+        "lessons": [
+          "3"
+        ]
+      },
+      {
+        "id": "les-1786932424958",
+        "title": "4",
+        "duration": "20 دقيقة",
+        "isLocked": false,
+        "type": "video",
+        "videoUrl": "https://player.mediadelivery.net/play/729792/25d7c975-a287-4786-b553-427514a454c3",
+        "lessons": [
+          "4"
+        ]
+      }
     ],
-    outcomes: [
-      "فهم وتجربة محاكي مشغل الكورسات المحلي التفاعلي.",
-      "تتبع التقدم الحقيقي وإتمام الدروس ومزامنتها محلياً.",
-      "توليد شهادة إتمام معتمدة فورية قابلة للطباعة PDF بنقرة واحدة.",
-    ],
-    requirements: "لا توجد متطلبات مسبقة. الدورة مصممة ومتاحة للجميع مجاناً.",
-    ghlCheckoutUrl: "/checkout?slug=free-trial-course",
-    ghlCourseId: "course-free-trial",
-  },
-  {
-    id: 1,
-    title: "دورة استخدام الحاسب الالي في الاعمال المكتبية",
-    slug: "computer-basics-office",
-    description: "للمبتدئين والخريجين الجدد، تعلم اساسيات الحاسب الالي لرفع مستوى إنتاجيتك في الأعمال المكتبية. هذه الدورة تتضمن استخدام برامج إدارة البيانات مثل Microsoft Office. استعد للمنافسة في سوق العمل بكل ثقة.",
-    image: "/logo.webp",
-    category: "admin",
-    level: "beginner",
-    price: 900,
-    rating: 4.9,
-    enrollees: 1250,
-    duration: "40 ساعة",
-    lessonsCount: 20,
-    featured: true,
-    trainerId: "tr-1",
-    curriculum: [
-      { 
-        id: "h-m1", 
-        title: "الدرس الأول: مقدمة في الحاسب الآلي وأنظمة التشغيل", 
-        isLocked: false, 
-        duration: "ساعتان", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
-          "التعرف على المكونات المادية والبرمجية للحاسب الآلي",
-          "إتقان أساسيات نظام التشغيل Windows وإدارة الملفات"
-        ]
-      },
-      { 
-        id: "h-m2", 
-        title: "الدرس الثاني: احتراف Microsoft Word وتنسيق النصوص", 
-        isLocked: true, 
-        duration: "10 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
-          "إنشاء وتحرير المستندات والتقارير المكتبية الرسمية",
-          "تنسيق الجداول، وإدراج الصور، وضبط إعدادات الهوامش والطباعة"
-        ]
-      },
-      { 
-        id: "h-m3", 
-        title: "الدرس الثالث: إدارة البيانات وتحليلها عبر Microsoft Excel", 
-        isLocked: true, 
-        duration: "15 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
-          "تصميم الجداول الحسابية وإدخال البيانات بكفاءة",
-          "استخدام الدوال الأساسية والمعادلات الرياضية والرسوم البيانية"
-        ]
-      },
-      { 
-        id: "h-m4", 
-        title: "الدرس الرابع: العروض التقديمية وتصميم الشرائح Microsoft PowerPoint", 
-        isLocked: true, 
-        duration: "8 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
-          "بناء وتصميم عروض تقديمية تفاعلية جذابة",
-          "استخدام الانتقالات والرسوم المتحركة لعرض المشاريع بأسلوب مميز"
-        ]
-      },
-      { 
-        id: "h-m5", 
-        title: "الدرس الخامس: البريد الإلكتروني وإدارة الوقت وتنظيم المراسلات", 
-        isLocked: true, 
-        duration: "5 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
-          "صياغة وإرسال رسائل البريد الإلكتروني المهنية",
-          "استخدام التقويم وتنظيم الاجتماعات وإدارة المهام اليومية"
-        ]
-      },
-    ],
-    outcomes: [
+    "outcomes": [
       "إتقان استخدام نظام التشغيل Windows وتطبيقاته.",
       "إنشاء وتنسيق المستندات الاحترافية باستخدام Word.",
       "إعداد وتصميم الجداول الإلكترونية وتحليل البيانات في Excel.",
       "تصميم العروض التقديمية الفعالة والجذابة في PowerPoint.",
-      "إدارة رسائل البريد الإلكتروني والمهام باستخدام Outlook.",
+      "إدارة رسائل البريد الإلكتروني والمهام باستخدام Outlook."
     ],
-    requirements: "لا توجد متطلبات مسبقة. الدورة مصممة للمبتدئين تماماً.",
-    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
-    ghlCourseId: "course-haceb",
+    "requirements": "لا توجد متطلبات مسبقة. الدورة مصممة للمبتدئين تماماً.",
+    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
+    "ghlCourseId": "course-haceb"
   },
   {
-    id: 2,
-    title: "دورات ادخال بيانات ومعالجة نصوص",
-    slug: "data-entry-word-processing",
-    description: "كن متميزا بين أقرانك وامتلك مهارة جديدة من خلال تعلم كيفية إدخال البيانات ومعالجة النصوص بكفاءة باستخدام أحدث البرامج. هذه الدورة تمنحك القدرة على العمل في المجالات المدنية وتوسيع فرصك الوظيفية.",
-    image: "/logo.webp",
-    category: "data",
-    level: "intermediate",
-    price: 1300,
-    rating: 4.8,
-    enrollees: 980,
-    duration: "30 ساعة",
-    lessonsCount: 15,
-    featured: true,
-    trainerId: "tr-2",
-    curriculum: [
-      { 
-        id: "d-m1", 
-        title: "الدرس الأول: أساسيات الكتابة السريعة ولوحة المفاتيح", 
-        isLocked: false, 
-        duration: "3 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+    "id": 2,
+    "title": "دورات ادخال بيانات ومعالجة نصوص",
+    "slug": "data-entry-word-processing",
+    "description": "كن متميزا بين أقرانك وامتلك مهارة جديدة من خلال تعلم كيفية إدخال البيانات ومعالجة النصوص بكفاءة باستخدام أحدث البرامج. هذه الدورة تمنحك القدرة على العمل في المجالات المدنية وتوسيع فرصك الوظيفية.",
+    "image": "/logo.webp",
+    "category": "data",
+    "level": "intermediate",
+    "price": 1300,
+    "rating": 4.8,
+    "enrollees": 980,
+    "duration": "30 ساعة",
+    "lessonsCount": 15,
+    "featured": true,
+    "trainerId": "tr-2",
+    "instructor": "أ. د. سارة العتيبي",
+    "curriculum": [
+      {
+        "id": "d-m1",
+        "title": "الدرس الأول: أساسيات الكتابة السريعة ولوحة المفاتيح",
+        "isLocked": false,
+        "duration": "3 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "تقنيات وضعية الأصابع الصحيحة للكتابة دون النظر",
           "تمارين مكثفة لزيادة سرعة الكتابة باللغتين العربية والإنجليزية"
         ]
       },
-      { 
-        id: "d-m2", 
-        title: "الدرس الثاني: معالجة النصوص المتقدمة وإعداد الخطابات", 
-        isLocked: true, 
-        duration: "10 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "d-m2",
+        "title": "الدرس الثاني: معالجة النصوص المتقدمة وإعداد الخطابات",
+        "isLocked": true,
+        "duration": "10 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "إعداد الخطابات الإدارية والمعاملات الحكومية الرسمية",
           "استخدام الأنماط الجاهزة والتحكم المتقدم في الفقرات والهوامش"
         ]
       },
-      { 
-        id: "d-m3", 
-        title: "الدرس الثالث: دقة وجودة إدخال البيانات وتدقيق المعاملات", 
-        isLocked: true, 
-        duration: "12 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "d-m3",
+        "title": "الدرس الثالث: دقة وجودة إدخال البيانات وتدقيق المعاملات",
+        "isLocked": true,
+        "duration": "12 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "آليات إدخال السجلات وقواعد البيانات بطرق علمية دقيقة",
           "فحص وتدقيق البيانات وتجنب الأخطاء الشائعة أثناء الرصد السريع"
         ]
       },
-      { 
-        id: "d-m4", 
-        title: "الدرس الرابع: مشروع تطبيقي شامل ومحاكاة بيئة العمل", 
-        isLocked: true, 
-        duration: "5 ساعات", 
-        type: "quiz",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "d-m4",
+        "title": "الدرس الرابع: مشروع تطبيقي شامل ومحاكاة بيئة العمل",
+        "isLocked": true,
+        "duration": "5 ساعات",
+        "type": "quiz",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "تنفيذ مشروع إدخال سجلات متكامل تحت ضغط الوقت",
           "تقييم دقة وسرعة المتدرب وإعطائه تقرير فني بالأداء"
         ]
-      },
+      }
     ],
-    outcomes: [
+    "outcomes": [
       "رفع سرعة ودقة الكتابة على لوحة المفاتيح.",
       "احتراف معالجة النصوص وتنسيق المعاملات الرسمية.",
       "التعامل مع ملفات البيانات الضخمة وضمان جودتها.",
-      "توسيع الفرص الوظيفية في القطاعين العام والخاص.",
+      "توسيع الفرص الوظيفية في القطاعين العام والخاص."
     ],
-    requirements: "معرفة أساسية بسيطة باستخدام الحاسب الآلي.",
-    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
-    ghlCourseId: "course-data-entry",
+    "requirements": "معرفة أساسية بسيطة باستخدام الحاسب الآلي.",
+    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
+    "ghlCourseId": "course-data-entry"
   },
   {
-    id: 3,
-    title: "دورة اللغة الانجليزية",
-    slug: "english-language-course",
-    description: "هل ترغب في تحسين مهاراتك في الإنجليزية؟ تعلم اللغة الإنجليزية من خلال دورات تفاعلية تساعدك على التحدث والكتابة بثقة. هذه الكورسات موجهة لجميع المستويات وتفتح لك فرصا واسعة في العمل والدراسة.",
-    image: "/logo.webp",
-    category: "languages",
-    level: "all",
-    price: 0,
-    rating: 5.0,
-    enrollees: 3400,
-    duration: "60 ساعة",
-    lessonsCount: 40,
-    featured: true,
-    trainerId: "tr-3",
-    curriculum: [
-      { 
-        id: "e-m1", 
-        title: "الدرس الأول: مقدمة وتحديد المستوى التفاعلي", 
-        isLocked: false, 
-        duration: "ساعتان", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+    "id": 3,
+    "title": "دورة اللغة الانجليزية",
+    "slug": "english-language-course",
+    "description": "هل ترغب في تحسين مهاراتك في الإنجليزية؟ تعلم اللغة الإنجليزية من خلال دورات تفاعلية تساعدك على التحدث والكتابة بثقة. هذه الكورسات موجهة لجميع المستويات وتفتح لك فرصا واسعة في العمل والدراسة.",
+    "image": "/logo.webp",
+    "category": "languages",
+    "level": "all",
+    "price": 0,
+    "rating": 5,
+    "enrollees": 3400,
+    "duration": "60 ساعة",
+    "lessonsCount": 40,
+    "featured": true,
+    "trainerId": "tr-3",
+    "instructor": "د. خالد الدوسري",
+    "curriculum": [
+      {
+        "id": "e-m1",
+        "title": "الدرس الأول: مقدمة وتحديد المستوى التفاعلي",
+        "isLocked": false,
+        "duration": "ساعتان",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "اختبار تحديد مستوى شامل لقياس المهارات اللغوية الأربعة",
           "بناء خطة الدراسة المخصصة بناءً على نقاط القوة والضعف"
         ]
       },
-      { 
-        id: "e-m2", 
-        title: "الدرس الثاني: المحادثة اليومية والتركيبات الأساسية للمبتدئين", 
-        isLocked: true, 
-        duration: "15 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "e-m2",
+        "title": "الدرس الثاني: المحادثة اليومية والتركيبات الأساسية للمبتدئين",
+        "isLocked": true,
+        "duration": "15 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "التعرف على المفردات والجمل الشائعة في التعارف والمطاعم والتسوق",
           "ممارسة النطق الصحيح وتجنب الأخطاء الصوتية الشائعة"
         ]
       },
-      { 
-        id: "e-m3", 
-        title: "الدرس الثالث: القواعد الأساسية والأزمنة في اللغة", 
-        isLocked: true, 
-        duration: "15 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "e-m3",
+        "title": "الدرس الثالث: القواعد الأساسية والأزمنة في اللغة",
+        "isLocked": true,
+        "duration": "15 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "شرح مبسط للأزمنة الأساسية (المضارع، الماضي، المستقبل)",
           "تطبيق القواعد في صياغة جمل صحيحة وتجنب الأخطاء النحوية"
         ]
       },
-      { 
-        id: "e-m4", 
-        title: "الدرس الرابع: مهارات الكتابة والمراسلات البريدية والمهنية", 
-        isLocked: true, 
-        duration: "15 hour", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "e-m4",
+        "title": "الدرس الرابع: مهارات الكتابة والمراسلات البريدية والمهنية",
+        "isLocked": true,
+        "duration": "15 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "هيكلة البريد الإلكتروني والرسائل الإدارية باللغة الإنجليزية",
           "اختيار الأسلوب المناسب للمراسلات الرسمية والمهنية"
         ]
       },
-      { 
-        id: "e-m5", 
-        title: "الدرس الخامس: تطوير مهارات الاستماع والفهم للغات المختلفة", 
-        isLocked: true, 
-        duration: "13 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "e-m5",
+        "title": "الدرس الخامس: تطوير مهارات الاستماع والفهم للغات المختلفة",
+        "isLocked": true,
+        "duration": "13 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "الاستماع لمقاطع صوتية بلهجات مختلفة (بريطانية، أمريكية)",
           "تطوير تقنيات الاستخلاص والتلخيص وفهم سياق الحوار السريع"
         ]
-      },
+      }
     ],
-    outcomes: [
+    "outcomes": [
       "التحدث بطلاقة في مواقف الحياة اليومية والمهنية.",
       "تحسين مستويات الفهم والاستماع للكنات المختلفة.",
       "إتقان بناء الجمل وكتابة المراسلات باللغة الإنجليزية.",
-      "التحضير لاجتياز اختبارات تحديد المستوى العالمية.",
+      "التحضير لاجتياز اختبارات تحديد المستوى العالمية."
     ],
-    requirements: "الرغبة في التعلم والتطور المستمر.",
-    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
-    ghlCourseId: "course-english",
+    "requirements": "الرغبة في التعلم والتطور المستمر.",
+    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
+    "ghlCourseId": "course-english"
   },
   {
-    id: 4,
-    title: "دورة الذكاء الاصطناعي",
-    slug: "ai-course",
-    description: "استعد لمستقبل التكنولوجيا مع دورة الذكاء الاصطناعي. تعلم كيف يتم استخدام تقنيات الذكاء الاصطناعي في تطبيقات متعددة مثل التحليل والروبوتات. ستكتسب المهارات التي تؤهلك للعمل في هذا مجال المتقدم.",
-    image: "/logo.webp",
-    category: "tech",
-    level: "all",
-    price: 450,
-    rating: 4.9,
-    enrollees: 1120,
-    duration: "45 ساعة",
-    lessonsCount: 30,
-    featured: true,
-    trainerId: "tr-1",
-    curriculum: [
-      { 
-        id: "a-m1", 
-        title: "الدرس الأول: مقدمة في الذكاء الاصطناعي وتاريخه", 
-        isLocked: false, 
-        duration: "4 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+    "id": 4,
+    "title": "دورة الذكاء الاصطناعي",
+    "slug": "ai-course",
+    "description": "استعد لمستقبل التكنولوجيا مع دورة الذكاء الاصطناعي. تعلم كيف يتم استخدام تقنيات الذكاء الاصطناعي في تطبيقات متعددة مثل التحليل والروبوتات. ستكتسب المهارات التي تؤهلك للعمل في هذا مجال المتقدم.",
+    "image": "/logo.webp",
+    "category": "tech",
+    "level": "all",
+    "price": 450,
+    "rating": 4.9,
+    "enrollees": 1120,
+    "duration": "45 ساعة",
+    "lessonsCount": 30,
+    "featured": true,
+    "trainerId": "tr-1",
+    "instructor": "د. محمد القحطاني",
+    "curriculum": [
+      {
+        "id": "a-m1",
+        "title": "الدرس الأول: مقدمة في الذكاء الاصطناعي وتاريخه",
+        "isLocked": false,
+        "duration": "4 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "التعرف على المفاهيم التأسيسية للذكاء الاصطناعي وتطورها التاريخي",
           "فهم خوارزميات التعلم الآلي والشبكات العصبية والفرق بينها"
         ]
       },
-      { 
-        id: "a-m2", 
-        title: "الدرس الثاني: تطبيقات الذكاء الاصطناعي العملية في قطاع الأعمال", 
-        isLocked: true, 
-        duration: "20 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "a-m2",
+        "title": "الدرس الثاني: تطبيقات الذكاء الاصطناعي العملية في قطاع الأعمال",
+        "isLocked": true,
+        "duration": "20 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "كيفية توظيف أدوات الذكاء الاصطناعي لرفع الإنتاجية وصناعة المحتوى",
           "استكشاف نماذج لغة التوليد التلقائي (Generative AI) وكتابة الأوامر الهندسية"
         ]
       },
-      { 
-        id: "a-m3", 
-        title: "الدرس الثالث: الأخلاقيات ومستقبل تقنيات الذكاء الاصطناعي", 
-        isLocked: true, 
-        duration: "21 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "a-m3",
+        "title": "الدرس الثالث: الأخلاقيات ومستقبل تقنيات الذكاء الاصطناعي",
+        "isLocked": true,
+        "duration": "21 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "دراسة قضايا التحيز والأمان الرقمي وحماية الملكية الفكرية",
           "استعراض الفرص المستقبلية لوظائف الذكاء الاصطناعي وطرق التأهيل لها"
         ]
-      },
+      }
     ],
-    outcomes: [
+    "outcomes": [
       "فهم أسس الذكاء الاصطناعي والتعلم الآلي.",
       "تطبيقات الذكاء الاصطناعي التوليدي العملية.",
       "مبادئ وأخلاقيات هندسة الأوامر (Prompt Engineering)."
     ],
-    requirements: "أساسيات الحاسب الآلي.",
-    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
-    ghlCourseId: "course-ai",
+    "requirements": "أساسيات الحاسب الآلي.",
+    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
+    "ghlCourseId": "course-ai"
   },
   {
-    id: 5,
-    title: "دورة محلل الأمن السيبراني",
-    slug: "cybersecurity-analyst",
-    description: "هل ترغب في حماية البيانات والشبكات من الهجمات الالكترونية؟ تعلم كيف تصبح محلل أمن سيبراني مع هذه الدورة المتخصصة. ستكتسب المهارات الأساسية لحماية الأنظمة المعلوماتية في بيئة العمل.",
-    image: "/logo.webp",
-    category: "tech",
-    level: "intermediate",
-    price: 349,
-    rating: 4.8,
-    enrollees: 850,
-    duration: "40 ساعة",
-    lessonsCount: 25,
-    featured: true,
-    trainerId: "tr-2",
-    curriculum: [
-      { 
-        id: "c-m1", 
-        title: "الدرس الأول: مبادئ الأمن السيبراني والمخاطر الشائعة", 
-        isLocked: false, 
-        duration: "5 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+    "id": 5,
+    "title": "دورة محلل الأمن السيبراني",
+    "slug": "cybersecurity-analyst",
+    "description": "هل ترغب في حماية البيانات والشبكات من الهجمات الالكترونية؟ تعلم كيف تصبح محلل أمن سيبراني مع هذه الدورة المتخصصة. ستكتسب المهارات الأساسية لحماية الأنظمة المعلوماتية في بيئة العمل.",
+    "image": "/logo.webp",
+    "category": "tech",
+    "level": "intermediate",
+    "price": 349,
+    "rating": 4.8,
+    "enrollees": 850,
+    "duration": "40 ساعة",
+    "lessonsCount": 25,
+    "featured": true,
+    "trainerId": "tr-2",
+    "instructor": "أ. د. سارة العتيبي",
+    "curriculum": [
+      {
+        "id": "c-m1",
+        "title": "الدرس الأول: مبادئ الأمن السيبراني والمخاطر الشائعة",
+        "isLocked": false,
+        "duration": "5 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "فهم ركائز الأمان الثلاثة (السرية، السلامة، التوافرية)",
           "التعرف على أساليب الهندسة الاجتماعية والبرمجيات الخبيثة وطرق التصدي لها"
         ]
       },
-      { 
-        id: "c-m2", 
-        title: "الدرس الثاني: تأمين الشبكات وحوكمة البيانات المؤسسية", 
-        isLocked: true, 
-        duration: "20 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "c-m2",
+        "title": "الدرس الثاني: تأمين الشبكات وحوكمة البيانات المؤسسية",
+        "isLocked": true,
+        "duration": "20 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "إعداد وضبط جدران الحماية وأنظمة الكشف عن التسلل (IDS/IPS)",
           "مبادئ التشفير المتماثل وغير المتماثل وتأمين قنوات الاتصال"
         ]
       },
-      { 
-        id: "c-m3", 
-        title: "الدرس الثالث: الاستجابة للحوادث الأمنية والتحقيق الرقمي", 
-        isLocked: true, 
-        duration: "15 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "c-m3",
+        "title": "الدرس الثالث: الاستجابة للحوادث الأمنية والتحقيق الرقمي",
+        "isLocked": true,
+        "duration": "15 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "خطوات احتواء الهجمات الإلكترونية وتقليل الأضرار بعد الاختراق",
           "أدوات جمع الأدلة الرقمية وكتابة تقارير الحوادث الفنية للإدارة"
         ]
-      },
+      }
     ],
-    outcomes: ["معرفة أنواع الهجمات الإلكترونية وطرق الحماية.", "تأمين الشبكات والبيانات المؤسسية."],
-    requirements: "معرفة جيدة بالشبكات وأنظمة التشغيل.",
-    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
-    ghlCourseId: "course-cybersecurity",
+    "outcomes": [
+      "معرفة أنواع الهجمات الإلكترونية وطرق الحماية.",
+      "تأمين الشبكات والبيانات المؤسسية."
+    ],
+    "requirements": "معرفة جيدة بالشبكات وأنظمة التشغيل.",
+    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
+    "ghlCourseId": "course-cybersecurity"
   },
   {
-    id: 6,
-    title: "دورة صيانة الجوالات",
-    slug: "mobile-maintenance",
-    description: "لراغبي الدخول إلى عالم صيانة الجوالات احصل على المهارات اللازمة لإصلاح الهواتف الذكية من خلال دورة متكاملة. ستكون مؤهلاً للعمل في هذا المجال المتطور وفتح ورشة صيانة خاصة بك.",
-    image: "/logo.webp",
-    category: "tech",
-    level: "all",
-    price: 750,
-    rating: 5.0,
-    enrollees: 2100,
-    duration: "60 ساعة",
-    lessonsCount: 40,
-    featured: true,
-    trainerId: "tr-3",
-    curriculum: [
-      { 
-        id: "mo-m1", 
-        title: "الدرس الأول: مبادئ الإلكترونيات وفحص القطع والعتاد", 
-        isLocked: false, 
-        duration: "6 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+    "id": 6,
+    "title": "دورة صيانة الجوالات",
+    "slug": "mobile-maintenance",
+    "description": "لراغبي الدخول إلى عالم صيانة الجوالات احصل على المهارات اللازمة لإصلاح الهواتف الذكية من خلال دورة متكاملة. ستكون مؤهلاً للعمل في هذا المجال المتطور وفتح ورشة صيانة خاصة بك.",
+    "image": "/logo.webp",
+    "category": "tech",
+    "level": "all",
+    "price": 750,
+    "rating": 5,
+    "enrollees": 2100,
+    "duration": "60 ساعة",
+    "lessonsCount": 40,
+    "featured": true,
+    "trainerId": "tr-3",
+    "instructor": "د. خالد الدوسري",
+    "curriculum": [
+      {
+        "id": "mo-m1",
+        "title": "الدرس الأول: مبادئ الإلكترونيات وفحص القطع والعتاد",
+        "isLocked": false,
+        "duration": "6 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "التعرف على المكونات الداخلية للهاتف وأدوات الفحص والقياس",
           "طرق تفكيك وتركيب الأجهزة الذكية وتحديد القطع التالفة بأمان"
         ]
       },
-      { 
-        id: "mo-m2", 
-        title: "الدرس الثاني: صيانة العتاد الصلب (Hardware) واستبدال الأجزاء", 
-        isLocked: true, 
-        duration: "24 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "mo-m2",
+        "title": "الدرس الثاني: صيانة العتاد الصلب (Hardware) واستبدال الأجزاء",
+        "isLocked": true,
+        "duration": "24 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "مبادئ وتقنيات اللحام الدقيق (Micro-soldering) وإصلاح الدوائر",
           "استبدال الشاشات، البطاريات، منافذ الشحن، والكاميرات التالفة"
         ]
       },
-      { 
-        id: "mo-m3", 
-        title: "الدرس الثالث: صيانة البرمجيات (Software) وحل المشاكل الفنية", 
-        isLocked: true, 
-        duration: "20 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "mo-m3",
+        "title": "الدرس الثالث: صيانة البرمجيات (Software) وحل المشاكل الفنية",
+        "isLocked": true,
+        "duration": "20 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "تثبيت وتحديث أنظمة التشغيل iOS و Android وحل تعليق النظام",
           "طرق استرجاع البيانات المفقودة، وعمل النسخ الاحتياطي، وفك الأقفال البرمجية"
         ]
       },
-      { 
-        id: "mo-m4", 
-        title: "الدرس الرابع: دراسة السوق وتأسيس مشروع صيانة خاص بك", 
-        isLocked: true, 
-        duration: "10 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "mo-m4",
+        "title": "الدرس الرابع: دراسة السوق وتأسيس مشروع صيانة خاص بك",
+        "isLocked": true,
+        "duration": "10 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "مصادر شراء قطع الغيار الأصلية وأدوات الصيانة بأسعار اقتصادية",
           "خطوات الترخيص وتجهيز المحل وجذب العملاء وتسعير الخدمات"
         ]
-      },
+      }
     ],
-    outcomes: ["تشخيص أعطال الهواتف بكفاءة.", "إصلاح المشاكل البرمجية والعتاد (Hardware/Software)."],
-    requirements: "لا توجد متطلبات سابقة.",
-    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
-    ghlCourseId: "course-mobile",
+    "outcomes": [
+      "تشخيص أعطال الهواتف بكفاءة.",
+      "إصلاح المشاكل البرمجية والعتاد (Hardware/Software)."
+    ],
+    "requirements": "لا توجد متطلبات سابقة.",
+    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
+    "ghlCourseId": "course-mobile"
   },
   {
-    id: 7,
-    title: "دورة الأوشا",
-    slug: "osha-course",
-    description: "حافظ على سلامتك في العمل مع دورة الأوشا المتخصصة في الأمن والسلامة. تعلم كيف تساهم في توفير بيئة عمل آمنة وتلتزم بالمعايير المحلية والدولية. هذه الدورة ضرورية لكل من يسعى لتحسين مستوى الأمان في مكان عمله.",
-    image: "/logo.webp",
-    category: "corporate",
-    level: "all",
-    price: 249,
-    rating: 4.7,
-    enrollees: 620,
-    duration: "30 ساعة",
-    lessonsCount: 15,
-    featured: true,
-    trainerId: "tr-1",
-    curriculum: [
-      { 
-        id: "os-m1", 
-        title: "الدرس الأول: معايير الأوشا الأساسية ومقدمة في السلامة المهنية", 
-        isLocked: false, 
-        duration: "5 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+    "id": 7,
+    "title": "دورة الأوشا",
+    "slug": "osha-course",
+    "description": "حافظ على سلامتك في العمل مع دورة الأوشا المتخصصة في الأمن والسلامة. تعلم كيف تساهم في توفير بيئة عمل آمنة وتلتزم بالمعايير المحلية والدولية. هذه الدورة ضرورية لكل من يسعى لتحسين مستوى الأمان في مكان عمله.",
+    "image": "/logo.webp",
+    "category": "corporate",
+    "level": "all",
+    "price": 249,
+    "rating": 4.7,
+    "enrollees": 620,
+    "duration": "30 ساعة",
+    "lessonsCount": 15,
+    "featured": true,
+    "trainerId": "tr-1",
+    "instructor": "د. محمد القحطاني",
+    "curriculum": [
+      {
+        "id": "os-m1",
+        "title": "الدرس الأول: معايير الأوشا الأساسية ومقدمة في السلامة المهنية",
+        "isLocked": false,
+        "duration": "5 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "تاريخ الأوشا وأهميتها والتعرف على الحقوق والمسؤوليات القانونية",
           "تصنيف المخاطر المهنية في مكان العمل (فيزيائية، كيميائية، بيولوجية)"
         ]
       },
-      { 
-        id: "os-m2", 
-        title: "الدرس الثاني: المخاطر الهندسية وخطط الوقاية والحماية من السقوط", 
-        isLocked: true, 
-        duration: "15 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "os-m2",
+        "title": "الدرس الثاني: المخاطر الهندسية وخطط الوقاية والحماية من السقوط",
+        "isLocked": true,
+        "duration": "15 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "معايير الحماية من السقوط والعمل بأمان في المرتفعات والسحالات",
           "مبادئ السلامة الكهربائية، وسلامة الآلات، وخطوات العزل الميكانيكي والكهربائي"
         ]
       },
-      { 
-        id: "os-m3", 
-        title: "الدرس الثالث: إدارة الحرائق وخطط الإخلاء في الحالات الطارئة", 
-        isLocked: true, 
-        duration: "10 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "os-m3",
+        "title": "الدرس الثالث: إدارة الحرائق وخطط الإخلاء في الحالات الطارئة",
+        "isLocked": true,
+        "duration": "10 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "أنواع الحرائق واستخدام مطافئ الحريق المختلفة بمهارة",
           "تصميم وتطبيق خطة طوارئ وإخلاء متكاملة للمنشأة"
         ]
-      },
+      }
     ],
-    outcomes: ["فهم معايير السلامة المهنية.", "تطبيق سياسات الأوشا في بيئة العمل."],
-    requirements: "لا توجد متطلبات مسبقة.",
-    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
-    ghlCourseId: "course-osha",
+    "outcomes": [
+      "فهم معايير السلامة المهنية.",
+      "تطبيق سياسات الأوشا في بيئة العمل."
+    ],
+    "requirements": "لا توجد متطلبات مسبقة.",
+    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
+    "ghlCourseId": "course-osha"
   },
   {
-    id: 8,
-    title: "دورة النيبوش",
-    slug: "nebosh-course",
-    description: "احصل على شهادة النيبوش التي تفتح لك أبواب العمل في مجال الأمن والسلامة. تعلم كيف تدير المخاطر وتحافظ على السلامة في بيئة العمل باستخدام النظام السعودي المعتمد. الدورة موجهة للمهتمين بتطوير مهاراتهم في هذا المجال الحيوي.",
-    image: "/logo.webp",
-    category: "corporate",
-    level: "advanced",
-    price: 255,
-    rating: 4.8,
-    enrollees: 780,
-    duration: "40 ساعة",
-    lessonsCount: 20,
-    featured: true,
-    trainerId: "tr-2",
-    curriculum: [
-      { 
-        id: "ne-m1", 
-        title: "الدرس الأول: مقدمة عن النيبوش ونظم إدارة السلامة العالمية", 
-        isLocked: false, 
-        duration: "4 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+    "id": 8,
+    "title": "دورة النيبوش",
+    "slug": "nebosh-course",
+    "description": "احصل على شهادة النيبوش التي تفتح لك أبواب العمل في مجال الأمن والسلامة. تعلم كيف تدير المخاطر وتحافظ على السلامة في بيئة العمل باستخدام النظام السعودي المعتمد. الدورة موجهة للمهتمين بتطوير مهاراتهم في هذا المجال الحيوي.",
+    "image": "/logo.webp",
+    "category": "corporate",
+    "level": "advanced",
+    "price": 255,
+    "rating": 4.8,
+    "enrollees": 780,
+    "duration": "40 ساعة",
+    "lessonsCount": 20,
+    "featured": true,
+    "trainerId": "tr-2",
+    "instructor": "أ. د. سارة العتيبي",
+    "curriculum": [
+      {
+        "id": "ne-m1",
+        "title": "الدرس الأول: مقدمة عن النيبوش ونظم إدارة السلامة العالمية",
+        "isLocked": false,
+        "duration": "4 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "هيكل وتصنيف شهادة النيبوش وأهميتها في الأسواق الدولية",
           "كيفية بناء نظام إدارة أمان وصحة مهنية متكامل (OHSMS)"
         ]
       },
-      { 
-        id: "ne-m2", 
-        title: "الدرس الثاني: تقييم المخاطر المهنية والتحكم والسيطرة عليها", 
-        isLocked: true, 
-        duration: "20 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "ne-m2",
+        "title": "الدرس الثاني: تقييم المخاطر المهنية والتحكم والسيطرة عليها",
+        "isLocked": true,
+        "duration": "20 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "خطوات وإعداد دراسات تقييم المخاطر (Risk Assessment)",
           "تطبيق هرم إجراءات التحكم والسيطرة للحد من حوادث العمل"
         ]
       },
-      { 
-        id: "ne-m3", 
-        title: "الدرس الثالث: مراقبة وتقييم ومراجعة الأداء الأمني للمؤسسة", 
-        isLocked: true, 
-        duration: "16 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "ne-m3",
+        "title": "الدرس الثالث: مراقبة وتقييم ومراجعة الأداء الأمني للمؤسسة",
+        "isLocked": true,
+        "duration": "16 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "أدوات التفتيش والتدقيق الداخلي على إجراءات السلامة",
           "التحقيق في الحوادث واستخلاص الدروس وتحسين الخطط الوقائية"
         ]
-      },
+      }
     ],
-    outcomes: ["الحصول على التأهيل اللازم لشهادة النيبوش العالمية.", "إدارة المخاطر المهنية المتقدمة."],
-    requirements: "يفضل خبرة سابقة في السلامة المهنية.",
-    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
-    ghlCourseId: "course-nebosh",
+    "outcomes": [
+      "الحصول على التأهيل اللازم لشهادة النيبوش العالمية.",
+      "إدارة المخاطر المهنية المتقدمة."
+    ],
+    "requirements": "يفضل خبرة سابقة في السلامة المهنية.",
+    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
+    "ghlCourseId": "course-nebosh"
   },
   {
-    id: 9,
-    title: "دورة القدرات",
-    slug: "qudurat-course",
-    description: "استعد لاختبارات القدرات بكل ثقة مع هذه الدورة المكثفة. تعلم استراتيجيات التفكير وحل المشكلات لرفع درجاتك في الاختبارات. ستكون مستعداً للتفوق في اختبارات القبول الجامعي أو الوظائف الحكومية.",
-    image: "/logo.webp",
-    category: "admin",
-    level: "all",
-    price: 550,
-    rating: 4.9,
-    enrollees: 3400,
-    duration: "50 ساعة",
-    lessonsCount: 35,
-    featured: true,
-    trainerId: "tr-3",
-    curriculum: [
-      { 
-        id: "qu-m1", 
-        title: "الدرس الأول: استراتيجيات الحل السريع والمهارات الرياضية (الكمي)", 
-        isLocked: false, 
-        duration: "5 ساعات", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+    "id": 9,
+    "title": "دورة القدرات",
+    "slug": "qudurat-course",
+    "description": "استعد لاختبارات القدرات بكل ثقة مع هذه الدورة المكثفة. تعلم استراتيجيات التفكير وحل المشكلات لرفع درجاتك في الاختبارات. ستكون مستعداً للتفوق في اختبارات القبول الجامعي أو الوظائف الحكومية.",
+    "image": "/logo.webp",
+    "category": "admin",
+    "level": "all",
+    "price": 550,
+    "rating": 4.9,
+    "enrollees": 3400,
+    "duration": "50 ساعة",
+    "lessonsCount": 35,
+    "featured": true,
+    "trainerId": "tr-3",
+    "instructor": "د. خالد الدوسري",
+    "curriculum": [
+      {
+        "id": "qu-m1",
+        "title": "الدرس الأول: استراتيجيات الحل السريع والمهارات الرياضية (الكمي)",
+        "isLocked": false,
+        "duration": "5 ساعات",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "قوانين الجذور، الأسس، والنسب المئوية وطرق الحل السريع بدون استخدام حاسبة",
           "مهارات الهندسة والإحصاء وحل المسائل الحسابية والمنطقية المعقدة"
         ]
       },
-      { 
-        id: "qu-m2", 
-        title: "الدرس الثاني: استراتيجيات الفهم والتحليل واستيعاب المقروء (اللفظي)", 
-        isLocked: true, 
-        duration: "25 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "qu-m2",
+        "title": "الدرس الثاني: استراتيجيات الفهم والتحليل واستيعاب المقروء (اللفظي)",
+        "isLocked": true,
+        "duration": "25 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "تقنيات حل التناظر اللفظي، إكمال الجمل، والخطأ السياقي",
           "فهم وتحليل النصوص الطويلة واستنتاج المعاني والعلاقات الضمنية"
         ]
       },
-      { 
-        id: "qu-m3", 
-        title: "الدرس الثالث: اختبارات تجريبية شاملة وتحليل نقاط الضعف", 
-        isLocked: true, 
-        duration: "20 ساعة", 
-        type: "video",
-        videoUrl: "MmHWTPJMzbQ",
-        lessons: [
+      {
+        "id": "qu-m3",
+        "title": "الدرس الثالث: اختبارات تجريبية شاملة وتحليل نقاط الضعف",
+        "isLocked": true,
+        "duration": "20 ساعة",
+        "type": "video",
+        "videoUrl": "MmHWTPJMzbQ",
+        "lessons": [
           "محاكاة اختبار القدرات الفعلي تحت قيود زمنية محددة",
           "مراجعة إجابات المتدرب وتحليل الأخطاء وتوفير شروحات مسجلة لها"
         ]
-      },
+      }
     ],
-    outcomes: ["إتقان المهارات الكمية واللفظية.", "تطوير سرعة الحل وفهم الأسئلة المعقدة."],
-    requirements: "الاستعداد النفسي والالتزام بالتدريب.",
-    ghlCheckoutUrl: "https://members.nabdtraining.com/login",
-    ghlCourseId: "course-qudurat",
-  },
+    "outcomes": [
+      "إتقان المهارات الكمية واللفظية.",
+      "تطوير سرعة الحل وفهم الأسئلة المعقدة."
+    ],
+    "requirements": "الاستعداد النفسي والالتزام بالتدريب.",
+    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
+    "ghlCourseId": "course-qudurat"
+  }
 ];
 
-export const getCourseBySlug = (slug: string): Course | undefined => {
-  return courses.find(c => c.slug === slug);
-};
+export const courses: Course[] = INITIAL_9_COURSES;
+
+export function getCourseBySlug(slug: string): Course | undefined {
+  if (!slug) return undefined;
+  const clean = slug.replace(/^course-/, '').toLowerCase().trim();
+  return courses.find(
+    (c) => {
+      const cSlug = (c.slug || '').toLowerCase().trim();
+      const cGhl = (c.ghlCourseId || '').replace(/^course-/, '').toLowerCase().trim();
+      return cSlug === clean || cSlug === slug.toLowerCase().trim() || cGhl === clean || String(c.id) === clean;
+    }
+  );
+}

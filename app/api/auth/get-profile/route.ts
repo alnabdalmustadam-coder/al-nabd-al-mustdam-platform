@@ -1,30 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/server";
+import { supabase as supabaseAdmin } from "@/lib/supabase";
 
 export async function GET(req: NextRequest) {
-  const email = req.nextUrl.searchParams.get("email");
-  const userId = req.nextUrl.searchParams.get("userId");
-
-  if (!email && !userId) {
-    return NextResponse.json({ message: "email أو userId مطلوب" }, { status: 400 });
-  }
-
   try {
-    let query = supabase.from("profiles").select("*");
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (email) {
-      query = query.eq("email", email.toLowerCase().trim());
-    } else if (userId) {
-      query = query.eq("id", userId);
+    if (!user) {
+      return NextResponse.json({ message: "غير مصرح: يرجى تسجيل الدخول أولاً" }, { status: 401 });
     }
 
-    const { data: profile, error } = await query.maybeSingle();
+    const requestedUserId = req.nextUrl.searchParams.get("userId") || user.id;
 
-    if (error) throw error;
+    // Security Check: If requesting another user's profile, verify that caller is ADMIN
+    if (requestedUserId !== user.id) {
+      const { data: callerProfile } = await supabaseAdmin
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
 
-    return NextResponse.json({ profile: profile || null });
+      const callerRole = (callerProfile?.role || "").toUpperCase();
+      if (callerRole !== "ADMIN") {
+        return NextResponse.json({ message: "غير مصرح بالوصول إلى بيانات هذا المستخدم" }, { status: 403 });
+      }
+    }
+
+    const { data: profile, error } = await supabaseAdmin
+      .from("profiles")
+      .select("*")
+      .eq("id", requestedUserId)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json({ success: true, profile: profile || null });
   } catch (err) {
-    console.error("Get profile error:", err);
-    return NextResponse.json({ message: "حدث خطأ" }, { status: 500 });
+    console.error("Secure Get Profile Error:", err);
+    return NextResponse.json({ message: "حدث خطأ أثناء جلب الملف الشخصي" }, { status: 500 });
   }
 }

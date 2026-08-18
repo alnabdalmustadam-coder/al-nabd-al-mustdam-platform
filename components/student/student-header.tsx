@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Home,
@@ -15,6 +15,7 @@ import {
 import { DefaultAvatar } from './default-avatar';
 import Link from 'next/link';
 import { StudentNotifications } from '@/components/student/student-notifications';
+import { createClient } from '@/utils/supabase/client';
 
 interface StudentHeaderProps {
   isSidebarCollapsed?: boolean;
@@ -29,6 +30,40 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
 }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState<{
+    fullName: string;
+    avatarUrl: string | null;
+  }>({
+    fullName: '',
+    avatarUrl: null,
+  });
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
+          const metaAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
+
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          setUserProfile({
+            fullName: profile?.full_name || metaName || '',
+            avatarUrl: profile?.avatar_url || metaAvatar || null,
+          });
+        }
+      } catch (e) {
+        console.error('Error loading header user:', e);
+      }
+    }
+    loadUser();
+  }, []);
 
   return (
     <header className="sticky top-0 z-[30] w-full font-[family-name:var(--font-cairo)] m-0 p-0">
@@ -123,7 +158,11 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
               className="w-9 h-9 rounded-full text-slate-700 hover:text-[#173A7C] transition-all cursor-pointer flex items-center justify-center border border-slate-200/60 p-0.5 overflow-hidden"
               title="الملف الشخصي والحساب"
             >
-              <DefaultAvatar size="sm" />
+              <DefaultAvatar
+                src={userProfile.avatarUrl}
+                name={userProfile.fullName}
+                size="sm"
+              />
             </button>
 
             {/* Profile Dropdown Menu */}

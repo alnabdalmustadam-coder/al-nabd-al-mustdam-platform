@@ -34,30 +34,30 @@ export default function AdminSurveysPage() {
     {
       id: 'rev-1',
       studentName: 'عبدالله الشمري',
-      courseTitle: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      instructorName: 'د. خالد الدوسري',
+      courseTitle: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
+      instructorName: 'د. محمد القحطاني',
       rating: 5,
-      comment: 'دورة ممتازة جداً! المحتوى العلمي ثري، والتطبيقات العملية في الحوار والمواطنة الصالحة كانت على أعلى مستوى من الاحترافية.',
+      comment: 'دورة ممتازة جداً! المحتوى العلمي ثري، وتطبيقات Microsoft Office والإنتاجية كانت على أعلى مستوى من الاحترافية.',
       date: 'اليوم، 11:20 ص',
       status: 'approved',
     },
     {
       id: 'rev-2',
       studentName: 'سارة العتيبي',
-      courseTitle: 'برنامج القيادة المستدامة والمسؤولية المجتمعية',
-      instructorName: 'د. محمد القحطاني',
+      courseTitle: 'دورات ادخال بيانات ومعالجة نصوص',
+      instructorName: 'أ. د. سارة العتيبي',
       rating: 5,
-      comment: 'من أفضل البرامج التدريبية التي حضرتها. أسلوب د. محمد متميز والتفاعل في الورش المباشرة ممتاز والتطبيقات واقعية.',
+      comment: 'من أفضل البرامج التدريبية التي حضرتها. أسلوب الشرح متميز وسرعة الكتابة والتنسيق تطورت بشكل مذهل.',
       date: 'أمس، 05:45 م',
       status: 'approved',
     },
     {
       id: 'rev-3',
       studentName: 'م. خالد الدوسري',
-      courseTitle: 'الشهادة الاحترافية في إدارة الاستدامة البيئية',
-      instructorName: 'أ. د. سارة العتيبي',
+      courseTitle: 'دورة الذكاء الاصطناعي',
+      instructorName: 'د. خالد الدوسري',
       rating: 4,
-      comment: 'المحتوى مفيد وقيم جداً، ونقترح زيادة التطبيقات العملية في وحدة التقييم الذاتي للسلامة البيئية.',
+      comment: 'المحتوى مفيد وقيم جداً في هندسة الأوامر ونماذج الذكاء الاصطناعي الحديثة.',
       date: '28 يوليو 2026',
       status: 'approved',
     },
@@ -89,8 +89,8 @@ export default function AdminSurveysPage() {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-3 sm:space-y-3.5">
             <div className="flex flex-col items-start">
-              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-900 text-[10px] sm:text-xs font-black border border-amber-500/20 shrink-0 whitespace-nowrap mb-3 sm:mb-4">
-                <Star className="w-3.5 h-3.5 text-amber-600 fill-amber-500 shrink-0" />
+              <div className="admin-hero-tag bg-amber-500/10 text-amber-900 border border-amber-500/20">
+                <Star className="w-4 h-4 text-amber-600 fill-amber-500 shrink-0" />
                 <span>تقييمات المتدربين واستبيانات الجودة الأكاديمية</span>
               </div>
               <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">

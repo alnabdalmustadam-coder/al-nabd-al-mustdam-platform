@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import CourseCard from "@/components/ui/CourseCard";
 import { courses, courseCategories } from "@/data/courses";
@@ -21,6 +21,7 @@ const sortOptions = [
 ];
 
 export default function CoursesPage() {
+  const [courseList, setCourseList] = useState(courses);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [level, setLevel] = useState("all");
@@ -28,7 +29,18 @@ export default function CoursesPage() {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  let filtered = courses.filter((c) => {
+  useEffect(() => {
+    fetch('/api/courses')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+          setCourseList(data.courses);
+        }
+      })
+      .catch((err) => console.error('Error fetching live courses:', err));
+  }, []);
+
+  let filtered = courseList.filter((c) => {
     const matchSearch = !search || c.title.includes(search) || c.description.includes(search);
     const matchCat = category === "all" || c.category === category;
     const matchLevel = level === "all" || c.level === level;

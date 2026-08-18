@@ -100,21 +100,21 @@ export default function StudentLivePage() {
   const pastRecordings = [
     {
       id: 'rec-1',
-      title: 'المحاضرة المباشرة الأولى: مدخل في استراتيجيات القيادة المستدامة',
-      courseName: 'برنامج القيادة المستدامة والمسؤولية المجتمعية',
-      instructor: 'أ. د. سارة العتيبي',
+      title: 'المحاضرة المباشرة الأولى: مدخل في استخدام الحاسب الآلي',
+      courseName: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
+      instructor: 'د. محمد القحطاني',
       date: '20 يوليو 2026',
       duration: 'ساعة و 20 دقيقة',
-      recordingUrl: '/dashboard/student/courses/sustainable-leadership/lessons/lesson-1',
+      recordingUrl: '/dashboard/student/courses/computer-basics-office/lessons/lesson-1',
     },
     {
       id: 'rec-2',
-      title: 'ورشة التحليل البيئي والتقييم الذاتي للمؤسسات',
-      courseName: 'شهادة التميز المؤسسي والجودة الحوكمية',
+      title: 'ورشة الذكاء الاصطناعي وتطبيقاته في الأعمال',
+      courseName: 'دورة الذكاء الاصطناعي',
       instructor: 'د. خالد الدوسري',
       date: '15 يوليو 2026',
       duration: 'ساعة و 45 دقيقة',
-      recordingUrl: '/dashboard/student/courses/institutional-excellence/lessons/lesson-1',
+      recordingUrl: '/dashboard/student/courses/ai-course/lessons/lesson-1',
     },
   ];
 
@@ -297,63 +297,72 @@ export default function StudentLivePage() {
           animate="visible"
           className="space-y-4 pt-2"
         >
-          <motion.h2 variants={textFadeVariants} className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-emerald-400 !text-sm sm:!text-base">
-            <Calendar className="w-4 h-4 text-emerald-400" />
+          <motion.h2 variants={textFadeVariants} className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C] !text-sm sm:!text-base">
+            <div className="p-1.5 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
+              <Calendar className="w-4 h-4" />
+            </div>
             <span>جدول الجلسات والندوات القادمة</span>
           </motion.h2>
 
-          <div className="grid grid-cols-1 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-stretch">
             {upcomingSessions.map((session) => (
               <motion.div
                 key={session.id}
                 variants={textFadeVariants}
-                whileHover={{ y: -2 }}
-                className="relative overflow-hidden rounded-2xl sm:rounded-[24px] p-6 sm:p-7 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all duration-300 liquid-glass-card liquid-glass-hover student-card-accent"
+                whileHover={{ y: -3 }}
+                className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col justify-between gap-4 transition-all duration-300 liquid-glass-card liquid-glass-hover student-card-accent hover:shadow-xl bg-white/90"
               >
-                <div className="space-y-3 flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2.5 text-xs">
+                <div className="space-y-3">
+                  {/* Top Badges */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     {session.isLiveNow ? (
-                      <span className="px-4 py-1.5 rounded-full bg-red-600 text-white font-black flex items-center gap-1.5 animate-pulse shadow-md shadow-red-500/20 text-xs">
+                      <span className="px-3.5 py-1 rounded-full bg-red-600 text-white font-black flex items-center gap-1.5 animate-pulse shadow-md shadow-red-500/25 text-xs">
                         <Radio className="w-3.5 h-3.5" />
-                        مباشر الآن Live
+                        <span>مباشر الآن Live</span>
                       </span>
                     ) : (
-                      <span className="px-4 py-1.5 rounded-full bg-blue-50 text-[#173A7C] font-black border border-blue-200/80 shadow-2xs text-xs">
+                      <span className="px-3.5 py-1 rounded-full bg-blue-50 text-[#173A7C] font-black border border-blue-200/80 shadow-2xs text-xs">
                         مجدولة قريباً
                       </span>
                     )}
-                    <span className="text-slate-600 font-extrabold text-xs">{session.courseName}</span>
+
+                    <span className="text-slate-500 font-extrabold text-[11px] bg-slate-100/80 px-2.5 py-0.5 rounded-lg border border-slate-200/60 truncate max-w-[200px]">
+                      {session.courseName}
+                    </span>
                   </div>
 
-                  <h3 className="student-heading-h3 !text-xs sm:!text-base pt-0.5">
+                  {/* Title */}
+                  <h3 className="student-heading-h3 !text-sm sm:!text-base leading-snug font-black text-slate-900 line-clamp-2">
                     {session.title}
                   </h3>
 
-                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-bold text-slate-700 pt-0.5">
-                    <div className="flex items-center gap-1.5 bg-slate-100/90 px-3.5 py-1.5 rounded-xl border border-slate-200/80 text-xs">
+                  {/* Chips: Instructor, Date, Time */}
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-slate-700 pt-1">
+                    <div className="flex items-center gap-1.5 bg-slate-100/90 px-3 py-1.5 rounded-xl border border-slate-200/80 text-xs">
                       <User className="w-3.5 h-3.5 text-[#173A7C]" />
                       <span>{session.instructor}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-emerald-50/90 px-3.5 py-1.5 rounded-xl border border-emerald-200/80 text-emerald-800 text-xs">
+                    <div className="flex items-center gap-1.5 bg-emerald-50/90 px-3 py-1.5 rounded-xl border border-emerald-200/80 text-emerald-800 text-xs">
                       <Calendar className="w-3.5 h-3.5 text-[#5CB07C]" />
                       <span>{session.date}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-amber-50/90 px-3.5 py-1.5 rounded-xl border border-amber-200/80 text-amber-800 text-xs">
+                    <div className="flex items-center gap-1.5 bg-amber-50/90 px-3 py-1.5 rounded-xl border border-amber-200/80 text-amber-800 text-xs">
                       <Clock className="w-3.5 h-3.5 text-amber-600" />
                       <span>{session.time}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="shrink-0 flex flex-col items-stretch sm:items-end gap-2 w-full sm:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-slate-200/60">
-                  <span className="text-[11px] font-extrabold text-slate-500 text-center sm:text-left">
+                {/* Footer Platform & CTA Button */}
+                <div className="pt-3 border-t border-slate-200/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                  <span className="text-[11px] font-extrabold text-slate-500">
                     المنصة: <strong className="text-[#173A7C]">{session.platform}</strong>
                   </span>
                   <a
                     href={session.joinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`px-5 py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-95 ${session.isLiveNow
+                    className={`px-5 py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-95 cursor-pointer ${session.isLiveNow
                         ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white shadow-red-500/25 animate-pulse'
                         : 'bg-[#173A7C] hover:bg-[#1E4D9D] text-white shadow-[#173A7C]/20'
                       }`}
@@ -372,40 +381,50 @@ export default function StudentLivePage() {
           variants={staggerContainerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-3.5"
+          className="space-y-4"
         >
-          {pastRecordings.map((rec) => (
-            <motion.div
-              key={rec.id}
-              variants={textFadeVariants}
-              whileHover={{ y: -2 }}
-              className="relative overflow-hidden rounded-2xl sm:rounded-[24px] p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-300 liquid-glass-card liquid-glass-hover student-card-accent"
-            >
-              <div className="space-y-2 flex-1 min-w-0">
-                <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#0D5C3A] mb-0.5" style={{ textShadow: '0 1px 0px rgba(255,255,255,0.6)' }}>
-                  <Video className="w-3.5 h-3.5 text-[#0D5C3A]" />
-                  <span>تسجيل مسجل HD</span>
-                </span>
-                <h3 className="student-heading-h3 !text-xs sm:!text-sm">
-                  {rec.title}
-                </h3>
-                <div className="flex flex-wrap items-center gap-3 text-[11px] font-bold text-slate-600 pt-0.5">
-                  <span>المساق: {rec.courseName}</span>
-                  <span>المحاضر: {rec.instructor}</span>
-                  <span>تاريخ البث: {rec.date}</span>
-                  <span>المدة: {rec.duration}</span>
-                </div>
-              </div>
-
-              <Link
-                href={rec.recordingUrl}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer shadow-md shadow-[#173A7C]/20 active:scale-95"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-stretch">
+            {pastRecordings.map((rec) => (
+              <motion.div
+                key={rec.id}
+                variants={textFadeVariants}
+                whileHover={{ y: -3 }}
+                className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col justify-between gap-4 transition-all duration-300 liquid-glass-card liquid-glass-hover student-card-accent hover:shadow-xl bg-white/90"
               >
-                <PlayCircle className="w-3.5 h-3.5 text-emerald-400" />
-                <span>مشاهدة التسجيل</span>
-              </Link>
-            </motion.div>
-          ))}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      <Video className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>تسجيل مسجل HD</span>
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-bold bg-slate-100 px-2.5 py-0.5 rounded-lg">
+                      {rec.duration}
+                    </span>
+                  </div>
+
+                  <h3 className="student-heading-h3 !text-sm sm:!text-base font-black text-slate-900 leading-snug line-clamp-2">
+                    {rec.title}
+                  </h3>
+
+                  <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold text-slate-600 pt-1">
+                    <span className="bg-slate-100/90 px-2.5 py-1 rounded-lg border border-slate-200">المساق: {rec.courseName}</span>
+                    <span className="bg-slate-100/90 px-2.5 py-1 rounded-lg border border-slate-200">المحاضر: {rec.instructor}</span>
+                    <span className="bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 text-emerald-800">التاريخ: {rec.date}</span>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-200/60 flex justify-end">
+                  <Link
+                    href={rec.recordingUrl}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-[#173A7C]/20 active:scale-95"
+                  >
+                    <PlayCircle className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>مشاهدة التسجيل</span>
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       )}
     </div>

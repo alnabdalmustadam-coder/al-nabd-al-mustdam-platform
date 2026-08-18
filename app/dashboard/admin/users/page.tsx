@@ -161,8 +161,8 @@ export default function AdminUsersPage() {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-3 sm:space-y-3.5">
             <div className="flex flex-col items-start">
-              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#173A7C]/10 text-[#173A7C] text-[10px] sm:text-xs font-black border border-[#173A7C]/15 shrink-0 whitespace-nowrap mb-3 sm:mb-4">
-                <Users className="w-3.5 h-3.5 text-[#173A7C] shrink-0" />
+              <div className="admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15">
+                <Users className="w-4 h-4 text-[#173A7C] shrink-0" />
                 <span>إدارة المتدربين وسجلات الحضور</span>
               </div>
               <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">

@@ -145,7 +145,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-3xl font-black text-slate-900 mb-6 group-hover:text-[#5CB07C] transition-colors">رؤيتنا</h3>
               <p className="text-slate-500 leading-relaxed font-medium text-lg">
-                أن نصبح احد افضل شركات التدريب بالمملكة بجودة ومصداقية حتى نصل إلى أعلى مستويات التدريب وفقاً لرؤية ٢٠٣٠ .
+                أن نصبح احد افضل شركات التدريب بالمملكة بجودة ومصداقية حتى نصل إلى أعلى مستويات التدريب وفقاً لرؤية 2030 .
               </p>
             </div>
           </motion.div>

@@ -24,8 +24,29 @@ export async function POST(req: NextRequest) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const cleanSlug = courseId.replace(/^course-/, "").trim();
 
-    // 1. Fetch profile to get name and national ID
+    // 1. Check if user is already enrolled in this course to prevent duplicates & protect progress
+    const { data: existingEnroll } = await supabase
+      .from("enrollments")
+      .select("id, progress, status")
+      .eq("email", normalizedEmail)
+      .or(`course_id.eq.${courseId},course_id.eq.course-${cleanSlug},course_id.eq.${cleanSlug},course_title.eq.${courseTitle}`)
+      .maybeSingle();
+
+    if (existingEnroll) {
+      return NextResponse.json(
+        { 
+          success: true, 
+          alreadyEnrolled: true, 
+          message: "أنت مسجل بالفعل في هذه الدورة مسبقاً",
+          progress: existingEnroll.progress,
+        },
+        { headers: CORS }
+      );
+    }
+
+    // 2. Fetch profile to get name and national ID
     const { data: profile } = await supabase
       .from("profiles")
       .select("full_name, national_id")
@@ -35,24 +56,21 @@ export async function POST(req: NextRequest) {
     const name = profile?.full_name || normalizedEmail.split("@")[0];
     const nationalId = profile?.national_id || "";
 
-    // 2. Upsert enrollment in Supabase
+    // 3. Insert new enrollment in Supabase
     const { error: enrollError } = await supabase
       .from("enrollments")
-      .upsert(
-        {
-          email: normalizedEmail,
-          course_id: courseId,
-          course_title: courseTitle,
-          course_url: courseUrl || "https://members.nabdtraining.com",
-          progress: 0,
-          status: "active",
-          enrolled_at: new Date().toISOString(),
-        },
-        { onConflict: "email,course_id" }
-      );
+      .insert({
+        email: normalizedEmail,
+        course_id: courseId,
+        course_title: courseTitle,
+        course_url: courseUrl || `/courses/${courseId}`,
+        progress: 0,
+        status: "active",
+        enrolled_at: new Date().toISOString(),
+      });
 
     if (enrollError) {
-      console.error("Enrollment upsert error:", enrollError);
+      console.error("Enrollment insert error:", enrollError);
       return NextResponse.json(
         { success: false, message: "فشل حفظ التسجيل في قاعدة البيانات", error: enrollError.message },
         { status: 500, headers: CORS }

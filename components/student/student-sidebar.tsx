@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -18,9 +18,12 @@ import {
   Library,
   BookmarkCheck,
   ShieldCheck,
+  Heart,
   X,
 } from 'lucide-react';
 import { DefaultAvatar } from './default-avatar';
+import { useWishlist } from '@/context/WishlistContext';
+import { createClient } from '@/utils/supabase/client';
 
 interface StudentSidebarProps {
   isCollapsed?: boolean;
@@ -35,15 +38,99 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
   onCloseMobile,
 }) => {
   const pathname = usePathname();
+  const { wishlistCount } = useWishlist();
+
+  const [userProfile, setUserProfile] = useState<{
+    fullName: string;
+    avatarUrl: string | null;
+    role: string;
+    enrolledCount: number;
+    completedCount: number;
+  }>({
+    fullName: 'متدرب معتمد',
+    avatarUrl: null,
+    role: 'متدرب معتمد بالمنصة',
+    enrolledCount: 0,
+    completedCount: 0,
+  });
+
+  useEffect(() => {
+    async function loadUserProfile() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
+          const metaAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
+          const userEmail = user.email ? user.email.toLowerCase().trim() : '';
+
+          // Query profiles table
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url, role')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          // Query enrollments to get dynamic course counts
+          let enrolledCount = 0;
+          let completedCount = 0;
+          if (userEmail) {
+            const { data: enrollments } = await supabase
+              .from('enrollments')
+              .select('course_id, progress')
+              .eq('email', userEmail);
+
+            if (enrollments) {
+              const uniqueSlugs = new Set(enrollments.map(e => (e.course_id || '').replace(/^course-/, '')));
+              enrolledCount = uniqueSlugs.size;
+              completedCount = enrollments.filter(e => Number(e.progress) >= 100).length;
+            }
+          }
+
+          const name = profile?.full_name || metaName || userEmail.split('@')[0] || 'متدرب معتمد';
+          const avatar = profile?.avatar_url || metaAvatar || null;
+
+          setUserProfile({
+            fullName: name,
+            avatarUrl: avatar,
+            role: profile?.role === 'ADMIN' ? 'مدير المنصة' : profile?.role === 'INSTRUCTOR' ? 'مدرب معتمد' : 'متدرب معتمد بالمنصة',
+            enrolledCount,
+            completedCount,
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching sidebar profile:', err);
+      }
+    }
+
+    loadUserProfile();
+
+    const handleStorage = () => {
+      loadUserProfile();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorage);
+      window.addEventListener('nabd_progress_updated', handleStorage);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleStorage);
+        window.removeEventListener('nabd_progress_updated', handleStorage);
+      }
+    };
+  }, []);
 
   const navItems = [
     { label: 'الرئيسية والمؤشرات', href: '/dashboard/student', icon: LayoutDashboard },
-    { label: 'دوراتي التدريبية', href: '/dashboard/student/courses', icon: BookOpen, count: '3' },
+    { label: 'دوراتي التدريبية', href: '/dashboard/student/courses', icon: BookOpen, count: userProfile.enrolledCount > 0 ? String(userProfile.enrolledCount) : undefined },
+    { label: 'الدورات المفضلة', href: '/dashboard/student/wishlist', icon: Heart, count: wishlistCount > 0 ? String(wishlistCount) : undefined },
     { label: 'الاختبارات والتقييمات', href: '/dashboard/student/quizzes', icon: Award },
     { label: 'الواجبات والمهام', href: '/dashboard/student/assignments', icon: ClipboardList },
     { label: 'اللقاءات المباشرة', href: '/dashboard/student/live', icon: Radio, count: 'بث 🔴' },
-    { label: 'شهاداتي المعتمدة', href: '/dashboard/student/certificates', icon: Crown, count: '2', highlight: true },
-    { label: 'المسارات والكتب', href: '/dashboard/student/pathways', icon: Library },
+    { label: 'شهاداتي المعتمدة', href: '/dashboard/student/certificates', icon: Crown, count: userProfile.completedCount > 0 ? String(userProfile.completedCount) : undefined, highlight: true },
+    { label: 'الدورات والكتب', href: '/dashboard/student/pathways', icon: Library },
     { label: 'المشاريع والتطبيقات', href: '/dashboard/student/projects', icon: FolderGit2 },
     { label: 'الملاحظات والمحفوظات', href: '/dashboard/student/bookmarks', icon: BookmarkCheck },
     { label: 'السجل المالي والفواتير', href: '/dashboard/student/billing', icon: CreditCard },
@@ -54,17 +141,15 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
   return (
     <>
       {/* ========================================================================= */}
-      {/* 1. DESKTOP SIDEBAR — Same Glass Background as Cards (rgba(255,255,255,0.85)), NO TOP BORDER */}
+      {/* 1. DESKTOP SIDEBAR */}
       {/* ========================================================================= */}
       <aside
-        className={`hidden lg:block shrink-0 fixed top-0 right-0 bottom-0 h-screen z-40 font-[family-name:var(--font-cairo)] transition-all duration-300 ${
-          isCollapsed ? 'w-20' : 'w-72'
-        }`}
+        className={`hidden lg:block shrink-0 fixed top-0 right-0 bottom-0 h-screen z-40 font-[family-name:var(--font-cairo)] transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-72'
+          }`}
       >
         <div
-          className={`relative overflow-hidden rounded-none border-l h-full flex flex-col justify-between transition-all duration-300 ${
-            isCollapsed ? 'p-2 pt-1' : 'px-3.5 py-2.5'
-          }`}
+          className={`relative overflow-hidden rounded-none border-l h-full flex flex-col justify-between transition-all duration-300 ${isCollapsed ? 'p-2 pt-1' : 'px-3.5 py-2.5'
+            }`}
           style={{
             background: 'rgba(255, 255, 255, 0.85)',
             backdropFilter: 'blur(28px) saturate(1.8)',
@@ -73,28 +158,31 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
             borderLeft: '1px solid rgba(255, 255, 255, 0.60)',
           }}
         >
-          {/* DELETED TOP GRADIENT ACCENT RIBBON BORDER AS REQUESTED */}
-
           <div className="space-y-3 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 
             {/* Student Profile Identity Card */}
             <div
-              className={`rounded-xl border border-slate-200/80 transition-all duration-300 relative group overflow-hidden ${
-                isCollapsed ? 'p-2 flex items-center justify-center' : 'p-3.5'
-              }`}
+              className={`rounded-xl border border-slate-200/80 transition-all duration-300 relative group overflow-hidden ${isCollapsed ? 'p-2 flex items-center justify-center' : 'p-3.5'
+                }`}
               style={{
                 background: 'rgba(241, 245, 249, 0.8)',
               }}
             >
               <div className="flex items-center gap-3">
-                <DefaultAvatar size="md" />
+                <DefaultAvatar
+                  src={userProfile.avatarUrl}
+                  name={userProfile.fullName}
+                  size="md"
+                />
                 {!isCollapsed && (
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <h3 className="font-extrabold text-xs text-slate-900 truncate">عبدالله الشمري</h3>
+                      <h3 className="font-extrabold text-xs text-slate-900 truncate" title={userProfile.fullName}>
+                        {userProfile.fullName}
+                      </h3>
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     </div>
-                    <p className="text-[10px] text-emerald-700 font-bold truncate">متدرب معتمد بالمنصة</p>
+                    <p className="text-[10px] text-emerald-700 font-bold truncate">{userProfile.role}</p>
                   </div>
                 )}
               </div>
@@ -141,23 +229,19 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                     <Link
                       href={item.href}
                       title={isCollapsed ? item.label : undefined}
-                      className={`relative flex items-center rounded-xl font-bold text-xs transition-all duration-200 group cursor-pointer ${
-                        isCollapsed ? 'p-2.5 justify-center' : 'p-3 justify-between'
-                      } ${
-                        isActive
+                      className={`relative flex items-center rounded-xl font-bold text-xs transition-all duration-200 group cursor-pointer ${isCollapsed ? 'p-2.5 justify-center' : 'p-3 justify-between'
+                        } ${isActive
                           ? 'text-white bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] border border-blue-400/40 shadow-lg shadow-[#173A7C]/30'
                           : 'text-slate-800 hover:text-[#173A7C] hover:bg-slate-100/90 border border-slate-200/60'
-                      }`}
+                        }`}
                     >
                       <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
                         <div
-                          className={`rounded-lg transition-all shrink-0 flex items-center justify-center relative ${
-                            isCollapsed ? 'w-8 h-8 p-0' : 'p-2'
-                          } ${
-                            isActive
+                          className={`rounded-lg transition-all shrink-0 flex items-center justify-center relative ${isCollapsed ? 'w-8 h-8 p-0' : 'p-2'
+                            } ${isActive
                               ? 'bg-white/20 text-white'
                               : 'bg-[#173A7C]/10 text-[#173A7C] group-hover:bg-[#173A7C] group-hover:text-white'
-                          }`}
+                            }`}
                         >
                           <Icon className="w-4 h-4" />
                           {isCollapsed && item.count && (
@@ -175,11 +259,10 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                         <div className="flex items-center gap-1.5 shrink-0">
                           {item.count && (
                             <span
-                              className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${
-                                isActive
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${isActive
                                   ? 'bg-white/20 text-white border border-white/30'
                                   : 'text-emerald-800 bg-emerald-100 border border-emerald-300'
-                              }`}
+                                }`}
                             >
                               {item.count}
                             </span>
@@ -268,13 +351,19 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                   background: 'rgba(241, 245, 249, 0.85)',
                 }}
               >
-                <DefaultAvatar size="sm" />
+                <DefaultAvatar
+                  src={userProfile.avatarUrl}
+                  name={userProfile.fullName}
+                  size="sm"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <h3 className="font-extrabold text-xs text-slate-900 truncate">عبدالله الشمري</h3>
+                    <h3 className="font-extrabold text-xs text-slate-900 truncate" title={userProfile.fullName}>
+                      {userProfile.fullName}
+                    </h3>
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   </div>
-                  <p className="text-[10px] text-emerald-700 font-bold truncate">متدرب معتمد بالمنصة</p>
+                  <p className="text-[10px] text-emerald-700 font-bold truncate">{userProfile.role}</p>
                 </div>
               </div>
 
@@ -289,19 +378,17 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                       key={item.href}
                       href={item.href}
                       onClick={onCloseMobile}
-                      className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all ${
-                        isActive
+                      className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all ${isActive
                           ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-blue-400/40'
                           : 'text-slate-800 hover:text-[#173A7C] hover:bg-slate-100/90 border border-slate-200/60'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2.5">
                         <div
-                          className={`p-1.5 rounded-lg shrink-0 flex items-center justify-center ${
-                            isActive
+                          className={`p-1.5 rounded-lg shrink-0 flex items-center justify-center ${isActive
                               ? 'bg-white/20 text-white'
                               : 'bg-[#173A7C]/10 text-[#173A7C]'
-                          }`}
+                            }`}
                         >
                           <Icon className="w-4 h-4" />
                         </div>
@@ -309,11 +396,10 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                       </div>
                       {item.count && (
                         <span
-                          className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${
-                            isActive
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${isActive
                               ? 'bg-white/20 text-white'
                               : 'bg-emerald-100 text-emerald-800'
-                          }`}
+                            }`}
                         >
                           {item.count}
                         </span>

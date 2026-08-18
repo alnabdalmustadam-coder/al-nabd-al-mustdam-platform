@@ -1,16 +1,24 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-function safeEncode(val: string): string {
+function toSafeByteString(val: string): string {
   if (typeof val !== 'string') return ''
-  try {
-    if (/[\u0080-\uFFFF]/.test(val)) {
-      return encodeURIComponent(val);
-    }
-    return val;
-  } catch {
-    return val || '';
+  if (/[^\x00-\x7F]/.test(val)) {
+    return encodeURIComponent(val)
   }
+  return val
+}
+
+function fromSafeByteString(val: string): string {
+  if (typeof val !== 'string') return ''
+  if (val.includes('%')) {
+    try {
+      return decodeURIComponent(val)
+    } catch {
+      return val
+    }
+  }
+  return val
 }
 
 export async function updateSession(request: NextRequest) {
@@ -33,11 +41,10 @@ export async function updateSession(request: NextRequest) {
         cookies: {
           getAll() {
             try {
-              const all = request.cookies.getAll();
-              return all.map(c => ({
-                name: safeEncode(c.name),
-                value: safeEncode(c.value)
-              }));
+              return request.cookies.getAll().map(c => ({
+                name: c.name,
+                value: fromSafeByteString(c.value),
+              }))
             } catch {
               return []
             }
@@ -45,16 +52,16 @@ export async function updateSession(request: NextRequest) {
           setAll(cookiesToSet) {
             try {
               cookiesToSet.forEach(({ name, value }) => {
-                request.cookies.set(safeEncode(name), safeEncode(value))
+                request.cookies.set(name, toSafeByteString(value))
               })
               supabaseResponse = NextResponse.next({
                 request,
               })
               cookiesToSet.forEach(({ name, value, options }) => {
-                supabaseResponse.cookies.set(safeEncode(name), safeEncode(value), options)
+                supabaseResponse.cookies.set(name, toSafeByteString(value), options)
               })
             } catch {
-              // Ignore component render cookie errors
+              // Ignore cookie set errors
             }
           },
         },
@@ -71,26 +78,62 @@ export async function updateSession(request: NextRequest) {
 
     const { pathname } = request.nextUrl
 
-    // Legacy /login path redirect to /auth/login
+    // 1. Legacy /login path redirect to /auth/login
     if (pathname === '/login') {
       const url = request.nextUrl.clone()
       url.pathname = '/auth/login'
       return NextResponse.redirect(url)
     }
 
-    // Protected Dashboard Routes Logic
-    if (pathname.startsWith('/dashboard')) {
+    // 2. Protect Admin Dashboard Routes (/dashboard/admin/*)
+    if (pathname.startsWith('/dashboard/admin')) {
       if (!user) {
         const url = request.nextUrl.clone()
         url.pathname = '/auth/login'
+        url.searchParams.set('redirect', pathname)
+        return NextResponse.redirect(url)
+      }
+
+      // Check User Role from metadata or fallback
+      const userRole = (user.user_metadata?.role || 'STUDENT').toUpperCase();
+
+      // If user is a student, deny access to admin dashboard and redirect to student dashboard
+      if (userRole === 'STUDENT' || userRole === 'TRAINEE') {
+        const url = request.nextUrl.clone()
+        url.pathname = '/dashboard/student'
         return NextResponse.redirect(url)
       }
     }
 
-    if (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register')) {
-      if (user) {
+    // 3. Protect Student Dashboard Routes (/dashboard/student/*)
+    if (pathname.startsWith('/dashboard/student')) {
+      if (!user) {
         const url = request.nextUrl.clone()
-        url.pathname = '/dashboard/student'
+        url.pathname = '/auth/login'
+        url.searchParams.set('redirect', pathname)
+        return NextResponse.redirect(url)
+      }
+    }
+
+    // 4. Auto Redirect Authenticated Users Away from Auth Pages (/auth/login, /auth/register)
+    if (pathname === '/auth/login' || pathname === '/auth/register') {
+      if (user) {
+        const redirectParam = request.nextUrl.searchParams.get('redirect');
+        if (redirectParam && redirectParam.startsWith('/')) {
+          const url = request.nextUrl.clone()
+          url.pathname = redirectParam
+          url.search = ''
+          return NextResponse.redirect(url)
+        }
+
+        const userRole = (user.user_metadata?.role || 'STUDENT').toUpperCase();
+
+        const url = request.nextUrl.clone()
+        if (userRole === 'ADMIN' || userRole === 'INSTRUCTOR' || userRole === 'TRAINER') {
+          url.pathname = '/dashboard/admin'
+        } else {
+          url.pathname = '/dashboard/student'
+        }
         return NextResponse.redirect(url)
       }
     }
@@ -101,4 +144,3 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.next({ request })
   }
 }
-

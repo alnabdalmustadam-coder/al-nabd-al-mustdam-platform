@@ -43,8 +43,8 @@ export default function StudentBillingPage() {
     {
       id: 'INV-2026-881',
       date: '15 يوليو 2026',
-      courseName: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      amount: '1,450 ر.س',
+      courseName: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
+      amount: '900 ر.س',
       paymentMethod: 'مدى (Mada) / Visa',
       status: 'paid',
       statusLabel: 'مدفوع ومكتمل',
@@ -52,8 +52,8 @@ export default function StudentBillingPage() {
     {
       id: 'INV-2026-412',
       date: '02 يونيو 2026',
-      courseName: 'برنامج القيادة المستدامة والمسؤولية المجتمعية',
-      amount: '2,100 ر.س',
+      courseName: 'دورات ادخال بيانات ومعالجة نصوص',
+      amount: '1,300 ر.س',
       paymentMethod: 'Apple Pay',
       status: 'paid',
       statusLabel: 'مدفوع ومكتمل',
@@ -61,8 +61,8 @@ export default function StudentBillingPage() {
     {
       id: 'INV-2026-109',
       date: '10 يناير 2026',
-      courseName: 'شهادة التميز المؤسسي والجودة الحوكمية',
-      amount: '1,800 ر.س',
+      courseName: 'دورة صيانة الجوالات',
+      amount: '750 ر.س',
       paymentMethod: 'تحويل بنكي مباشر',
       status: 'paid',
       statusLabel: 'مدفوع ومكتمل',
@@ -145,8 +145,10 @@ export default function StudentBillingPage() {
           custom={2}
           className="flex items-center justify-between pr-1"
         >
-          <h2 className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-emerald-400">
-            <Receipt className="w-5 h-5 text-emerald-400" />
+          <h2 className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]">
+            <div className="p-1.5 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
+              <Receipt className="w-4 h-4" />
+            </div>
             <span>الفواتير الضريبية المعتمدة</span>
           </h2>
         </motion.div>

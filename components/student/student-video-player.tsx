@@ -10,7 +10,8 @@ import {
   SkipForward,
   List,
   BookmarkPlus,
-  Circle
+  Circle,
+  ShieldAlert
 } from 'lucide-react';
 
 interface StudentVideoPlayerProps {
@@ -26,19 +27,65 @@ interface StudentVideoPlayerProps {
   onToggleComplete?: () => void;
 }
 
+const extractBunnyGuid = (str: string): string | null => {
+  if (!str) return null;
+  const match = str.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+  return match ? match[0] : null;
+};
+
+const isYouTubeId = (str: string): boolean => {
+  return /^[a-zA-Z0-9_-]{11}$/.test(str.trim());
+};
+
 const parseEmbedUrl = (url: string): string => {
   if (!url) return '';
-  let vId = '';
-  if (url.includes('youtube.com/watch?v=')) {
-    vId = url.split('v=')[1]?.split('&')[0] || '';
-  } else if (url.includes('youtu.be/')) {
-    vId = url.split('youtu.be/')[1]?.split('?')[0] || '';
+  const trimmed = url.trim();
+
+  // 1. Raw YouTube 11-character video ID (e.g., MmHWTPJMzbQ)
+  if (isYouTubeId(trimmed)) {
+    return `https://www.youtube-nocookie.com/embed/${trimmed}?autoplay=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1`;
   }
 
-  if (vId) {
-    return `https://www.youtube.com/embed/${vId}?autoplay=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1`;
+  // 2. Full YouTube Links (watch, embed, short)
+  if (trimmed.includes('youtube.com/watch?v=') || trimmed.includes('youtu.be/') || trimmed.includes('youtube.com/embed/')) {
+    let vId = '';
+    if (trimmed.includes('youtube.com/watch?v=')) {
+      vId = trimmed.split('v=')[1]?.split('&')[0] || '';
+    } else if (trimmed.includes('youtu.be/')) {
+      vId = trimmed.split('youtu.be/')[1]?.split('?')[0] || '';
+    } else if (trimmed.includes('youtube.com/embed/')) {
+      vId = trimmed.split('youtube.com/embed/')[1]?.split('?')[0] || '';
+    }
+    if (vId && isYouTubeId(vId)) {
+      return `https://www.youtube-nocookie.com/embed/${vId}?autoplay=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1`;
+    }
   }
-  return url;
+
+  // 3. Vimeo Links
+  if (trimmed.includes('vimeo.com/')) {
+    const vimeoMatch = trimmed.match(/vimeo\.com\/(?:video\/)?([0-9]+)/);
+    if (vimeoMatch && vimeoMatch[1]) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?title=0&byline=0&portrait=0`;
+    }
+  }
+
+  // 4. Bunny Player to Embed URL conversion
+  if (trimmed.includes('player.mediadelivery.net/play/')) {
+    return trimmed.replace('player.mediadelivery.net/play/', 'iframe.mediadelivery.net/embed/');
+  }
+
+  // 5. Already Signed Bunny Stream URL
+  if (trimmed.includes('iframe.mediadelivery.net')) {
+    return trimmed;
+  }
+
+  // 6. Any other full HTTPS URL
+  if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
+    return trimmed;
+  }
+
+  // Safety fallback for empty or unrecognized strings: fallback to platform default video
+  return 'https://www.youtube-nocookie.com/embed/1BEWMhAuBd4?autoplay=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1';
 };
 
 export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
@@ -54,10 +101,8 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
   onToggleComplete,
 }) => {
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
-  const [userWatermark, setUserWatermark] = useState<string>('الطالب المعتمد');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentSpeed, setCurrentSpeed] = useState<string>('1.0x');
 
   const watchedSecondsRef = useRef<number>(0);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -66,44 +111,70 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
   useEffect(() => {
     let isMounted = true;
 
-    if (videoUrl) {
-      setIframeUrl(parseEmbedUrl(videoUrl));
-      setUserWatermark('الطالب المعتمد');
-      setLoading(false);
-      return;
-    }
-
-    async function fetchPlaybackToken() {
+    async function loadVideo() {
       setLoading(true);
       setError(null);
 
       try {
-        const res = await fetch('/api/videos/playback-token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lessonId }),
-        });
+        const trimmed = (videoUrl || '').trim();
 
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-          throw new Error(data.error || 'تعذر تشغيل الفيديو، يرجى التأكد من صلاحية اشتراكك.');
+        // 1. YouTube or direct standard URL or raw YouTube video ID
+        if (trimmed && (trimmed.includes('youtube.com') || trimmed.includes('youtu.be') || trimmed.includes('youtube.com/embed') || isYouTubeId(trimmed))) {
+          if (isMounted) {
+            setIframeUrl(parseEmbedUrl(trimmed));
+            setLoading(false);
+          }
+          return;
         }
 
-        if (isMounted) {
-          setIframeUrl(parseEmbedUrl(data.iframeUrl));
-          setUserWatermark(data.userWatermark || 'الطالب المعتمد');
+        // 2. Bunny Stream GUID Extraction (from GUID or URL)
+        const bunnyGuid = extractBunnyGuid(trimmed);
+
+        if (bunnyGuid) {
+          try {
+            const res = await fetch('/api/videos/playback-token', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ lessonId, videoId: bunnyGuid }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.success && data.iframeUrl) {
+              if (isMounted) {
+                setIframeUrl(data.iframeUrl);
+                setLoading(false);
+                return;
+              }
+            }
+          } catch (tokenErr) {
+            console.error('Error fetching signed Bunny playback token:', tokenErr);
+          }
+        }
+
+        // 3. Fallback to parseEmbedUrl
+        if (trimmed) {
+          if (isMounted) {
+            setIframeUrl(parseEmbedUrl(trimmed));
+            setLoading(false);
+          }
+        } else {
+          throw new Error('يرجى اختيار درس يحتوي على محاضرة فيديو.');
         }
       } catch (err: any) {
         if (isMounted) {
-          setError(err.message || 'حدث خطأ أثناء تحميل مشغل الفيديو');
+          if (videoUrl) {
+            setIframeUrl(parseEmbedUrl(videoUrl));
+            setLoading(false);
+          } else {
+            setError(err.message || 'حدث خطأ أثناء تحميل مشغل الفيديو');
+            setLoading(false);
+          }
         }
-      } finally {
-        if (isMounted) setLoading(false);
       }
     }
 
-    fetchPlaybackToken();
+    loadVideo();
 
     return () => {
       isMounted = false;
@@ -111,14 +182,18 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
     };
   }, [lessonId, videoUrl]);
 
+  // Real-time tracking of watched progress in exact seconds
   useEffect(() => {
     if (!iframeUrl) return;
 
     watchedSecondsRef.current = 0;
     progressTimerRef.current = setInterval(() => {
-      watchedSecondsRef.current += 10;
-      saveProgress(watchedSecondsRef.current, false);
-    }, 10000);
+      watchedSecondsRef.current += 1;
+      // Periodically sync progress with server every 10 seconds
+      if (watchedSecondsRef.current % 10 === 0) {
+        saveProgress(watchedSecondsRef.current, false);
+      }
+    }, 1000);
 
     return () => {
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
@@ -127,24 +202,24 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
 
   const saveProgress = async (watchedSec: number, completedStatus: boolean) => {
     try {
-      await fetch('/api/lessons/progress', {
+      await fetch('/api/courses/complete-lesson', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           lessonId,
           watchedSeconds: watchedSec,
-          lastPositionSeconds: watchedSec,
           isCompleted: completedStatus,
         }),
       });
     } catch (err) {
-      console.error('Error saving progress:', err);
+      console.error('Error saving progress in seconds:', err);
     }
   };
 
   const handleTimestampNote = () => {
-    const mins = Math.floor(watchedSecondsRef.current / 60);
-    const secs = watchedSecondsRef.current % 60;
+    const totalSecs = watchedSecondsRef.current;
+    const mins = Math.floor(totalSecs / 60);
+    const secs = totalSecs % 60;
     const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     if (onAddNoteAtTimestamp) {
       onAddNoteAtTimestamp(timeStr);
@@ -152,9 +227,9 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-col justify-between h-full bg-slate-950 rounded-2xl overflow-hidden shadow-md">
+    <div className="w-full flex flex-col justify-between h-full bg-[#10223E]/80 backdrop-blur-xl border border-white/15 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
       {/* Video Header Strip */}
-      <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-900 border-b border-slate-800 text-white shrink-0">
+      <div className="flex items-center justify-between gap-2 px-3.5 sm:px-4 py-2.5 bg-[#173056]/85 backdrop-blur-md border-b border-white/10 text-white shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           {onOpenLessonsDrawer && (
             <button
@@ -167,19 +242,20 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
             </button>
           )}
           <Video className="w-4 h-4 text-emerald-400 shrink-0 hidden xs:block" />
-          <h3 className="font-black text-xs sm:text-sm text-slate-100 truncate max-w-[180px] xs:max-w-xs sm:max-w-none">{lessonTitle}</h3>
+          <h3 className="font-black text-xs sm:text-sm text-slate-100 truncate max-w-[220px] xs:max-w-xs sm:max-w-none">{lessonTitle}</h3>
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0 text-slate-400 text-xs font-medium">
-          <span className="hidden sm:inline-flex text-[10px] bg-slate-800 px-2 py-0.5 rounded text-emerald-400 font-mono border border-slate-700">
-            🔒 {userWatermark}
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2.5 py-0.5 rounded-full backdrop-blur-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>مشغل تدريبي معتمد</span>
           </span>
         </div>
       </div>
 
-      {/* Video Viewport */}
+      {/* Video Viewport (No watermarks) */}
       <div
-        className="relative w-full flex-1 aspect-video lg:aspect-auto lg:min-h-[560px] xl:min-h-[650px] bg-black flex items-center justify-center select-none overflow-hidden"
+        className="relative w-full flex-1 aspect-video lg:aspect-auto lg:min-h-[560px] xl:min-h-[650px] bg-[#0A1322]/85 backdrop-blur-sm flex items-center justify-center select-none overflow-hidden"
         onContextMenu={(e) => e.preventDefault()}
       >
         {loading && (
@@ -190,12 +266,12 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
         )}
 
         {error && (
-          <div className="p-6 text-center max-w-sm rounded-2xl bg-slate-900 border border-slate-800 text-slate-200">
+          <div className="p-6 text-center max-w-sm rounded-2xl bg-[#173056]/90 border border-white/10 text-slate-200">
             <Lock className="w-7 h-7 text-red-400 mx-auto mb-2" />
             <p className="text-xs font-bold leading-relaxed mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-[#173A7C] text-white rounded-xl text-xs font-bold"
+              className="px-4 py-2 bg-[#173A7C] hover:bg-[#1E4D9D] text-white rounded-xl text-xs font-bold cursor-pointer"
             >
               إعادة المحاولة
             </button>
@@ -214,42 +290,26 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
         )}
       </div>
 
-      {/* Single Clean Control Bar directly under the Video Viewport */}
-      <div className="px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-900 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-slate-300 shrink-0">
-        {/* Playback Speed Selector */}
-        <div className="flex items-center gap-1">
-          <span className="text-[10px] sm:text-[11px] text-slate-400 font-normal">السرعة:</span>
-          {['0.75x', '1.0x', '1.25x', '1.5x', '2.0x'].map((spd) => (
-            <button
-              key={spd}
-              onClick={() => setCurrentSpeed(spd)}
-              className={`px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${currentSpeed === spd
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-            >
-              {spd}
-            </button>
-          ))}
-        </div>
-
-        {/* Action Buttons: Note, Prev/Next, Complete */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Add Timestamp Note */}
+      {/* Control Bar */}
+      <div className="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-[#173056]/85 backdrop-blur-md border-t border-white/10 flex items-center justify-between gap-2 text-xs font-bold text-slate-200 shrink-0">
+        {/* Left Side: Note with Timestamp Button */}
+        <div className="flex items-center gap-2">
           <button
             onClick={handleTimestampNote}
-            className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] sm:text-xs font-bold transition-all cursor-pointer border border-slate-700"
-            title="إضافة ملاحظة عند هذه الدقيقة"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 hover:text-amber-200 border border-amber-500/30 text-[11px] sm:text-xs font-black transition-all cursor-pointer shadow-xs"
+            title="تدوين ملاحظة عند هذه اللحظة"
           >
-            <BookmarkPlus className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden xs:inline">ملاحظة ⏱️</span>
+            <BookmarkPlus className="w-4 h-4 text-amber-400" />
+            <span>تدوين ملاحظة [⏱️ دقيقة]</span>
           </button>
+        </div>
 
-          {/* Prev Lesson Button */}
+        {/* Right Side: Navigation & Completion Toggle */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {prevLessonUrl && (
             <a
               href={prevLessonUrl}
-              className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all flex items-center gap-1 text-[11px] sm:text-xs font-bold border border-slate-700"
+              className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 hover:text-white transition-all flex items-center gap-1 text-[11px] sm:text-xs font-bold border border-white/10"
               title="الدرس السابق"
             >
               <SkipForward className="w-3.5 h-3.5" />
@@ -257,11 +317,10 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
             </a>
           )}
 
-          {/* Next Lesson Button */}
           {nextLessonUrl && (
             <a
               href={nextLessonUrl}
-              className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all flex items-center gap-1 text-[11px] sm:text-xs font-bold border border-slate-700"
+              className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 hover:text-white transition-all flex items-center gap-1 text-[11px] sm:text-xs font-bold border border-white/10"
               title="الدرس التالي"
             >
               <span className="hidden sm:inline">التالي</span>
@@ -269,22 +328,21 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
             </a>
           )}
 
-          {/* Complete Toggle Button */}
           <button
             onClick={onToggleComplete || onLessonComplete}
-            className={`px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer shadow-xs ${isCompleted
-                ? 'bg-emerald-600 text-white'
-                : 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white hover:opacity-90'
+            className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md ${isCompleted
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 border border-emerald-400/40'
+                : 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white hover:opacity-95 border border-white/20 shadow-blue-900/30'
               }`}
           >
             {isCompleted ? (
               <>
-                <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                <CheckCircle2 className="w-4 h-4 text-white" />
                 <span>مكتمل ✓</span>
               </>
             ) : (
               <>
-                <Circle className="w-3.5 h-3.5 text-slate-300" />
+                <Circle className="w-4 h-4 text-slate-300" />
                 <span>تحديد كمكتمل</span>
               </>
             )}

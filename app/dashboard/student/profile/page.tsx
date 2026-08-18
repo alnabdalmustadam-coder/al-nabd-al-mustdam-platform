@@ -1,23 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
-import {
-  User,
-  Mail,
-  Phone,
-  Shield,
-  Save,
-  UserCheck,
-  CheckCircle2,
-  Lock,
-  Smartphone,
-  Laptop,
-  Globe,
-  Trash2,
-  Key,
-} from 'lucide-react';
+import { User, Mail, Phone, Key, Shield, Calendar, Laptop, Smartphone, Trash2, CheckCircle2, UserCheck, RefreshCw, Loader2, Save } from 'lucide-react';
 import { DefaultAvatar } from '@/components/student/default-avatar';
+import { getOrCreateDeviceId, getDeviceInfo } from '@/utils/device';
+import { createClient } from '@/utils/supabase/client';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -48,12 +36,14 @@ const textItemVariants: Variants = {
 
 export default function StudentProfilePage() {
   const [student, setStudent] = useState({
-    fullName: 'عبدالله بن محمد الشمري',
-    email: 'abdullah.alshammari@example.com',
-    phone: '+966 50 123 4567',
-    nationalId: '1098765432',
-    role: 'متدرب ألمعي معتمد',
+    id: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    nationalId: '',
+    role: 'متدرب معتمد بالمنصة',
     joinedDate: 'يناير 2026',
+    avatarUrl: null as string | null,
   });
 
   const [passwords, setPasswords] = useState({
@@ -64,15 +54,112 @@ export default function StudentProfilePage() {
 
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [passSuccess, setPassSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [devices, setDevices] = useState([
-    { id: '1', name: 'Windows PC (الكمبيوتر الحالي)', browser: 'Chrome 126', location: 'الرياض، المملكة العربية السعودية', active: true, date: 'الآن' },
-    { id: '2', name: 'iPhone 15 Pro Max', browser: 'Safari Mobile', location: 'الرياض، المملكة العربية السعودية', active: false, date: 'منذ يومين' },
-  ]);
+  useEffect(() => {
+    async function loadStudentProfile() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const metaName = user.user_metadata?.full_name || user.user_metadata?.name || '';
+          const metaAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
+          const userEmail = user.email || '';
 
-  const handleSaveProfile = () => {
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          const activeEmail = profile?.email || userEmail;
+
+          setStudent({
+            id: user.id,
+            fullName: profile?.full_name || metaName || userEmail.split('@')[0] || 'متدرب',
+            email: activeEmail,
+            phone: profile?.phone || user.user_metadata?.phone || '+966 50 000 0000',
+            nationalId: profile?.national_id || user.user_metadata?.national_id || '10XXXXXXXX',
+            role: profile?.role === 'ADMIN' ? 'مدير المنصة' : profile?.role === 'INSTRUCTOR' ? 'مدرب معتمد' : 'متدرب معتمد بالمنصة',
+            joinedDate: user.created_at ? new Date(user.created_at).toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' }) : 'يناير 2026',
+            avatarUrl: profile?.avatar_url || metaAvatar || null,
+          });
+
+          loadDevices(activeEmail);
+        } else {
+          loadDevices();
+        }
+      } catch (err) {
+        console.error('Error loading profile:', err);
+        loadDevices();
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadStudentProfile();
+  }, []);
+
+  const [devices, setDevices] = useState<any[]>([]);
+  const [currentDeviceId, setCurrentDeviceId] = useState('');
+  const [loadingDevices, setLoadingDevices] = useState(true);
+  const [deletingDeviceId, setDeletingDeviceId] = useState<string | null>(null);
+
+  const loadDevices = async (overrideEmail?: string) => {
+    try {
+      setLoadingDevices(true);
+      const devInfo = getDeviceInfo();
+      setCurrentDeviceId(devInfo.deviceId);
+
+      const targetEmail = overrideEmail || student.email;
+
+      // 1. Send heartbeat / register current device first
+      const postRes = await fetch('/api/auth/devices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...devInfo,
+          email: targetEmail,
+        }),
+      });
+
+      const postData = await postRes.json();
+      if (postData.success && Array.isArray(postData.devices)) {
+        setDevices(postData.devices);
+        return;
+      }
+
+      // 2. Fallback to GET
+      const queryParam = targetEmail ? `?email=${encodeURIComponent(targetEmail)}` : '';
+      const getRes = await fetch(`/api/auth/devices${queryParam}`);
+      const getData = await getRes.json();
+      if (getData.success && Array.isArray(getData.devices)) {
+        setDevices(getData.devices);
+      }
+    } catch (err) {
+      console.error('Error loading devices:', err);
+    } finally {
+      setLoadingDevices(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      const supabase = createClient();
+      if (student.id) {
+        await supabase
+          .from('profiles')
+          .update({
+            full_name: student.fullName,
+            phone: student.phone,
+          })
+          .eq('id', student.id);
+      }
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    } catch (err) {
+      console.error('Error saving profile:', err);
+    }
   };
 
   const handleSavePassword = (e: React.FormEvent) => {
@@ -83,8 +170,22 @@ export default function StudentProfilePage() {
     setTimeout(() => setPassSuccess(false), 3000);
   };
 
-  const handleRemoveDevice = (id: string) => {
-    setDevices(devices.filter(d => d.id !== id));
+  const handleRemoveDevice = async (targetDevId: string) => {
+    try {
+      setDeletingDeviceId(targetDevId);
+      const res = await fetch('/api/auth/devices', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deviceId: targetDevId, email: student.email }),
+      });
+      if (res.ok) {
+        await loadDevices();
+      }
+    } catch (err) {
+      console.error('Error removing device:', err);
+    } finally {
+      setDeletingDeviceId(null);
+    }
   };
 
   const glassCard = {
@@ -120,14 +221,18 @@ export default function StudentProfilePage() {
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-5">
           <div className="flex items-center gap-3">
-            <DefaultAvatar size="lg" />
+            <DefaultAvatar
+              src={student.avatarUrl}
+              name={student.fullName}
+              size="lg"
+            />
             <div className="space-y-1 pr-2">
               <motion.div variants={textItemVariants} className="student-tag-badge bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-xs">
                 <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{student.role}</span>
               </motion.div>
               <motion.h1 variants={textItemVariants} className="student-heading-h1">
-                {student.fullName}
+                {student.fullName || (isLoading ? 'جاري التحميل...' : 'المتدرب')}
               </motion.h1>
               <motion.p variants={textItemVariants} className="text-xs text-slate-500 font-medium">
                 عضو معتمد في معهد النبض المستدام العالي منذ {student.joinedDate}
@@ -296,7 +401,7 @@ export default function StudentProfilePage() {
         </form>
       </motion.div>
 
-      {/* Registered Devices Management */}
+      {/* Registered Devices Management (2-Device Policy) */}
       <motion.div
         variants={sectionFadeVariants}
         initial="hidden"
@@ -305,40 +410,98 @@ export default function StudentProfilePage() {
         className="relative overflow-hidden rounded-[24px] p-6 sm:p-7 border border-white/50 space-y-4 student-card-accent"
         style={glassCard}
       >
-        <h3 className="student-heading-h3 flex items-center gap-2 border-b border-slate-200/30 pb-3">
-          <Laptop className="w-4 h-4 text-[#173A7C]" />
-          <span>الأجهزة النشطة والمسجلة</span>
-        </h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/30 pb-3">
+          <h3 className="student-heading-h3 flex items-center gap-2">
+            <Laptop className="w-4 h-4 text-[#173A7C]" />
+            <span>الأجهزة النشطة والمسجلة</span>
+          </h3>
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-[#173A7C] border border-blue-200/70">
+              الأجهزة المسجلة: {devices.length} من 2 (الحد الأقصى)
+            </span>
+            <button
+              onClick={() => loadDevices()}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-[#173A7C] hover:bg-slate-100 transition-colors"
+              title="تحديث قائمة الأجهزة"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingDevices ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+        </div>
 
         <div className="space-y-3">
-          {devices.map((device) => (
-            <div key={device.id} className="p-4 rounded-xl flex items-center justify-between gap-4 text-xs font-bold border border-slate-200/40" style={glassInput}>
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-[#173A7C]/10 text-[#173A7C]">
-                  {device.name.includes('iPhone') ? <Smartphone className="w-4 h-4" /> : <Laptop className="w-4 h-4" />}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-black text-slate-800">{device.name}</h4>
-                    {device.active && (
-                      <span className="px-3 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs">الآن (نشط)</span>
+          {loadingDevices && devices.length === 0 ? (
+            <div className="p-8 text-center text-xs font-bold text-slate-500 flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-[#173A7C]" />
+              <span>جاري مزامنة بيانات الأجهزة المسجلة...</span>
+            </div>
+          ) : devices.length === 0 ? (
+            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 text-center text-xs font-bold text-slate-500">
+              لا توجد أجهزة مسجلة حالياً، جاري تسجيل جهازك الحالي تلقائياً...
+            </div>
+          ) : (
+            <>
+              {devices.map((device, idx) => {
+                const isCurrent = device.device_id === currentDeviceId;
+                const isMobile = device.device_name?.includes('iPhone') || device.device_name?.includes('هاتف') || device.device_type === 'mobile';
+
+                return (
+                  <div
+                    key={device.device_id || device.id || idx}
+                    className="p-4 rounded-xl flex items-center justify-between gap-4 text-xs font-bold border border-slate-200/40 hover:border-slate-300 transition-all bg-white/70"
+                    style={glassInput}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`p-2.5 rounded-xl ${isCurrent ? 'bg-[#173A7C] text-white shadow-xs' : 'bg-slate-200/70 text-slate-700'}`}>
+                        {isMobile ? <Smartphone className="w-4 h-4" /> : <Laptop className="w-4 h-4" />}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-black text-slate-800 truncate">
+                            {device.device_name || 'كمبيوتر شخصي (PC)'}
+                          </h4>
+                          {isCurrent ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              (الجهاز الحالي) نشط الآن
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
+                              مسجل
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-bold mt-0.5">
+                          {device.browser || 'متصفح ويب'} • {device.os || 'نظام تشغيل'} • {device.location || 'المملكة العربية السعودية'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {!isCurrent && (
+                      <button
+                        onClick={() => handleRemoveDevice(device.device_id)}
+                        disabled={deletingDeviceId === device.device_id}
+                        className="p-2 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 cursor-pointer shrink-0"
+                        title="إلغاء ربط هذا الجهاز"
+                      >
+                        {deletingDeviceId === device.device_id ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-red-600" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </button>
                     )}
                   </div>
-                  <p className="text-[10px] text-slate-400 font-bold mt-0.5">{device.browser} • {device.location}</p>
-                </div>
-              </div>
+                );
+              })}
 
-              {!device.active && (
-                <button
-                  onClick={() => handleRemoveDevice(device.id)}
-                  className="p-2 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-                  title="تسجيل الخروج"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+              {devices.length === 1 && (
+                <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/60 text-xs font-bold text-blue-900 flex items-center justify-between gap-2">
+                  <span>💡 لديك مقعد متبقي: يمكنك تسجيل الدخول من جهاز آخر إضافي (مثال: هاتفك الجوال).</span>
+                  <span className="text-[11px] font-black px-2 py-0.5 bg-blue-100 rounded-md">متاح 1 من 2</span>
+                </div>
               )}
-            </div>
-          ))}
+            </>
+          )}
         </div>
       </motion.div>
     </div>

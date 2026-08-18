@@ -188,9 +188,11 @@ export default function StudentSupportPage() {
             initial="hidden"
             animate="visible"
             custom={1}
-            className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-emerald-400"
+            className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]"
           >
-            <MessageSquare className="w-5 h-5 text-emerald-400" />
+            <div className="p-1.5 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
+              <MessageSquare className="w-4 h-4" />
+            </div>
             <span>تذاكر الاستفسارات النشطة والحساب</span>
           </motion.h2>
 
@@ -253,8 +255,10 @@ export default function StudentSupportPage() {
           className="relative overflow-hidden rounded-2xl sm:rounded-[28px] p-6 sm:p-8 space-y-6 liquid-glass-card liquid-glass-hover student-card-accent"
         >
           <div className="space-y-1">
-            <h2 className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-emerald-400">
-              <Send className="w-5 h-5 text-emerald-400" />
+            <h2 className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]">
+              <div className="p-1.5 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
+                <Send className="w-4 h-4" />
+              </div>
               <span>تقديم تذكرة استفسار جديدة</span>
             </h2>
             <p className="text-xs text-slate-500 font-bold pr-3.5 pt-1">
@@ -329,9 +333,11 @@ export default function StudentSupportPage() {
             initial="hidden"
             animate="visible"
             custom={1}
-            className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-emerald-400"
+            className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]"
           >
-            <HelpCircle className="w-5 h-5 text-emerald-400" />
+            <div className="p-1.5 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
+              <HelpCircle className="w-4 h-4" />
+            </div>
             <span>الأسئلة الشائعة والخدمات الذاتية</span>
           </motion.h2>
 

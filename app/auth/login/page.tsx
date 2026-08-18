@@ -1,137 +1,149 @@
-'use client'
+'use client';
 
-import { useState, Suspense } from 'react'
-import { login } from '../actions'
-import Link from 'next/link'
-import Button from '@/components/ui/Button'
-import { createClient } from '@/utils/supabase/client'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useSearchParams } from 'next/navigation'
-import { translateAuthError } from '../utils'
+import React, { useState, Suspense } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ShieldCheck, UserCheck, GraduationCap } from 'lucide-react';
+import { login } from '../actions';
+import { createClient } from '@/utils/supabase/client';
+import { useSearchParams } from 'next/navigation';
+import { translateAuthError } from '../utils';
 
 function LoginForm() {
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
-  const searchParams = useSearchParams()
-  const message = searchParams.get('message')
-  const redirectParam = searchParams.get('redirect') || '/dashboard/student'
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+  const message = searchParams.get('message');
+  const redirectParam = searchParams.get('redirect') || '/dashboard/student';
 
   // OTP screen state for unconfirmed email login attempts
-  const [showOtpScreen, setShowOtpScreen] = useState(false)
-  const [email, setEmail] = useState('')
-  const [otpToken, setOtpToken] = useState('')
-  const [otpLoading, setOtpLoading] = useState(false)
-  const [resendSuccess, setResendSuccess] = useState<string | null>(null)
+  const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [otpToken, setOtpToken] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setResendSuccess(null)
-    
-    const formData = new FormData(e.currentTarget)
-    const emailVal = (formData.get('email') as string) || ''
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setResendSuccess(null);
 
-    const result = await login(formData)
+    const formData = new FormData(e.currentTarget);
+    const emailVal = (formData.get('email') as string) || '';
+
+    const result = await login(formData);
     if (result?.error) {
-      // If error is related to unconfirmed email, show OTP screen
       if (
-        result.error.toLowerCase().includes('confirm') || 
+        result.error.toLowerCase().includes('confirm') ||
         result.error.toLowerCase().includes('verify')
       ) {
-        setEmail(emailVal)
-        setShowOtpScreen(true)
+        setEmail(emailVal);
+        setShowOtpScreen(true);
       } else {
-        setError(translateAuthError(result.error))
+        setError(translateAuthError(result.error));
       }
-      setLoading(false)
+      setLoading(false);
+    } else if (result?.redirectUrl) {
+      window.dispatchEvent(new Event('nabd_user_updated'));
+      window.location.href = result.redirectUrl;
+    } else {
+      window.dispatchEvent(new Event('nabd_user_updated'));
+      window.location.href = redirectParam;
     }
   }
 
   const handleOtpVerify = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setOtpLoading(true)
-    setError(null)
-    setResendSuccess(null)
+    e.preventDefault();
+    setOtpLoading(true);
+    setError(null);
+    setResendSuccess(null);
 
-    const tokenClean = otpToken.trim()
+    const tokenClean = otpToken.trim();
     if (tokenClean.length !== 6 || !/^\d+$/.test(tokenClean)) {
-      setError('الرجاء إدخال رمز التحقق المكون من 6 أرقام')
-      setOtpLoading(false)
-      return
+      setError('الرجاء إدخال رمز التحقق المكون من 6 أرقام');
+      setOtpLoading(false);
+      return;
     }
 
     try {
-      const supabase = createClient()
+      const supabase = createClient();
       const { data, error: verifyError } = await supabase.auth.verifyOtp({
         email,
         token: tokenClean,
-        type: 'signup'
-      })
+        type: 'signup',
+      });
 
       if (verifyError) {
-        setError(translateAuthError(verifyError.message))
-        setOtpLoading(false)
-        return
+        setError(translateAuthError(verifyError.message));
+        setOtpLoading(false);
+        return;
       }
 
-      // Fetch user's profile to get their name
       const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name')
+        .select('full_name, role')
         .eq('id', data.user?.id)
-        .single()
+        .single();
 
-      // Establish HTTP-Only session cookies
       await fetch('/api/auth/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name: profile?.full_name || data.user?.email?.split('@')[0] || '' })
-      })
+        body: JSON.stringify({
+          email,
+          name: profile?.full_name || data.user?.email?.split('@')[0] || '',
+        }),
+      });
 
-      // Trigger custom auth update event (for navbar)
-      window.dispatchEvent(new Event('nabd_user_updated'))
+      window.dispatchEvent(new Event('nabd_user_updated'));
 
-      // Redirect to dynamic target redirect
-      window.location.href = redirectParam
-    } catch (err) {
-      setError('حدث خطأ غير متوقع أثناء تفعيل الحساب')
-      setOtpLoading(false)
-    }
-  }
-
-  const handleResendOtp = async () => {
-    setOtpLoading(true)
-    setError(null)
-    setResendSuccess(null)
-    try {
-      const supabase = createClient()
-      const { error: resendError } = await supabase.auth.resend({
-        type: 'signup',
-        email: email
-      })
-
-      if (resendError) {
-        setError(translateAuthError(resendError.message))
+      // If role is instructor or admin, redirect to admin
+      const role = (profile?.role || data.user?.user_metadata?.role || 'STUDENT').toUpperCase();
+      if (role === 'ADMIN' || role === 'INSTRUCTOR' || role === 'TRAINER') {
+        window.location.href = '/dashboard/admin';
       } else {
-        setResendSuccess('تم إعادة إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني')
+        window.location.href = redirectParam;
       }
     } catch (err) {
-      setError('حدث خطأ أثناء محاولة إعادة إرسال الرمز')
-    } finally {
-      setOtpLoading(false)
+      setError('حدث خطأ غير متوقع أثناء تفعيل الحساب');
+      setOtpLoading(false);
     }
-  }
+  };
+
+  const handleResendOtp = async () => {
+    setOtpLoading(true);
+    setError(null);
+    setResendSuccess(null);
+    try {
+      const supabase = createClient();
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      });
+
+      if (resendError) {
+        setError(translateAuthError(resendError.message));
+      } else {
+        setResendSuccess('تم إعادة إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني');
+      }
+    } catch (err) {
+      setError('حدث خطأ أثناء محاولة إعادة إرسال الرمز');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
 
   const handleGoogleLogin = async () => {
-    setGoogleLoading(true)
-    setError(null)
+    setGoogleLoading(true);
+    setError(null);
     try {
-      const supabase = createClient()
-      const callbackUrl = new URL('/auth/callback', window.location.origin)
+      const supabase = createClient();
+      const callbackUrl = new URL('/auth/callback', window.location.origin);
       if (redirectParam && redirectParam !== '/dashboard/student') {
-        callbackUrl.searchParams.set('next', redirectParam)
+        callbackUrl.searchParams.set('next', redirectParam);
       }
 
       const { error } = await supabase.auth.signInWithOAuth({
@@ -139,156 +151,202 @@ function LoginForm() {
         options: {
           redirectTo: callbackUrl.toString(),
         },
-      })
+      });
       if (error) {
-        setError(translateAuthError(error.message))
-        setGoogleLoading(false)
+        setError(translateAuthError(error.message));
+        setGoogleLoading(false);
       }
     } catch (err) {
-      setError('حدث خطأ أثناء الاتصال بجوجل')
-      setGoogleLoading(false)
+      setError('حدث خطأ أثناء الاتصال بجوجل');
+      setGoogleLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0A1128] py-20 px-4 dir-rtl" dir="rtl">
-      {/* Background Radial Glows */}
-      <div className="absolute top-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-[#173A7C]/20 blur-[150px]" />
-      <div className="absolute bottom-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-[#5CB07C]/15 blur-[150px]" />
+    <div className="relative min-h-[calc(100vh-80px)] flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-hidden font-[family-name:var(--font-cairo)]" dir="rtl">
+      {/* Background /bg.webp texture & soft ambient glow */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22] pointer-events-none -z-10"
+        style={{ backgroundImage: 'url("/bg.webp")' }}
+      />
+      <div className="fixed top-[-10%] right-[-5%] w-[550px] h-[550px] rounded-full bg-[#173A7C]/8 blur-[140px] pointer-events-none -z-10" />
+      <div className="fixed bottom-[-10%] left-[-5%] w-[550px] h-[550px] rounded-full bg-[#5CB07C]/10 blur-[140px] pointer-events-none -z-10" />
 
-      <motion.div 
-        initial={{ opacity: 0, y: 30 }}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="relative z-10 w-full max-w-md"
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-lg my-auto"
       >
-        {/* Logo and Brand Title */}
-        <div className="mb-8 text-center">
-          <Link href="/" className="inline-block">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-tr from-[#5CB07C] to-[#173A7C] p-0.5 shadow-xl shadow-[#173A7C]/20 mx-auto mb-4 hover:scale-105 transition-transform duration-300">
-              <div className="flex h-full w-full items-center justify-center rounded-[22px] bg-[#0A1128]">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 16H9.5L12 7L16 25L19 13L21.5 16H28" stroke="url(#logo_grad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                  <defs>
-                     <linearGradient id="logo_grad" x1="4" y1="16" x2="28" y2="16" gradientUnits="userSpaceOnUse">
-                       <stop stopColor="#5CB07C" />
-                       <stop offset="1" stopColor="#3B82F6" />
-                     </linearGradient>
-                  </defs>
-                </svg>
+        {/* Main Luxurious Glass Card */}
+        <div className="relative rounded-[2.5rem] bg-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_25px_60px_-15px_rgba(23,58,124,0.12),0_0_0_1px_rgba(23,58,124,0.05)] p-6 sm:p-9 md:p-10">
+          
+          {/* Header with Pure Logo (No Box/Card Frame) */}
+          <div className="flex items-center gap-4 pb-6 border-b border-slate-100/90 mb-6">
+            <Link href="/" className="shrink-0 group" title="الرئيسية">
+              <div className="relative w-14 h-14 flex items-center justify-center transition-transform group-hover:scale-105 duration-300">
+                <Image
+                  src="/logo.webp"
+                  alt="منصة النبض المستدام"
+                  width={56}
+                  height={56}
+                  className="object-contain drop-shadow-xs"
+                  priority
+                />
               </div>
+            </Link>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
+                {showOtpScreen ? 'تأكيد الحساب' : 'تسجيل الدخول'}
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 font-semibold mt-1 truncate">
+                {showOtpScreen ? 'أدخل رمز التحقق لتفعيل حسابك' : 'الدخول الموحد للطلاب، المدربين، والإدارة'}
+              </p>
             </div>
-          </Link>
-          <h2 className="text-3xl font-black tracking-tight text-white font-[family-name:var(--font-cairo)]">
-            {showOtpScreen ? 'تأكيد الحساب' : 'تسجيل الدخول'}
-          </h2>
-          <p className="mt-2.5 text-sm font-medium text-slate-400">
-            {showOtpScreen ? 'أدخل رمز التحقق لتفعيل حسابك البدء' : 'أهلاً بك مجدداً في منصة النبض المستدام'}
-          </p>
-        </div>
+          </div>
 
-        {/* Card */}
-        <div className="backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl rounded-3xl p-8 sm:p-10">
           <AnimatePresence mode="wait">
             {!showOtpScreen ? (
               <motion.div
-                key="login-form-panel"
-                initial={{ opacity: 0, x: 20 }}
+                key="login-form"
+                initial={{ opacity: 0, x: 15 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, x: -15 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-5"
               >
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Role Chips Banner */}
+                <div className="flex items-center justify-between px-4 py-2 bg-slate-50/80 rounded-2xl border border-slate-200/70 text-xs font-bold text-slate-600">
+                  <span className="flex items-center gap-1.5 text-emerald-700">
+                    <GraduationCap className="w-4 h-4" />
+                    <span>متدرب</span>
+                  </span>
+                  <span className="text-slate-300">•</span>
+                  <span className="flex items-center gap-1.5 text-[#173A7C]">
+                    <UserCheck className="w-4 h-4" />
+                    <span>مدرب ومحاضر</span>
+                  </span>
+                  <span className="text-slate-300">•</span>
+                  <span className="flex items-center gap-1.5 text-purple-700">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>إدارة المنصة</span>
+                  </span>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                   <input type="hidden" name="redirect" value={redirectParam} />
+
                   {message && (
-                    <div className="text-emerald-400 text-sm font-bold text-center bg-emerald-950/40 border border-emerald-900/30 py-3.5 px-4 rounded-2xl">
-                      {message === 'Check your email to confirm your account' 
-                        ? 'تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتأكيد الحساب وتفعيله قبل تسجيل الدخول.' 
+                    <div className="text-emerald-700 text-xs sm:text-sm font-bold text-center bg-emerald-50 border border-emerald-200 py-3 px-4 rounded-2xl">
+                      {message === 'Check your email to confirm your account'
+                        ? 'تم إنشاء الحساب بنجاح! يرجى تأكيد بريدك الإلكتروني.'
                         : message}
                     </div>
                   )}
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-bold text-slate-300 mb-2" htmlFor="email">
-                        البريد الإلكتروني
-                      </label>
+                  {/* Email Input */}
+                  <div>
+                    <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-2" htmlFor="email">
+                      البريد الإلكتروني <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
                       <input
                         id="email"
                         name="email"
                         type="email"
                         autoComplete="email"
                         required
-                        className="block w-full rounded-2xl border border-white/10 bg-white/5 py-3.5 px-4 text-white placeholder-slate-500 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none text-base font-medium transition-all duration-200"
+                        className="w-full rounded-2xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-3 pr-10 pl-3.5 text-sm font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:border-[#5CB07C] focus:ring-4 focus:ring-[#5CB07C]/15 outline-none transition-all duration-200"
                         placeholder="name@example.com"
                       />
+                      <Mail className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
                     </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="block text-sm font-bold text-slate-300" htmlFor="password">
-                          كلمة المرور
-                        </label>
-                        <Link href="/auth/reset-password" className="text-xs font-semibold text-[#5CB07C] hover:underline">
-                          نسيت كلمة المرور؟
-                        </Link>
-                      </div>
+                  </div>
+
+                  {/* Password Input */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs sm:text-sm font-bold text-slate-700" htmlFor="password">
+                        كلمة المرور <span className="text-rose-500">*</span>
+                      </label>
+                      <Link
+                        href="/auth/reset-password"
+                        className="text-xs font-bold text-[#5CB07C] hover:text-[#4EA06E] hover:underline transition-colors"
+                      >
+                        نسيت كلمة المرور؟
+                      </Link>
+                    </div>
+                    <div className="relative">
                       <input
                         id="password"
                         name="password"
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         autoComplete="current-password"
                         required
-                        className="block w-full rounded-2xl border border-white/10 bg-white/5 py-3.5 px-4 text-white placeholder-slate-500 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none text-base font-medium transition-all duration-200"
+                        className="w-full rounded-2xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-3 pr-10 pl-10 text-sm font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:border-[#5CB07C] focus:ring-4 focus:ring-[#5CB07C]/15 outline-none transition-all duration-200"
                         placeholder="••••••••"
                       />
+                      <Lock className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors p-1"
+                        aria-label="إظهار / إخفاء كلمة المرور"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
 
                   {error && (
-                    <div className="text-red-400 text-sm font-bold text-center bg-red-950/40 border border-red-900/30 py-3 px-4 rounded-2xl">
-                      {error}
+                    <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-bold">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                      <span>{error}</span>
                     </div>
                   )}
 
-                  <div>
-                    <Button
+                  {/* Submit Button (Pill-shaped with Glass Effect) */}
+                  <div className="pt-2">
+                    <button
                       type="submit"
                       disabled={loading || googleLoading}
-                      className="w-full bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] hover:from-[#4EA06E] hover:to-[#5CB07C] text-white py-3.5 rounded-2xl transition-all font-black text-base shadow-lg shadow-[#5CB07C]/20 border-0 flex items-center justify-center gap-2"
+                      className="relative w-full rounded-full py-3.5 sm:py-4 px-6 bg-gradient-to-r from-[#5CB07C] via-[#4EA06E] to-[#3D8F5C] hover:from-[#4EA06E] hover:to-[#5CB07C] text-white font-black text-sm sm:text-base shadow-[0_12px_28px_-6px_rgba(92,176,124,0.45),inset_0_1px_1px_rgba(255,255,255,0.4)] border border-white/20 hover:shadow-[0_16px_32px_-6px_rgba(92,176,124,0.55)] active:scale-[0.99] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 overflow-hidden group"
                     >
+                      <span className="absolute inset-0 bg-gradient-to-b from-white/25 via-transparent to-transparent pointer-events-none rounded-full" />
+                      
                       {loading ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          جاري تسجيل الدخول...
+                          <span>جاري التحقق...</span>
                         </>
                       ) : (
-                        'تسجيل الدخول'
+                        <span>تسجيل الدخول</span>
                       )}
-                    </Button>
+                    </button>
                   </div>
                 </form>
 
-                {/* Separator */}
-                <div className="relative my-7">
-                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div className="w-full border-t border-white/10"></div>
+                {/* Divider */}
+                <div className="relative my-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-200/80"></div>
                   </div>
-                  <div className="relative flex justify-center text-sm font-bold">
-                    <span className="bg-[#0f1837] px-4 text-slate-400">أو من خلال</span>
+                  <div className="relative flex justify-center text-xs font-bold">
+                    <span className="bg-white/90 px-4 text-slate-400">أو من خلال</span>
                   </div>
                 </div>
 
-                {/* Google Login Button */}
+                {/* Google Sign-in (Pill-shaped with Glass Effect) */}
                 <button
+                  type="button"
                   onClick={handleGoogleLogin}
                   disabled={loading || googleLoading}
-                  className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-900 font-bold border border-slate-200 shadow-sm transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-50"
-                  type="button"
+                  className="relative w-full rounded-full py-3 sm:py-3.5 px-6 bg-white/80 hover:bg-white backdrop-blur-md border border-slate-200/90 hover:border-slate-300 shadow-[0_4px_16px_rgba(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.8)] text-slate-700 hover:text-slate-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.99] cursor-pointer disabled:opacity-50"
                 >
                   {googleLoading ? (
-                    <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-slate-800 border-t-transparent rounded-full animate-spin" />
                   ) : (
-                    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                       <path
                         fill="#EA4335"
                         d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.98 1 12 1 7.35 1 3.37 3.67 1.39 7.56l3.85 2.99c.92-2.77 3.5-4.81 6.76-4.81Z"
@@ -307,32 +365,33 @@ function LoginForm() {
                       />
                     </svg>
                   )}
-                  <span className="text-base">متابعة باستخدام Google</span>
+                  <span>متابعة باستخدام Google</span>
                 </button>
               </motion.div>
             ) : (
+              /* OTP Verification Panel */
               <motion.div
-                key="otp-verification-panel"
-                initial={{ opacity: 0, x: -20 }}
+                key="otp-panel"
+                initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, x: 15 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-5"
               >
-                <form onSubmit={handleOtpVerify} className="space-y-6">
+                <form onSubmit={handleOtpVerify} className="space-y-5">
                   <div className="text-center space-y-2">
-                    <p className="text-sm text-slate-300">
-                      حسابك غير مفعل بعد. تم إرسال رمز تحقق مكون من 6 أرقام إلى بريدك الإلكتروني:
+                    <p className="text-sm text-slate-600 font-medium">
+                      حسابك غير مفعّل بعد. تم إرسال رمز تحقق مكوّن من 6 أرقام إلى:
                     </p>
-                    <span className="block text-base font-bold text-white bg-white/5 py-2 px-3 rounded-xl border border-white/5 select-all">
+                    <span className="inline-block text-xs sm:text-sm font-bold text-slate-900 bg-slate-100/90 py-1.5 px-4 rounded-xl border border-slate-200 select-all">
                       {email}
                     </span>
-                    <p className="text-xs text-slate-400">
-                      يرجى التحقق من صندوق البريد وكتابة الرمز لتفعيل الحساب وتسجيل الدخول.
-                    </p>
                   </div>
 
                   <div>
-                    <label htmlFor="otp" className="block text-sm font-bold text-slate-300 mb-2 text-center">رمز التحقق</label>
+                    <label htmlFor="otp" className="block text-xs sm:text-sm font-bold text-slate-700 mb-2 text-center">
+                      رمز التحقق (OTP)
+                    </label>
                     <input
                       id="otp"
                       type="text"
@@ -342,83 +401,92 @@ function LoginForm() {
                       required
                       value={otpToken}
                       onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, ''))}
-                      className="block w-full text-center tracking-[0.5em] font-mono text-2xl rounded-2xl border border-white/10 bg-white/5 py-3.5 px-4 text-white placeholder-slate-600 focus:border-[#5CB07C] focus:ring-1 focus:ring-[#5CB07C] focus:bg-[#0f1938] outline-none transition-all duration-200"
+                      className="block w-full text-center tracking-[0.4em] font-mono text-2xl font-bold rounded-2xl border border-slate-200/90 bg-slate-50/70 focus:bg-white py-3.5 px-4 text-slate-900 placeholder:text-slate-300 focus:border-[#5CB07C] focus:ring-4 focus:ring-[#5CB07C]/15 outline-none transition-all"
                       placeholder="000000"
                     />
                   </div>
 
                   {error && (
-                    <div className="text-red-400 text-sm font-bold text-center bg-red-950/40 border border-red-900/30 py-3 px-4 rounded-2xl">
-                      {error}
+                    <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-bold">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                      <span>{error}</span>
                     </div>
                   )}
 
                   {resendSuccess && (
-                    <div className="text-emerald-400 text-sm font-bold text-center bg-emerald-950/40 border border-emerald-900/30 py-3 px-4 rounded-2xl">
-                      {resendSuccess}
+                    <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs sm:text-sm font-bold">
+                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                      <span>{resendSuccess}</span>
                     </div>
                   )}
 
-                  <div className="space-y-3">
-                    <Button
-                      type="submit"
-                      disabled={otpLoading}
-                      className="w-full bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] hover:from-[#4EA06E] hover:to-[#5CB07C] text-white py-3.5 rounded-2xl transition-all font-black text-base shadow-lg shadow-[#5CB07C]/20 border-0 flex items-center justify-center gap-2"
-                    >
-                      {otpLoading ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          جاري تأكيد الرمز...
-                        </>
-                      ) : (
-                        'تأكيد وتفعيل الحساب'
-                      )}
-                    </Button>
+                  <button
+                    type="submit"
+                    disabled={otpLoading}
+                    className="relative w-full rounded-full py-4 px-6 bg-gradient-to-r from-[#5CB07C] via-[#4EA06E] to-[#3D8F5C] hover:from-[#4EA06E] hover:to-[#5CB07C] text-white font-black text-sm sm:text-base shadow-[0_12px_28px_-6px_rgba(92,176,124,0.45),inset_0_1px_1px_rgba(255,255,255,0.4)] border border-white/20 hover:shadow-[0_16px_32px_-6px_rgba(92,176,124,0.55)] active:scale-[0.99] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 overflow-hidden"
+                  >
+                    <span className="absolute inset-0 bg-gradient-to-b from-white/25 via-transparent to-transparent pointer-events-none rounded-full" />
+                    {otpLoading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>جاري التفعيل...</span>
+                      </>
+                    ) : (
+                      'تأكيد وتفعيل الحساب'
+                    )}
+                  </button>
 
-                    <div className="flex justify-between text-sm pt-2">
-                      <button
-                        type="button"
-                        onClick={handleResendOtp}
-                        disabled={otpLoading}
-                        className="font-bold text-[#5CB07C] hover:underline"
-                      >
-                        إعادة إرسال الرمز
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowOtpScreen(false)}
-                        className="font-bold text-slate-400 hover:text-white transition-colors"
-                      >
-                        الرجوع لتسجيل الدخول
-                      </button>
-                    </div>
+                  <div className="flex items-center justify-between text-xs sm:text-sm pt-2">
+                    <button
+                      type="button"
+                      onClick={handleResendOtp}
+                      disabled={otpLoading}
+                      className="font-bold text-[#5CB07C] hover:underline"
+                    >
+                      إعادة إرسال الرمز
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowOtpScreen(false)}
+                      className="font-bold text-slate-500 hover:text-slate-800 transition-colors"
+                    >
+                      الرجوع لتسجيل الدخول
+                    </button>
                   </div>
                 </form>
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
 
-        {/* Register Footer */}
-        <p className="mt-8 text-center text-sm font-medium text-slate-400">
-          ليس لديك حساب؟{' '}
-          <Link href={`/auth/register?redirect=${encodeURIComponent(redirectParam)}`} className="font-bold text-[#5CB07C] hover:underline">
-            سجل الآن كمتدرب
-          </Link>
-        </p>
+          {/* Footer Register Link */}
+          <div className="mt-6 pt-5 border-t border-slate-100/90 text-center">
+            <p className="text-xs sm:text-sm text-slate-600 font-medium">
+              ليس لديك حساب؟{' '}
+              <Link
+                href={`/auth/register?redirect=${encodeURIComponent(redirectParam)}`}
+                className="font-black text-[#5CB07C] hover:text-[#4EA06E] hover:underline transition-colors"
+              >
+                سجل الآن كمتدرب
+              </Link>
+            </p>
+          </div>
+
+        </div>
       </motion.div>
     </div>
-  )
+  );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-[#0A1128]">
-        <div className="w-10 h-10 border-4 border-[#5CB07C] border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="w-8 h-8 border-3 border-[#5CB07C] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
-  )
+  );
 }

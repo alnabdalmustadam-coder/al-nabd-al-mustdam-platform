@@ -36,21 +36,21 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     {
       id: '1',
       title: 'إصدار شهادة معتمدة بنجاح ⚡',
-      desc: 'تم إصدار وتوثيق شهادة (القيادة المستدامة) للمتدرب عبدالله الشمري بنسبة 98%',
+      desc: 'تم إصدار وتوثيق شهادة (استخدام الحاسب الآلي) للمتدرب عبدالله الشمري بنسبة 98%',
       time: 'منذ 4 دقائق',
       unread: true,
     },
     {
       id: '2',
       title: 'عملية دفع جديدة مؤكدة',
-      desc: 'سداد القسط الأول 625 ر.س لدبلوم التسامح والمواطنة عبر (تمارا)',
+      desc: 'سداد القسط الأول 433 ر.س لدورة إدخال البيانات ومعالجة النصوص عبر (تمارا)',
       time: 'منذ 14 دقيقة',
       unread: true,
     },
     {
       id: '3',
       title: 'تسجيل متدرب جديد',
-      desc: 'انضم المتدرب د. خالد العتيبي إلى مساق إدارة الاستدامة البيئية',
+      desc: 'انضم المتدرب د. خالد العتيبي إلى مساق دورة الذكاء الاصطناعي',
       time: 'منذ 35 دقيقة',
       unread: false,
     },
@@ -67,7 +67,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     <header className="sticky top-0 z-[30] w-full font-[family-name:var(--font-cairo)] m-0 p-0" dir="rtl">
       {/* Sleek 100% Flush Header with Platform Logo & Glass Backdrop */}
       <div
-        className="w-full rounded-none px-3.5 sm:px-6 py-3 sm:py-3.5 min-h-[3.75rem] flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 relative z-30"
+        className="w-full rounded-none px-3.5 sm:px-6 py-[calc(0.75rem+1vh)] min-h-[calc(3.75rem+2vh)] flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 relative z-30"
         style={{
           background: 'rgba(255, 255, 255, 0.88)',
           backdropFilter: 'blur(28px) saturate(1.8)',
@@ -82,7 +82,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="lg:hidden w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
+              className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
               title="القائمة الجانبية"
             >
               <Menu className="w-5 h-5" />
@@ -94,7 +94,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <button
               onClick={onToggleSidebar}
               title={isSidebarCollapsed ? 'توسيع القائمة الجانبية' : 'طي القائمة الجانبية'}
-              className="hidden lg:flex w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer items-center justify-center"
+              className="hidden lg:flex w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer items-center justify-center"
             >
               {isSidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
             </button>
@@ -112,7 +112,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
         {/* CENTER: Desktop Search Bar (Hidden on Mobile) */}
         <div className="hidden md:flex flex-1 min-w-0 max-w-md mx-4">
-          <div className="w-full relative flex items-center px-3.5 rounded-xl border border-slate-200/80 overflow-hidden transition-all focus-within:border-[#173A7C] bg-slate-50/80 shadow-xs">
+          <div className="w-full relative flex items-center px-3.5 py-0.5 rounded-xl border border-slate-200/80 overflow-hidden transition-all focus-within:border-[#173A7C] bg-slate-50/80 shadow-xs">
             <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
             <input
               type="text"
@@ -130,7 +130,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {/* Mobile Search Button Toggle */}
           <button
             onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-            className="md:hidden w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
+            className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
             title="البحث بالنظام"
           >
             {isMobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
@@ -139,7 +139,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {/* Go to Home Link (Uniform size matching student portal) */}
           <Link
             href="/"
-            className="w-9 h-9 sm:w-auto sm:px-3 sm:py-1.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-[#173A7C] hover:text-[#1E4D9D] transition-all cursor-pointer border border-slate-200/60 flex items-center justify-center gap-1.5 shrink-0 text-xs font-black"
+            className="w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-[#173A7C] hover:text-[#1E4D9D] transition-all cursor-pointer border border-slate-200/60 flex items-center justify-center gap-1.5 shrink-0 text-xs font-black"
             title="الذهاب للرئيسية"
           >
             <Home className="w-4 h-4 text-[#173A7C] shrink-0" />
@@ -153,7 +153,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 setShowNotifications(!showNotifications);
                 setShowProfileMenu(false);
               }}
-              className="w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center relative"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center relative"
               title="الإشعارات"
             >
               <Bell className="w-4 h-4 text-[#173A7C]" />
@@ -209,10 +209,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 setShowProfileMenu(!showProfileMenu);
                 setShowNotifications(false);
               }}
-              className="h-9 px-2 sm:px-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 flex items-center gap-2 cursor-pointer"
+              className="h-9 sm:h-10 px-2 sm:px-3 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 flex items-center gap-2 cursor-pointer"
               title="حساب الإدارة"
             >
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-[11px] shadow-xs">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-[11px] sm:text-xs shadow-xs">
                 A
               </div>
               <div className="hidden sm:block text-right">

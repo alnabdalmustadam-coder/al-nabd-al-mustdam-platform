@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Badge from "@/components/ui/Badge";
-import StarRating from "@/components/ui/StarRating";
 import { Course } from "@/types";
-import { Users, Clock, Play, ShoppingCart, ArrowRight } from "lucide-react";
+import { Users, Clock, Play, ShoppingCart, ArrowRight, Heart, Check } from "lucide-react";
 import Image from "next/image";
+import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 
 interface CourseCardProps {
   course: Course;
@@ -15,6 +16,11 @@ interface CourseCardProps {
 
 export default function CourseCard({ course, index = 0 }: CourseCardProps) {
   const imageUrl = typeof course.image === "string" ? course.image : "/logo.webp";
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { isInCart, addToCart, isCartOpen, setIsCartOpen } = useCart();
+
+  const isFavorited = isInWishlist(course.id);
+  const inCart = isInCart(course.id);
 
   return (
     <motion.div
@@ -42,22 +48,51 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
             />
           </div>
 
+          {/* Hover Play Overlay */}
           <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#173A7C]/20 backdrop-blur-[4px]">
-            <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-[0_10px_40px_rgba(23,58,124,0.3)] text-[#5CB07C] group-hover:scale-110 transition-transform duration-500">
+            <Link
+              href={`/courses/${course.slug}`}
+              className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-[0_10px_40px_rgba(23,58,124,0.3)] text-[#5CB07C] group-hover:scale-110 transition-transform duration-500 cursor-pointer"
+            >
               <Play className="w-6 h-6 ml-1" fill="currentColor" />
-            </div>
+            </Link>
           </div>
 
+          {/* Category Badge (Top Right) */}
           <div className="absolute top-4 right-4 z-30">
             <Badge label={course.category} variant={course.category as any} className="shadow-sm border border-white/50 backdrop-blur-md" />
           </div>
+
+          {/* Wishlist Heart Icon (Top Left) */}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleWishlist(course);
+            }}
+            className={`absolute top-4 left-4 z-30 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 shadow-md backdrop-blur-md cursor-pointer active:scale-90 ${
+              isFavorited
+                ? "bg-rose-500 text-white shadow-rose-500/30 scale-105"
+                : "bg-white/90 text-slate-400 hover:text-rose-500 hover:bg-white shadow-slate-900/10"
+            }`}
+            title={isFavorited ? "إزالة من المفضلة" : "إضافة إلى المفضلة"}
+            aria-label="المفضلة"
+          >
+            <Heart
+              className={`w-4 h-4 transition-transform duration-300 ${
+                isFavorited ? "fill-white stroke-white scale-110" : "stroke-current"
+              }`}
+            />
+          </button>
         </div>
 
         {/* Content Section */}
         <div className="p-5 sm:p-6 flex flex-col flex-1 relative z-20 bg-white">
-          <h3 className="text-lg sm:text-[19px] font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#173A7C] group-hover:to-[#5CB07C] transition-all duration-300 leading-[1.3]">
-            {course.title}
-          </h3>
+          <Link href={`/courses/${course.slug}`}>
+            <h3 className="text-lg sm:text-[19px] font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#173A7C] group-hover:to-[#5CB07C] transition-all duration-300 leading-[1.3]">
+              {course.title}
+            </h3>
+          </Link>
           <p className="text-[13px] sm:text-sm text-slate-500 mb-5 line-clamp-2 leading-relaxed flex-1 font-medium">
             {course.description}
           </p>
@@ -86,19 +121,37 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
             </span>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2.5 mt-auto">
-            <Link href={`/checkout?slug=${course.slug}`} className="flex-1 bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] text-white text-[15px] font-black py-3 px-2 rounded-full hover:from-[#4EA06E] hover:to-[#5CB07C] transition-all shadow-[0_8px_20px_-5px_rgba(92,176,124,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(92,176,124,0.5)] hover:-translate-y-0.5 flex items-center justify-center gap-2">
+          {/* Action Buttons: Register Now + Details + Cart */}
+          <div className="flex items-center gap-2 mt-auto pt-1">
+            <Link
+              href={`/checkout?slug=${course.slug}`}
+              className="flex-1 bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] text-white text-xs font-black py-2.5 px-3 rounded-xl hover:from-[#4EA06E] hover:to-[#5CB07C] transition-all shadow-md shadow-[#5CB07C]/20 hover:-translate-y-0.5 flex items-center justify-center gap-1 text-center truncate"
+            >
               سجل الآن
             </Link>
-            <Link href={`/courses/${course.slug}`} className="flex-1 bg-white text-slate-700 text-[15px] font-black py-3 px-2 rounded-full border-2 border-slate-200 hover:border-[#173A7C] hover:text-[#173A7C] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group/btn">
+
+            <Link
+              href={`/courses/${course.slug}`}
+              className="flex-1 bg-slate-100 hover:bg-[#173A7C] text-slate-700 hover:text-white border border-slate-200 hover:border-[#173A7C] text-xs font-black py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1 text-center truncate"
+            >
               التفاصيل
-              <ArrowRight className="w-[18px] h-[18px] -rotate-45 group-hover/btn:rotate-0 transition-transform text-slate-400 group-hover/btn:text-[#173A7C]" />
             </Link>
+
+            <button
+              onClick={() => addToCart(course)}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0 border cursor-pointer ${
+                inCart
+                  ? "bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-500/20"
+                  : "bg-white hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border-slate-200 hover:border-emerald-300"
+              }`}
+              title={inCart ? "موجودة في السلة" : "إضافة إلى السلة"}
+              aria-label="إضافة إلى السلة"
+            >
+              {inCart ? <Check className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
+            </button>
           </div>
         </div>
       </div>
     </motion.div>
   );
 }
-

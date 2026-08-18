@@ -33,34 +33,34 @@ export default function AdminQuizzesPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   // New Quiz Form State
-  const [courseTitle, setCourseTitle] = useState('دبلوم التسامح والسلام والمواطنة الصالحة');
+  const [courseTitle, setCourseTitle] = useState('دورة استخدام الحاسب الالي في الاعمال المكتبية');
   const [quizTitle, setQuizTitle] = useState('اختبار الوحدة الأولى: المفاهيم الأساسية');
   const [passPercentage, setPassPercentage] = useState('70');
 
   const [quizzes, setQuizzes] = useState<QuizItem[]>([
     {
       id: 'qz-1',
-      courseTitle: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      quizTitle: 'اختبار الوحدة الأولى: المفاهيم الأساسية للتسامح والمواطنة',
+      courseTitle: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
+      quizTitle: 'اختبار الوحدة الأولى: المفاهيم الأساسية لنظام التشغيل وWord',
       questionsCount: 10,
       passPercentage: 70,
       status: 'active',
     },
     {
       id: 'qz-2',
-      courseTitle: 'برنامج القيادة المستدامة والمسؤولية المجتمعية',
-      quizTitle: 'الاختبار النهائي: استراتيجيات التقييم المؤسسي',
+      courseTitle: 'دورات ادخال بيانات ومعالجة نصوص',
+      quizTitle: 'الاختبار النهائي: دقة وسرعة إدخال البيانات',
       questionsCount: 20,
       passPercentage: 75,
       status: 'active',
     },
     {
       id: 'qz-3',
-      courseTitle: 'الشهادة الاحترافية في إدارة الاستدامة البيئية',
-      quizTitle: 'اختبار التقييم الذاتي للسلامة البيئية',
+      courseTitle: 'دورة الذكاء الاصطناعي',
+      quizTitle: 'اختبار التقييم الذاتي لنماذج الذكاء الاصطناعي التوليدي',
       questionsCount: 15,
       passPercentage: 80,
-      status: 'draft',
+      status: 'active',
     },
   ]);
 
@@ -106,8 +106,8 @@ export default function AdminQuizzesPage() {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-3 sm:space-y-3.5">
             <div className="flex flex-col items-start">
-              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#173A7C]/10 text-[#173A7C] text-[10px] sm:text-xs font-black border border-[#173A7C]/15 shrink-0 whitespace-nowrap mb-3 sm:mb-4">
-                <FileQuestion className="w-3.5 h-3.5 text-[#173A7C] shrink-0" />
+              <div className="admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15">
+                <FileQuestion className="w-4 h-4 text-[#173A7C] shrink-0" />
                 <span>إدارة بنك الأسئلة والاختبارات الأكاديمية</span>
               </div>
               <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">
@@ -184,13 +184,13 @@ export default function AdminQuizzesPage() {
             <div className="specular-card-reflection" />
 
             {/* Badges Row */}
-            <div className="flex items-center justify-between gap-2">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold bg-[#173A7C]/8 text-[#173A7C] border border-[#173A7C]/15 truncate max-w-[190px] sm:max-w-none">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-[#173A7C]/8 text-[#173A7C] border border-[#173A7C]/15 leading-relaxed break-words">
                 {quiz.courseTitle}
               </span>
 
               <span
-                className={`px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border shrink-0 whitespace-nowrap ${
+                className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold border shrink-0 whitespace-nowrap ${
                   quiz.status === 'active'
                     ? 'bg-emerald-500/10 text-emerald-800 border-emerald-500/25'
                     : 'bg-amber-500/10 text-amber-800 border-amber-500/25'
@@ -217,9 +217,10 @@ export default function AdminQuizzesPage() {
               </div>
             </div>
 
-            <div className="pt-2 flex items-center justify-end gap-2">
-              <button className="px-4.5 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold text-xs shadow-md shadow-[#173A7C]/15 transition-all cursor-pointer border border-white/20">
-                إدارة الأسئلة والإجابات 📝
+            <div className="pt-2 flex items-center justify-end">
+              <button className="w-full sm:w-auto py-2.5 px-4 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1.5 shadow-sm shadow-[#173A7C]/15 transition-all cursor-pointer border border-white/20">
+                <span>إدارة الأسئلة والإجابات</span>
+                <span>📝</span>
               </button>
             </div>
           </motion.div>

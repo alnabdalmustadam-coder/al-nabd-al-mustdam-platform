@@ -59,23 +59,23 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen 2xl:h-[100vh] flex flex-col items-center justify-center overflow-x-hidden overflow-y-auto bg-slate-50 pt-28 pb-16 lg:pt-20 lg:pb-0">
+    <section className="relative min-h-screen 2xl:h-[100vh] flex flex-col items-center justify-center overflow-x-hidden overflow-y-auto bg-[#F8FAFC] pt-24 pb-16 lg:pt-20 lg:pb-0 w-full max-w-full">
 
       {/* Particle Grid */}
-      <div className="particles-grid opacity-60" />
+      <div className="particles-grid opacity-60 pointer-events-none" />
 
-      {/* Ultra Premium Glow Effects */}
-      <div className="absolute top-10 right-[5%] w-[400px] h-[400px] bg-[#173A7C]/20 rounded-full blur-[100px] mix-blend-multiply animate-pulse [animation-duration:8s]" />
-      <div className="absolute bottom-10 left-[5%] w-[300px] h-[300px] bg-[#5CB07C]/25 rounded-full blur-[100px] mix-blend-multiply animate-pulse [animation-duration:10s]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#1E4D9D]/10 rounded-full blur-[120px]" />
+      {/* Ultra Premium Glow Effects matching Dashboard */}
+      <div className="absolute top-10 right-[5%] w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-[#173A7C]/15 rounded-full blur-[100px] pointer-events-none mix-blend-multiply animate-pulse [animation-duration:8s]" />
+      <div className="absolute bottom-10 left-[5%] w-[300px] sm:w-[450px] h-[300px] sm:h-[450px] bg-[#5CB07C]/20 rounded-full blur-[100px] pointer-events-none mix-blend-multiply animate-pulse [animation-duration:10s]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[700px] h-[350px] sm:h-[500px] bg-[#1E4D9D]/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Section-wide Ornament Background (bg.webp) */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.07] pointer-events-none overflow-hidden z-0">
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.22] pointer-events-none overflow-hidden z-0 select-none">
         <img src="/bg.webp" alt="" className="w-full h-full object-cover" />
       </div>
 
       {/* Hero Content Container */}
-      <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-6 xl:px-12 2xl:px-16 flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-6 sm:gap-10 lg:gap-4 xl:gap-8 min-h-[500px] lg:min-h-[450px] xl:min-h-[550px] py-8 lg:py-16 xl:py-20 pointer-events-none mt-4 lg:mt-0 xl:mt-4 -translate-y-[9vh] lg:-translate-y-[3vh]">
+      <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-6 xl:px-12 2xl:px-16 flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-6 sm:gap-10 lg:gap-4 xl:gap-8 min-h-[500px] lg:min-h-[450px] xl:min-h-[550px] py-6 sm:py-8 lg:py-16 xl:py-20 pointer-events-none mt-2 lg:mt-0 xl:mt-4 translate-y-0 lg:-translate-y-[3vh]">
 
         {/* Left Side (Text content) */}
         <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-3 lg:order-1 flex items-stretch justify-center pointer-events-none mb-16 lg:mb-0">
@@ -88,7 +88,7 @@ export default function HeroSection() {
               transition={{ delay: 0.3, duration: 0.7 }}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
-              className="w-full h-full min-h-[300px] lg:min-h-0 text-right pointer-events-auto bg-white/10 backdrop-blur-md p-6 sm:p-10 lg:p-5 xl:p-8 2xl:p-12 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/20 shadow-xl flex flex-col justify-between cursor-pointer"
+              className="w-full h-full min-h-[300px] lg:min-h-0 text-right pointer-events-auto bg-white/40 backdrop-blur-md p-6 sm:p-10 lg:p-5 xl:p-8 2xl:p-12 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl flex flex-col justify-between cursor-pointer"
             >
               <div>
                 <h2 className="text-2xl sm:text-3xl lg:text-lg xl:text-3xl 2xl:text-4xl font-black mb-4 sm:mb-6 lg:mb-3 xl:mb-6 leading-tight text-[#173A7C] drop-shadow-sm line-clamp-2">
@@ -112,14 +112,14 @@ export default function HeroSection() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
-            className="flex-1 relative bg-white/40 backdrop-blur-[40px] border border-white/40 shadow-[0_40px_80px_-20px_rgba(23,58,124,0.15)] rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] 2xl:rounded-[3rem] p-6 sm:p-10 lg:p-6 xl:p-10 w-full flex flex-col justify-center items-center overflow-hidden transition-all duration-700 hover:shadow-[0_50px_100px_-20px_rgba(23,58,124,0.2)] hover:-translate-y-1 group min-h-[250px] lg:min-h-0"
+            className="flex-1 relative bg-white/50 backdrop-blur-[40px] border border-white/60 shadow-[0_40px_80px_-20px_rgba(23,58,124,0.12)] rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] 2xl:rounded-[3rem] p-5 sm:p-10 lg:p-6 xl:p-10 w-full flex flex-col justify-center items-center overflow-hidden transition-all duration-700 hover:shadow-[0_50px_100px_-20px_rgba(23,58,124,0.2)] hover:-translate-y-1 group min-h-[240px] lg:min-h-0"
           >
             <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/60 to-transparent pointer-events-none rounded-t-[2.5rem] lg:rounded-t-[1.5rem] xl:rounded-t-[2rem] 2xl:rounded-t-[3rem]" />
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
 
             <div className="relative z-10 text-center w-full">
               {/* Subtitle */}
-              <p className="text-[#5CB07C] text-xs sm:text-sm lg:text-[10px] xl:text-xs 2xl:text-sm font-bold mb-4 sm:mb-6 lg:mb-3 xl:mb-5 tracking-wide bg-white/70 shadow-sm border border-white/90 inline-block px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 rounded-full backdrop-blur-md">
+              <p className="text-[#5CB07C] text-xs sm:text-sm lg:text-[10px] xl:text-xs 2xl:text-sm font-bold mb-4 sm:mb-6 lg:mb-3 xl:mb-5 tracking-wide bg-white/80 shadow-sm border border-white/90 inline-block px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 rounded-full backdrop-blur-md">
                 منصة النبض المستدام للتدريب المهني
               </p>
 
@@ -133,18 +133,18 @@ export default function HeroSection() {
               {/* Typewriter */}
               <div className="text-base sm:text-2xl lg:text-sm xl:text-xl 2xl:text-2xl text-slate-800 mb-6 sm:mb-8 lg:mb-4 xl:mb-8 h-8 sm:h-12 lg:h-6 xl:h-10 flex items-center justify-center gap-2 font-bold">
                 <span className="opacity-80">في المجال</span>
-                <span className="text-[#173A7C] font-black min-w-[70px] sm:min-w-[100px] lg:min-w-[60px] xl:min-w-[90px] inline-block text-right tracking-tight drop-shadow-sm">
+                <span className="text-[#173A7C] font-black min-w-[65px] sm:min-w-[100px] lg:min-w-[60px] xl:min-w-[90px] inline-block text-right tracking-tight drop-shadow-sm">
                   {displayed}
                   <span className="animate-pulse font-normal opacity-40">|</span>
                 </span>
               </div>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 sm:gap-4 lg:gap-2 xl:gap-4 w-full px-2 lg:px-0">
+              <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 sm:gap-4 lg:gap-2 xl:gap-4 w-full px-1 lg:px-0">
                 <Button href="/courses" size="lg" className="flex-1 w-full h-12 sm:h-14 lg:h-10 xl:h-12 2xl:h-14 text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold border border-white/20 px-2 sm:px-8 lg:px-1 xl:px-4 transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
                   استكشف الدورات
                 </Button>
-                <Button href="/corporate" variant="secondary" size="lg" className="flex-1 w-full h-12 sm:h-14 lg:h-10 xl:h-12 2xl:h-14 text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold bg-white/70 backdrop-blur-md border border-white/80 px-2 sm:px-8 lg:px-1 xl:px-4 transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
+                <Button href="/corporate" variant="secondary" size="lg" className="flex-1 w-full h-12 sm:h-14 lg:h-10 xl:h-12 2xl:h-14 text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold bg-white/80 backdrop-blur-md border border-white/80 px-2 sm:px-8 lg:px-1 xl:px-4 transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
                   دورات الشركات
                 </Button>
               </div>
@@ -156,7 +156,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="w-full relative bg-white/40 backdrop-blur-[40px] border border-white/40 shadow-[0_20px_50px_-10px_rgba(23,58,124,0.1)] rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-[1.25rem] xl:rounded-[1.5rem] p-4 sm:p-6 lg:p-3 xl:p-5 flex flex-row items-center justify-around gap-2 sm:gap-6 lg:gap-2 xl:gap-4 transition-all duration-700 hover:shadow-[0_30px_60px_-10px_rgba(23,58,124,0.18)] hover:-translate-y-0.5 group shrink-0"
+            className="w-full relative bg-white/50 backdrop-blur-[40px] border border-white/60 shadow-[0_20px_50px_-10px_rgba(23,58,124,0.1)] rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-[1.25rem] xl:rounded-[1.5rem] p-4 sm:p-6 lg:p-3 xl:p-5 flex flex-row items-center justify-around gap-2 sm:gap-6 lg:gap-2 xl:gap-4 transition-all duration-700 hover:shadow-[0_30px_60px_-10px_rgba(23,58,124,0.18)] hover:-translate-y-0.5 group shrink-0"
           >
             <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/50 to-transparent pointer-events-none rounded-t-[1.5rem] lg:rounded-t-[1.25rem] xl:rounded-t-[1.5rem]" />
 
@@ -202,16 +202,17 @@ export default function HeroSection() {
               transition={{ delay: 0.5, duration: 0.7 }}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
-              className="relative w-full h-full aspect-[4/3] sm:aspect-square lg:aspect-auto min-h-[300px] lg:min-h-[250px] flex items-center justify-center pointer-events-auto bg-white/10 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/20 shadow-xl cursor-pointer"
+              className="relative w-full h-full aspect-[4/3] sm:aspect-square lg:aspect-auto min-h-[300px] lg:min-h-[250px] flex items-center justify-center pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
             >
               <div className="w-full h-full relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem]">
                 <img src={heroCourses[currentSlide].image} alt={heroCourses[currentSlide].title} className="w-full h-full object-cover sm:object-cover transition-transform duration-[1.5s] ease-out hover:scale-[1.08]" />
               </div>
 
-              <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 lg:-top-3 lg:-right-3 xl:-top-5 xl:-right-5 px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 bg-white/80 backdrop-blur-[30px] rounded-xl sm:rounded-2xl lg:rounded-lg xl:rounded-xl shadow-[0_15px_40px_rgba(23,58,124,0.15)] border border-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30">
+              {/* Badges positioned cleanly on all screen sizes */}
+              <div className="absolute top-2 right-2 sm:-top-5 sm:-right-5 lg:-top-3 lg:-right-3 xl:-top-5 xl:-right-5 px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 bg-white/90 backdrop-blur-[30px] rounded-xl sm:rounded-2xl lg:rounded-lg xl:rounded-xl shadow-[0_15px_40px_rgba(23,58,124,0.15)] border border-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30">
                 <img src="/tabby.webp" alt="Tabby" className="h-6 sm:h-8 lg:h-4 xl:h-6 2xl:h-8 w-auto object-contain drop-shadow-sm" />
               </div>
-              <div className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 lg:-bottom-3 lg:-left-3 xl:-bottom-5 xl:-left-5 px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 bg-white/80 backdrop-blur-[30px] rounded-xl sm:rounded-2xl lg:rounded-lg xl:rounded-xl shadow-[0_15px_40px_rgba(23,58,124,0.15)] border border-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30">
+              <div className="absolute bottom-2 left-2 sm:-bottom-5 sm:-left-5 lg:-bottom-3 lg:-left-3 xl:-bottom-5 xl:-left-5 px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 bg-white/90 backdrop-blur-[30px] rounded-xl sm:rounded-2xl lg:rounded-lg xl:rounded-xl shadow-[0_15px_40px_rgba(23,58,124,0.15)] border border-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30">
                 <img src="/Tamara.webp" alt="Tamara" className="h-6 sm:h-8 lg:h-4 xl:h-6 2xl:h-8 w-auto object-contain drop-shadow-sm" />
               </div>
             </motion.div>
@@ -221,7 +222,7 @@ export default function HeroSection() {
       </div>
 
       {/* Carousel Controls Container */}
-      <div className="absolute bottom-24 lg:bottom-4 xl:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-6 lg:gap-3 xl:gap-6 z-30 pointer-events-auto bg-white/40 sm:bg-white/20 backdrop-blur-md px-6 sm:px-8 py-2.5 sm:py-3 lg:px-4 lg:py-1.5 xl:px-6 xl:py-2 rounded-full border border-white/50 shadow-lg">
+      <div className="absolute bottom-20 lg:bottom-4 xl:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-6 lg:gap-3 xl:gap-6 z-30 pointer-events-auto bg-white/60 sm:bg-white/40 backdrop-blur-md px-6 sm:px-8 py-2.5 sm:py-3 lg:px-4 lg:py-1.5 xl:px-6 xl:py-2 rounded-full border border-white/70 shadow-lg">
         <button aria-label="الشريحة السابقة" onClick={prevSlide} className="w-10 h-10 sm:w-12 sm:h-12 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-full bg-white/95 hover:bg-[#173A7C] hover:text-white backdrop-blur-xl flex items-center justify-center text-[#173A7C] transition-all shadow-md group/btn ring-2 ring-white/50">
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 lg:w-4 lg:h-4 xl:w-5 xl:h-5 group-hover/btn:scale-110 transition-transform" />
         </button>

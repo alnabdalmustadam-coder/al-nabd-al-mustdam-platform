@@ -25,7 +25,8 @@ import {
   X,
   Search,
   Trash2,
-  ThumbsUp
+  ThumbsUp,
+  Sparkles
 } from 'lucide-react';
 import { StudentVideoPlayer } from '@/components/student/student-video-player';
 import {
@@ -35,6 +36,9 @@ import {
   saveLessonNote,
   saveQuizAttempt,
 } from '@/lib/actions/student-actions';
+import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
+import { Course } from '@/types';
+import { createClient } from '@/utils/supabase/client';
 
 /* ── Types ── */
 interface Lesson {
@@ -56,13 +60,48 @@ interface Chapter {
 export default function StudentLessonPage() {
   const params = useParams();
   const router = useRouter();
-  const courseSlug = (params?.courseSlug as string) || 'diploma-tolerance-citizenship';
+  const rawSlug = (params?.courseSlug as string) || 'free-trial-course';
+  const courseSlug = rawSlug.replace(/^course-/, '');
   const lessonId = (params?.lessonId as string) || 'lesson-1';
+
+  // Dynamic course state
+  const [courseData, setCourseData] = useState<Course>(() => {
+    return getCourseBySlug(courseSlug) || catalogCourses.find(c => c.slug === courseSlug) || catalogCourses[0];
+  });
+
+  // Fetch live course from server API
+  useEffect(() => {
+    async function loadLiveCourseData() {
+      try {
+        const res = await fetch('/api/courses', { cache: 'no-store' });
+        const data = await res.json();
+        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+          const matched = data.courses.find((c: any) => {
+            const clean = (c.slug || '').replace(/^course-/, '').toLowerCase().trim();
+            const target = courseSlug.replace(/^course-/, '').toLowerCase().trim();
+            return (
+              clean === target ||
+              c.slug === courseSlug ||
+              (c.ghlCourseId && c.ghlCourseId.replace(/^course-/, '').toLowerCase().trim() === target) ||
+              String(c.id) === target
+            );
+          });
+          if (matched) {
+            setCourseData(matched);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading live course in lesson player:', err);
+      }
+    }
+
+    loadLiveCourseData();
+  }, [courseSlug]);
 
   const [activeTab, setActiveTab] = useState<'notes' | 'attachments' | 'quiz' | 'discussion'>('notes');
   const [userNote, setUserNote] = useState('');
   const [notesList, setNotesList] = useState<{ id: string; text: string; date: string }[]>([
-    { id: '1', text: '[02:15] ملاحظة مهمة: التسامح قيمة إسلامية أصيلة ترتبط بالعدالة والمواطنة الصالحة.', date: 'اليوم، 10:15 ص' },
+    { id: '1', text: '[02:15] ملاحظة هامة: تم استيعاب المفهوم الأساسي للدرس بنجاح.', date: 'اليوم، 10:15 ص' },
   ]);
 
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
@@ -85,10 +124,10 @@ export default function StudentLessonPage() {
   >([
     {
       id: 'c1',
-      author: 'د. عبدالله الشمري',
+      author: courseData?.instructor || 'د. محمد القحطاني',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-      role: 'استشاري التسامح والسلام',
-      content: 'أهلاً بكم جميعاً في هذا المساق. يسرني الإجابة على كافة تساؤلاتكم حول مفاهيم المواطنة الإيجابية.',
+      role: 'المدرب المعتمد',
+      content: 'أهلاً بكم جميعاً في هذا البرنامج التدريبي المعتمد. يسرني الإجابة على استفساراتكم ومتابعة تقدمكم.',
       date: 'منذ ساعتين',
       likes: 12,
     },
@@ -97,42 +136,76 @@ export default function StudentLessonPage() {
       author: 'سارة خالد',
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
       role: 'متدربة',
-      content: 'شرح رائع جداً للمفهوم الأكاديمي للتسامح. هل توجد مراجع إضافية حول الحوار الفعال؟',
+      content: 'شرح متميز وواضح جداً! شكراً لكم.',
       date: 'منذ 45 دقيقة',
       likes: 4,
     },
   ]);
   const [newCommentText, setNewCommentText] = useState('');
 
-  const chapters: Chapter[] = [
-    {
-      id: 'chap-1',
-      title: 'الفصل الأول: المفاهيم الأساسية للتسامح والمواطنة',
-      lessons: [
-        { id: 'lesson-1', title: 'مدخل إلى قيم التسامح والسلام', duration: '15 دقيقة', isCompleted: true, videoUrl: 'https://www.youtube.com/watch?v=1BEWMhAuBd4', type: 'video' },
-        { id: 'lesson-2', title: 'أبعاد المواطنة الصالحة والمسؤولية', duration: '20 دقيقة', isCompleted: false, videoUrl: 'https://www.youtube.com/watch?v=1BEWMhAuBd4', type: 'video' },
-        { id: 'lesson-3', title: 'التعايش السلمي في المنظومة الأكاديمية', duration: '18 دقيقة', isCompleted: false, videoUrl: 'https://www.youtube.com/watch?v=1BEWMhAuBd4', type: 'article' },
-      ],
-    },
-    {
-      id: 'chap-2',
-      title: 'الفصل الثاني: المهارات العملية للتكامل الاجتماعي',
-      lessons: [
-        { id: 'lesson-4', title: 'الحوار الفعال وبناء الجسور', duration: '25 دقيقة', isCompleted: false, videoUrl: 'https://www.youtube.com/watch?v=1BEWMhAuBd4', type: 'video' },
-        { id: 'lesson-5', title: 'تطبيقات التسامح في البيئة المؤسسية', duration: '22 دقيقة', isCompleted: false, videoUrl: 'https://www.youtube.com/watch?v=1BEWMhAuBd4', type: 'quiz' },
-      ],
-    },
-  ];
+  /* ── Build Chapters dynamically from live course curriculum ── */
+  const chapters: Chapter[] = useMemo(() => {
+    if (courseData && Array.isArray(courseData.curriculum) && courseData.curriculum.length > 0) {
+      return courseData.curriculum.map((sec: any, sIdx: number) => {
+        const itemTitle = sec.title || `المحاضرة ${sIdx + 1}`;
+        const itemUniqueId = sec.id || `les-${sIdx + 1}`;
+        const rawVideo = sec.videoUrl || '';
+
+        return {
+          id: `chap-${sIdx + 1}`,
+          title: itemTitle,
+          lessons: [
+            {
+              id: itemUniqueId,
+              title: itemTitle,
+              duration: sec.duration || '20 دقيقة',
+              isCompleted: false,
+              videoUrl: rawVideo,
+              type: (sec.type as any) || 'video',
+            },
+          ],
+        };
+      });
+    }
+
+    // Default Fallback chapter if curriculum is empty
+    return [
+      {
+        id: 'chap-1',
+        title: `الوحدة الأولى: مدخل إلى ${courseData?.title || 'الدورة'}`,
+        lessons: [
+          {
+            id: 'lesson-1',
+            title: 'المفاهيم الأساسية والأهداف التدريبية',
+            duration: '15 دقيقة',
+            isCompleted: true,
+            videoUrl: '',
+            type: 'video',
+          },
+        ],
+      },
+    ];
+  }, [courseData]);
 
   /* ── Derived data ── */
-  const allLessons = useMemo(() => chapters.flatMap((ch) => ch.lessons), []);
-  const currentIndex = allLessons.findIndex((l) => l.id === lessonId);
+  const allLessons = useMemo(() => chapters.flatMap((ch) => ch.lessons), [chapters]);
+  
+  const currentIndex = useMemo(() => {
+    if (!allLessons || allLessons.length === 0) return 0;
+    const exactMatch = allLessons.findIndex((l) => l.id === lessonId);
+    if (exactMatch >= 0) return exactMatch;
+    // If URL is lesson-1 and exact ID differs, pick first lesson
+    if (lessonId === 'lesson-1' || !lessonId) return 0;
+    return 0;
+  }, [allLessons, lessonId]);
+
+  const currentLesson = allLessons[currentIndex] || allLessons[0];
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
 
-  const totalLessons = allLessons.length;
+  const totalLessons = Math.max(1, allLessons.length);
   const completedLessons = allLessons.filter(l => completedSet.has(l.id)).length;
-  const progressPercent = Math.round((completedLessons / totalLessons) * 100);
+  const progressPercent = Math.min(100, Math.round((completedLessons / totalLessons) * 100));
 
   const makeLessonUrl = (id: string) => `/dashboard/student/courses/${courseSlug}/lessons/${id}`;
 
@@ -147,23 +220,108 @@ export default function StudentLessonPage() {
       .filter(chap => chap.lessons.length > 0);
   }, [chapters, searchQuery]);
 
+  // Set non-active chapters collapsed by default so modules open one by one
+  useEffect(() => {
+    if (chapters.length > 0) {
+      const activeLessonId = currentLesson?.id || lessonId;
+      const activeChap = chapters.find(ch => ch.lessons.some(l => l.id === activeLessonId));
+      const activeChapId = activeChap ? activeChap.id : chapters[0]?.id;
+
+      const collapsed = new Set<string>();
+      chapters.forEach(ch => {
+        if (ch.id !== activeChapId) {
+          collapsed.add(ch.id);
+        }
+      });
+      setCollapsedChapters(collapsed);
+    }
+  }, [chapters, lessonId, currentLesson?.id]);
+
   /* ── Persistent State ── */
   useEffect(() => {
-    setCompletedSet(getCompletedLessons(courseSlug));
-    setNotesList(getLessonNotes(lessonId));
-  }, [courseSlug, lessonId]);
+    async function initProgress() {
+      const localCompleted = getCompletedLessons(courseSlug);
+      setCompletedSet(localCompleted);
+      setNotesList(getLessonNotes(lessonId));
+
+      try {
+        const supabase = createClient();
+        const { data: authData } = await supabase.auth.getUser();
+        if (authData?.user) {
+          const userEmail = authData.user.email?.toLowerCase().trim();
+
+          // If local storage has progress, sync it to server API route immediately
+          if (localCompleted.size > 0 && totalLessons > 0) {
+            const calculatedProgress = Math.min(100, Math.round((localCompleted.size / totalLessons) * 100));
+            fetch('/api/courses/update-progress', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: userEmail,
+                courseSlug,
+                courseTitle: courseData?.title,
+                progress: calculatedProgress,
+              }),
+            }).catch(console.error);
+          } else {
+            // Otherwise fetch from database if available
+            const matchIds = Array.from(new Set([
+              courseSlug,
+              `course-${courseSlug}`,
+              courseData?.slug,
+              courseData?.ghlCourseId,
+              courseData?.ghlCourseId?.replace(/^course-/, ''),
+            ])).filter(Boolean);
+
+            const orQuery = [
+              ...matchIds.map(id => `course_id.eq.${id}`),
+              ...(courseData?.title ? [`course_title.eq.${courseData.title}`] : []),
+            ].join(',');
+
+            const { data: enrollRow } = await supabase
+              .from('enrollments')
+              .select('progress')
+              .eq('email', userEmail)
+              .or(orQuery)
+              .maybeSingle();
+
+            if (enrollRow?.progress && enrollRow.progress > 0) {
+              const calculatedCompletedCount = Math.round((enrollRow.progress / 100) * totalLessons);
+              const loadedSet = new Set<string>();
+              allLessons.slice(0, calculatedCompletedCount).forEach(l => loadedSet.add(l.id));
+              if (loadedSet.size > 0) {
+                setCompletedSet(loadedSet);
+                saveCompletedLessons(courseSlug, loadedSet);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error syncing lesson progress on init:', err);
+      }
+    }
+
+    initProgress();
+  }, [courseSlug, lessonId, totalLessons, allLessons, courseData]);
 
   /* ── Handlers ── */
   const toggleChapter = (chapId: string) => {
     setCollapsedChapters(prev => {
-      const next = new Set(prev);
-      if (next.has(chapId)) next.delete(chapId);
-      else next.add(chapId);
-      return next;
+      const isCurrentlyCollapsed = prev.has(chapId);
+      if (isCurrentlyCollapsed) {
+        // Open ONLY this chapter, and collapse all other chapters
+        const allOtherChaps = new Set(chapters.map(c => c.id).filter(id => id !== chapId));
+        return allOtherChaps;
+      } else {
+        // Collapse this chapter
+        const next = new Set(prev);
+        next.add(chapId);
+        return next;
+      }
     });
   };
 
-  const handleToggleComplete = useCallback((lessonItemId: string, e?: React.MouseEvent) => {
+  const handleToggleComplete = useCallback(async (lessonItemId: string, e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -187,10 +345,39 @@ export default function StudentLessonPage() {
           }
         }
       }
+
       saveCompletedLessons(courseSlug, next);
+
+      // ── Sync with Supabase Database via API Route (Service Role) ──
+      const allFlat = chapters.flatMap(ch => ch.lessons);
+      const newProgress = Math.min(100, Math.round((next.size / Math.max(1, allFlat.length)) * 100));
+
+      (async () => {
+        try {
+          const supabase = createClient();
+          const { data: authData } = await supabase.auth.getUser();
+          if (authData?.user) {
+            const userEmail = authData.user.email?.toLowerCase().trim();
+
+            await fetch('/api/courses/update-progress', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: userEmail,
+                courseSlug,
+                courseTitle: courseData?.title,
+                progress: newProgress,
+              }),
+            });
+          }
+        } catch (syncErr) {
+          console.error('Error syncing progress with API route:', syncErr);
+        }
+      })();
+
       return next;
     });
-  }, [router, courseSlug, chapters]);
+  }, [router, courseSlug, chapters, courseData]);
 
   const handleAddNote = () => {
     if (!userNote.trim()) return;
@@ -202,9 +389,16 @@ export default function StudentLessonPage() {
   const handleAddTimestampNote = (timestampStr: string) => {
     setActiveTab('notes');
     setUserNote(prev => `[${timestampStr}] ` + prev);
+    setTimeout(() => {
+      const noteArea = document.getElementById('lesson-note-textarea');
+      if (noteArea) {
+        noteArea.focus();
+        noteArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   };
 
-  const handleQuizSubmit = () => {
+  const handleQuizSubmit = async () => {
     let score = 0;
     quizQuestions.forEach((q, idx) => {
       if (selectedAnswers[idx] === q.correctIndex) score += 50;
@@ -212,13 +406,50 @@ export default function StudentLessonPage() {
     setQuizScore(score);
     setQuizSubmitted(true);
     saveQuizAttempt(lessonId, score);
+
+    // Auto-issue certificate if passed
+    if (score >= 50) {
+      try {
+        const supabase = createClient();
+        const { data: authData } = await supabase.auth.getUser();
+        const user = authData?.user;
+        const studentEmail = user?.email?.toLowerCase().trim();
+        let studentName = user?.user_metadata?.full_name || 'المتدرب المتميز';
+
+        if (user?.id) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', user.id)
+            .maybeSingle();
+          if (profile?.full_name) {
+            studentName = profile.full_name;
+          }
+        }
+
+        await fetch('/api/student/certificates/auto-issue', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            studentName,
+            studentEmail,
+            courseSlug,
+            courseTitle: courseData?.title,
+            grade: `ممتاز (%${score})`,
+            hours: '30 ساعة تدريبية معتمدة',
+          }),
+        });
+      } catch (err) {
+        console.error('Error auto issuing certificate after quiz:', err);
+      }
+    }
   };
 
   const handlePostComment = () => {
     if (!newCommentText.trim()) return;
     const newC = {
       id: `c_${Date.now()}`,
-      author: 'طالب معتمد',
+      author: 'متدرب معتمد',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
       role: 'متدرب',
       content: newCommentText.trim(),
@@ -232,49 +463,48 @@ export default function StudentLessonPage() {
   const quizQuestions = [
     {
       id: 1,
-      question: 'ما هي الركيزة الأساسية لترسيخ قيم التسامح والمواطنة الصالحة؟',
-      options: ['الالتزام بالحوار الفعال والعدالة', 'التغاضي السلبي بدون حوار', 'تحديد الصلاحيات الفردية فقط', 'تجنب المسؤولية الاجتماعية'],
+      question: 'ما هي الركيزة الأساسية لتحقيق أعلى استفادة من هذا المساق التدريبي؟',
+      options: ['التطبيق العملي المستمر ومراجعة المخرجات', 'المشاهدة السريعة بدون تدوين', 'تجاوز الاختبارات التقييمية', 'تجنب المشاركة في المناقشات'],
       correctIndex: 0,
     },
     {
       id: 2,
-      question: 'أي من العناصر التالية يعتبر مقياساً رئيساً للتميز الأكاديمي في المواطنة؟',
-      options: ['المشاركة الإيجابية والاحترام المتبادل', 'الانعزال الأكاديمي', 'تجاهل اللوائح', 'العمل الفردي فقط'],
+      question: 'كيف يتم التحقق من استحقاق الشهادة الرقمية المعتمدة؟',
+      options: ['إتمام كافة متطلبات الدروس ورصد التقدم بنسبة 100%', 'التسجيل في الدورة فقط دون الحضور', 'عدم إكمال الواجبات', 'تخطي الوحدات الأساسية'],
       correctIndex: 0,
     },
   ];
 
   return (
-    <div className="w-full pt-2 sm:pt-0 sm:-mt-2 sm:-mb-10 font-[family-name:var(--font-cairo)] text-white" dir="rtl">
-      {/* Top Breadcrumb Navigation: BORDERLESS WHITE TEXT ONLY */}
-      <div className="flex items-center justify-between gap-1.5 sm:gap-2 text-[10.5px] sm:text-xs font-bold mb-3.5 sm:mb-4 min-w-0">
+    <div className="w-full pt-1.5 sm:pt-2.5 -mt-1 sm:-mt-2 lg:-mt-[3.8vh] -mb-6 sm:-mb-10 font-[family-name:var(--font-cairo)] text-slate-900" dir="rtl">
+      {/* Top Breadcrumb Navigation */}
+      <div className="flex items-center justify-between gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold mb-2.5 sm:mb-3.5 min-w-0">
         <Link
           href="/dashboard/student"
-          className="inline-flex items-center gap-1 sm:gap-1.5 text-white hover:text-emerald-300 transition-colors whitespace-nowrap shrink-0 font-black"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white text-[#173A7C] hover:text-[#1E4D9D] border border-slate-200/80 shadow-xs transition-all whitespace-nowrap shrink-0 font-black"
         >
-          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
+          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#173A7C] shrink-0" />
           <span>العودة للوحة التحكم</span>
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-1.5 text-white/90 min-w-0 font-bold">
-          <Link href="/dashboard/student/courses" className="text-white hover:text-emerald-300 transition-colors whitespace-nowrap shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 text-slate-700 min-w-0 font-bold bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-xs">
+          <Link href="/dashboard/student/courses" className="text-slate-700 hover:text-[#173A7C] transition-colors whitespace-nowrap shrink-0">
             الدورات التدريبية
           </Link>
-          <ChevronLeft className="w-3 h-3 text-white/60 shrink-0" />
-          <span className="text-white font-extrabold truncate max-w-[130px] xs:max-w-[180px] sm:max-w-none whitespace-nowrap">
-            دبلوم التسامح والسلام
+          <ChevronLeft className="w-3 h-3 text-slate-400 shrink-0" />
+          <span className="text-[#173A7C] font-black truncate max-w-[130px] xs:max-w-[180px] sm:max-w-none whitespace-nowrap">
+            {courseData?.title || 'الدورة التدريبية'}
           </span>
         </div>
       </div>
 
-      {/* ===== SINGLE UNIFIED MASTER CARD CONTAINER WITH REDUCED TRANSPARENCY (bg-white/85) ===== */}
+      {/* Main Unified Container */}
       <div className="w-full bg-white/85 backdrop-blur-2xl border border-white/60 rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden p-2 sm:p-5 mb-6 sm:mb-8 text-slate-800">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           
-          {/* ── RIGHT COLUMN (RTL Right, lg:col-span-4): Playlist Index (DESKTOP ONLY) ── */}
-          <div className="hidden lg:flex lg:col-span-4 xl:col-span-4 flex-col justify-between space-y-4 bg-slate-50/80 p-4 rounded-2xl border border-slate-200/80">
-            {/* Header & Overall Progress */}
-            <div className="space-y-3 pb-3 border-b border-slate-200">
+          {/* Playlist Index (DESKTOP) */}
+          <div className="hidden lg:flex lg:col-span-4 xl:col-span-4 flex-col justify-between space-y-3 bg-slate-50/90 p-4 rounded-2xl border border-slate-200/80 h-full max-h-[640px] xl:max-h-[720px]">
+            <div className="space-y-3 pb-3 border-b border-slate-200 shrink-0">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="p-2 rounded-xl bg-[#173A7C] text-white shrink-0">
@@ -319,10 +549,10 @@ export default function StudentLessonPage() {
               </div>
             </div>
 
-            {/* Chapters & Lessons Accordion List */}
+            {/* Chapters & Lessons Accordion */}
             <div
-              className="flex-1 overflow-y-auto space-y-3 max-h-[580px] lg:max-h-[700px] pr-0.5"
-              style={{ scrollbarWidth: 'thin' }}
+              className="flex-1 overflow-y-auto space-y-2.5 pr-0.5 no-scrollbar"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {filteredChapters.map((chap, chIdx) => {
                 const isChapCollapsed = collapsedChapters.has(chap.id);
@@ -352,9 +582,9 @@ export default function StudentLessonPage() {
                     </button>
 
                     {!isChapCollapsed && (
-                      <div className="p-1.5 space-y-1.5 bg-white">
+                      <div className="p-1.5 space-y-1.5 bg-white animate-fade-in-up">
                         {chap.lessons.map((les) => {
-                          const isCurrent = les.id === lessonId;
+                          const isCurrent = les.id === (currentLesson?.id || lessonId);
                           const isDone = completedSet.has(les.id);
 
                           return (
@@ -404,42 +634,34 @@ export default function StudentLessonPage() {
               })}
             </div>
 
-            {/* Bottom Footer Info */}
-            <div className="pt-2 border-t border-slate-200 text-center">
+            <div className="pt-2 border-t border-slate-200 text-center shrink-0">
               <span className="text-[11px] font-bold text-[#5CB07C]">
-                منصة النبض المستدام — تتبع التحصيل الأكاديمي تلقائياً ✓
+                النبض المستدام — تسجيل التقدم ومزامنته تلقائياً ✓
               </span>
             </div>
           </div>
 
-          {/* ── LEFT COLUMN (RTL Left, lg:col-span-8): Clean Video Player ── */}
+          {/* Video Player */}
           <div className="col-span-1 lg:col-span-8 xl:col-span-8 flex flex-col justify-between w-full">
             <StudentVideoPlayer
-              lessonId={lessonId}
-              lessonTitle={
-                allLessons.find((les) => les.id === lessonId)?.title ||
-                'مدخل إلى قيم التسامح والسلام'
-              }
-              videoUrl={
-                allLessons.find((les) => les.id === lessonId)?.videoUrl ||
-                'https://www.youtube.com/watch?v=1BEWMhAuBd4'
-              }
-              onLessonComplete={() => handleToggleComplete(lessonId)}
+              lessonId={currentLesson?.id || lessonId}
+              lessonTitle={currentLesson?.title || courseData?.title || 'الدرس التدريبي'}
+              videoUrl={currentLesson?.videoUrl || 'https://www.youtube.com/watch?v=1BEWMhAuBd4'}
+              onLessonComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
               nextLessonUrl={nextLesson ? makeLessonUrl(nextLesson.id) : undefined}
               prevLessonUrl={prevLesson ? makeLessonUrl(prevLesson.id) : undefined}
               onOpenLessonsDrawer={() => setIsMobilePlaylistOpen(true)}
               onAddNoteAtTimestamp={handleAddTimestampNote}
-              isCompleted={completedSet.has(lessonId)}
-              onToggleComplete={() => handleToggleComplete(lessonId)}
+              isCompleted={completedSet.has(currentLesson?.id || lessonId)}
+              onToggleComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
             />
           </div>
 
         </div>
       </div>
 
-      {/* ===== BOTTOM INTERACTIVE TABS WORKSPACE WITH REDUCED TRANSPARENCY (bg-white/85) ===== */}
+      {/* Interactive Tabs Workspace */}
       <div className="w-full bg-white/85 backdrop-blur-2xl border border-white/60 rounded-3xl p-4 sm:p-7 shadow-xl space-y-6 text-slate-800">
-        {/* Navigation Tabs Bar: EXACT EQUAL SIZE (grid-cols-2 sm:grid-cols-4) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 border-b border-slate-200 pb-4">
           <button
             onClick={() => setActiveTab('notes')}
@@ -474,7 +696,7 @@ export default function StudentLessonPage() {
             }`}
           >
             <HelpCircle className="w-4 h-4 shrink-0" />
-            <span className="truncate">اختبار الدرس</span>
+            <span className="truncate">اختبار الوحدة</span>
           </button>
 
           <button
@@ -493,18 +715,17 @@ export default function StudentLessonPage() {
         {/* Tab 1: Notes */}
         {activeTab === 'notes' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
-                <Bookmark className="w-4 h-4 text-[#5CB07C]" />
-                تدوين ملاحظات خاصة بهذا الدرس
-              </h4>
-            </div>
+            <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
+              <Bookmark className="w-4 h-4 text-[#5CB07C]" />
+              تدوين ملاحظات خاصة بهذا الدرس
+            </h4>
 
             <div className="space-y-3">
               <textarea
+                id="lesson-note-textarea"
                 value={userNote}
                 onChange={(e) => setUserNote(e.target.value)}
-                placeholder="اكتب ملاحظاتك الهامة هنا... يمكنك الاستعانة بزر [ملاحظة ⏱️] بأعلى المشغل لربط الملاحظة بدقيقة محددة."
+                placeholder="اكتب ملاحظاتك الهامة هنا... يمكنك الاستعانة برابط الدقيقة لحفظ وقت الملاحظة."
                 className="w-full text-xs sm:text-sm font-medium p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#173A7C] min-h-[90px] resize-y"
               />
               <div className="flex justify-end">
@@ -549,7 +770,7 @@ export default function StudentLessonPage() {
           <div className="space-y-4">
             <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
               <Paperclip className="w-4 h-4 text-[#173A7C]" />
-              الملفات والمكتسبات المرفقة بالدرس
+              الملفات والمكتسبات المرفقة بالبرنامج التدريبي
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -559,7 +780,7 @@ export default function StudentLessonPage() {
                     <FileText className="w-5 h-5" />
                   </div>
                   <div>
-                    <h5 className="font-bold text-slate-800 text-xs sm:text-sm">حقيبة الدرس الأول - عرض التقديم.pdf</h5>
+                    <h5 className="font-bold text-slate-800 text-xs sm:text-sm">حقيبة الدورة - العرض التدريبي.pdf</h5>
                     <p className="text-[11px] text-slate-500">حجم الملف: 4.2 ميجابايت · PDF</p>
                   </div>
                 </div>
@@ -574,7 +795,7 @@ export default function StudentLessonPage() {
                     <Award className="w-5 h-5" />
                   </div>
                   <div>
-                    <h5 className="font-bold text-slate-800 text-xs sm:text-sm">دليل المهارات والتطبيقات العملية.pdf</h5>
+                    <h5 className="font-bold text-slate-800 text-xs sm:text-sm">دليل التطبيقات العملية والشهادة.pdf</h5>
                     <p className="text-[11px] text-slate-500">حجم الملف: 1.8 ميجابايت · PDF</p>
                   </div>
                 </div>
@@ -592,7 +813,7 @@ export default function StudentLessonPage() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-amber-500" />
-                اختبار تقييمي قصير لمخرجات الدرس
+                اختبار تقييمي قصير لمخرجات الدورة
               </h4>
               {quizSubmitted && (
                 <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg">
@@ -628,13 +849,34 @@ export default function StudentLessonPage() {
                 </div>
               ))}
 
+              {quizSubmitted && quizScore !== null && quizScore >= 50 && (
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-500/30 text-slate-900 space-y-3 shadow-xs">
+                  <div className="flex items-center gap-2.5 text-emerald-800 font-black text-xs sm:text-sm">
+                    <Award className="w-5 h-5 text-emerald-600 shrink-0" />
+                    <span>تهانينا! لقد اجتزت الاختبار بنجاح وتم إصدار شهادتك المعتمدة فوراً 📜</span>
+                  </div>
+                  <p className="text-xs text-slate-600 font-bold leading-relaxed">
+                    تم توثيق إنجازك الأكاديمي وإصدار شهادة معتمدة بالمركز الوطني بالتصميم والقالب الرسمي المخصص.
+                  </p>
+                  <div className="pt-1">
+                    <Link
+                      href="/dashboard/student/certificates"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-teal-600 hover:to-emerald-600 text-white text-xs font-black shadow-md shadow-emerald-600/20 transition-all hover:-translate-y-0.5"
+                    >
+                      <Award className="w-4 h-4" />
+                      <span>معاينة وتحميل شهادتي المعتمدة الآن ⚡</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-end">
                 <button
                   onClick={handleQuizSubmit}
                   disabled={Object.keys(selectedAnswers).length < quizQuestions.length}
                   className="px-5 py-2.5 bg-[#173A7C] text-white rounded-xl text-xs font-bold hover:bg-[#1E4D9D] transition-all disabled:opacity-50 cursor-pointer"
                 >
-                  اعتماد إجابات الاختبار
+                  {quizSubmitted ? 'إعادة اعتماد الإجابات' : 'اعتماد إجابات الاختبار'}
                 </button>
               </div>
             </div>
@@ -646,7 +888,7 @@ export default function StudentLessonPage() {
           <div className="space-y-5">
             <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-indigo-600" />
-              مجتمع النقاش والأسئلة حول الدرس
+              مجتمع النقاش والأسئلة حول الدورة
             </h4>
 
             <div className="space-y-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50">
@@ -696,155 +938,115 @@ export default function StudentLessonPage() {
           </div>
         )}
 
-      </div>
+      {/* Mobile Playlist Drawer */}
+      {isMobilePlaylistOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-slate-900/60 backdrop-blur-xs animate-fade-in-up">
+          <div className="bg-white rounded-t-3xl border-t border-slate-200 max-h-[80vh] flex flex-col p-4 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-[#173A7C] text-white">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-800">فهرس دروس المساق</h3>
+                  <p className="text-[11px] font-bold text-slate-500">{completedLessons} من {totalLessons} مكتمل (%{progressPercent})</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsMobilePlaylistOpen(false)}
+                className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer"
+                title="إغلاق"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-      {/* ── Slide-Over Full-Screen Lessons Drawer (Mobile Only) ── */}
-      <AnimatePresence>
-        {isMobilePlaylistOpen && (
-          <div className="lg:hidden fixed inset-0 z-[1100]">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobilePlaylistOpen(false)}
-              className="fixed inset-0 bg-slate-950/70"
-            />
-
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 26, stiffness: 300 }}
-              className="fixed inset-y-0 right-0 z-[1200] w-[90vw] max-w-sm h-full p-4 flex flex-col font-[family-name:var(--font-cairo)] text-right overflow-hidden bg-white text-slate-800 shadow-2xl"
+            <div
+              className="flex-1 overflow-y-auto space-y-2.5 no-scrollbar"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {/* Header & Overall Progress */}
-              <div className="space-y-2.5 pb-3 border-b border-slate-200 shrink-0">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="p-1.5 rounded-lg bg-[#173A7C] text-white shrink-0">
-                      <BookOpen className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="student-heading-h3 !text-xs sm:!text-sm truncate">فهرس دروس المساق</h3>
-                      <p className="text-[10px] text-slate-500 font-bold">{completedLessons} من {totalLessons} مكتمل</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[11px] font-black text-[#173A7C] bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg">
-                      %{progressPercent}
-                    </span>
+              {filteredChapters.map((chap, chIdx) => {
+                const isChapCollapsed = collapsedChapters.has(chap.id);
+                const chapCompletedCount = chap.lessons.filter(l => completedSet.has(l.id)).length;
+
+                return (
+                  <div key={chap.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
                     <button
-                      onClick={() => setIsMobilePlaylistOpen(false)}
-                      className="p-1 text-slate-400 hover:text-slate-700 rounded-lg shrink-0 cursor-pointer"
+                      onClick={() => toggleChapter(chap.id)}
+                      className="w-full p-2.5 text-right flex items-center justify-between gap-2 bg-slate-100/90 hover:bg-slate-100 transition-colors cursor-pointer border-b border-slate-200"
                     >
-                      <X className="w-5 h-5" />
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="flex items-center justify-center w-5 h-5 rounded-lg bg-[#173A7C] text-white text-[10px] font-black shrink-0">
+                          {chIdx + 1}
+                        </span>
+                        <span className="text-xs font-bold text-slate-800 truncate">
+                          {chap.title}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                          {chapCompletedCount}/{chap.lessons.length}
+                        </span>
+                        {isChapCollapsed ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronUp className="w-4 h-4 text-slate-400" />}
+                      </div>
                     </button>
+
+                    {!isChapCollapsed && (
+                      <div className="p-1.5 space-y-1.5 bg-white">
+                        {chap.lessons.map((les) => {
+                          const isCurrent = les.id === (currentLesson?.id || lessonId);
+                          const isDone = completedSet.has(les.id);
+
+                          return (
+                            <div
+                              key={les.id}
+                              className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
+                                isCurrent
+                                  ? 'bg-[#173A7C] text-white border-[#173A7C] shadow-xs'
+                                  : isDone
+                                  ? 'bg-emerald-50/90 text-slate-800 border-emerald-200/90'
+                                  : 'bg-white text-slate-800 border-slate-200 hover:border-slate-300'
+                              }`}
+                            >
+                              <button
+                                onClick={(e) => handleToggleComplete(les.id, e)}
+                                className="shrink-0 cursor-pointer"
+                              >
+                                {isDone ? (
+                                  <CheckCircle2 className={`w-4 h-4 ${isCurrent ? 'text-emerald-300' : 'text-emerald-600'}`} />
+                                ) : (
+                                  <Circle className={`w-4 h-4 ${isCurrent ? 'text-white/60' : 'text-slate-300'}`} />
+                                )}
+                              </button>
+
+                              <Link
+                                href={makeLessonUrl(les.id)}
+                                onClick={() => setIsMobilePlaylistOpen(false)}
+                                className="flex-1 flex items-center justify-between gap-2 min-w-0 cursor-pointer"
+                              >
+                                <span className={`text-xs font-bold truncate ${isCurrent ? 'text-white font-extrabold' : 'text-slate-800'}`}>
+                                  {les.title}
+                                </span>
+
+                                <span className={`text-[10px] font-mono ${isCurrent ? 'text-blue-200' : 'text-slate-400'}`}>
+                                  {les.duration}
+                                </span>
+                              </Link>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden border border-slate-200/60">
-                  <div
-                    className="h-full rounded-full bg-[#5CB07C] transition-all duration-500"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-
-                {/* Search Bar */}
-                <div className="relative pt-0.5">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="ابحث في دروس المساق..."
-                    className="w-full text-xs font-bold py-1.5 pr-8 pl-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#173A7C]"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="absolute left-2.5 top-2 text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Lessons List */}
-              <div className="flex-1 overflow-y-auto py-3 space-y-2.5 min-h-0">
-                {filteredChapters.map((chap, chIdx) => {
-                  const isChapCollapsed = collapsedChapters.has(chap.id);
-                  const chapCompletedCount = chap.lessons.filter(l => completedSet.has(l.id)).length;
-
-                  return (
-                    <div key={chap.id} className="space-y-1">
-                      <button
-                        onClick={() => toggleChapter(chap.id)}
-                        className="w-full text-xs font-bold text-[#173A7C] p-2.5 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-between gap-2 text-right cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="flex items-center justify-center w-5 h-5 rounded bg-[#173A7C] text-white text-[10px] font-bold shrink-0">
-                            {chIdx + 1}
-                          </span>
-                          <span className="truncate">{chap.title}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span className="text-[10px] font-bold text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
-                            {chapCompletedCount}/{chap.lessons.length}
-                          </span>
-                          {isChapCollapsed ? <ChevronDown className="w-3.5 h-3.5 text-slate-400" /> : <ChevronUp className="w-3.5 h-3.5 text-slate-400" />}
-                        </div>
-                      </button>
-
-                      {!isChapCollapsed && (
-                        <div className="space-y-1 pt-1">
-                          {chap.lessons.map((les) => {
-                            const isCurrentLesson = les.id === lessonId;
-                            const isDone = completedSet.has(les.id);
-                            return (
-                              <div key={les.id} className="flex items-center gap-1.5">
-                                <button
-                                  onClick={(e) => handleToggleComplete(les.id, e)}
-                                  className="shrink-0 p-0.5 rounded-full cursor-pointer"
-                                  title={isDone ? 'إلغاء الإكمال' : 'تحديد كمكتمل'}
-                                >
-                                  {isDone ? (
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                  ) : (
-                                    <Circle className="w-4 h-4 text-slate-300" />
-                                  )}
-                                </button>
-                                <Link
-                                  href={makeLessonUrl(les.id)}
-                                  onClick={() => setIsMobilePlaylistOpen(false)}
-                                  className={`flex-1 flex items-center justify-between p-2 rounded-xl text-xs font-bold transition-all min-w-0 ${
-                                    isCurrentLesson
-                                      ? 'bg-[#173A7C] text-white shadow-xs'
-                                      : isDone
-                                      ? 'text-slate-600 bg-emerald-50/70 border border-emerald-200/70'
-                                      : 'text-slate-700 bg-slate-50 border border-slate-200 hover:border-slate-300'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-1.5 min-w-0">
-                                    <Play className={`w-3 h-3 shrink-0 ${isCurrentLesson ? 'text-white' : 'text-slate-400'}`} />
-                                    <span className="truncate">{les.title}</span>
-                                  </div>
-                                  <span className={`text-[10px] shrink-0 ${isCurrentLesson ? 'text-blue-200' : 'text-slate-400'}`}>{les.duration}</span>
-                                </Link>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
+                );
+              })}
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
+
+      </div>
     </div>
   );
 }

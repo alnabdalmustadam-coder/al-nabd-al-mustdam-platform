@@ -64,18 +64,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const pathname = usePathname();
 
   const navItems = [
-    { label: 'الرئيسية والتحليلات', href: '/dashboard/admin', icon: LayoutDashboard, badge: 'مباشر' },
-    { label: 'إدارة المساقات والدورات', href: '/dashboard/admin/courses', icon: BookOpen, count: '48' },
-    { label: 'إدارة المتدربين والطلاب', href: '/dashboard/admin/users', icon: Users, count: '14.2k' },
-    { label: 'إدارة المدربين والمحاضرين', href: '/dashboard/admin/trainers', icon: UserCheck, count: '32' },
-    { label: 'استوديو وإدارة الشهادات', href: '/dashboard/admin/certificates', icon: Award, highlight: true },
-    { label: 'بنك الأسئلة والاختبارات', href: '/dashboard/admin/quizzes', icon: FileQuestion, count: '12' },
-    { label: 'قسائم الخصم والعروض', href: '/dashboard/admin/coupons', icon: Sparkles, count: 'خصم' },
-    { label: 'استبيانات وتقييمات', href: '/dashboard/admin/surveys', icon: Star, count: '4.9★' },
-    { label: 'اللقاءات المباشرة', href: '/dashboard/admin/live', icon: Radio, count: '5' },
-    { label: 'السجل المالي والإيرادات', href: '/dashboard/admin/finance', icon: CreditCard, count: 'ر.س' },
-    { label: 'الدعم وتذاكر الخدمة', href: '/dashboard/admin/support', icon: Headphones, count: '12' },
-    { label: 'إعدادات المنصة والهوية', href: '/dashboard/admin/settings', icon: Settings },
+    { label: 'الرئيسية', href: '/dashboard/admin', icon: LayoutDashboard, badge: 'مباشر' },
+    { label: 'إدارة الدورات', href: '/dashboard/admin/courses', icon: BookOpen, count: '48' },
+    { label: 'إدارة المتدربين', href: '/dashboard/admin/users', icon: Users, count: '14.2k' },
+    { label: 'إدارة المدربين', href: '/dashboard/admin/trainers', icon: UserCheck, count: '32' },
+    { label: 'إدارة الشهادات', href: '/dashboard/admin/certificates', icon: Award, highlight: true },
+    { label: 'بنك الاختبارات', href: '/dashboard/admin/quizzes', icon: FileQuestion, count: '12' },
+    { label: 'قسائم الخصم', href: '/dashboard/admin/coupons', icon: Sparkles, count: 'خصم' },
+    { label: 'الاستبيانات', href: '/dashboard/admin/surveys', icon: Star, count: '4.9★' },
+    { label: 'البث المباشر', href: '/dashboard/admin/live', icon: Radio, count: '5' },
+    { label: 'السجل المالي', href: '/dashboard/admin/finance', icon: CreditCard, count: 'ر.س' },
+    { label: 'تذاكر الدعم', href: '/dashboard/admin/support', icon: Headphones, count: '12' },
+    { label: 'إعدادات المنصة', href: '/dashboard/admin/settings', icon: Settings },
   ];
 
   return (

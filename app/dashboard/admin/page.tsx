@@ -183,29 +183,29 @@ export default function AdminDashboardPage() {
 
   const topCourses = [
     {
-      title: 'برنامج القيادة المستدامة والمسؤولية المجتمعية',
-      category: 'الاستدامة والحوكمة',
-      instructor: 'أ. د. سارة العتيبي',
-      students: 4850,
-      revenue: '6,062,500 ر.س',
+      title: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
+      category: 'أعمال مكتبية',
+      instructor: 'د. محمد القحطاني',
+      students: 1250,
+      revenue: '1,125,000 ر.س',
       rating: '4.95',
       completion: 96,
     },
     {
-      title: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      category: 'الدبلومات العليا',
-      instructor: 'د. محمد القحطاني',
-      students: 3200,
-      revenue: '8,000,000 ر.س',
+      title: 'دورات ادخال بيانات ومعالجة نصوص',
+      category: 'إدخال بيانات',
+      instructor: 'أ. د. سارة العتيبي',
+      students: 980,
+      revenue: '1,274,000 ر.س',
       rating: '4.92',
       completion: 94,
     },
     {
-      title: 'الشهادة الاحترافية في إدارة الاستدامة البيئية',
-      category: 'البيئة والطاقة',
+      title: 'دورة الذكاء الاصطناعي وهندسة الأوامر',
+      category: 'تقنية',
       instructor: 'د. خالد الدوسري',
-      students: 1790,
-      revenue: '3,222,000 ر.س',
+      students: 1120,
+      revenue: '504,000 ر.س',
       rating: '4.88',
       completion: 91,
     },
@@ -222,7 +222,7 @@ export default function AdminDashboardPage() {
     {
       id: '1',
       title: 'إصدار شهادة معتمدة بنجاح ⚡',
-      desc: 'تم إصدار شهادة (برنامج القيادة المستدامة) للمتدرب عبدالله الشمري بنسبة %98',
+      desc: 'تم إصدار شهادة (استخدام الحاسب الآلي) للمتدرب عبدالله الشمري بنسبة %98',
       time: 'منذ 4 دقائق',
       icon: Award,
       badge: 'الشهادات',
@@ -231,7 +231,7 @@ export default function AdminDashboardPage() {
     {
       id: '2',
       title: 'عملية دفع جديدة عبر (تمارا)',
-      desc: 'سداد القسط الأول 625 ر.س لدبلوم التسامح والمواطنة الصالحة',
+      desc: 'سداد القسط الأول 433 ر.س لدورة إدخال البيانات ومعالجة النصوص',
       time: 'منذ 14 دقيقة',
       icon: CreditCard,
       badge: 'المالية',
@@ -240,7 +240,7 @@ export default function AdminDashboardPage() {
     {
       id: '3',
       title: 'تسجيل متدرب جديد في المنصة',
-      desc: 'انضم المتدرب د. خالد العتيبي إلى مساق إدارة الاستدامة البيئية',
+      desc: 'انضم المتدرب د. خالد العتيبي إلى مساق دورة الذكاء الاصطناعي',
       time: 'منذ 35 دقيقة',
       icon: Users,
       badge: 'الطلاب',
@@ -278,8 +278,8 @@ export default function AdminDashboardPage() {
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-6">
           <div className="space-y-1.5 sm:space-y-2.5 pr-0.5 sm:pr-2">
             <motion.div variants={textItemVariants} className="flex flex-col items-start">
-              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#173A7C]/10 text-[#173A7C] text-[10px] sm:text-xs font-black border border-[#173A7C]/15 shrink-0 whitespace-nowrap mb-3 sm:mb-4">
-                <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
+              <div className="admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15">
+                <Crown className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>مركز التحليلات الذكية والأداء المؤسسي</span>
               </div>
               <h1 className="text-sm sm:text-xl lg:text-2xl font-black student-heading-h1 leading-snug">
@@ -832,7 +832,7 @@ export default function AdminDashboardPage() {
               <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-200/60">
                 <div>
                   <span className="text-slate-500 text-[9.5px] block font-bold">إجمالي المتدربين</span>
-                  <span className="font-extrabold text-[#173A7C] block text-xs">{crs.students.toLocaleString()} طالب</span>
+                  <span className="font-extrabold text-[#173A7C] block text-xs">{crs.students.toLocaleString('en-US')} طالب</span>
                 </div>
                 <div>
                   <span className="text-slate-500 text-[9.5px] block font-bold">إجمالي الإيراد</span>

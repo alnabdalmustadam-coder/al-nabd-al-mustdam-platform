@@ -2,270 +2,807 @@
 
 import { useState } from "react";
 import { use } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getCourseBySlug, courses } from "@/data/courses";
 import CourseCard from "@/components/ui/CourseCard";
-import StarRating from "@/components/ui/StarRating";
 import Badge from "@/components/ui/Badge";
-import Button from "@/components/ui/Button";
 import SmartCourseAction from "@/components/ui/SmartCourseAction";
+import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import {
-  Clock, Users, BookOpen, Award, ChevronDown, ChevronUp,
-  CheckCircle, Play
+  Clock,
+  Users,
+  BookOpen,
+  Award,
+  ChevronDown,
+  ChevronUp,
+  CheckCircle,
+  Play,
+  Star,
+  ShieldCheck,
+  Sparkles,
+  ShoppingBag,
+  Heart,
+  Share2,
+  Check,
+  FileText,
+  HelpCircle,
+  GraduationCap,
+  Briefcase,
+  Layers,
+  X,
+  Target,
 } from "lucide-react";
 
+const CATEGORY_MAP: Record<string, string> = {
+  admin: "أعمال مكتبية",
+  data: "إدخال بيانات",
+  languages: "لغات",
+  tech: "تقنية وبرمجة",
+  corporate: "إدارة وأعمال",
+  security: "الأمن والسلامة",
+  management: "إدارة ومشاريع",
+  design: "تصميم وإعلام",
+  all: "عام",
+};
+
 const tabs = [
-  { key: "overview", label: "نظرة عامة" },
-  { key: "curriculum", label: "المحتوى" },
-  { key: "instructor", label: "المدرب" },
-  { key: "reviews", label: "التقييمات" },
+  { key: "overview", label: "نظرة عامة على الدورة", icon: BookOpen },
+  { key: "curriculum", label: "محتوى الدروس والمنهج", icon: Layers },
+  { key: "certificate", label: "الشهادة والاعتماد", icon: Award },
+  { key: "instructor", label: "المدرب والخبرات", icon: GraduationCap },
+  { key: "faq", label: "الأسئلة الشائعة", icon: HelpCircle },
 ];
 
 export default function CourseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const course = getCourseBySlug(slug);
-  
+
   if (!course) notFound();
 
   const [activeTab, setActiveTab] = useState("overview");
   const [openAccordion, setOpenAccordion] = useState<number | null>(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  const [enrollmentStatus, setEnrollmentStatus] = useState<"guest" | "enrolled" | "not_enrolled">("guest");
 
-  const related = courses.filter((c) => c.id !== course.id && c.category === course.category).slice(0, 3);
+  const { addToCart, isInCart, openCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+
+  const isFavorited = isInWishlist(course.id);
+  const inCart = isInCart(course.id);
+  const isEnrolled = enrollmentStatus === "enrolled";
+
+  const related = courses
+    .filter((c) => c.id !== course.id && (c.category === course.category || c.featured))
+    .slice(0, 3);
+
+  const originalPrice = course.price ? Math.round(course.price * 1.35) : 0;
+  const installmentAmount = course.price ? Math.round(course.price / 4) : 0;
+  const categoryLabel = CATEGORY_MAP[course.category] || course.category;
+
+  const previewVideoUrl =
+    course.curriculum?.[0]?.videoUrl ||
+    "https://player.mediadelivery.net/play/729792/efdbb993-f2f4-4ddb-9553-00629191a155";
+
+  const handleShare = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2500);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (isEnrolled) return;
+    addToCart(course);
+    openCart();
+  };
+
+  const courseFaqs = [
+    {
+      q: "هل الشهادة الممنوحة معتمدة رسمياً في المملكة؟",
+      a: "نعم، جميع الشهادات الصادرة معتمدة وتحمل رقم تحقق وطني، ومناسبة للتقديم في القطاعين الحكومي والخاص وإضافتها إلى السيرة الذاتية وLinkedIn.",
+    },
+    {
+      q: "كيف يمكنني متابعة الدورة بعد الاشتراك؟",
+      a: "فور إتمام التسجيل، يتم تفعيل حسابك مباشرة وتتمكن من متابعة الدروس عبر مشغل الفيديو في أي وقت ومن أي جهاز دون أي قيود زمنية.",
+    },
+    {
+      q: "هل يتوفر خيار التقسيط لرسوم الدورة؟",
+      a: "نعم، يمكنك تقسيط الرسوم على 4 دفعات شهرية ميسرة بدون فوائد عبر تابي أو تمارا عند صفحة الدفع.",
+    },
+    {
+      q: "هل الدروس مسجلة أم بث مباشر؟",
+      a: "الدروس مسجلة بجودة عالية ومتاحة لك للمشاهدة في أي وقت يناسبك مع صلاحية وصول دائمة ومستمرة مدى الحياة.",
+    },
+  ];
 
   return (
-    <div className="min-h-screen pt-28 pb-20 bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero */}
-        <div className="relative rounded-[24px] overflow-hidden mb-12 shadow-sm border border-slate-200">
-          <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgwLDAsMCwwLjA0KSIvPjwvc3ZnPg==')] opacity-50" />
-          <div className="relative p-8 sm:p-12 lg:p-16">
-            <Badge label={course.category} variant={course.category as any} className="mb-6 shadow-sm" />
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-6 leading-tight">{course.title}</h1>
-            <p className="text-slate-600 max-w-3xl mb-8 text-lg leading-relaxed">{course.description}</p>
-            
-            <div className="flex flex-wrap items-center gap-6 text-sm font-semibold text-slate-700 bg-white inline-flex p-3 rounded-2xl shadow-sm border border-slate-100">
-              <div className="flex items-center gap-2 pr-2">
-                <StarRating rating={course.rating} size="sm" />
-                <span>{course.rating} ({course.reviewsCount} تقييم)</span>
-              </div>
-              <div className="w-px h-4 bg-slate-200 hidden sm:block"></div>
-              <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-slate-400" />{course.studentsCount} متدرب</span>
-              <div className="w-px h-4 bg-slate-200 hidden sm:block"></div>
-              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-slate-400" />{course.duration}</span>
-              <div className="w-px h-4 bg-slate-200 hidden sm:block"></div>
-              <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-slate-400" />{course.lessonsCount} درس</span>
-            </div>
-          </div>
+    <div className="min-h-screen bg-[#F8FAFC] font-[family-name:var(--font-cairo)] text-slate-900 selection:bg-[#5CB07C] selection:text-white" dir="rtl">
+      
+      {/* ═════════════════════════════════════════════════════════════════ */}
+      {/* 1. HERO SECTION (90VH, LIGHT THEME WITH BG.WEBP & GLASS CARDS)  */}
+      {/* ═════════════════════════════════════════════════════════════════ */}
+      <section className="relative min-h-[85vh] lg:min-h-[90vh] flex flex-col justify-center pt-28 pb-16 overflow-hidden bg-gradient-to-b from-slate-100/90 via-slate-50 to-slate-100/60 border-b border-slate-200/80">
+        
+        {/* Background Ornament Texture (bg.webp) */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none overflow-hidden z-0">
+          <img src="/bg.webp" alt="" className="w-full h-full object-cover" />
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
-          {/* Main Content */}
-          <div className="flex-1 w-full min-w-0">
-            {/* Tabs */}
-            <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-2 scrollbar-none sticky top-24 z-10 bg-slate-50 pt-2 border-b border-slate-200 shadow-[0_4px_10px_-10px_rgba(0,0,0,0.1)]">
-              {tabs.map((tab) => (
+        {/* Ambient Subtle Glows */}
+        <div className="absolute top-12 right-10 w-96 h-96 bg-[#173A7C]/[0.05] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-12 left-10 w-96 h-96 bg-[#5CB07C]/[0.06] rounded-full blur-[100px] pointer-events-none" />
+        <div className="particles-grid opacity-30" />
+
+        <div className="relative max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 z-10 py-4">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+            
+            {/* Right Side: Course Info & Actions (Span 6) - Balanced Full Height */}
+            <div className="lg:col-span-6 flex flex-col justify-between gap-5">
+              
+              {/* Top Block: Badges, Title, and Description */}
+              <div className="space-y-3.5">
+                {/* Badges with Unified Height & Padding */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="h-7 inline-flex items-center gap-1.5 px-3 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-xs">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>معتمد رسمياً من المركز الوطني</span>
+                  </span>
+                  <span className="h-7 inline-flex items-center px-3 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold shadow-xs">
+                    {categoryLabel}
+                  </span>
+                  <span className="h-7 inline-flex items-center px-3 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold shadow-xs">
+                    برنامج مهني
+                  </span>
+                </div>
+
+                {/* Course Title */}
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-snug tracking-tight">
+                  {course.title}
+                </h1>
+
+                {/* Course Description */}
+                <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                  {course.description}
+                </p>
+              </div>
+
+              {/* Middle Block: Rich 4-Item Stats Widget (Spacious & Prominent) */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 sm:p-3.5 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-xs">
+                {/* Rating */}
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-amber-50/70 border border-amber-100">
+                  <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                    <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-black text-slate-900 block leading-tight">{course.rating}</span>
+                    <span className="text-[10px] text-slate-500 font-bold block">تقييم المتدربين</span>
+                  </div>
+                </div>
+
+                {/* Students */}
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                    <Users className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-black text-slate-900 block leading-tight">{course.studentsCount || course.enrollees || 1250}+</span>
+                    <span className="text-[10px] text-slate-500 font-bold block">متدرب مسجل</span>
+                  </div>
+                </div>
+
+                {/* Duration */}
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-blue-50/70 border border-blue-100">
+                  <div className="w-7 h-7 rounded-lg bg-blue-100 text-[#173A7C] flex items-center justify-center shrink-0">
+                    <Clock className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-black text-slate-900 block leading-tight">{course.duration}</span>
+                    <span className="text-[10px] text-slate-500 font-bold block">المدة الإجمالية</span>
+                  </div>
+                </div>
+
+                {/* Lessons */}
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-purple-50/70 border border-purple-100">
+                  <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+                    <BookOpen className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-black text-slate-900 block leading-tight">{course.lessonsCount} دروس</span>
+                    <span className="text-[10px] text-slate-500 font-bold block">منهج تفاعلي</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Block: Pricing & Glass Actions Box */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_8px_25px_rgba(23,58,124,0.06)] space-y-4 shrink-0">
+                
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <span className="text-[11px] text-slate-500 font-bold block mb-1">
+                      {isEnrolled ? "حالة التسجيل في البرنامج:" : "الرسوم الشاملة للاشتراك والشهادة:"}
+                    </span>
+                    {isEnrolled ? (
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-xs">
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <span>أنت مشترك بالفعل في هذه الدورة</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl sm:text-3xl font-black text-slate-900">
+                          {course.price} <span className="text-xs font-bold text-emerald-600">ر.س</span>
+                        </span>
+                        {originalPrice > course.price && (
+                          <span className="text-xs text-slate-400 line-through font-bold">
+                            {originalPrice} ر.س
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Tabby & Tamara Pill */}
+                  {!isEnrolled && (
+                    <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200 text-[11px] text-slate-600 font-medium">
+                      <span>أو 4 دفعات <strong className="text-emerald-700 font-bold">{installmentAmount} ر.س</strong></span>
+                      <div className="flex items-center gap-1">
+                        <span className="px-1.5 py-0.5 bg-slate-900 text-white rounded text-[9px] font-black">tabby</span>
+                        <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded text-[9px] font-black">tamara</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Primary Action Buttons */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                  
+                  {/* Smart Enrollment Action (متابعة التعلم / سجل الآن) */}
+                  <div className="flex-1">
+                    <SmartCourseAction
+                      ghlCourseId={course.ghlCourseId}
+                      ghlCheckoutUrl={course.ghlCheckoutUrl}
+                      courseTitle={course.title}
+                      courseSlug={course.slug}
+                      onStatusChange={setEnrollmentStatus}
+                    />
+                  </div>
+
+                  {/* Add to Cart (Only visible/active if NOT enrolled) */}
+                  {!isEnrolled && (
+                    <button
+                      onClick={handleAddToCart}
+                      className={`py-3 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                        inCart
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
+                          : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200"
+                      }`}
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>{inCart ? "في السلة" : "إضافة إلى السلة"}</span>
+                    </button>
+                  )}
+
+                  {/* Wishlist Button */}
+                  <button
+                    onClick={() => toggleWishlist(course)}
+                    className={`p-3 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                      isFavorited
+                        ? "bg-rose-50 border-rose-200 text-rose-600"
+                        : "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-600"
+                    }`}
+                    title={isFavorited ? "إزالة من المفضلة" : "إضافة إلى المفضلة"}
+                    aria-label="المفضلة"
+                  >
+                    <Heart className={`w-4 h-4 ${isFavorited ? "fill-rose-500 text-rose-500" : ""}`} />
+                  </button>
+
+                  {/* Share Button */}
+                  <button
+                    onClick={handleShare}
+                    className="p-3 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all cursor-pointer"
+                    title="مشاركة رابط الدورة"
+                    aria-label="مشاركة"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {isCopied && (
+                  <p className="text-[11px] text-emerald-700 font-bold text-center">
+                    ✓ تم نسخ رابط الدورة بنجاح!
+                  </p>
+                )}
+              </div>
+
+            </div>
+
+            {/* Left Side: Large Prominent Course Image Showcase (Span 6) - Equal Full Height */}
+            <div className="lg:col-span-6 flex flex-col">
+              <div className="h-full flex flex-col justify-between rounded-3xl bg-white/95 backdrop-blur-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-[0_15px_40px_rgba(23,58,124,0.08)] group overflow-hidden">
+                
+                {/* Large Featured Image Frame with clean styling and light subtle overlay */}
+                <div className="relative flex-1 w-full min-h-[300px] sm:min-h-[360px] rounded-2xl bg-slate-100 border border-slate-200/80 flex items-center justify-center overflow-hidden">
+                  <Image
+                    src={course.image || "/logo.webp"}
+                    alt={course.title}
+                    fill
+                    priority
+                    className="object-cover group-hover:scale-102 transition-transform duration-500"
+                  />
+
+                  {/* Very light subtle overlay only on hover */}
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors pointer-events-none" />
+
+                  {/* Prominent Play Button Overlay */}
+                  <button
+                    onClick={() => setIsVideoModalOpen(true)}
+                    className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 cursor-pointer"
+                    aria-label="معاينة فيديو الدورة"
+                  >
+                    <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-[#5CB07C]/95 hover:bg-[#4EA06E] text-white flex items-center justify-center shadow-lg shadow-[#5CB07C]/30 group-hover:scale-110 transition-all backdrop-blur-xs">
+                      <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-white translate-x-[-1px]" />
+                    </div>
+                    <span className="px-3.5 py-1 rounded-full bg-slate-900/75 backdrop-blur-md text-white text-xs font-black border border-white/20 shadow-md">
+                      مشاهدة مقدمة الدورة
+                    </span>
+                  </button>
+                </div>
+
+                {/* Bottom Trust Guarantee Bar */}
+                <div className="mt-3 flex items-center justify-between text-xs text-slate-600 px-3 py-2 bg-slate-50/90 rounded-xl border border-slate-100 font-bold shrink-0">
+                  <span className="flex items-center gap-1.5 text-emerald-700">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>وصول فوري لكافة الدروس</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 text-amber-700">
+                    <Award className="w-3.5 h-3.5 text-amber-600" />
+                    <span>شهادة إتمام معتمدة رسمياً</span>
+                  </span>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ═════════════════════════════════════════════════════════════════ */}
+      {/* 2. CENTERED TABS NAVIGATION (NO HORIZONTAL SCROLL ON MOBILE)    */}
+      {/* ═════════════════════════════════════════════════════════════════ */}
+      <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          
+          {/* Mobile Grid (2 Columns, NO Horizontal Scroll) + Desktop Centered Flex */}
+          <div className="grid grid-cols-2 sm:flex sm:justify-center sm:items-center gap-2 sm:gap-3">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.key;
+              return (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`px-6 py-3 rounded-t-xl text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
-                    activeTab === tab.key
-                      ? "bg-white text-[#173A7C] border-t-2 border-x border-[#173A7C]/20 border-b-white -mb-px"
-                      : "bg-transparent text-slate-500 hover:text-slate-800 border border-transparent border-b-0 hover:bg-slate-100/50"
+                  className={`flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+                    isActive
+                      ? "text-white bg-[#173A7C] shadow-md shadow-[#173A7C]/20"
+                      : "text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/80"
                   }`}
                 >
-                  {tab.label}
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-400" : "text-slate-400"}`} />
+                  <span className="truncate">{tab.label}</span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
+          </div>
 
-            {/* Tab Content */}
+        </div>
+      </div>
+
+      {/* ═════════════════════════════════════════════════════════════════ */}
+      {/* 3. MAIN TAB CONTENT AREA (MAX WIDTH 1400PX)                     */}
+      {/* ═════════════════════════════════════════════════════════════════ */}
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="max-w-5xl mx-auto">
+          <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-8"
             >
+
+              {/* ───────────────── TAB 1: OVERVIEW ───────────────── */}
               {activeTab === "overview" && (
                 <div className="space-y-8">
+                  
                   {/* What You'll Learn */}
-                  <div className="bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm">
-                    <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
-                      <Award className="w-6 h-6 text-[#173A7C]" />
-                      ما ستتعلمه في هذه الدورة
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                      {course.outcomes.map((o: string, i: number) => (
-                         <div key={i} className="flex items-start gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                           <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
-                             <CheckCircle className="w-4 h-4 text-emerald-600" />
-                           </div>
-                           <span className="text-sm font-medium text-slate-700 leading-relaxed">{o}</span>
-                         </div>
+                  <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                    <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <CheckCircle className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg sm:text-xl font-black text-slate-900">ماذا ستتعلم في هذه الدورة؟</h2>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">المهارات العملية والتطبيقية المتوافقة مع متطلبات سوق العمل</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      {course.outcomes && course.outcomes.length > 0 ? (
+                        course.outcomes.map((outcome: string, idx: number) => (
+                          <div
+                            key={idx}
+                            className="p-4 rounded-2xl bg-slate-50 hover:bg-emerald-50/40 border border-slate-200/80 hover:border-emerald-200 transition-all flex items-start gap-3"
+                          >
+                            <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            </div>
+                            <p className="text-xs sm:text-[13px] font-bold text-slate-800 leading-relaxed">
+                              {outcome}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="col-span-2 text-slate-500 text-sm py-4">
+                          يتم تحديث مخرجات التعلم باستمرار.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Target Audience */}
+                  <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                    <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+                      <div className="w-10 h-10 rounded-2xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center shrink-0">
+                        <Target className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg sm:text-xl font-black text-slate-900">الفئات المستهدفة من هذا البرنامج</h2>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">صُممت الدورة لتلبي احتياجات فئات مهنية متعددة</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      {[
+                        { title: "الخريجون والباحثون عن عمل", desc: "لبناء سيرة ذاتية قوية واكتساب المهارات الأكثر طلباً في سوق العمل." },
+                        { title: "الموظفون في القطاعين الحكومي والخاص", desc: "لتطوير الأداء الوظيفي والتأهل للترقيات والمهام الإدارية الأعلى." },
+                        { title: "رواد الأعمال وأصحاب المشاريع", desc: "لإدارة أعمالهم ومستنداتهم بكفاءة واحترافية عالية." },
+                        { title: "الراغبون في تطوير مهاراتهم الرقمية", desc: "لمواكبة التحول الرقمي وإتقان التطبيقات المكتبية الحديثة." },
+                      ].map((aud, idx) => (
+                        <div key={idx} className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                          <Briefcase className="w-5 h-5 text-[#173A7C] shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="text-xs sm:text-sm font-black text-slate-900 mb-0.5">{aud.title}</h4>
+                            <p className="text-xs text-slate-500 font-medium leading-relaxed">{aud.desc}</p>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Why This Course */}
-                  {course.whyThisCourse && course.whyThisCourse.length > 0 && (
-                    <div className="bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm">
-                      <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">لماذا هذه الدورة؟</h3>
-                      <ul className="space-y-4">
-                        {course.whyThisCourse.map((w: string, i: number) => (
-                          <li key={i} className="flex items-start gap-4 text-sm font-medium text-slate-700 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                            <span className="text-[#173A7C] mt-0.5 w-6 text-center">✦</span>
-                            <span className="leading-relaxed">{w}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === "curriculum" && (
-                <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-slate-200 shadow-sm">
-                   <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">محتوى الدورة</h3>
-                     <div className="space-y-4">
-                     {course.curriculum.map((section: any, i: number) => (
-                       <div key={i} className="border border-slate-200 rounded-xl overflow-hidden hover:border-slate-300 transition-colors bg-slate-50/50">
-                         <button
-                           onClick={() => setOpenAccordion(openAccordion === i ? null : i)}
-                           className="w-full flex items-center justify-between p-5 cursor-pointer bg-white"
-                         >
-                           <div className="flex items-center gap-4">
-                             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-base font-bold text-slate-500">
-                               {i + 1}
-                             </div>
-                             <div className="text-right">
-                               <h4 className="font-bold text-slate-900 text-base">{section.title}</h4>
-                               {section.lessons && <span className="text-sm font-medium text-slate-500 mt-1 block">{section.lessons.length} دروس · {section.duration}</span>}
-                             </div>
-                           </div>
-                           <div className={`p-2 rounded-full transition-colors ${openAccordion === i ? 'bg-slate-100 text-slate-800' : 'text-slate-400'}`}>
-                             {openAccordion === i ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                           </div>
-                         </button>
-                         {openAccordion === i && section.lessons && (
-                           <motion.div
-                             initial={{ height: 0, opacity: 0 }}
-                             animate={{ height: "auto", opacity: 1 }}
-                             transition={{ duration: 0.3 }}
-                             className="border-t border-slate-100 bg-slate-50/80"
-                           >
-                             <ul className="py-2 px-4 shadow-inner">
-                               {section.lessons.map((lesson: string, j: number) => (
-                                 <li key={j} className="flex items-center justify-between p-4 my-2 text-sm font-medium text-slate-700 bg-white rounded-lg border border-slate-100 shadow-sm hover:border-[#173A7C]/30 hover:shadow transition-all group cursor-default">
-                                   <div className="flex items-center gap-3">
-                                     <div className="w-8 h-8 rounded-full bg-[#173A7C]/5 flex items-center justify-center group-hover:bg-[#173A7C]/10 transition-colors">
-                                      <Play className="w-3.5 h-3.5 text-[#173A7C] mr-0.5" />
-                                     </div>
-                                     {lesson}
-                                   </div>
-                                 </li>
-                               ))}
-                             </ul>
-                           </motion.div>
-                         )}
-                       </div>
-                     ))}
-                   </div>
-                </div>
-              )}
-
-              {activeTab === "instructor" && (
-                <div className="bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm">
-                  <div className="flex flex-col sm:flex-row items-start gap-8">
-                    <div className="w-24 h-24 rounded-full bg-slate-100 p-1 shrink-0 border border-slate-200">
-                      <div className="w-full h-full rounded-full bg-slate-200 flex items-center justify-center text-3xl font-black text-slate-400">
-                        {course.trainerId ? course.trainerId.slice(-1) : course.title[0]}
-                      </div>
+                  {/* Requirements */}
+                  <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-2xl bg-slate-100 text-[#173A7C] flex items-center justify-center shrink-0">
+                      <FileText className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-black text-slate-900 mb-2">أكاديمية النبض المستدام</h3>
-                      <p className="text-base text-slate-600 mb-6 leading-relaxed max-w-2xl">نخبة من المدربين المتخصصين في تقديم أحدث المحتويات التعليمية والتدريبية بمنهجية احترافية تواكب متطلبات سوق العمل.</p>
-                      <div className="flex items-center gap-8 text-sm font-medium text-slate-500 bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100 inline-flex">
-                         <div className="flex flex-col items-center">
-                           <span className="text-[#173A7C] font-black text-xl mb-1">{course.studentsCount}+</span>
-                           <span>متدرب</span>
-                         </div>
-                         <div className="w-px h-10 bg-slate-200"></div>
-                         <div className="flex flex-col items-center">
-                           <span className="text-[#173A7C] font-black text-xl mb-1">{course.rating}</span>
-                           <span>تقييم</span>
-                         </div>
+                      <h3 className="text-sm sm:text-base font-black text-slate-900">المتطلبات المسبقة</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-1">
+                        {course.requirements || "لا توجد متطلبات مسبقة معقدة. الدورة تبدأ معك من الصفر خطوة بخطوة حتى الإتقان الكامل، وتحتاج فقط إلى رغبة في التعلم وجهاز كمبيوتر أو هاتف ذكي."}
+                      </p>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* ───────────────── TAB 2: CURRICULUM ───────────────── */}
+              {activeTab === "curriculum" && (
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                  <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-100">
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-black text-slate-900">منهج الدورة والدروس</h2>
+                      <p className="text-xs text-slate-500 font-medium mt-0.5">
+                        يتضمن البرنامج {course.curriculum?.length || 1} وحدات تدريبية بإجمالي {course.lessonsCount} دروس تفاعلية
+                      </p>
+                    </div>
+                    <span className="px-3.5 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">
+                      إجمالي المدة: {course.duration}
+                    </span>
+                  </div>
+
+                  {/* Lessons Accordion */}
+                  <div className="space-y-3">
+                    {course.curriculum && course.curriculum.length > 0 ? (
+                      course.curriculum.map((section: any, idx: number) => {
+                        const isOpen = openAccordion === idx;
+                        const sectionTitle =
+                          section.title.length > 2
+                            ? section.title
+                            : `الوحدة التدريبية ${idx + 1}: المهارات والتطبيقات العملية`;
+                        return (
+                          <div
+                            key={idx}
+                            className="rounded-2xl border border-slate-200 overflow-hidden bg-white shadow-xs"
+                          >
+                            <button
+                              onClick={() => setOpenAccordion(isOpen ? null : idx)}
+                              className="w-full flex items-center justify-between p-4 sm:p-5 text-right cursor-pointer hover:bg-slate-50 transition-colors"
+                            >
+                              <div className="flex items-center gap-3.5">
+                                <div className="w-8 h-8 rounded-xl bg-[#173A7C]/10 text-[#173A7C] font-black text-xs flex items-center justify-center shrink-0">
+                                  {idx + 1}
+                                </div>
+                                <div>
+                                  <h3 className="text-sm sm:text-base font-black text-slate-900">
+                                    {sectionTitle}
+                                  </h3>
+                                  <span className="text-xs text-slate-500 font-medium">
+                                    {section.lessons?.length || 1} درس • {section.duration || "20 دقيقة"}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className={`p-1.5 rounded-lg ${isOpen ? "text-[#173A7C]" : "text-slate-400"}`}>
+                                {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                              </div>
+                            </button>
+
+                            <AnimatePresence initial={false}>
+                              {isOpen && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="border-t border-slate-100 bg-slate-50/70 p-4 space-y-2"
+                                >
+                                  {section.lessons && section.lessons.length > 0 ? (
+                                    section.lessons.map((lesson: string, lIdx: number) => (
+                                      <div
+                                        key={lIdx}
+                                        className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/70 text-xs sm:text-sm font-bold text-slate-800"
+                                      >
+                                        <div className="flex items-center gap-2.5">
+                                          <Play className="w-4 h-4 text-emerald-600 shrink-0" />
+                                          <span>{lesson.length > 2 ? lesson : `الدرس ${lIdx + 1}: التطبيق العملي والشرح`}</span>
+                                        </div>
+                                        <span className="text-xs text-slate-400 font-normal">
+                                          {section.duration || "20 دقيقة"}
+                                        </span>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <div className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/70 text-xs sm:text-sm font-bold text-slate-800">
+                                      <div className="flex items-center gap-2.5">
+                                        <Play className="w-4 h-4 text-emerald-600 shrink-0" />
+                                        <span>الدرس التطبيقي الشامل</span>
+                                      </div>
+                                      <span className="text-xs text-slate-400 font-normal">{section.duration}</span>
+                                    </div>
+                                  )}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-center py-6 text-slate-500 text-sm">
+                        جاري تحديث وحدات المنهج.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* ───────────────── TAB 3: CERTIFICATE ───────────────── */}
+              {activeTab === "certificate" && (
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-black text-slate-900">الشهادة والاعتماد الرسمي</h2>
+                    <p className="text-xs text-slate-500 font-medium mt-1">شهادة مهنية معتمدة تضاف لسيرتك الذاتية وتدعم مسارك الوظيفي</p>
+                  </div>
+
+                  <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                        <Award className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm sm:text-base font-black text-slate-900">شهادة إتمام معتمدة برقم تحقق وطني</h3>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">تصدر الشهادة فور إكمال متطلبات الدورة ومشاهدة الدروس.</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-slate-700">
+                      <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <span>إصدار رقمي فوري</span>
+                      </div>
+                      <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <span>رمز QR للتحقق السريع</span>
+                      </div>
+                      <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <span>متوافقة مع LinkedIn</span>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {activeTab === "reviews" && (
-                <div className="bg-white p-12 rounded-[24px] border border-slate-200 shadow-sm text-center">
-                  <div className="text-6xl font-black text-[#173A7C] mb-4">{course.rating}</div>
-                  <StarRating rating={course.rating} size="lg" className="justify-center mb-4 text-[#E8A020]" />
-                  <p className="text-base font-medium text-slate-500">{course.reviewsCount} تقييم إيجابي من المتدربين</p>
+              {/* ───────────────── TAB 4: INSTRUCTOR ───────────────── */}
+              {activeTab === "instructor" && (
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-5">
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-black text-slate-900">عن المدرب وهيئة التدريس</h2>
+                    <p className="text-xs text-slate-500 font-medium mt-1">نخبة من الكفاءات والخبراء المعتمدين في المملكة</p>
+                  </div>
+
+                  <div className="flex items-start gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <div className="w-16 h-16 rounded-2xl bg-[#173A7C] text-white font-black text-xl flex items-center justify-center shrink-0">
+                      {course.instructor ? course.instructor[0] : "ن"}
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-base font-black text-slate-900">
+                        {course.instructor || "أكاديمية النبض المستدام"}
+                      </h3>
+                      <span className="text-xs text-emerald-700 font-bold block">مدرب معتمد واستشاري تدريب</span>
+                      <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed pt-1">
+                        {course.instructorBio ||
+                          "خبرة واسعة في تقديم البرامج التدريبية المعتمدة وتطوير مهارات الكوادر الوطنية لتلبية متطلبات سوق العمل الحديث."}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
+
+              {/* ───────────────── TAB 5: FAQ ───────────────── */}
+              {activeTab === "faq" && (
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-4">
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-black text-slate-900">الأسئلة الشائعة</h2>
+                    <p className="text-xs text-slate-500 font-medium mt-1">إجابات مباشرة لأبرز الاستفسارات حول الدورة</p>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {courseFaqs.map((faq, idx) => {
+                      const isOpen = openFaq === idx;
+                      return (
+                        <div
+                          key={idx}
+                          className="rounded-2xl border border-slate-200 overflow-hidden bg-white"
+                        >
+                          <button
+                            onClick={() => setOpenFaq(isOpen ? null : idx)}
+                            className="w-full flex items-center justify-between p-4 text-right cursor-pointer hover:bg-slate-50 transition-colors"
+                          >
+                            <span className="text-xs sm:text-sm font-black text-slate-900">{faq.q}</span>
+                            <div className={`p-1 rounded-lg ${isOpen ? "text-[#173A7C]" : "text-slate-400"}`}>
+                              {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </div>
+                          </button>
+
+                          <AnimatePresence initial={false}>
+                            {isOpen && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="border-t border-slate-100 bg-slate-50 p-4 text-xs sm:text-sm text-slate-600 font-medium leading-relaxed"
+                              >
+                                {faq.a}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
             </motion.div>
-          </div>
-
-          {/* Sticky Sidebar */}
-          <aside className="w-full lg:w-80 shrink-0">
-            <div className="bg-white rounded-[24px] border border-slate-200 shadow-xl shadow-slate-200/50 p-6 sticky top-28">
-              <div className="text-center mb-8 pb-6 border-b border-slate-100">
-                <div className="text-4xl font-black text-[#173A7C] mb-2 flex items-center justify-center gap-2">
-                  {course.price} <span className="text-base font-bold text-slate-400">ر.س /شهر</span>
-                </div>
-              </div>
-
-              <SmartCourseAction 
-                ghlCourseId={course.ghlCourseId} 
-                ghlCheckoutUrl={course.ghlCheckoutUrl} 
-                courseTitle={course.title} 
-                courseSlug={course.slug}
-              />
-              <Button variant="secondary" size="md" className="w-full font-bold">
-                تواصل للاستفسار
-              </Button>
-
-              <div className="mt-8 pt-6 border-t border-slate-100 space-y-4">
-                <div className="flex items-center justify-between text-sm font-medium">
-                  <span className="text-slate-500 flex items-center gap-2"><Clock className="w-4 h-4 text-slate-400" /> المدة</span>
-                  <span className="text-slate-900">{course.duration}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm font-medium">
-                  <span className="text-slate-500 flex items-center gap-2"><BookOpen className="w-4 h-4 text-slate-400" /> الدروس</span>
-                  <span className="text-slate-900">{course.lessonsCount} درس تفاعلي</span>
-                </div>
-                <div className="flex items-center justify-between text-sm font-medium">
-                  <span className="text-slate-500 flex items-center gap-2"><svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> المستوى</span>
-                  <span className="text-slate-900">
-                    {course.level === "beginner" ? "مبتدئ" : course.level === "intermediate" ? "متوسط" : "متقدم"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm font-medium bg-emerald-50 rounded-lg p-3 mt-4 border border-emerald-100">
-                  <span className="text-emerald-700 flex items-center gap-2"> الشهادة</span>
-                  <span className="text-emerald-700 font-bold flex items-center gap-1">معتمدة <CheckCircle className="w-4 h-4" /></span>
-                </div>
-              </div>
-            </div>
-          </aside>
+          </AnimatePresence>
         </div>
 
-        {/* Related Courses */}
+        {/* ═════════════════════════════════════════════════════════════════ */}
+        {/* 4. RELATED COURSES (1400PX CONTAINER)                           */}
+        {/* ═════════════════════════════════════════════════════════════════ */}
         {related.length > 0 && (
-          <div className="mt-24 pt-16 border-t border-slate-200">
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-10 text-center">دورات <span className="text-[#173A7C]">ذات صلة</span></h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <section className="mt-20 pt-12 border-t border-slate-200">
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                دورات تدريبية <span className="text-[#173A7C]">ذات صلة</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                برامج تدريبية مكملة لتطوير مهاراتك المهنية
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {related.map((c, i) => (
                 <CourseCard key={c.id} course={c} index={i} />
               ))}
             </div>
+          </section>
+        )}
+
+      </main>
+
+      {/* ═════════════════════════════════════════════════════════════════ */}
+      {/* 5. VIDEO PREVIEW MODAL                                          */}
+      {/* ═════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {isVideoModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" dir="rtl">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsVideoModalOpen(false)}
+              className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"
+            />
+
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-3xl bg-white rounded-3xl overflow-hidden shadow-2xl z-10 border border-slate-200"
+            >
+              <div className="p-4 flex items-center justify-between border-b border-slate-100 bg-slate-50">
+                <div className="flex items-center gap-2">
+                  <Play className="w-4 h-4 text-emerald-600 fill-emerald-600" />
+                  <h3 className="text-xs sm:text-sm font-black text-slate-900">{course.title}</h3>
+                </div>
+
+                <button
+                  onClick={() => setIsVideoModalOpen(false)}
+                  className="w-8 h-8 rounded-lg bg-slate-200/80 hover:bg-slate-300 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                  aria-label="إغلاق"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="relative aspect-video bg-black">
+                <iframe
+                  src={previewVideoUrl}
+                  loading="lazy"
+                  className="w-full h-full border-0"
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                  allowFullScreen
+                />
+              </div>
+
+              <div className="p-4 bg-slate-50 flex items-center justify-between flex-wrap gap-2 text-xs">
+                <span className="text-slate-600 font-medium">
+                  احصل على الشهادة المعتمدة وكامل المحتوى بعد التسجيل.
+                </span>
+                <Link
+                  href={course.slug ? `/checkout?slug=${course.slug}` : "/checkout"}
+                  className="px-4 py-2 rounded-xl bg-[#5CB07C] hover:bg-[#4EA06E] text-white font-black transition-colors"
+                >
+                  سجّل الآن في الدورة
+                </Link>
+              </div>
+            </motion.div>
           </div>
         )}
-      </div>
+      </AnimatePresence>
+
     </div>
   );
 }

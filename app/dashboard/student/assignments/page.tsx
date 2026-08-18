@@ -171,9 +171,9 @@ export default function StudentAssignmentsPage() {
           ))}
         </div>
 
-        {/* High-Contrast Clear White Text on Dark Background */}
-        <div className="text-[10px] sm:text-xs text-slate-200 font-extrabold flex items-center gap-1.5 drop-shadow-xs">
-          <FileCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+        {/* High-Contrast Clear Text on Background */}
+        <div className="text-[10px] sm:text-xs text-slate-700 font-extrabold flex items-center gap-1.5 drop-shadow-xs">
+          <FileCheck className="w-3.5 h-3.5 text-[#0D5C3A] shrink-0" />
           <span>الملفات المقبولة: PDF, DOCX (بحد أقصى 25 ميجابايت)</span>
         </div>
       </div>

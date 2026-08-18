@@ -191,10 +191,10 @@ export default function StudentQuizzesPage() {
           ))}
         </div>
 
-        {/* High-Contrast Clear White Text on Dark Background */}
-        <div className="text-[10px] sm:text-xs text-slate-200 font-extrabold flex items-center gap-1.5 drop-shadow-xs">
-          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <span>تظهر النتائج فور التسليم مع التحليل العلمي</span>
+        {/* High-Contrast Clear Text on Background */}
+        <div className="text-[10px] sm:text-xs text-slate-700 font-extrabold flex items-center gap-1.5 drop-shadow-xs">
+          <CheckCircle2 className="w-3.5 h-3.5 text-[#0D5C3A] shrink-0" />
+          <span>فرص الإعادة متاحة للاختبارات غير المجتازة</span>
         </div>
       </div>
 
@@ -212,9 +212,9 @@ export default function StudentQuizzesPage() {
               {/* Card Header & Status Badge Ribbon */}
               <div className="space-y-3.5 mb-5">
                 <div className="flex items-center justify-between gap-2.5 flex-wrap">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-black text-[#0D5C3A]" style={{ textShadow: '0 1px 0px rgba(255,255,255,0.6)' }}>
-                    <BookOpen className="w-3.5 h-3.5 text-[#0D5C3A]" />
-                    <span className="truncate">{quiz.courseTitle}</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-black text-[#0D5C3A] leading-relaxed break-words" style={{ textShadow: '0 1px 0px rgba(255,255,255,0.6)' }}>
+                    <BookOpen className="w-3.5 h-3.5 text-[#0D5C3A] shrink-0" />
+                    <span>{quiz.courseTitle}</span>
                   </span>
 
                   {/* Vivid Crisp Status Badges */}
@@ -288,13 +288,22 @@ export default function StudentQuizzesPage() {
                 )}
 
                 {quiz.status === 'passed' && (
-                  <button
-                    onClick={() => setActiveQuizModal(quiz)}
-                    className="w-full xs:w-auto px-5 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-extrabold text-xs border border-slate-300/90 shadow-xs flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    <FileCheck className="w-3.5 h-3.5 text-[#173A7C]" />
-                    <span>عرض الإجابات التفصيلية</span>
-                  </button>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      onClick={() => setActiveQuizModal(quiz)}
+                      className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-extrabold text-xs border border-slate-300/90 shadow-xs flex items-center justify-center gap-1.5 transition-all hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      <FileCheck className="w-3.5 h-3.5 text-[#173A7C]" />
+                      <span>تفاصيل الإجابات</span>
+                    </button>
+                    <Link
+                      href="/dashboard/student/certificates"
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-teal-600 hover:to-emerald-600 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      <Award className="w-3.5 h-3.5" />
+                      <span>عرض الشهادة 📜</span>
+                    </Link>
+                  </div>
                 )}
               </div>
             </motion.div>

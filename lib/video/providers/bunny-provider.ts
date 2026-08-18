@@ -25,12 +25,10 @@ export class BunnyStreamProvider implements IVideoProvider {
     const expires = Math.floor(Date.now() / 1000) + expirationSeconds;
     
     // Bunny Stream Token Hash Formula
-    // If tokenKey is set, compute SHA256(tokenKey + videoId + expires)
+    // Official standard: SHA256(tokenKey + videoId + expires)
     let tokenParam = '';
     if (this.tokenKey) {
-      const hashInput = userIp
-        ? `${this.tokenKey}${videoId}${expires}${userIp}`
-        : `${this.tokenKey}${videoId}${expires}`;
+      const hashInput = `${this.tokenKey}${videoId}${expires}`;
       
       const token = crypto
         .createHash('sha256')

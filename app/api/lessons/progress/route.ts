@@ -87,10 +87,9 @@ export async function POST(req: Request) {
       await supabase
         .from('enrollments')
         .update({
-          progress_percent: percent,
-          last_accessed_at: new Date().toISOString(),
+          progress: percent,
         })
-        .eq('user_id', user.id)
+        .eq('email', user.email)
         .eq('course_id', lessonObj.course_id);
     }
 

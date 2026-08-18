@@ -9,15 +9,26 @@ import WhatsAppFloat from '@/components/ui/WhatsAppFloat';
 export default function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith('/dashboard');
+  const isAuth = pathname?.startsWith('/auth');
 
   if (isDashboard) {
-    return <main className="flex-1 min-h-screen">{children}</main>;
+    return <main className="flex-1 min-h-screen w-full max-w-full overflow-x-hidden">{children}</main>;
+  }
+
+  if (isAuth) {
+    return (
+      <>
+        <Navbar />
+        <main className="flex-1 w-full max-w-full overflow-x-hidden flex flex-col justify-center">{children}</main>
+        <WhatsAppFloat />
+      </>
+    );
   }
 
   return (
     <>
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
       <Footer />
       <WhatsAppFloat />
     </>

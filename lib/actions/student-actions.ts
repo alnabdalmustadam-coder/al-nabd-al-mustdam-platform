@@ -21,24 +21,73 @@ export interface QuizAttempt {
   passed: boolean;
 }
 
+// ── Helper to flat-map all lessons of a course identically across platform ──
+export const getCourseAllLessons = (course: any): { id: string; title: string }[] => {
+  if (!course) return [];
+  if (course.curriculum && Array.isArray(course.curriculum) && course.curriculum.length > 0) {
+    return course.curriculum.flatMap((sec: any, sIdx: number) => {
+      const subLessons = Array.isArray(sec.lessons) && sec.lessons.length > 0
+        ? sec.lessons
+        : [sec.title];
+      return subLessons.map((lesTitle: string, lIdx: number) => ({
+        id: `lesson-${sIdx + 1}-${lIdx + 1}`,
+        title: lesTitle,
+      }));
+    });
+  }
+  return [
+    { id: 'lesson-1', title: 'المفاهيم الأساسية والأهداف التدريبية' },
+    { id: 'lesson-2', title: 'التطبيقات العملية ودراسة الحالة' },
+    { id: 'lesson-3', title: 'التقييم الختامي والاعتماد المهني' },
+  ];
+};
+
 // ── Completion Handler ──
 export const getCompletedLessons = (courseSlug: string): Set<string> => {
-  if (typeof window === 'undefined') return new Set(['lesson-1']);
+  if (typeof window === 'undefined' || !courseSlug) return new Set<string>();
   try {
-    const raw = localStorage.getItem(`${STORAGE_KEYS.COMPLETED_LESSONS}_${courseSlug}`);
-    if (!raw) return new Set(['lesson-1']);
-    const parsed = JSON.parse(raw);
-    return new Set(Array.isArray(parsed) ? parsed : ['lesson-1']);
+    const clean = courseSlug.replace(/^course-/, '').toLowerCase().trim();
+    const keysToCheck = [
+      `${STORAGE_KEYS.COMPLETED_LESSONS}_${courseSlug}`,
+      `${STORAGE_KEYS.COMPLETED_LESSONS}_${clean}`,
+      `${STORAGE_KEYS.COMPLETED_LESSONS}_course-${clean}`,
+      `nabd_completed_lessons_${courseSlug}`,
+      `nabd_completed_lessons_${clean}`,
+    ];
+
+    for (const key of keysToCheck) {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return new Set<string>(parsed);
+        }
+      }
+    }
+    return new Set<string>();
   } catch (e) {
-    return new Set(['lesson-1']);
+    return new Set<string>();
   }
 };
 
 export const saveCompletedLessons = (courseSlug: string, completedSet: Set<string>): void => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || !courseSlug) return;
   try {
+    const clean = courseSlug.replace(/^course-/, '').toLowerCase().trim();
     const arrayData = Array.from(completedSet);
-    localStorage.setItem(`${STORAGE_KEYS.COMPLETED_LESSONS}_${courseSlug}`, JSON.stringify(arrayData));
+    const json = JSON.stringify(arrayData);
+
+    localStorage.setItem(`${STORAGE_KEYS.COMPLETED_LESSONS}_${courseSlug}`, json);
+    localStorage.setItem(`${STORAGE_KEYS.COMPLETED_LESSONS}_${clean}`, json);
+    localStorage.setItem(`${STORAGE_KEYS.COMPLETED_LESSONS}_course-${clean}`, json);
+
+    // Notify other components/tabs
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('nabd_progress_updated', {
+        detail: { courseSlug, completedCount: completedSet.size }
+      }));
+    }
   } catch (e) {
     console.error('Failed to persist completed lessons', e);
   }

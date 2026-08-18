@@ -25,8 +25,8 @@ export default function AdminFinancePage() {
     {
       id: 'tx-1',
       student: 'عبدالله الشمري',
-      course: 'برنامج القيادة المستدامة والمسؤولية المجتمعية',
-      amount: '1,250 ر.س',
+      course: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
+      amount: '900 ر.س',
       gateway: 'تمارا Tamara',
       date: '27 يوليو 2026',
       status: 'مكتمل ومدفوع',
@@ -35,8 +35,8 @@ export default function AdminFinancePage() {
     {
       id: 'tx-2',
       student: 'سارة العتيبي',
-      course: 'الشهادة الاحترافية في إدارة الاستدامة البيئية',
-      amount: '1,800 ر.س',
+      course: 'دورات ادخال بيانات ومعالجة نصوص',
+      amount: '1,300 ر.س',
       gateway: 'مدى Mada',
       date: '26 يوليو 2026',
       status: 'مكتمل ومدفوع',
@@ -45,8 +45,8 @@ export default function AdminFinancePage() {
     {
       id: 'tx-3',
       student: 'محمد الغامدي',
-      course: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      amount: '2,500 ر.س',
+      course: 'دورة صيانة الجوالات',
+      amount: '750 ر.س',
       gateway: 'تابـي Tabby',
       date: '24 يوليو 2026',
       status: 'مكتمل ومدفوع',
@@ -55,8 +55,8 @@ export default function AdminFinancePage() {
     {
       id: 'tx-4',
       student: 'د. خالد الدوسري',
-      course: 'دبلوم الحوكمة المؤسسية والتميز الأكاديمي',
-      amount: '3,100 ر.س',
+      course: 'دورة الذكاء الاصطناعي',
+      amount: '450 ر.س',
       gateway: 'Apple Pay',
       date: '22 يوليو 2026',
       status: 'مكتمل ومدفوع',
@@ -90,8 +90,8 @@ export default function AdminFinancePage() {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-3 sm:space-y-3.5">
             <div className="flex flex-col items-start">
-              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-800 text-[10px] sm:text-xs font-black border border-emerald-500/20 shrink-0 whitespace-nowrap mb-3 sm:mb-4">
-                <CreditCard className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <div className="admin-hero-tag bg-emerald-500/10 text-emerald-800 border border-emerald-500/20">
+                <CreditCard className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>السجل المالي وتقارير الإيرادات المباشرة</span>
               </div>
               <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">
@@ -260,23 +260,40 @@ export default function AdminFinancePage() {
         </div>
 
         {/* Mobile Cards View */}
-        <div className="md:hidden divide-y divide-[#173A7C]/8">
+        <div className="md:hidden divide-y divide-slate-200/80">
           {filteredTransactions.map((tx) => (
-            <div key={tx.id} className="p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-extrabold text-xs sm:text-sm text-[#152C5B] student-heading-h3">{tx.student}</h4>
-                  <p className="text-[10px] text-slate-500 font-bold">{tx.course}</p>
-                </div>
-                <span className="font-mono font-black text-emerald-700 text-xs sm:text-sm">{tx.amount}</span>
+            <div key={tx.id} className="p-3.5 sm:p-4 space-y-2.5 hover:bg-slate-50/60 transition-colors">
+              {/* Row 1: Invoice Reference + Amount */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono font-black text-[11px] text-[#173A7C] bg-blue-50/90 px-2.5 py-1 rounded-md border border-blue-200/80 shrink-0 shadow-2xs">
+                  #{tx.reference}
+                </span>
+                <span className="font-mono font-black text-emerald-700 text-xs sm:text-sm bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20 shrink-0">
+                  {tx.amount}
+                </span>
               </div>
 
-              <div className="flex items-center justify-between text-[10px] pt-1">
-                <span className="font-mono font-bold text-[#173A7C] bg-[#173A7C]/10 px-2 py-0.5 rounded border border-[#173A7C]/15">
-                  {tx.reference}
-                </span>
-                <span className="text-slate-500 font-bold">{tx.gateway} • {tx.date}</span>
-                <span className="px-2 py-0.5 rounded-md font-bold bg-emerald-500/10 text-emerald-800 border border-emerald-500/20">
+              {/* Row 2: Student Name & Course */}
+              <div>
+                <h4 className="font-black text-xs sm:text-sm text-[#152C5B] student-heading-h3 leading-snug">
+                  {tx.student}
+                </h4>
+                <p className="text-[11px] text-slate-600 font-bold mt-0.5 leading-snug">
+                  {tx.course}
+                </p>
+              </div>
+
+              {/* Row 3: Gateway + Date + Status */}
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 text-[10px]">
+                <div className="flex items-center gap-1.5 text-slate-600 font-bold shrink-0">
+                  <span className="px-2 py-0.5 rounded-md bg-slate-100/90 text-slate-700 font-bold border border-slate-200/90">
+                    {tx.gateway}
+                  </span>
+                  <span className="text-slate-400">•</span>
+                  <span className="text-slate-500">{tx.date}</span>
+                </div>
+
+                <span className="px-2.5 py-0.5 rounded-md font-bold bg-emerald-500/10 text-emerald-800 border border-emerald-500/25 shrink-0 whitespace-nowrap">
                   {tx.status} 🟢
                 </span>
               </div>

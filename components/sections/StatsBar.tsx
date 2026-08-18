@@ -35,7 +35,7 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
 
   return (
     <span ref={ref} className="text-3xl sm:text-4xl font-black text-white">
-      {count.toLocaleString("ar-SA")}
+      {count.toLocaleString("en-US")}
       <span className="text-gold">{suffix}</span>
     </span>
   );
