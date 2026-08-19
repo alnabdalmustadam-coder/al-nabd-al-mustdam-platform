@@ -59,7 +59,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen 2xl:h-[100vh] flex flex-col items-center justify-start lg:justify-center overflow-x-hidden overflow-y-auto bg-[#F8FAFC] pt-[4.5rem] sm:pt-24 pb-12 lg:pt-20 lg:pb-0 w-full max-w-full">
+    <section className="relative min-h-screen lg:h-[100vh] flex flex-col items-center justify-start lg:justify-center overflow-x-hidden overflow-y-auto bg-[#F8FAFC] pt-[4.5rem] sm:pt-24 pb-24 lg:pt-20 lg:pb-0 w-full max-w-full">
 
       {/* Particle Grid */}
       <div className="particles-grid opacity-60 pointer-events-none" />
@@ -78,7 +78,7 @@ export default function HeroSection() {
       <div className="relative z-10 w-full max-w-[1700px] mx-auto px-3 sm:px-6 lg:px-6 xl:px-12 2xl:px-16 flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-4 sm:gap-10 lg:gap-4 xl:gap-8 min-h-0 lg:min-h-[450px] xl:min-h-[550px] py-1 sm:py-8 lg:py-16 xl:py-20 pointer-events-none mt-0 lg:mt-0 xl:mt-4 translate-y-0 lg:-translate-y-[3vh]">
 
         {/* Left Side (Text content) */}
-        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-3 lg:order-1 flex items-stretch justify-center pointer-events-none mb-16 lg:mb-0">
+        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-3 lg:order-1 flex items-stretch justify-center pointer-events-none mb-0 lg:mb-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -222,7 +222,7 @@ export default function HeroSection() {
       </div>
 
       {/* Carousel Controls Container */}
-      <div className="absolute bottom-20 lg:bottom-4 xl:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-6 lg:gap-3 xl:gap-6 z-30 pointer-events-auto bg-white/60 sm:bg-white/40 backdrop-blur-md px-6 sm:px-8 py-2.5 sm:py-3 lg:px-4 lg:py-1.5 xl:px-6 xl:py-2 rounded-full border border-white/70 shadow-lg">
+      <div className="relative mt-8 mb-16 lg:mt-0 lg:mb-0 lg:absolute lg:bottom-4 xl:bottom-8 left-0 right-0 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 flex items-center justify-center gap-4 sm:gap-6 lg:gap-3 xl:gap-6 z-30 pointer-events-auto mx-auto w-fit bg-white/80 lg:bg-white/40 backdrop-blur-md px-6 sm:px-8 py-2.5 sm:py-3 lg:px-4 lg:py-1.5 xl:px-6 xl:py-2 rounded-full border border-white/70 shadow-lg">
         <button aria-label="الشريحة السابقة" onClick={prevSlide} className="w-10 h-10 sm:w-12 sm:h-12 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-full bg-white/95 hover:bg-[#173A7C] hover:text-white backdrop-blur-xl flex items-center justify-center text-[#173A7C] transition-all shadow-md group/btn ring-2 ring-white/50">
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 lg:w-4 lg:h-4 xl:w-5 xl:h-5 group-hover/btn:scale-110 transition-transform" />
         </button>
