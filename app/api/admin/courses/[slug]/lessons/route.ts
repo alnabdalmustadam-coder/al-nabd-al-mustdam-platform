@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { addOrUpdateLesson, deleteLesson, getCourseBySlug } from '@/lib/courses-store';
+import { addOrUpdateLessonAsync, deleteLessonAsync, getCourseBySlugAsync } from '@/lib/courses-store';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(
   req: Request,
@@ -9,16 +10,23 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    const course = getCourseBySlug(slug);
+    const course = await getCourseBySlugAsync(slug);
     if (!course) {
       return NextResponse.json({ success: false, error: 'الدورة غير موجودة' }, { status: 404 });
     }
 
-    return NextResponse.json({
-      success: true,
-      curriculum: course.curriculum || [],
-      lessonsCount: course.curriculum ? course.curriculum.length : 0,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        curriculum: course.curriculum || [],
+        lessonsCount: course.curriculum ? course.curriculum.length : 0,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
+    );
   } catch (err: any) {
     console.error('Error fetching lessons:', err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -37,7 +45,7 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'عنوان الدرس مطلوب' }, { status: 400 });
     }
 
-    const updatedCourse = addOrUpdateLesson(slug, {
+    const updatedCourse = await addOrUpdateLessonAsync(slug, {
       id: body.id,
       title: body.title,
       duration: body.duration || '20 دقيقة',
@@ -51,11 +59,18 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'تعذر تحديث دروس الدورة' }, { status: 400 });
     }
 
-    return NextResponse.json({
-      success: true,
-      course: updatedCourse,
-      curriculum: updatedCourse.curriculum,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        course: updatedCourse,
+        curriculum: updatedCourse.curriculum,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
+    );
   } catch (err: any) {
     console.error('Error saving lesson:', err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -75,16 +90,23 @@ export async function DELETE(
       return NextResponse.json({ success: false, error: 'معرّف الدرس مطلوب' }, { status: 400 });
     }
 
-    const updatedCourse = deleteLesson(slug, lessonId);
+    const updatedCourse = await deleteLessonAsync(slug, lessonId);
     if (!updatedCourse) {
       return NextResponse.json({ success: false, error: 'تعذر حذف الدرس' }, { status: 400 });
     }
 
-    return NextResponse.json({
-      success: true,
-      course: updatedCourse,
-      curriculum: updatedCourse.curriculum,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        course: updatedCourse,
+        curriculum: updatedCourse.curriculum,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
+    );
   } catch (err: any) {
     console.error('Error deleting lesson:', err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getAllCourses, saveCourse, deleteCourse } from '@/lib/courses-store';
+import { getAllCoursesAsync, saveCourseAsync, deleteCourseAsync } from '@/lib/courses-store';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
   try {
-    const courses = getAllCourses();
+    const courses = await getAllCoursesAsync();
     const formatted = courses.map((c) => {
       let numericHours = 20;
       if (typeof c.duration === 'string') {
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'عنوان الدورة مطلوب' }, { status: 400 });
     }
 
-    const saved = saveCourse(body);
+    const saved = await saveCourseAsync(body);
     return NextResponse.json(
       { success: true, course: saved },
       {
@@ -91,7 +91,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ success: false, error: 'معرّف الدورة مطلوب' }, { status: 400 });
     }
 
-    const deleted = deleteCourse(slug);
+    const deleted = await deleteCourseAsync(slug);
     return NextResponse.json({ success: deleted });
   } catch (err: any) {
     console.error('Admin DELETE course error:', err);

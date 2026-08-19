@@ -173,24 +173,27 @@ export default function StudentPathwaysPage() {
     allCatalogCourses.filter(c => c.slug !== 'free-trial-course')
   );
 
-  // Function to load live courses from API
+  // Function to load live courses from API and update enrollments
   const loadPlatformCourses = async () => {
     try {
-      const res = await fetch('/api/courses', { cache: 'no-store' });
+      const res = await fetch(`/api/courses?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-        setAccreditedCourses(data.courses.filter((c: any) => c.slug !== 'free-trial-course'));
+        const liveFiltered = data.courses.filter((c: any) => c.slug !== 'free-trial-course');
+        setAccreditedCourses(liveFiltered);
+        return liveFiltered;
       }
     } catch (err) {
       console.error('Error fetching live courses in pathways:', err);
     }
+    return accreditedCourses;
   };
 
   // Load student enrollments to reflect real progress
   useEffect(() => {
-    loadPlatformCourses();
+    async function loadData() {
+      const currentCourses = await loadPlatformCourses();
 
-    async function loadStudentEnrollments() {
       try {
         const supabase = createClient();
         const { data: authData } = await supabase.auth.getUser();
@@ -207,11 +210,11 @@ export default function StudentPathwaysPage() {
 
           if (enrollmentsData && enrollmentsData.length > 0) {
             enrollmentsData.forEach((e: any) => {
-              const cleanSlug = (e.course_id || '').replace(/^course-/, '');
-              const matchedCatalog = accreditedCourses.find(c =>
-                c.slug === cleanSlug ||
-                c.slug === e.course_id ||
-                c.ghlCourseId === e.course_id ||
+              const cleanSlug = (e.course_id || '').replace(/^course-/, '').toLowerCase().trim();
+              const matchedCatalog = (currentCourses || accreditedCourses).find((c: Course) =>
+                (c.slug || '').toLowerCase().trim() === cleanSlug ||
+                String(c.id) === cleanSlug ||
+                (c.ghlCourseId || '').replace(/^course-/, '').toLowerCase().trim() === cleanSlug ||
                 c.title === e.course_title
               );
 
@@ -220,7 +223,7 @@ export default function StudentPathwaysPage() {
               const totalLessons = Math.max(1, allLessons.length);
 
               const localCompleted = getCompletedLessons(canonicalSlug);
-              const completedCount = allLessons.filter(l => localCompleted.has(l.id)).length;
+              const completedCount = allLessons.filter((l: any) => localCompleted.has(l.id)).length;
 
               let progress = 0;
               if (completedCount > 0) {
@@ -246,11 +249,10 @@ export default function StudentPathwaysPage() {
       }
     }
 
-    loadStudentEnrollments();
+    loadData();
 
     const handleStorage = () => {
-      loadPlatformCourses();
-      loadStudentEnrollments();
+      loadData();
     };
 
     if (typeof window !== 'undefined') {

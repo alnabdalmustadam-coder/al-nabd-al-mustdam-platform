@@ -67,6 +67,18 @@ export default function StudentCoursesPage() {
   useEffect(() => {
     async function loadCourses() {
       try {
+        // 1. Fetch live courses catalog from API
+        let liveList: any[] = catalogCourses;
+        try {
+          const res = await fetch('/api/courses', { cache: 'no-store' });
+          const data = await res.json();
+          if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
+            liveList = data.courses;
+          }
+        } catch (e) {
+          console.warn('Could not fetch live courses, falling back to catalog:', e);
+        }
+
         const supabase = createClient();
         const { data: authData } = await supabase.auth.getUser();
         const user = authData?.user;
@@ -83,14 +95,17 @@ export default function StudentCoursesPage() {
             const courseMap = new Map<string, EnrolledCourseItem>();
 
             enrollmentsData.forEach((e: any, idx: number) => {
-              const cleanSlug = (e.course_id || '').replace(/^course-/, '');
+              const cleanSlug = (e.course_id || '').replace(/^course-/, '').toLowerCase().trim();
               const matchedCatalog =
+                liveList.find((c) => (c.slug || '').toLowerCase().trim() === cleanSlug) ||
+                liveList.find((c) => String(c.id) === cleanSlug) ||
+                liveList.find((c) => (c.ghlCourseId || '').replace(/^course-/, '').toLowerCase().trim() === cleanSlug) ||
+                liveList.find((c) => c.title === e.course_title) ||
                 getCourseBySlug(cleanSlug) ||
-                getCourseBySlug(e.course_id) ||
                 catalogCourses.find((c) => c.title === e.course_title) ||
-                catalogCourses[idx % catalogCourses.length];
-              const canonicalSlug = matchedCatalog?.slug || cleanSlug;
+                liveList[idx % liveList.length];
 
+              const canonicalSlug = matchedCatalog?.slug || cleanSlug;
               const allCourseLessons = getCourseAllLessons(matchedCatalog);
               const totalLessons = Math.max(1, allCourseLessons.length);
 

@@ -1,5 +1,63 @@
 [
   {
+    "id": 10,
+    "slug": "tes4r-4296",
+    "title": "tes4r",
+    "description": "برنامج تدريبي معتمد وشامل.",
+    "category": "tech",
+    "level": "all",
+    "price": 500,
+    "rating": 5,
+    "enrollees": 0,
+    "duration": "30 ساعة",
+    "lessonsCount": 3,
+    "featured": true,
+    "image": "/logo.webp",
+    "instructor": "د. محمد القحطاني",
+    "trainerId": "tr-1",
+    "curriculum": [
+      {
+        "id": "les-1787102092061-1",
+        "title": "الدرس الأول: مقدمة تمهيدية وأهداف البرنامج",
+        "duration": "20 دقيقة",
+        "videoUrl": "MmHWTPJMzbQ",
+        "type": "video",
+        "isLocked": false,
+        "lessons": [
+          "الدرس الأول: مقدمة تمهيدية وأهداف البرنامج"
+        ]
+      },
+      {
+        "id": "les-1787102104700-2",
+        "title": "الدرس 2:",
+        "duration": "25 دقيقة",
+        "videoUrl": "MmHWTPJMzbQ",
+        "type": "video",
+        "isLocked": false,
+        "lessons": [
+          "الدرس 2:"
+        ]
+      },
+      {
+        "id": "les-1787102120194-3",
+        "title": "الدرس 3:",
+        "duration": "25 دقيقة",
+        "videoUrl": "MmHWTPJMzbQ",
+        "type": "video",
+        "isLocked": false,
+        "lessons": [
+          "الدرس 3:"
+        ]
+      }
+    ],
+    "outcomes": [
+      "اكتساب المعارف والمهارات الأساسية للمسار."
+    ],
+    "requirements": "لا توجد متطلبات مسبقة.",
+    "ghlCheckoutUrl": "/checkout?slug=tes4r-4296",
+    "ghlCourseId": "course-tes4r-4296"
+  },
+  {
     "id": 1,
     "title": "دورة استخدام الحاسب الالي في الاعمال المكتبية",
     "slug": "computer-basics-office",
