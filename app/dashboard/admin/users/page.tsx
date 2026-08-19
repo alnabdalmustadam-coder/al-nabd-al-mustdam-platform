@@ -52,6 +52,18 @@ export default function AdminUsersPage() {
 
   const [users, setUsers] = useState<UserRecord[]>([
     {
+      id: 'u-superadmin',
+      name: 'المدير العام (Super Admin)',
+      email: 'superadmin@admin.com',
+      phone: '+966 50 000 0000',
+      role: 'أدمن',
+      enrolledCourses: 24,
+      certificatesCount: 24,
+      status: 'active',
+      lastActive: 'نشط الآن',
+      attendanceRate: '100%',
+    },
+    {
       id: 'u-1',
       name: 'عبدالله الشمري',
       email: 'abdullah@example.com',

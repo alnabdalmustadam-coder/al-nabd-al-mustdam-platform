@@ -33,15 +33,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. جيب الـ GHL Contact ID من profiles
+    // 2. Fetch profile and role from profiles table
     const { data: profile } = await supabase
       .from("profiles")
-      .select("ghl_contact_id")
+      .select("ghl_contact_id, role")
       .eq("id", authData.user.id)
-      .single();
+      .maybeSingle();
 
-    // 3. توجيه المستخدم للداشبورد مباشرة
-    let redirectUrl = "/dashboard/student";
+    // 3. Determine redirect URL based on user role
+    const userRole = (profile?.role || authData.user?.user_metadata?.role || "STUDENT").toUpperCase();
+    const isAdmin = userRole === "ADMIN" || userRole === "SUPERADMIN" || userRole === "INSTRUCTOR" || userRole === "TRAINER";
+    const redirectUrl = isAdmin ? "/dashboard/admin" : "/dashboard/student";
 
     return NextResponse.json(
       { success: true, redirectUrl },
