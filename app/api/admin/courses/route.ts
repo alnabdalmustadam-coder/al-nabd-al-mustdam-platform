@@ -40,6 +40,8 @@ export async function GET() {
         status: 'published',
         description: c.description || '',
         curriculum: c.curriculum || [],
+        attachments: c.attachments || [],
+        finalExam: c.finalExam || undefined,
         image: c.image || '/logo.webp',
       };
     });

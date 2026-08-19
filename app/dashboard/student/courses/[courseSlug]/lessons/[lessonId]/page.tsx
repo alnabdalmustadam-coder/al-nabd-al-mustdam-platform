@@ -26,7 +26,11 @@ import {
   Search,
   Trash2,
   ThumbsUp,
-  Sparkles
+  Sparkles,
+  Video as VideoIcon,
+  ExternalLink,
+  Layers,
+  FileCheck,
 } from 'lucide-react';
 import { StudentVideoPlayer } from '@/components/student/student-video-player';
 import {
@@ -37,7 +41,7 @@ import {
   saveQuizAttempt,
 } from '@/lib/actions/student-actions';
 import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
-import { Course } from '@/types';
+import { Course, CourseAttachment, QuizData, SubLessonItem } from '@/types';
 import { createClient } from '@/utils/supabase/client';
 
 /* ── Types ── */
@@ -48,7 +52,11 @@ interface Lesson {
   isCompleted: boolean;
   isCurrent?: boolean;
   videoUrl: string;
-  type?: 'video' | 'quiz' | 'article';
+  type?: 'video' | 'pdf' | 'doc' | 'quiz' | 'article';
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: string;
+  quizData?: QuizData;
 }
 
 interface Chapter {
@@ -147,23 +155,54 @@ export default function StudentLessonPage() {
   const chapters: Chapter[] = useMemo(() => {
     if (courseData && Array.isArray(courseData.curriculum) && courseData.curriculum.length > 0) {
       return courseData.curriculum.map((sec: any, sIdx: number) => {
-        const itemTitle = sec.title || `المحاضرة ${sIdx + 1}`;
-        const itemUniqueId = sec.id || `les-${sIdx + 1}`;
-        const rawVideo = sec.videoUrl || '';
+        const itemTitle = sec.title || `الوحدة ${sIdx + 1}`;
+        const itemUniqueId = sec.id || `sec-${sIdx + 1}`;
 
-        return {
-          id: `chap-${sIdx + 1}`,
-          title: itemTitle,
-          lessons: [
+        let secLessons: Lesson[] = [];
+
+        if (Array.isArray(sec.items) && sec.items.length > 0) {
+          secLessons = sec.items.map((it: any, subIdx: number) => ({
+            id: it.id || `sub-${sIdx + 1}-${subIdx + 1}`,
+            title: it.title || `المقطع ${subIdx + 1}`,
+            duration: it.duration || '15 دقيقة',
+            isCompleted: false,
+            videoUrl: it.videoUrl || '',
+            type: it.type || 'video',
+            fileUrl: it.fileUrl,
+            fileName: it.fileName,
+            fileSize: it.fileSize,
+            quizData: it.quizData,
+          }));
+        } else if (Array.isArray(sec.lessons) && sec.lessons.length > 1) {
+          secLessons = sec.lessons.map((lesName: string, subIdx: number) => ({
+            id: `sub-${sIdx + 1}-${subIdx + 1}`,
+            title: lesName,
+            duration: '15 دقيقة',
+            isCompleted: false,
+            videoUrl: subIdx === 0 ? (sec.videoUrl || '') : '',
+            type: 'video',
+          }));
+        } else {
+          secLessons = [
             {
               id: itemUniqueId,
               title: itemTitle,
               duration: sec.duration || '20 دقيقة',
               isCompleted: false,
-              videoUrl: rawVideo,
+              videoUrl: sec.videoUrl || '',
               type: (sec.type as any) || 'video',
+              fileUrl: sec.fileUrl,
+              fileName: sec.fileName,
+              fileSize: sec.fileSize,
+              quizData: sec.quizData,
             },
-          ],
+          ];
+        }
+
+        return {
+          id: `chap-${sIdx + 1}`,
+          title: itemTitle,
+          lessons: secLessons,
         };
       });
     }
@@ -194,7 +233,6 @@ export default function StudentLessonPage() {
     if (!allLessons || allLessons.length === 0) return 0;
     const exactMatch = allLessons.findIndex((l) => l.id === lessonId);
     if (exactMatch >= 0) return exactMatch;
-    // If URL is lesson-1 and exact ID differs, pick first lesson
     if (lessonId === 'lesson-1' || !lessonId) return 0;
     return 0;
   }, [allLessons, lessonId]);
@@ -236,6 +274,90 @@ export default function StudentLessonPage() {
       setCollapsedChapters(collapsed);
     }
   }, [chapters, lessonId, currentLesson?.id]);
+
+  /* ── Dynamic Attachments Compilation ── */
+  const allAttachments = useMemo(() => {
+    const list: Array<{ id: string; title: string; fileUrl: string; fileSize?: string; fileType?: string }> = [];
+
+    // 1. Course Level Attachments
+    if (Array.isArray(courseData?.attachments)) {
+      courseData.attachments.forEach((att) => {
+        if (att.fileUrl) list.push(att);
+      });
+    }
+
+    // 2. Section & Sub-lesson Attachments
+    if (Array.isArray(courseData?.curriculum)) {
+      courseData.curriculum.forEach((sec: any) => {
+        if (sec.fileUrl && !list.some((l) => l.fileUrl === sec.fileUrl)) {
+          list.push({
+            id: `sec-${sec.id || sec.title}`,
+            title: sec.fileName || `${sec.title} - ملخص الوحدة`,
+            fileUrl: sec.fileUrl,
+            fileSize: sec.fileSize || 'PDF',
+            fileType: 'pdf',
+          });
+        }
+        if (Array.isArray(sec.items)) {
+          sec.items.forEach((it: any) => {
+            if (it.fileUrl && !list.some((l) => l.fileUrl === it.fileUrl)) {
+              list.push({
+                id: `item-${it.id || it.title}`,
+                title: it.fileName || `${it.title} - المرفق`,
+                fileUrl: it.fileUrl,
+                fileSize: it.fileSize || 'PDF',
+                fileType: it.type === 'pdf' ? 'pdf' : 'word',
+              });
+            }
+          });
+        }
+      });
+    }
+
+    return list;
+  }, [courseData]);
+
+  /* ── Dynamic Active Quiz Compilation ── */
+  const activeQuiz: QuizData = useMemo(() => {
+    // 1. Check if current lesson has specific quizData
+    if (currentLesson?.quizData && Array.isArray(currentLesson.quizData.questions) && currentLesson.quizData.questions.length > 0) {
+      return currentLesson.quizData;
+    }
+
+    // 2. Check if parent section has quizData
+    const parentChap = chapters.find((ch) => ch.lessons.some((l) => l.id === currentLesson?.id));
+    const rawSec = courseData?.curriculum?.find((s: any) => s.title === parentChap?.title || s.id === parentChap?.id);
+    if (rawSec?.quizData && Array.isArray(rawSec.quizData.questions) && rawSec.quizData.questions.length > 0) {
+      return rawSec.quizData;
+    }
+
+    // 3. Check if course has finalExam
+    if (courseData?.finalExam && Array.isArray(courseData.finalExam.questions) && courseData.finalExam.questions.length > 0) {
+      return courseData.finalExam;
+    }
+
+    // 4. Default high-quality quiz fallback
+    return {
+      title: `اختبار تقييمي لمخرجات ${courseData?.title || 'الدورة التدريبية'}`,
+      passingScore: 70,
+      questions: [
+        {
+          id: 'q-default-1',
+          question: 'ما هي الركيزة الأساسية لتحقيق أعلى استفادة من هذا المساق التدريبي؟',
+          options: ['التطبيق العملي المستمر ومراجعة المخرجات', 'المشاهدة السريعة بدون تدوين', 'تجاوز الاختبارات التقييمية', 'تجنب المشاركة في المناقشات'],
+          correctIndex: 0,
+          explanation: 'التطبيق العملي المستمر يساعد على ترسيخ المعارف واكتساب المهارة الفعلية.',
+        },
+        {
+          id: 'q-default-2',
+          question: 'كيف يتم التحقق من استحقاق الشهادة الرقمية المعتمدة؟',
+          options: ['إتمام كافة متطلبات الدروس ورصد التقدم واجتياز التقييم', 'التسجيل في الدورة فقط دون الحضور', 'عدم إكمال الواجبات', 'تخطي الوحدات الأساسية'],
+          correctIndex: 0,
+          explanation: 'يتم إصدار الشهادة آلياً وتوثيقها فور إكمال المحاضرات والاختبار.',
+        },
+      ],
+    };
+  }, [currentLesson, courseData, chapters]);
 
   /* ── Persistent State ── */
   useEffect(() => {
@@ -302,21 +424,20 @@ export default function StudentLessonPage() {
     }
 
     initProgress();
-  }, [courseSlug, lessonId, totalLessons, allLessons, courseData]);
+  }, [courseSlug, lessonId, totalLessons, allLessons, courseData?.title, courseData?.slug, courseData?.ghlCourseId]);
 
-  /* ── Handlers ── */
   const toggleChapter = (chapId: string) => {
-    setCollapsedChapters(prev => {
-      const isCurrentlyCollapsed = prev.has(chapId);
-      if (isCurrentlyCollapsed) {
-        // Open ONLY this chapter, and collapse all other chapters
-        const allOtherChaps = new Set(chapters.map(c => c.id).filter(id => id !== chapId));
-        return allOtherChaps;
-      } else {
-        // Collapse this chapter
-        const next = new Set(prev);
-        next.add(chapId);
+    setCollapsedChapters((prev) => {
+      const next = new Set(prev);
+      if (next.has(chapId)) {
+        next.delete(chapId);
         return next;
+      } else {
+        const single = new Set<string>();
+        chapters.forEach(c => {
+          if (c.id !== chapId) single.add(c.id);
+        });
+        return single;
       }
     });
   };
@@ -348,7 +469,7 @@ export default function StudentLessonPage() {
 
       saveCompletedLessons(courseSlug, next);
 
-      // ── Sync with Supabase Database via API Route (Service Role) ──
+      // ── Sync with Supabase Database via API Route ──
       const allFlat = chapters.flatMap(ch => ch.lessons);
       const newProgress = Math.min(100, Math.round((next.size / Math.max(1, allFlat.length)) * 100));
 
@@ -399,16 +520,21 @@ export default function StudentLessonPage() {
   };
 
   const handleQuizSubmit = async () => {
-    let score = 0;
-    quizQuestions.forEach((q, idx) => {
-      if (selectedAnswers[idx] === q.correctIndex) score += 50;
+    let correctCount = 0;
+    const questions = activeQuiz.questions || [];
+    questions.forEach((q, idx) => {
+      if (selectedAnswers[idx] === q.correctIndex) correctCount += 1;
     });
+
+    const score = Math.round((correctCount / Math.max(1, questions.length)) * 100);
     setQuizScore(score);
     setQuizSubmitted(true);
     saveQuizAttempt(lessonId, score);
 
+    const passingScore = activeQuiz.passingScore || 70;
+
     // Auto-issue certificate if passed
-    if (score >= 50) {
+    if (score >= passingScore) {
       try {
         const supabase = createClient();
         const { data: authData } = await supabase.auth.getUser();
@@ -436,7 +562,7 @@ export default function StudentLessonPage() {
             courseSlug,
             courseTitle: courseData?.title,
             grade: `ممتاز (%${score})`,
-            hours: '30 ساعة تدريبية معتمدة',
+            hours: courseData?.duration || '30 ساعة تدريبية معتمدة',
           }),
         });
       } catch (err) {
@@ -459,21 +585,6 @@ export default function StudentLessonPage() {
     setDiscussionComments([newC, ...discussionComments]);
     setNewCommentText('');
   };
-
-  const quizQuestions = [
-    {
-      id: 1,
-      question: 'ما هي الركيزة الأساسية لتحقيق أعلى استفادة من هذا المساق التدريبي؟',
-      options: ['التطبيق العملي المستمر ومراجعة المخرجات', 'المشاهدة السريعة بدون تدوين', 'تجاوز الاختبارات التقييمية', 'تجنب المشاركة في المناقشات'],
-      correctIndex: 0,
-    },
-    {
-      id: 2,
-      question: 'كيف يتم التحقق من استحقاق الشهادة الرقمية المعتمدة؟',
-      options: ['إتمام كافة متطلبات الدروس ورصد التقدم بنسبة 100%', 'التسجيل في الدورة فقط دون الحضور', 'عدم إكمال الواجبات', 'تخطي الوحدات الأساسية'],
-      correctIndex: 0,
-    },
-  ];
 
   return (
     <div className="w-full pt-1.5 sm:pt-2.5 -mt-1 sm:-mt-2 lg:-mt-[3.8vh] -mb-6 sm:-mb-10 font-[family-name:var(--font-cairo)] text-slate-900" dir="rtl">
@@ -535,7 +646,7 @@ export default function StudentLessonPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ابحث في الدروس..."
+                  placeholder="ابحث في الدروس والمقاطع..."
                   className="w-full text-xs font-bold py-2 pr-9 pl-3 rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#173A7C]"
                 />
                 {searchQuery && (
@@ -549,7 +660,7 @@ export default function StudentLessonPage() {
               </div>
             </div>
 
-            {/* Chapters & Lessons Accordion */}
+            {/* Chapters & Sub-Lessons Accordion */}
             <div
               className="flex-1 overflow-y-auto space-y-2.5 pr-0.5 no-scrollbar"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -614,9 +725,18 @@ export default function StudentLessonPage() {
                                 href={makeLessonUrl(les.id)}
                                 className="flex-1 flex items-center justify-between gap-2 min-w-0 cursor-pointer"
                               >
-                                <span className={`text-xs font-bold truncate ${isCurrent ? 'text-white font-extrabold' : 'text-slate-800'}`}>
-                                  {les.title}
-                                </span>
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  {les.type === 'pdf' ? (
+                                    <FileText className={`w-3.5 h-3.5 shrink-0 ${isCurrent ? 'text-emerald-300' : 'text-blue-600'}`} />
+                                  ) : les.type === 'quiz' ? (
+                                    <HelpCircle className={`w-3.5 h-3.5 shrink-0 ${isCurrent ? 'text-amber-300' : 'text-amber-500'}`} />
+                                  ) : (
+                                    <VideoIcon className={`w-3.5 h-3.5 shrink-0 ${isCurrent ? 'text-blue-200' : 'text-slate-400'}`} />
+                                  )}
+                                  <span className={`text-xs font-bold truncate ${isCurrent ? 'text-white font-extrabold' : 'text-slate-800'}`}>
+                                    {les.title}
+                                  </span>
+                                </div>
 
                                 <div className="flex items-center gap-1 shrink-0">
                                   <span className={`text-[10px] font-mono ${isCurrent ? 'text-blue-200' : 'text-slate-400'}`}>
@@ -641,20 +761,50 @@ export default function StudentLessonPage() {
             </div>
           </div>
 
-          {/* Video Player */}
+          {/* Video Player or Content Pane */}
           <div className="col-span-1 lg:col-span-8 xl:col-span-8 flex flex-col justify-between w-full">
-            <StudentVideoPlayer
-              lessonId={currentLesson?.id || lessonId}
-              lessonTitle={currentLesson?.title || courseData?.title || 'الدرس التدريبي'}
-              videoUrl={currentLesson?.videoUrl || 'https://www.youtube.com/watch?v=1BEWMhAuBd4'}
-              onLessonComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
-              nextLessonUrl={nextLesson ? makeLessonUrl(nextLesson.id) : undefined}
-              prevLessonUrl={prevLesson ? makeLessonUrl(prevLesson.id) : undefined}
-              onOpenLessonsDrawer={() => setIsMobilePlaylistOpen(true)}
-              onAddNoteAtTimestamp={handleAddTimestampNote}
-              isCompleted={completedSet.has(currentLesson?.id || lessonId)}
-              onToggleComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
-            />
+            {currentLesson?.type === 'pdf' && currentLesson?.fileUrl ? (
+              <div className="aspect-video w-full rounded-2xl bg-gradient-to-br from-slate-900 via-[#173A7C] to-slate-900 flex flex-col items-center justify-center p-6 text-white text-center space-y-4 shadow-xl border border-white/10">
+                <div className="w-16 h-16 rounded-3xl bg-white/10 flex items-center justify-center border border-white/20 shadow-lg">
+                  <FileText className="w-8 h-8 text-emerald-300" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-black">{currentLesson.title}</h3>
+                  <p className="text-xs text-blue-100 font-medium">ملف تدريبي مرفق جاهز للقراءة والتحميل المباشر</p>
+                </div>
+                <div className="flex items-center gap-3 pt-2">
+                  <a
+                    href={currentLesson.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black shadow-md cursor-pointer transition-all"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>تحميل المستند ({currentLesson.fileSize || 'PDF'})</span>
+                  </a>
+                  <button
+                    onClick={() => handleToggleComplete(currentLesson.id)}
+                    className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span>{completedSet.has(currentLesson.id) ? 'تمت القراءة' : 'تحديد كمكتمل'}</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <StudentVideoPlayer
+                lessonId={currentLesson?.id || lessonId}
+                lessonTitle={currentLesson?.title || courseData?.title || 'الدرس التدريبي'}
+                videoUrl={currentLesson?.videoUrl || 'https://www.youtube.com/watch?v=1BEWMhAuBd4'}
+                onLessonComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
+                nextLessonUrl={nextLesson ? makeLessonUrl(nextLesson.id) : undefined}
+                prevLessonUrl={prevLesson ? makeLessonUrl(prevLesson.id) : undefined}
+                onOpenLessonsDrawer={() => setIsMobilePlaylistOpen(true)}
+                onAddNoteAtTimestamp={handleAddTimestampNote}
+                isCompleted={completedSet.has(currentLesson?.id || lessonId)}
+                onToggleComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
+              />
+            )}
           </div>
 
         </div>
@@ -684,7 +834,7 @@ export default function StudentLessonPage() {
             }`}
           >
             <Paperclip className="w-4 h-4 shrink-0" />
-            <span className="truncate">الملحقات (2)</span>
+            <span className="truncate">المرفقات ({allAttachments.length})</span>
           </button>
 
           <button
@@ -696,7 +846,7 @@ export default function StudentLessonPage() {
             }`}
           >
             <HelpCircle className="w-4 h-4 shrink-0" />
-            <span className="truncate">اختبار الوحدة</span>
+            <span className="truncate">الاختبار والتقييم</span>
           </button>
 
           <button
@@ -765,7 +915,7 @@ export default function StudentLessonPage() {
           </div>
         )}
 
-        {/* Tab 2: Attachments */}
+        {/* Tab 2: Attachments (PDF / Word / Resources) */}
         {activeTab === 'attachments' && (
           <div className="space-y-4">
             <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
@@ -773,87 +923,118 @@ export default function StudentLessonPage() {
               الملفات والمكتسبات المرفقة بالبرنامج التدريبي
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2.5 rounded-lg bg-blue-100 text-[#173A7C] shrink-0">
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-slate-800 text-xs sm:text-sm">حقيبة الدورة - العرض التدريبي.pdf</h5>
-                    <p className="text-[11px] text-slate-500">حجم الملف: 4.2 ميجابايت · PDF</p>
-                  </div>
-                </div>
-                <button className="p-2 rounded-lg bg-[#173A7C] text-white hover:bg-[#1E4D9D] transition-colors cursor-pointer shrink-0">
-                  <Download className="w-4 h-4" />
-                </button>
+            {allAttachments.length === 0 ? (
+              <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
+                <FileText className="w-8 h-8 text-slate-300 mx-auto" />
+                <div className="text-xs font-bold text-slate-700">لا توجد ملفات مرفقة إضافية لهذا المساق حالياً</div>
+                <p className="text-[11px] text-slate-400">كافة المكتسبات العلمية مشمولة ضمن المحاضرات التفاعلية</p>
               </div>
-
-              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2.5 rounded-lg bg-emerald-100 text-[#5CB07C] shrink-0">
-                    <Award className="w-5 h-5" />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {allAttachments.map((att, idx) => (
+                  <div
+                    key={att.id || idx}
+                    className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3 hover:border-blue-300 transition-all"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="p-2.5 rounded-lg bg-blue-100 text-[#173A7C] shrink-0">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h5 className="font-bold text-slate-800 text-xs sm:text-sm truncate" title={att.title}>
+                          {att.title}
+                        </h5>
+                        <p className="text-[11px] text-slate-500">
+                          {att.fileSize || 'ملف رقمي'} · {att.fileType?.toUpperCase() || 'PDF'}
+                        </p>
+                      </div>
+                    </div>
+                    <a
+                      href={att.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="p-2 rounded-lg bg-[#173A7C] text-white hover:bg-[#1E4D9D] transition-colors cursor-pointer shrink-0"
+                      title="تحميل الملف"
+                    >
+                      <Download className="w-4 h-4" />
+                    </a>
                   </div>
-                  <div>
-                    <h5 className="font-bold text-slate-800 text-xs sm:text-sm">دليل التطبيقات العملية والشهادة.pdf</h5>
-                    <p className="text-[11px] text-slate-500">حجم الملف: 1.8 ميجابايت · PDF</p>
-                  </div>
-                </div>
-                <button className="p-2 rounded-lg bg-[#173A7C] text-white hover:bg-[#1E4D9D] transition-colors cursor-pointer shrink-0">
-                  <Download className="w-4 h-4" />
-                </button>
+                ))}
               </div>
-            </div>
+            )}
           </div>
         )}
 
-        {/* Tab 3: Quiz */}
+        {/* Tab 3: Interactive Quiz */}
         {activeTab === 'quiz' && (
           <div className="space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-amber-500" />
-                اختبار تقييمي قصير لمخرجات الدورة
-              </h4>
+              <div>
+                <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-amber-500" />
+                  <span>{activeQuiz.title || 'اختبار تقييمي لمخرجات الدورة'}</span>
+                </h4>
+                <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                  نسبة الاجتياز المطلوبة: %{activeQuiz.passingScore || 70}
+                </p>
+              </div>
+
               {quizSubmitted && (
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg">
-                  النتيجة: %{quizScore}
+                <span className={`text-xs font-black px-3 py-1 rounded-lg ${
+                  (quizScore ?? 0) >= (activeQuiz.passingScore || 70)
+                    ? 'text-emerald-800 bg-emerald-100'
+                    : 'text-amber-800 bg-amber-100'
+                }`}>
+                  {(quizScore ?? 0) >= (activeQuiz.passingScore || 70) ? 'ناجح ✓' : 'حاول مجدداً'} (%{quizScore})
                 </span>
               )}
             </div>
 
             <div className="space-y-4">
-              {quizQuestions.map((q, qIdx) => (
-                <div key={q.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+              {activeQuiz.questions?.map((q, qIdx) => (
+                <div key={q.id || qIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
                   <h5 className="student-heading-h3 !text-xs sm:!text-sm">
                     السؤال {qIdx + 1}: {q.question}
                   </h5>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {q.options.map((opt, optIdx) => {
+                    {q.options?.map((opt, optIdx) => {
                       const isSelected = selectedAnswers[qIdx] === optIdx;
+                      const isCorrect = q.correctIndex === optIdx;
+
+                      let btnStyle = 'bg-white text-slate-700 border-slate-200 hover:border-slate-300';
+                      if (quizSubmitted) {
+                        if (isCorrect) btnStyle = 'bg-emerald-50 border-emerald-400 text-emerald-800 font-bold';
+                        else if (isSelected && !isCorrect) btnStyle = 'bg-rose-50 border-rose-300 text-rose-700';
+                      } else if (isSelected) {
+                        btnStyle = 'bg-[#173A7C] text-white border-[#173A7C]';
+                      }
+
                       return (
                         <button
                           key={optIdx}
                           onClick={() => setSelectedAnswers({ ...selectedAnswers, [qIdx]: optIdx })}
-                          className={`p-2.5 rounded-lg text-right text-xs font-bold transition-all cursor-pointer border ${
-                            isSelected
-                              ? 'bg-[#173A7C] text-white border-[#173A7C]'
-                              : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
-                          }`}
+                          className={`p-2.5 rounded-lg text-right text-xs font-bold transition-all cursor-pointer border ${btnStyle}`}
                         >
                           {opt}
                         </button>
                       );
                     })}
                   </div>
+
+                  {quizSubmitted && q.explanation && (
+                    <p className="text-[11px] text-slate-500 bg-white p-2 rounded-lg border border-slate-200 font-medium">
+                      💡 {q.explanation}
+                    </p>
+                  )}
                 </div>
               ))}
 
-              {quizSubmitted && quizScore !== null && quizScore >= 50 && (
+              {quizSubmitted && quizScore !== null && quizScore >= (activeQuiz.passingScore || 70) && (
                 <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-500/30 text-slate-900 space-y-3 shadow-xs">
                   <div className="flex items-center gap-2.5 text-emerald-800 font-black text-xs sm:text-sm">
                     <Award className="w-5 h-5 text-emerald-600 shrink-0" />
-                    <span>تهانينا! لقد اجتزت الاختبار بنجاح وتم إصدار شهادتك المعتمدة فوراً 📜</span>
+                    <span>تهانينا! لقد اجتزت الاختبار بنجاح وتم توثيق نتيجتك فوراً 📜</span>
                   </div>
                   <p className="text-xs text-slate-600 font-bold leading-relaxed">
                     تم توثيق إنجازك الأكاديمي وإصدار شهادة معتمدة بالمركز الوطني بالتصميم والقالب الرسمي المخصص.
@@ -873,7 +1054,7 @@ export default function StudentLessonPage() {
               <div className="flex justify-end">
                 <button
                   onClick={handleQuizSubmit}
-                  disabled={Object.keys(selectedAnswers).length < quizQuestions.length}
+                  disabled={Object.keys(selectedAnswers).length < (activeQuiz.questions?.length || 1)}
                   className="px-5 py-2.5 bg-[#173A7C] text-white rounded-xl text-xs font-bold hover:bg-[#1E4D9D] transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {quizSubmitted ? 'إعادة اعتماد الإجابات' : 'اعتماد إجابات الاختبار'}
@@ -938,6 +1119,8 @@ export default function StudentLessonPage() {
           </div>
         )}
 
+      </div>
+
       {/* Mobile Playlist Drawer */}
       {isMobilePlaylistOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-slate-900/60 backdrop-blur-xs animate-fade-in-up">
@@ -948,105 +1131,56 @@ export default function StudentLessonPage() {
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-slate-800">فهرس دروس المساق</h3>
-                  <p className="text-[11px] font-bold text-slate-500">{completedLessons} من {totalLessons} مكتمل (%{progressPercent})</p>
+                  <h3 className="student-heading-h3 !text-sm">فهرس المحاضرات</h3>
+                  <p className="text-[11px] text-slate-500 font-bold">{completedLessons} من {totalLessons} مكتمل</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsMobilePlaylistOpen(false)}
-                className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer"
-                title="إغلاق"
+                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div
-              className="flex-1 overflow-y-auto space-y-2.5 no-scrollbar"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {filteredChapters.map((chap, chIdx) => {
-                const isChapCollapsed = collapsedChapters.has(chap.id);
-                const chapCompletedCount = chap.lessons.filter(l => completedSet.has(l.id)).length;
-
-                return (
-                  <div key={chap.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
-                    <button
-                      onClick={() => toggleChapter(chap.id)}
-                      className="w-full p-2.5 text-right flex items-center justify-between gap-2 bg-slate-100/90 hover:bg-slate-100 transition-colors cursor-pointer border-b border-slate-200"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="flex items-center justify-center w-5 h-5 rounded-lg bg-[#173A7C] text-white text-[10px] font-black shrink-0">
-                          {chIdx + 1}
-                        </span>
-                        <span className="text-xs font-bold text-slate-800 truncate">
-                          {chap.title}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
-                          {chapCompletedCount}/{chap.lessons.length}
-                        </span>
-                        {isChapCollapsed ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronUp className="w-4 h-4 text-slate-400" />}
-                      </div>
-                    </button>
-
-                    {!isChapCollapsed && (
-                      <div className="p-1.5 space-y-1.5 bg-white">
-                        {chap.lessons.map((les) => {
-                          const isCurrent = les.id === (currentLesson?.id || lessonId);
-                          const isDone = completedSet.has(les.id);
-
-                          return (
-                            <div
-                              key={les.id}
-                              className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
-                                isCurrent
-                                  ? 'bg-[#173A7C] text-white border-[#173A7C] shadow-xs'
-                                  : isDone
-                                  ? 'bg-emerald-50/90 text-slate-800 border-emerald-200/90'
-                                  : 'bg-white text-slate-800 border-slate-200 hover:border-slate-300'
-                              }`}
-                            >
-                              <button
-                                onClick={(e) => handleToggleComplete(les.id, e)}
-                                className="shrink-0 cursor-pointer"
-                              >
-                                {isDone ? (
-                                  <CheckCircle2 className={`w-4 h-4 ${isCurrent ? 'text-emerald-300' : 'text-emerald-600'}`} />
-                                ) : (
-                                  <Circle className={`w-4 h-4 ${isCurrent ? 'text-white/60' : 'text-slate-300'}`} />
-                                )}
-                              </button>
-
-                              <Link
-                                href={makeLessonUrl(les.id)}
-                                onClick={() => setIsMobilePlaylistOpen(false)}
-                                className="flex-1 flex items-center justify-between gap-2 min-w-0 cursor-pointer"
-                              >
-                                <span className={`text-xs font-bold truncate ${isCurrent ? 'text-white font-extrabold' : 'text-slate-800'}`}>
-                                  {les.title}
-                                </span>
-
-                                <span className={`text-[10px] font-mono ${isCurrent ? 'text-blue-200' : 'text-slate-400'}`}>
-                                  {les.duration}
-                                </span>
-                              </Link>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+            <div className="flex-1 overflow-y-auto space-y-2.5">
+              {filteredChapters.map((chap, chIdx) => (
+                <div key={chap.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                  <div className="p-2.5 bg-slate-50 font-bold text-xs text-slate-800 flex items-center justify-between border-b border-slate-100">
+                    <span>{chap.title}</span>
+                    <span className="text-[10px] text-slate-500">
+                      {chap.lessons.filter(l => completedSet.has(l.id)).length}/{chap.lessons.length}
+                    </span>
                   </div>
-                );
-              })}
+                  <div className="p-1.5 space-y-1.5">
+                    {chap.lessons.map((les) => {
+                      const isCurrent = les.id === (currentLesson?.id || lessonId);
+                      const isDone = completedSet.has(les.id);
+                      return (
+                        <Link
+                          key={les.id}
+                          href={makeLessonUrl(les.id)}
+                          onClick={() => setIsMobilePlaylistOpen(false)}
+                          className={`flex items-center justify-between p-2 rounded-lg border text-xs font-bold ${
+                            isCurrent
+                              ? 'bg-[#173A7C] text-white border-[#173A7C]'
+                              : isDone
+                              ? 'bg-emerald-50 text-slate-800 border-emerald-200'
+                              : 'bg-white text-slate-700 border-slate-200'
+                          }`}
+                        >
+                          <span className="truncate">{les.title}</span>
+                          <span className="text-[10px] font-mono shrink-0">{les.duration}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       )}
-
-      </div>
     </div>
   );
 }

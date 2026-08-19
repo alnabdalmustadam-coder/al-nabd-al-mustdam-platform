@@ -1,3 +1,55 @@
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation?: string;
+}
+
+export interface QuizData {
+  id?: string;
+  title: string;
+  passingScore?: number; // e.g. 70 (%)
+  durationMinutes?: number;
+  questions: QuizQuestion[];
+}
+
+export interface CourseAttachment {
+  id: string;
+  title: string;
+  fileUrl: string;
+  fileType?: 'pdf' | 'doc' | 'word' | 'ppt' | 'zip' | 'other';
+  fileSize?: string;
+}
+
+export interface SubLessonItem {
+  id: string;
+  title: string;
+  duration?: string;
+  type?: 'video' | 'pdf' | 'doc' | 'quiz' | 'article';
+  videoUrl?: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: string;
+  isLocked?: boolean;
+  quizData?: QuizData;
+}
+
+export interface CurriculumSection {
+  id?: string;
+  title: string;
+  duration: string;
+  isLocked?: boolean;
+  type?: string;
+  videoUrl?: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: string;
+  quizData?: QuizData;
+  items?: SubLessonItem[];
+  lessons?: (string | SubLessonItem)[];
+}
+
 export interface Course {
   id: number;
   slug: string;
@@ -21,22 +73,14 @@ export interface Course {
   featured: boolean;
   outcomes: string[];
   curriculum: CurriculumSection[];
+  attachments?: CourseAttachment[];
+  finalExam?: QuizData;
   whyThisCourse?: string[];
   requirements?: string;
   trainerId?: string;
   enrollees?: number;
   ghlCourseId?: string;
   ghlCheckoutUrl?: string;
-}
-
-export interface CurriculumSection {
-  id?: string;
-  title: string;
-  lessons?: string[];
-  duration: string;
-  isLocked?: boolean;
-  type?: string;
-  videoUrl?: string;
 }
 
 export type CourseCategory = 'tech' | 'languages' | 'security' | 'corporate' | 'management' | 'design' | 'admin' | 'data';

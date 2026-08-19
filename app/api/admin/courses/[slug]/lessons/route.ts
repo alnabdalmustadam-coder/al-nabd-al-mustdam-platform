@@ -49,9 +49,14 @@ export async function POST(
       id: body.id,
       title: body.title,
       duration: body.duration || '20 دقيقة',
-      videoUrl: body.videoUrl || body.bunnyVideoId || 'MmHWTPJMzbQ',
+      videoUrl: body.videoUrl || body.bunnyVideoId || '',
       type: body.type || 'video',
       isLocked: body.isLocked ?? false,
+      fileUrl: body.fileUrl,
+      fileName: body.fileName,
+      fileSize: body.fileSize,
+      quizData: body.quizData,
+      items: body.items,
       subLessons: body.subLessons,
     });
 

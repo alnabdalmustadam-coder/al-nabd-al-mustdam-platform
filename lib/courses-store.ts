@@ -403,9 +403,14 @@ export async function addOrUpdateLessonAsync(
     id?: string;
     title: string;
     duration?: string;
-    videoUrl: string;
+    videoUrl?: string;
     type?: string;
     isLocked?: boolean;
+    fileUrl?: string;
+    fileName?: string;
+    fileSize?: string;
+    quizData?: any;
+    items?: any[];
     subLessons?: string[];
   }
 ): Promise<Course | null> {
@@ -420,18 +425,23 @@ export async function addOrUpdateLessonAsync(
   const lessonId = lessonData.id || `les-${Date.now()}`;
   const existingLessonIndex = curr.findIndex((l) => l.id === lessonId);
 
-  const newSection = {
+  const newSection: any = {
     id: lessonId,
     title: lessonData.title,
     duration: lessonData.duration || '20 دقيقة',
     isLocked: lessonData.isLocked ?? false,
     type: lessonData.type || 'video',
-    videoUrl: lessonData.videoUrl,
+    videoUrl: lessonData.videoUrl || '',
+    fileUrl: lessonData.fileUrl,
+    fileName: lessonData.fileName,
+    fileSize: lessonData.fileSize,
+    quizData: lessonData.quizData,
+    items: lessonData.items,
     lessons: lessonData.subLessons && lessonData.subLessons.length > 0 ? lessonData.subLessons : [lessonData.title],
   };
 
   if (existingLessonIndex >= 0) {
-    curr[existingLessonIndex] = newSection;
+    curr[existingLessonIndex] = { ...curr[existingLessonIndex], ...newSection };
   } else {
     curr.push(newSection);
   }
@@ -451,9 +461,14 @@ export function addOrUpdateLesson(
     id?: string;
     title: string;
     duration?: string;
-    videoUrl: string;
+    videoUrl?: string;
     type?: string;
     isLocked?: boolean;
+    fileUrl?: string;
+    fileName?: string;
+    fileSize?: string;
+    quizData?: any;
+    items?: any[];
     subLessons?: string[];
   }
 ): Course | null {
@@ -468,18 +483,23 @@ export function addOrUpdateLesson(
   const lessonId = lessonData.id || `les-${Date.now()}`;
   const existingLessonIndex = curr.findIndex((l) => l.id === lessonId);
 
-  const newSection = {
+  const newSection: any = {
     id: lessonId,
     title: lessonData.title,
     duration: lessonData.duration || '20 دقيقة',
     isLocked: lessonData.isLocked ?? false,
     type: lessonData.type || 'video',
-    videoUrl: lessonData.videoUrl,
+    videoUrl: lessonData.videoUrl || '',
+    fileUrl: lessonData.fileUrl,
+    fileName: lessonData.fileName,
+    fileSize: lessonData.fileSize,
+    quizData: lessonData.quizData,
+    items: lessonData.items,
     lessons: lessonData.subLessons && lessonData.subLessons.length > 0 ? lessonData.subLessons : [lessonData.title],
   };
 
   if (existingLessonIndex >= 0) {
-    curr[existingLessonIndex] = newSection;
+    curr[existingLessonIndex] = { ...curr[existingLessonIndex], ...newSection };
   } else {
     curr.push(newSection);
   }
