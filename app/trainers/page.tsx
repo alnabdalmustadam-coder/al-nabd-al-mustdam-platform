@@ -95,7 +95,7 @@ export default function TrainersPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#F1F6FA] to-white pb-24 font-sans selection:bg-[#173A7C] selection:text-white" dir="rtl">
 
       {/* ═══════════════════════════════════════ HERO SECTION ═══════════════════════════════════════ */}
-      <section className="relative w-full min-h-[100vh] flex flex-col items-center justify-center text-center overflow-hidden pt-32 pb-16">
+      <section className="relative w-full min-h-[100vh] flex flex-col items-center justify-start md:justify-center text-center overflow-hidden pt-20 md:pt-32 pb-16">
         {/* Background Image & High-End Overlay */}
         <div className="absolute inset-0 z-0">
           <img src="/bg.webp" alt="Training Background" className="w-full h-full object-cover scale-105" />

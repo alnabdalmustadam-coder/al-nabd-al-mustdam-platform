@@ -81,7 +81,7 @@ export default function TrainerGuidePage() {
   const [activeSection, setActiveSection] = useState<string>(sections[0].id);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-24 pt-[calc(10vh+5rem)] font-sans" dir="rtl">
+    <div className="min-h-screen bg-[#F8FAFC] pb-24 pt-20 md:pt-[calc(10vh+5rem)] font-sans" dir="rtl">
       
       {/* ═══════════════════════════════════════ HEADER ═══════════════════════════════════════ */}
       <section className="relative px-4 sm:px-6 mb-16 max-w-4xl mx-auto text-center">

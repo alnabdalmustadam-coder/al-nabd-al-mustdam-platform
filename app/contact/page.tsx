@@ -48,12 +48,12 @@ export default function ContactPage() {
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
   return (
-    <div className="min-h-screen pt-28 pb-20 bg-slate-50">
+    <div className="min-h-screen pt-20 md:pt-28 pb-20 bg-slate-50">
       {/* Hero */}
       <section className="relative overflow-hidden mb-16">
         <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgwLDAsMCwwLjA0KSIvPjwvc3ZnPg==')] opacity-50" />
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center py-16 pb-24">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center py-8 md:py-16 pb-16 md:pb-24">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
             <span className="text-[#173A7C] text-sm font-bold tracking-wide uppercase bg-[#173A7C]/5 px-4 py-1.5 rounded-full inline-block mb-4">
               الدعم الفني

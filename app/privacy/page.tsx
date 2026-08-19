@@ -57,7 +57,7 @@ export default function PrivacyPolicyPage() {
   const [activeSection, setActiveSection] = useState<string>(policies[0].id);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-24 pt-[calc(10vh+5rem)]">
+    <div className="min-h-screen bg-[#F8FAFC] pb-24 pt-20 md:pt-[calc(10vh+5rem)]">
       
       {/* ═══════════════════════════════════════ HEADER ═══════════════════════════════════════ */}
       <section className="relative px-4 sm:px-6 mb-16 max-w-4xl mx-auto text-center">

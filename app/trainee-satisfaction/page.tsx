@@ -308,7 +308,7 @@ export default function TraineeSatisfactionPage() {
       <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-[#5CB07C]/[0.06] rounded-full blur-[200px] pointer-events-none -translate-y-1/2 translate-x-1/3 z-0" />
       <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-[#173A7C]/[0.06] rounded-full blur-[180px] pointer-events-none translate-y-1/2 -translate-x-1/3 z-0" />
 
-      <div className="relative z-10 pb-24 pt-28">
+      <div className="relative z-10 pb-24 pt-20 md:pt-28">
         {/* ═══════════ HERO HEADER ═══════════ */}
         <section className="relative px-4 sm:px-6 mb-12 max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>

@@ -226,7 +226,7 @@ export default function SubscriptionPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.92] via-slate-50/[0.88] to-blue-50/[0.85]" />
       </div>
 
-      <div className="relative z-10 pb-24 pt-28">
+      <div className="relative z-10 pb-24 pt-20 md:pt-28">
         
         {/* ═══════════ HERO WITH LOGO ═══════════ */}
         <section className="relative px-4 sm:px-6 mb-12 max-w-4xl mx-auto text-center">

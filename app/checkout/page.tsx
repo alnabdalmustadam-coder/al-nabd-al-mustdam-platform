@@ -175,7 +175,7 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-20 bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-100/50 relative overflow-hidden text-slate-800 font-[family-name:var(--font-cairo)]" dir="rtl">
+    <div className="min-h-screen pt-20 md:pt-28 pb-20 bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-100/50 relative overflow-hidden text-slate-800 font-[family-name:var(--font-cairo)]" dir="rtl">
       {/* Decorative Glow Elements */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#5CB07C]/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />

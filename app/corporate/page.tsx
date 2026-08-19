@@ -81,7 +81,7 @@ export default function CorporatePage() {
     <div className="min-h-screen bg-white">
 
       {/* ═══════════════════════════════════════ HERO — LIGHT THEME ═══════════════════════════════════════ */}
-      <section className="relative h-screen max-h-screen flex flex-col items-center justify-center overflow-hidden bg-slate-50 pt-24 pb-0">
+      <section className="relative min-h-screen md:h-screen md:max-h-screen flex flex-col items-center justify-start md:justify-center overflow-hidden bg-slate-50 pt-20 md:pt-24 pb-0">
 
         {/* Particle Grid */}
         <div className="particles-grid opacity-60" />
@@ -92,7 +92,7 @@ export default function CorporatePage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center py-4 lg:py-6">
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center py-2 lg:py-6">
           
           {/* Main Glassmorphic Card */}
           <motion.div

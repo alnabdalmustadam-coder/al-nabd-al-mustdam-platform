@@ -24,7 +24,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-slate-50/50 pb-20">
       
       {/* ═══════════════════════════════════════ HERO SECTION ═══════════════════════════════════════ */}
-      <section className="relative pt-[calc(10vh+5rem)] pb-32 overflow-hidden bg-white">
+      <section className="relative pt-20 md:pt-[calc(10vh+5rem)] pb-16 md:pb-32 overflow-hidden bg-white">
         {/* Background Image & Texture */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none overflow-hidden z-0">
           <img src="/bg.webp" alt="Background Texture" className="w-full h-full object-contain" />

@@ -67,7 +67,7 @@ export default function CoursesPage() {
   return (
     <div className="min-h-screen bg-slate-50/50 pb-24">
       {/* ═══════════════════════════════════════ HERO SECTION — ULTRA PREMIUM ═══════════════════════════════════════ */}
-      <section className="relative pt-[calc(10vh+5rem)] pb-[10vh] overflow-hidden bg-white">
+      <section className="relative pt-20 md:pt-[calc(10vh+5rem)] pb-12 md:pb-[10vh] overflow-hidden bg-white">
         {/* bg.webp */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none overflow-hidden z-0">
           <img src="/bg.webp" alt="" className="w-full h-full object-contain" />

@@ -149,7 +149,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
       {/* ═════════════════════════════════════════════════════════════════ */}
       {/* 1. HERO SECTION (90VH, LIGHT THEME WITH BG.WEBP & GLASS CARDS)  */}
       {/* ═════════════════════════════════════════════════════════════════ */}
-      <section className="relative min-h-[85vh] lg:min-h-[90vh] flex flex-col justify-center pt-28 pb-16 overflow-hidden bg-gradient-to-b from-slate-100/90 via-slate-50 to-slate-100/60 border-b border-slate-200/80">
+      <section className="relative min-h-[85vh] lg:min-h-[90vh] flex flex-col justify-center pt-20 sm:pt-28 pb-16 overflow-hidden bg-gradient-to-b from-slate-100/90 via-slate-50 to-slate-100/60 border-b border-slate-200/80">
         
         {/* Background Ornament Texture (bg.webp) */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none overflow-hidden z-0">
