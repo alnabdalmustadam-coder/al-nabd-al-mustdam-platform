@@ -1,63 +1,5 @@
 [
   {
-    "id": 10,
-    "slug": "new-course-5896",
-    "title": "new course",
-    "description": "برنامج تدريبي معتمد وشامل.",
-    "category": "tech",
-    "level": "all",
-    "price": 500,
-    "rating": 5,
-    "enrollees": 0,
-    "duration": "30 ساعة",
-    "lessonsCount": 3,
-    "featured": true,
-    "image": "/logo.webp",
-    "instructor": "د. محمد القحطاني",
-    "trainerId": "tr-1",
-    "curriculum": [
-      {
-        "id": "les-1787103668953-1",
-        "title": "الدرس الأول: مقدمة تمهيدية وأهداف البرنامج",
-        "duration": "20 دقيقة",
-        "videoUrl": "d502e874-1cea-4c99-9dd7-0509933d5c50",
-        "type": "video",
-        "isLocked": false,
-        "lessons": [
-          "الدرس الأول: مقدمة تمهيدية وأهداف البرنامج"
-        ]
-      },
-      {
-        "id": "les-1787103742246-2",
-        "title": "الدرس 2:",
-        "duration": "25 دقيقة",
-        "videoUrl": "9683b610-e950-476a-a6d7-380b214ddbd1",
-        "type": "video",
-        "isLocked": false,
-        "lessons": [
-          "الدرس 2:"
-        ]
-      },
-      {
-        "id": "les-1787104217957-3",
-        "title": "الدرس 3:",
-        "duration": "25 دقيقة",
-        "videoUrl": "4a679a94-713d-4fbe-a675-36d1b9e9cdb7",
-        "type": "video",
-        "isLocked": false,
-        "lessons": [
-          "الدرس 3:"
-        ]
-      }
-    ],
-    "outcomes": [
-      "اكتساب المعارف والمهارات الأساسية للمسار."
-    ],
-    "requirements": "لا توجد متطلبات مسبقة.",
-    "ghlCheckoutUrl": "/checkout?slug=new-course-5896",
-    "ghlCourseId": "course-new-course-5896"
-  },
-  {
     "id": 1,
     "title": "دورة استخدام الحاسب الالي في الاعمال المكتبية",
     "slug": "computer-basics-office",
@@ -69,22 +11,11 @@
     "rating": 4.9,
     "enrollees": 1250,
     "duration": "4 ساعة",
-    "lessonsCount": 4,
+    "lessonsCount": 3,
     "featured": true,
     "trainerId": "tr-1",
     "instructor": "د. محمد القحطاني",
     "curriculum": [
-      {
-        "id": "les-1786932338476",
-        "title": "1",
-        "duration": "20 دقيقة",
-        "isLocked": false,
-        "type": "video",
-        "videoUrl": "https://player.mediadelivery.net/play/729792/efdbb993-f2f4-4ddb-9553-00629191a155",
-        "lessons": [
-          "1"
-        ]
-      },
       {
         "id": "les-1786932368573",
         "title": "2",

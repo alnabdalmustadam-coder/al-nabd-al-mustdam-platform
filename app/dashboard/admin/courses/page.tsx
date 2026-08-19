@@ -110,6 +110,55 @@ interface FormAttachmentItem {
   fileSize: string;
 }
 
+// ── Video Duration Helper: Calculates actual video file duration in the browser ──
+function formatVideoDuration(seconds: number): string {
+  if (!seconds || isNaN(seconds)) return '15 دقيقة';
+  const totalSec = Math.round(seconds);
+  const hrs = Math.floor(totalSec / 3600);
+  const mins = Math.floor((totalSec % 3600) / 60);
+  const secs = totalSec % 60;
+
+  if (hrs > 0) {
+    return `${hrs} ساعة و ${mins} دقيقة`;
+  }
+  if (mins > 0 && secs > 0) {
+    return `${mins} دقيقة و ${secs} ثانية`;
+  }
+  if (mins > 0) {
+    return `${mins} دقيقة`;
+  }
+  return `${secs} ثانية`;
+}
+
+function extractVideoDuration(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    try {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      const url = URL.createObjectURL(file);
+      video.src = url;
+
+      video.onloadedmetadata = () => {
+        URL.revokeObjectURL(url);
+        const durationFormatted = formatVideoDuration(video.duration);
+        resolve(durationFormatted);
+      };
+
+      video.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve('15 دقيقة');
+      };
+
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        resolve('15 دقيقة');
+      }, 3500);
+    } catch {
+      resolve('15 دقيقة');
+    }
+  });
+}
+
 export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -252,23 +301,15 @@ export default function AdminCoursesPage() {
       {
         id: `sec-${Date.now()}-1`,
         title: 'الوحدة الأولى: مدخل ومفاهيم أساسية',
-        duration: '45 دقيقة',
-        videoUrl: 'MmHWTPJMzbQ',
+        duration: '30 دقيقة',
+        videoUrl: '',
         type: 'video',
         isLocked: false,
         subItems: [
           {
             id: `sub-${Date.now()}-1-1`,
-            title: 'المقطع 1: أهداف البرنامج والتعريف بالمسار',
+            title: 'الدرس الأول: مقدمة تمهيدية وأهداف البرنامج',
             duration: '15 دقيقة',
-            videoUrl: 'MmHWTPJMzbQ',
-            type: 'video',
-            isLocked: false,
-          },
-          {
-            id: `sub-${Date.now()}-1-2`,
-            title: 'المقطع 2: التطبيق التفاعلي والأدوات المساعدة',
-            duration: '20 دقيقة',
             videoUrl: '',
             type: 'video',
             isLocked: false,
@@ -290,9 +331,24 @@ export default function AdminCoursesPage() {
     setFormHours(String(course.hours ?? 30));
     setFormDescription(course.description || '');
     setFormImage(course.image || '/logo.webp');
-    setFormAttachments((course.attachments as any) || []);
 
-    if (course.finalExam && course.finalExam.questions && course.finalExam.questions.length > 0) {
+    // Attachments
+    if (Array.isArray(course.attachments) && course.attachments.length > 0) {
+      setFormAttachments(
+        course.attachments.map((att: any, idx: number) => ({
+          id: att.id || `att-${Date.now()}-${idx}`,
+          title: att.title || 'مرفق تدريبي',
+          fileUrl: att.fileUrl,
+          fileType: att.fileType || 'pdf',
+          fileSize: att.fileSize || 'ملف رقمي',
+        }))
+      );
+    } else {
+      setFormAttachments([]);
+    }
+
+    // Final Exam
+    if (course.finalExam && Array.isArray(course.finalExam.questions) && course.finalExam.questions.length > 0) {
       setHasFinalExam(true);
       setFormFinalExam(course.finalExam);
     } else {
@@ -318,7 +374,6 @@ export default function AdminCoursesPage() {
               quizData: it.quizData,
             }));
           } else if (Array.isArray(sec.lessons) && sec.lessons.length > 1) {
-            // Backwards compatibility for lessons list
             parsedSubItems = sec.lessons.map((lesName: string, subIdx: number) => ({
               id: `sub-${Date.now()}-${idx + 1}-${subIdx + 1}`,
               title: lesName,
@@ -496,7 +551,7 @@ export default function AdminCoursesPage() {
   };
 
   // ═════════════════════════════════════════════════════════════════════════════
-  // BUNNY STREAM VIDEO UPLOAD IN MODAL
+  // BUNNY STREAM VIDEO UPLOAD IN MODAL (WITH AUTO DURATION DETECTION)
   // ═════════════════════════════════════════════════════════════════════════════
 
   const triggerVideoUpload = (secIdx: number, subIdx?: number) => {
@@ -516,10 +571,18 @@ export default function AdminCoursesPage() {
       ? formSections[secIdx]?.subItems?.[subIdx]?.title || 'درس فرعي'
       : formSections[secIdx]?.title || 'درس';
 
+    // ── 1. Calculate duration directly from the video file ──
+    const calculatedDuration = await extractVideoDuration(file);
+    if (subIdx !== undefined) {
+      handleUpdateSubItem(secIdx, subIdx, 'duration', calculatedDuration);
+    } else {
+      handleUpdateSection(secIdx, 'duration', calculatedDuration);
+    }
+
     setLessonUploadProgress(5);
 
     try {
-      // 1. Create Video on Bunny Stream
+      // 2. Create Video on Bunny Stream
       const createRes = await fetch('/api/bunny/create-video', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -534,7 +597,7 @@ export default function AdminCoursesPage() {
       const { videoId } = createData;
       setLessonUploadProgress(25);
 
-      // 2. Direct Upload to Bunny Stream
+      // 3. Direct Upload to Bunny Stream
       const libraryId = process.env.NEXT_PUBLIC_BUNNY_LIBRARY_ID || '729792';
       const apiKey = process.env.NEXT_PUBLIC_BUNNY_API_KEY || '20059e98-ea4c-4e3a-b8ae029fcf95-9bf8-466d';
 
@@ -564,14 +627,14 @@ export default function AdminCoursesPage() {
         xhr.send(file);
       });
 
-      // 3. Update Video ID in State
+      // 4. Update Video ID in State
       if (subIdx !== undefined) {
         handleUpdateSubItem(secIdx, subIdx, 'videoUrl', videoId);
       } else {
         handleUpdateSection(secIdx, 'videoUrl', videoId);
       }
 
-      showToast(`تم رفع الفيديو ومعالجته بنجاح على Bunny Stream!`);
+      showToast(`تم رفع الفيديو ومعالجته بنجاح على Bunny Stream! (المدة: ${calculatedDuration})`);
     } catch (err: any) {
       console.error('Lesson video upload failed:', err);
       showToast(err.message || 'فشل رفع الفيديو', 'error');
@@ -656,29 +719,32 @@ export default function AdminCoursesPage() {
         throw new Error(data.error || 'فشل رفع الملف المرفق');
       }
 
-      const newAttachment: FormAttachmentItem = {
+      const newAtt: FormAttachmentItem = {
         id: `att-${Date.now()}`,
         title: data.fileName || file.name,
         fileUrl: data.fileUrl,
-        fileType: data.fileType || 'pdf',
-        fileSize: data.fileSize || '2 MB',
+        fileType: (data.fileType as any) || 'pdf',
+        fileSize: data.fileSize || 'ملف رقمي',
       };
 
-      setFormAttachments((prev) => [...prev, newAttachment]);
-      showToast(`تم إضافة الملف (${newAttachment.title}) إلى حقيبة الدورة بنجاح!`);
+      setFormAttachments((prev) => [...prev, newAtt]);
+      showToast(`تمت إضافة الملف المرفق (${data.fileName}) لحقيبة الدورة بنجاح!`);
     } catch (err: any) {
-      console.error('Course attachment upload error:', err);
+      console.error('Attachment bag upload failed:', err);
       showToast(err.message || 'فشل رفع الملف', 'error');
     } finally {
       setIsUploadingAttachment(false);
-      if (attachmentFileInputRef.current) attachmentFileInputRef.current.value = '';
+      if (attachmentFileInputRef.current) {
+        attachmentFileInputRef.current.value = '';
+      }
     }
   };
 
-  // ═════════════════════════════════════════════════════════════════════════════
-  // COURSE COVER IMAGE UPLOAD
-  // ═════════════════════════════════════════════════════════════════════════════
+  const handleRemoveAttachmentFromBag = (attId: string) => {
+    setFormAttachments((prev) => prev.filter((a) => a.id !== attId));
+  };
 
+  // Handle Upload Course Image
   const handleCourseImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -696,26 +762,23 @@ export default function AdminCoursesPage() {
       const data = await res.json();
       if (res.ok && data.success && data.imageUrl) {
         setFormImage(data.imageUrl);
-        showToast('تم رفع صورة الغلاف بنجاح');
+        showToast('تم رفع وتحديث صورة الدورة بنجاح');
       } else {
-        showToast(data.error || 'فشل رفع الصورة', 'error');
+        throw new Error(data.error || 'فشل رفع الصورة');
       }
-    } catch (err) {
-      console.error('Error uploading image:', err);
-      showToast('حدث خطأ أثناء رفع الصورة', 'error');
+    } catch (err: any) {
+      console.error('Upload image error:', err);
+      showToast(err.message || 'حدث خطأ أثناء رفع الصورة', 'error');
     } finally {
       setIsUploadingImage(false);
     }
   };
 
-  // ═════════════════════════════════════════════════════════════════════════════
-  // SAVE COURSE WITH SECTIONS, SUB-LESSONS, ATTACHMENTS & QUIZ
-  // ═════════════════════════════════════════════════════════════════════════════
-
+  // Handle Save Course
   const handleSaveCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formTitle.trim()) {
-      showToast('يرجى كتابة عنوان الدورة التدريبية', 'error');
+      showToast('يرجى كتابة عنوان الدورة', 'error');
       return;
     }
 
@@ -724,47 +787,36 @@ export default function AdminCoursesPage() {
       const priceNum = parseFloat(formPrice.replace(/[^\d.]/g, '')) || 0;
       const hoursNum = parseInt(formHours.replace(/[^\d]/g, ''), 10) || 20;
 
-      // Transform Hierarchical Sections into Curriculum Data
-      const formattedCurriculum = formSections
-        .filter((sec) => sec.title.trim().length > 0)
-        .map((sec, sIdx) => {
-          const validSubItems = (sec.subItems || [])
-            .filter((sub) => sub.title.trim().length > 0)
-            .map((sub, subIdx) => ({
-              id: sub.id || `sub-${Date.now()}-${sIdx + 1}-${subIdx + 1}`,
-              title: sub.title.trim(),
-              duration: sub.duration.trim() || '15 دقيقة',
-              videoUrl: sub.videoUrl.trim() || '',
-              type: sub.type || 'video',
-              fileUrl: sub.fileUrl || undefined,
-              fileName: sub.fileName || undefined,
-              fileSize: sub.fileSize || undefined,
-              isLocked: sub.isLocked ?? false,
-              quizData: sub.quizData || undefined,
-            }));
+      // Transform form sections to storage format
+      const formattedCurriculum = formSections.map((sec, idx) => ({
+        id: sec.id || `sec-${idx + 1}`,
+        title: sec.title.trim() || `الوحدة ${idx + 1}`,
+        duration: sec.duration || '30 دقيقة',
+        videoUrl: sec.videoUrl || '',
+        type: sec.type || 'video',
+        fileUrl: sec.fileUrl,
+        fileName: sec.fileName,
+        fileSize: sec.fileSize,
+        isLocked: sec.isLocked,
+        quizData: sec.quizData,
+        items: sec.subItems.map((sub, sIdx) => ({
+          id: sub.id || `sub-${idx + 1}-${sIdx + 1}`,
+          title: sub.title.trim() || `المقطع ${sIdx + 1}`,
+          duration: sub.duration || '15 دقيقة',
+          videoUrl: sub.videoUrl || '',
+          type: sub.type || 'video',
+          fileUrl: sub.fileUrl,
+          fileName: sub.fileName,
+          fileSize: sub.fileSize,
+          isLocked: sub.isLocked,
+          quizData: sub.quizData,
+        })),
+        lessons: sec.subItems.map((sub) => sub.title),
+      }));
 
-          // Pick primary video URL from section or first sub-item
-          const firstSubVideo = validSubItems.find((s) => s.videoUrl && s.videoUrl.length > 0);
-          const primaryVideoUrl = sec.videoUrl?.trim() || firstSubVideo?.videoUrl || 'MmHWTPJMzbQ';
-
-          return {
-            id: sec.id || `sec-${Date.now()}-${sIdx + 1}`,
-            title: sec.title.trim(),
-            duration: sec.duration.trim() || '30 دقيقة',
-            videoUrl: primaryVideoUrl,
-            type: sec.type || 'video',
-            fileUrl: sec.fileUrl || undefined,
-            fileName: sec.fileName || undefined,
-            fileSize: sec.fileSize || undefined,
-            isLocked: sec.isLocked ?? false,
-            items: validSubItems,
-            quizData: sec.quizData || undefined,
-            lessons: validSubItems.length > 0 ? validSubItems.map((s) => s.title) : [sec.title.trim()],
-          };
-        });
-
+      // Count total lessons
       const totalLessonsCount = formattedCurriculum.reduce(
-        (acc, sec) => acc + (sec.items && sec.items.length > 0 ? sec.items.length : 1),
+        (acc, sec) => acc + (sec.items?.length || 1),
         0
       );
 
@@ -775,18 +827,16 @@ export default function AdminCoursesPage() {
         level: formLevel,
         instructor: formTrainer.trim(),
         price: priceNum,
-        duration: `${hoursNum} ساعة`,
-        description: formDescription.trim() || 'برنامج تدريبي معتمد وشامل.',
+        duration: `${hoursNum} ساعة تدريبية معتمدة`,
+        description: formDescription.trim(),
         image: formImage.trim() || '/logo.webp',
-        curriculum: formattedCurriculum.length > 0 ? formattedCurriculum : undefined,
-        attachments: formAttachments.length > 0 ? formAttachments : undefined,
-        finalExam: hasFinalExam && formFinalExam?.questions?.length > 0 ? formFinalExam : undefined,
-        lessonsCount: totalLessonsCount,
+        curriculum: formattedCurriculum,
+        attachments: formAttachments,
+        finalExam: hasFinalExam ? formFinalExam : undefined,
       };
 
-      if (editingCourse) {
-        payload.id = Number(editingCourse.id);
-        payload.slug = editingCourse.slug;
+      if (editingCourse?.id) {
+        payload.id = editingCourse.id;
       }
 
       const res = await fetch('/api/admin/courses', {
@@ -841,7 +891,6 @@ export default function AdminCoursesPage() {
           return [optimisticItem, ...prev];
         });
 
-        // Trigger background sync
         loadCourses();
       } else {
         showToast(data.error || 'حدث خطأ أثناء حفظ الدورة', 'error');
@@ -969,10 +1018,14 @@ export default function AdminCoursesPage() {
     }
   };
 
-  // Standalone Direct Video Upload
+  // Standalone Direct Video Upload (with auto duration calculation)
   const handleDirectVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !selectedCourseForLessons) return;
+
+    // Automatically calculate video duration from file
+    const calculatedDuration = await extractVideoDuration(file);
+    setNewLessonDuration(calculatedDuration);
 
     setIsUploading(true);
     setUploadProgress(5);
@@ -1026,8 +1079,8 @@ export default function AdminCoursesPage() {
       });
 
       setNewLessonUrl(videoId);
-      setUploadSuccess(`تم رفع الفيديو وتشفيره بنجاح! كود الفيديو: ${videoId}`);
-      showToast('تم رفع ومعالجة الفيديو بنجاح');
+      setUploadSuccess(`تم رفع الفيديو وتشفيره بنجاح! كود الفيديو: ${videoId} (المدة: ${calculatedDuration})`);
+      showToast(`تم رفع ومعالجة الفيديو بنجاح (المدة: ${calculatedDuration})`);
     } catch (err: any) {
       console.error('Direct video upload failed:', err);
       setUploadError(err.message || 'حدث خطأ أثناء رفع الفيديو');
@@ -1038,16 +1091,22 @@ export default function AdminCoursesPage() {
 
   // Filtered courses list
   const filteredCourses = courses.filter((c) => {
-    const matchesCategory = selectedCategory === 'all' || c.rawCategory === selectedCategory;
+    const matchesCategory =
+      selectedCategory === 'all' ||
+      c.rawCategory === selectedCategory ||
+      c.category.includes(selectedCategory);
+
     const matchesSearch =
+      searchQuery.trim() === '' ||
       c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.trainer.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (c.category && c.category.toLowerCase().includes(searchQuery.toLowerCase()));
+
     return matchesCategory && matchesSearch;
   });
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="w-full space-y-6 sm:space-y-7 font-[family-name:var(--font-cairo)]" dir="rtl">
       {/* Hidden File Inputs for Triggers */}
       <input
         ref={formLessonVideoInputRef}
@@ -1068,53 +1127,62 @@ export default function AdminCoursesPage() {
       <AnimatePresence>
         {toastMessage && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-xs font-black text-white ${
-              toastMessage.type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-black border backdrop-blur-md ${
+              toastMessage.type === 'success'
+                ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/40 shadow-emerald-950/40'
+                : 'bg-rose-950/90 text-rose-200 border-rose-500/40 shadow-rose-950/40'
             }`}
           >
-            {toastMessage.type === 'error' ? (
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            {toastMessage.type === 'success' ? (
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
             ) : (
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
             )}
             <span>{toastMessage.text}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Top Banner & Action Header */}
-      <div className="bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="space-y-2 z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-bold border border-white/10">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>نظام إدارة الدورات والوسائط والمرفقات المتقدم</span>
+      {/* Header Banner - Unified Liquid Glass Brand Theme */}
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-9 liquid-glass-hero border border-white/80 shadow-[0_10px_35px_-10px_rgba(23,58,124,0.08)]">
+        {/* Subtle Ambient Reflections */}
+        <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#173A7C]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#5CB07C]/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="specular-card-reflection" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2.5">
+            <div className="admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
+              <span>إدارة المساقات ومكتبة الفيديو الذكية</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#173A7C]">
+              إدارة الدورات والمحتوى الأكاديمي 📚
+            </h1>
+            <p className="text-slate-600 text-xs sm:text-sm font-medium max-w-2xl leading-relaxed">
+              تحكم كامل في البرامج التدريبية المعتمدة ({courses.length} دورات نشطة). أضف برامج جديدة، عدل الأسعار، الصور والأغلفة، وارفع فيديوهات مشفرة فورياً للمنصة.
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black">إدارة الدورات التدريبية والوسائط المتقدمة</h1>
-          <p className="text-xs sm:text-sm text-blue-100 max-w-2xl font-medium leading-relaxed">
-            أنشئ الدورات وقسّم المنهج إلى وحدات ومقاطع فرعية، وارفع ملفات PDF وWord التفاعلية والاختبارات التقييمية بسهولة تامة ⚡
-          </p>
-        </div>
 
-        <div className="flex items-center gap-3 z-10 w-full sm:w-auto">
-          <button
-            onClick={loadCourses}
-            className="p-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border border-white/10 shadow-xs"
-            title="تحديث البيانات"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-
-          <button
-            onClick={openCreateModal}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#0D5C3A] to-[#147A4E] hover:from-[#117349] hover:to-[#178C5A] text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-950/20 hover:shadow-emerald-950/30 transition-all cursor-pointer active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            <span>إضافة دورة تدريبية جديدة</span>
-          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={openCreateModal}
+              className="px-5 py-3 rounded-xl sm:rounded-2xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs sm:text-sm font-black shadow-lg shadow-[#173A7C]/20 transition-all flex items-center gap-2 cursor-pointer hover:-translate-y-0.5 active:scale-95"
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-300" />
+              <span>إضافة دورة تدريبية جديدة</span>
+            </button>
+            <button
+              onClick={loadCourses}
+              className="p-3 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 shadow-xs transition-all cursor-pointer hover:rotate-180 duration-500"
+              title="تحديث البيانات"
+            >
+              <RefreshCw className="w-4 h-4 text-slate-500" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1157,7 +1225,7 @@ export default function AdminCoursesPage() {
         </div>
       </div>
 
-      {/* Courses Grid */}
+      {/* Courses Grid - Restored Clean Brand Card Design */}
       {loading ? (
         <div className="p-16 text-center text-slate-500 text-sm font-bold flex flex-col items-center justify-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
@@ -1179,76 +1247,79 @@ export default function AdminCoursesPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredCourses.map((course) => (
             <motion.div
-              key={course.slug || course.id}
-              initial={{ opacity: 0, y: 10 }}
+              key={course.id || course.slug}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between"
+              className="group relative flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 bg-white/95"
             >
               <div>
-                {/* Course Image Header */}
-                <div className="relative aspect-video w-full bg-slate-900 overflow-hidden flex items-center justify-center">
-                  <img
-                    src={course.image || '/logo.webp'}
-                    alt={course.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/logo.webp';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                {/* 1. Clean Bright Image Section (Matches Original Platform Theme) */}
+                <div className="relative h-44 sm:h-48 rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 p-6 flex items-center justify-center overflow-hidden border border-slate-100/90 group-hover:border-blue-100 transition-colors mb-4">
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <img
+                      src={course.image || '/logo.webp'}
+                      alt={course.title}
+                      className="max-h-28 sm:max-h-32 w-auto object-contain p-2 opacity-95 group-hover:scale-105 transition-transform duration-500 drop-shadow-md"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/logo.webp';
+                      }}
+                    />
+                  </div>
 
-                  {/* Badges */}
-                  <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                    <span className="px-2.5 py-1 rounded-lg bg-[#173A7C]/90 backdrop-blur-md text-white text-[10px] font-black border border-white/10">
+                  {/* Category Badge on Top-Right */}
+                  <div className="absolute top-3 right-3 z-20">
+                    <span className="px-3 py-1 rounded-full text-[11px] font-black bg-white/90 text-[#173A7C] border border-blue-100/80 shadow-xs backdrop-blur-md">
                       {course.category}
                     </span>
                   </div>
 
-                  <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between text-white text-[11px] font-bold">
-                    <span className="flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>{course.students} متدرب</span>
-                    </span>
-                    <span className="text-emerald-300 font-black text-xs">
-                      {course.price}
+                  {/* Status Badge on Top-Left */}
+                  <div className="absolute top-3 left-3 z-20">
+                    <span className="px-3 py-1 rounded-full text-[11px] font-black bg-slate-900/75 text-white shadow-xs backdrop-blur-md">
+                      منشورة ⚡
                     </span>
                   </div>
                 </div>
 
-                {/* Body Details */}
-                <div className="p-4 space-y-3">
-                  <h3 className="text-sm font-black text-slate-900 leading-snug line-clamp-2" title={course.title}>
+                {/* 2. Course Title & Description */}
+                <div className="space-y-2">
+                  <h3 className="text-base font-black text-slate-900 group-hover:text-[#173A7C] transition-colors leading-snug line-clamp-2" title={course.title}>
                     {course.title}
                   </h3>
-
-                  <div className="flex items-center justify-between text-xs text-slate-500 font-bold border-y border-slate-100 py-2">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{course.hours} ساعة</span>
-                    </span>
-                    <span className="flex items-center gap-1 text-[#173A7C]">
-                      <Video className="w-3.5 h-3.5" />
-                      <span>{course.lessonsCount} درس / مقطع</span>
-                    </span>
-                    {course.attachments && course.attachments.length > 0 && (
-                      <span className="flex items-center gap-1 text-emerald-600">
-                        <Paperclip className="w-3.5 h-3.5" />
-                        <span>{course.attachments.length} ملف</span>
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed font-medium">
+                  <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2">
                     {course.description || 'برنامج تدريبي معتمد وشامل يغطي المهارات الأساسية والمتقدمة.'}
                   </p>
                 </div>
               </div>
 
-              {/* Actions Footer */}
-              <div className="p-4 pt-0 space-y-2">
+              {/* 3. Course Details & Trainer */}
+              <div className="space-y-3.5 pt-4 mt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-500">
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-[#173A7C]" />
+                    <span>{course.hours} ساعة</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-[#0D5C3A]" />
+                    <span>{course.lessonsCount} درس / مقطع</span>
+                  </span>
+                  <span className="text-emerald-700 font-black">
+                    {course.price}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-bold text-slate-600 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-1.5">
+                    <GraduationCap className="w-4 h-4 text-[#173A7C]" />
+                    <span className="text-slate-500 text-[11px]">المحاضر:</span>
+                    <span className="text-slate-800 font-black">{course.trainer}</span>
+                  </div>
+                </div>
+
+                {/* 4. Action Buttons Footer */}
                 <div className="flex items-center justify-between gap-2 pt-1">
                   <button
                     onClick={() => openLessonsManager(course)}
@@ -1388,7 +1459,7 @@ export default function AdminCoursesPage() {
 
                       <div className="flex flex-col sm:flex-row items-center gap-4">
                         {/* Live Preview Box */}
-                        <div className="w-32 h-24 rounded-2xl bg-gradient-to-br from-[#0c234b] to-[#173A7C] p-2 flex items-center justify-center shrink-0 border border-slate-200 shadow-xs relative overflow-hidden">
+                        <div className="w-32 h-24 rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 p-2 flex items-center justify-center shrink-0 border border-slate-200 shadow-xs relative overflow-hidden">
                           <img
                             src={formImage || '/logo.webp'}
                             alt="Preview"
@@ -1711,13 +1782,14 @@ export default function AdminCoursesPage() {
                                         <option value="quiz">❓ اختبار / كويز</option>
                                       </select>
 
-                                      <div className="w-20">
+                                      <div className="w-24">
                                         <input
                                           type="text"
                                           value={sub.duration}
                                           onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'duration', e.target.value)}
                                           placeholder="15 دقيقة"
                                           className="w-full px-2 py-1 text-[11px] font-bold text-slate-700 bg-white rounded-lg border border-slate-200"
+                                          title="يتم احتساب المدة تلقائياً فور رفع الفيديو أو يمكنك تعديلها"
                                         />
                                       </div>
 
@@ -1799,184 +1871,224 @@ export default function AdminCoursesPage() {
                                         className="px-3 py-1 rounded-lg bg-[#173A7C] text-white font-bold text-xs flex items-center gap-1 cursor-pointer"
                                       >
                                         <UploadCloud className="w-3.5 h-3.5" />
-                                        <span>رفع ملف المستند</span>
+                                        <span>{sub.fileUrl ? 'تغيير الملف' : 'رفع ملف PDF/Word'}</span>
                                       </button>
                                     </div>
                                   )}
 
                                   {sub.type === 'quiz' && (
-                                    <div className="p-3 bg-white rounded-lg border border-amber-200 space-y-2 text-xs">
-                                      <div className="flex items-center justify-between font-bold text-slate-800">
-                                        <span className="flex items-center gap-1 text-amber-700">
-                                          <HelpCircle className="w-4 h-4" />
-                                          <span>اختبار قصير للوحدة ({sub.quizData?.questions?.length || 1} أسئلة)</span>
+                                    <div className="p-3 bg-amber-50/70 rounded-lg border border-amber-200/80 space-y-2">
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                                          <HelpCircle className="w-4 h-4 text-amber-600" />
+                                          <span>أسئلة كويز الوحدة ({sub.quizData?.questions?.length || 0} أسئلة)</span>
                                         </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const currentQuestions = sub.quizData?.questions || [];
+                                            const nextQ: QuizQuestion = {
+                                              id: `q-${Date.now()}-${currentQuestions.length + 1}`,
+                                              question: `السؤال ${currentQuestions.length + 1}: `,
+                                              options: ['الخيار 1 (الصحيح)', 'الخيار 2', 'الخيار 3', 'الخيار 4'],
+                                              correctIndex: 0,
+                                              explanation: 'شرح الإجابة الصحيحة.',
+                                            };
+                                            handleUpdateSubItem(secIdx, subIdx, 'quizData', {
+                                              title: `اختبار ${sub.title}`,
+                                              passingScore: 70,
+                                              questions: [...currentQuestions, nextQ],
+                                            });
+                                          }}
+                                          className="text-[11px] font-bold text-[#173A7C] hover:underline cursor-pointer"
+                                        >
+                                          + إضافة سؤال للكويز
+                                        </button>
                                       </div>
-                                      <p className="text-[11px] text-slate-500 font-medium">
-                                        سيتمكن الطالب من أداء هذا الاختبار التفاعلي وحساب نتيجته فوراً في منصة الطالب.
-                                      </p>
+
+                                      {sub.quizData?.questions?.map((q, qIdx) => (
+                                        <div key={q.id || qIdx} className="p-2.5 bg-white rounded border border-amber-100 space-y-1.5 text-xs">
+                                          <div className="flex items-center justify-between">
+                                            <span className="font-bold text-slate-800">السؤال #{qIdx + 1}</span>
+                                            {sub.quizData!.questions.length > 1 && (
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  const filtered = sub.quizData!.questions.filter((_, idx) => idx !== qIdx);
+                                                  handleUpdateSubItem(secIdx, subIdx, 'quizData', {
+                                                    ...sub.quizData,
+                                                    questions: filtered,
+                                                  });
+                                                }}
+                                                className="text-rose-500 hover:text-rose-700 text-[10px] font-bold"
+                                              >
+                                                حذف
+                                              </button>
+                                            )}
+                                          </div>
+                                          <input
+                                            type="text"
+                                            value={q.question}
+                                            onChange={(e) => {
+                                              const updated = [...sub.quizData!.questions];
+                                              updated[qIdx].question = e.target.value;
+                                              handleUpdateSubItem(secIdx, subIdx, 'quizData', {
+                                                ...sub.quizData,
+                                                questions: updated,
+                                              });
+                                            }}
+                                            placeholder="نص السؤال..."
+                                            className="w-full px-2 py-1 text-xs font-bold bg-slate-50 border border-slate-200 rounded"
+                                          />
+                                        </div>
+                                      ))}
                                     </div>
                                   )}
                                 </div>
                               ))}
                             </div>
 
-                            {/* ➕ Add Sub-Lesson / Sub-Video Button */}
-                            <div className="flex items-center gap-2 pt-1">
+                            {/* Add Sub-Item Actions */}
+                            <div className="pt-2 flex flex-wrap items-center gap-2">
                               <button
                                 type="button"
                                 onClick={() => handleAddSubItemToSection(secIdx, 'video')}
-                                className="flex-1 py-2 px-3 rounded-xl border border-dashed border-[#173A7C]/40 bg-blue-50/50 hover:bg-blue-50 text-[#173A7C] text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                                className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#173A7C] font-black text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-blue-200"
                               >
-                                <Plus className="w-3.5 h-3.5 text-blue-600" />
+                                <PlusCircle className="w-3.5 h-3.5 text-blue-600" />
                                 <span>➕ إضافة مقطع / فيديو فرعي داخل هذا الدرس</span>
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => handleAddSubItemToSection(secIdx, 'pdf')}
-                                className="py-2 px-3 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-800 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer"
-                                title="إضافة ملف PDF فرعي"
+                                className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-emerald-200"
                               >
-                                <Paperclip className="w-3.5 h-3.5" />
-                                <span>+ ملف PDF</span>
+                                <FilePlus className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>+ ملف PDF فرعي</span>
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => handleAddSubItemToSection(secIdx, 'quiz')}
-                                className="py-2 px-3 rounded-xl border border-dashed border-amber-300 bg-amber-50/50 hover:bg-amber-50 text-amber-800 text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer"
-                                title="إضافة كويز تقييمي"
+                                className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-amber-200"
                               >
-                                <HelpCircle className="w-3.5 h-3.5" />
-                                <span>+ كويز</span>
+                                <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
+                                <span>+ كويز للوحدة</span>
                               </button>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
-
-                    {/* Bottom Add Section Button */}
-                    <button
-                      type="button"
-                      onClick={handleAddSection}
-                      className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#2A65C7] text-white text-xs sm:text-sm font-black flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer active:scale-98"
-                    >
-                      <Plus className="w-4 h-4 text-emerald-300" />
-                      <span>إضافة وحدة / درس رئيسي جديد للمنهج التدريبي</span>
-                    </button>
                   </div>
                 )}
 
                 {/* ═══════════════════════════════════════════════════════════ */}
-                {/* TAB 3: COURSE ATTACHMENTS (PDF / WORD / STUDY BAG) */}
+                {/* TAB 3: ATTACHMENTS & RESOURCES BAG */}
                 {/* ═══════════════════════════════════════════════════════════ */}
                 {modalActiveTab === 'attachments' && (
                   <div className="space-y-6 animate-fade-in-up">
-                    <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50/50 via-slate-50 to-emerald-50/30 border-2 border-emerald-200/80 space-y-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-100 pb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-[#0D5C3A] text-white flex items-center justify-center shadow-xs">
-                            <Paperclip className="w-5 h-5 text-emerald-300" />
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                              <span>الحقيبة التدريبية والمرفقات العامة للدورة</span>
-                              <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-black">
-                                {formAttachments.length} ملفات
-                              </span>
-                            </h4>
-                            <p className="text-[11px] text-slate-500 font-medium">
-                              ارفع العروض التدريبية (PowerPoint)، ملخصات الدورة (PDF)، كراسات التمارين، ونماذج العمل (Word) 📄
-                            </p>
-                          </div>
-                        </div>
-
-                        <div>
-                          <input
-                            ref={attachmentFileInputRef}
-                            type="file"
-                            accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.rar"
-                            onChange={handleCourseBagAttachmentUpload}
-                            className="hidden"
-                            id="course-bag-upload-input"
-                          />
-                          <label
-                            htmlFor="course-bag-upload-input"
-                            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0D5C3A] hover:bg-[#117349] text-white text-xs font-black cursor-pointer shadow-xs transition-all ${
-                              isUploadingAttachment ? 'opacity-50 pointer-events-none' : ''
-                            }`}
-                          >
-                            {isUploadingAttachment ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>جاري الرفع...</span>
-                              </>
-                            ) : (
-                              <>
-                                <UploadCloud className="w-4 h-4" />
-                                <span>رفع ملف جديد للحقيبة</span>
-                              </>
-                            )}
-                          </label>
-                        </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                      <div>
+                        <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                          <Paperclip className="w-4 h-4 text-[#173A7C]" />
+                          <span>الحقيبة التدريبية وملفات الدورة المرفقة (PDF / Word / ZIP)</span>
+                        </h4>
+                        <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                          الملفات المرفوعة هنا ستكون متاحة لجميع الطلاب المسجلين بالدورة في تبويب المرفقات 📄
+                        </p>
                       </div>
 
-                      {/* Attachments List */}
-                      {formAttachments.length === 0 ? (
-                        <div className="p-8 rounded-xl bg-white border border-slate-200 text-center space-y-2">
-                          <FileText className="w-8 h-8 text-slate-300 mx-auto" />
-                          <div className="text-xs font-black text-slate-700">لم يتم إرفاق ملفات بالحقيبة حتى الآن</div>
-                          <p className="text-[11px] text-slate-400">
-                            اضغط على زر "رفع ملف جديد للحقيبة" أعلاه لإضافة كتب أو عروض PDF أو ملفات Word
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {formAttachments.map((att, attIdx) => (
-                            <div
-                              key={att.id || attIdx}
-                              className="p-3.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between gap-3 shadow-2xs hover:border-emerald-300 transition-all"
-                            >
-                              <div className="flex items-center gap-3 min-w-0">
-                                <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 shrink-0">
-                                  <FileText className="w-5 h-5" />
-                                </div>
-                                <div className="min-w-0">
-                                  <h5 className="font-bold text-slate-800 text-xs truncate" title={att.title}>
-                                    {att.title}
-                                  </h5>
-                                  <p className="text-[10px] text-slate-400 font-mono mt-0.5">
-                                    {att.fileSize} · {att.fileType.toUpperCase()}
-                                  </p>
-                                </div>
-                              </div>
+                      <button
+                        type="button"
+                        onClick={() => attachmentFileInputRef.current?.click()}
+                        disabled={isUploadingAttachment}
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black flex items-center gap-1.5 shadow-xs transition-all cursor-pointer self-start sm:self-auto"
+                      >
+                        {isUploadingAttachment ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>جاري رفع الملف...</span>
+                          </>
+                        ) : (
+                          <>
+                            <UploadCloud className="w-4 h-4" />
+                            <span>رفع ملف جديد للحقيبة (PDF/Word)</span>
+                          </>
+                        )}
+                      </button>
+                      <input
+                        ref={attachmentFileInputRef}
+                        type="file"
+                        accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.rar"
+                        onChange={handleCourseBagAttachmentUpload}
+                        className="hidden"
+                      />
+                    </div>
 
-                              <div className="flex items-center gap-1.5 shrink-0">
-                                <a
-                                  href={att.fileUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="p-2 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-colors"
-                                  title="معاينة وتحميل"
-                                >
-                                  <Download className="w-3.5 h-3.5" />
-                                </a>
-                                <button
-                                  type="button"
-                                  onClick={() => setFormAttachments((prev) => prev.filter((_, idx) => idx !== attIdx))}
-                                  className="p-2 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-                                  title="حذف هذا الملف"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
+                    {formAttachments.length === 0 ? (
+                      <div className="p-8 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 text-center space-y-3">
+                        <FolderOpen className="w-10 h-10 text-slate-400 mx-auto" />
+                        <div className="text-xs font-black text-slate-700">لم يتم رفع ملفات لحقيبة هذه الدورة بعد</div>
+                        <p className="text-[11px] text-slate-400 max-w-md mx-auto">
+                          اضغط على زر الرفع أعلاه لإضافة الحقيبة التدريبية، الكتب المعتمدة، أو أوراق العمل بتنسيق PDF أو Word.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {formAttachments.map((att, idx) => (
+                          <div
+                            key={att.id || idx}
+                            className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 hover:border-slate-300 transition-all"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#173A7C] flex items-center justify-center shrink-0">
+                                <FileText className="w-5 h-5" />
+                              </div>
+                              <div className="min-w-0">
+                                <input
+                                  type="text"
+                                  value={att.title}
+                                  onChange={(e) => {
+                                    const updated = [...formAttachments];
+                                    updated[idx].title = e.target.value;
+                                    setFormAttachments(updated);
+                                  }}
+                                  className="text-xs font-black text-slate-900 bg-white px-2 py-1 rounded border border-slate-200 focus:outline-none focus:border-[#173A7C] w-full max-w-sm"
+                                  placeholder="عنوان الملف المرفق"
+                                />
+                                <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono mt-1">
+                                  <span>{att.fileSize}</span>
+                                  <span>•</span>
+                                  <span className="uppercase">{att.fileType}</span>
+                                </div>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <a
+                                href={att.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-2 rounded-xl bg-white hover:bg-blue-50 text-[#173A7C] border border-slate-200 text-xs font-bold flex items-center gap-1 transition-colors"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>تحميل</span>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveAttachmentFromBag(att.id)}
+                                className="p-2 rounded-xl bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 border border-slate-200 transition-colors cursor-pointer"
+                                title="حذف الملف"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -1985,16 +2097,16 @@ export default function AdminCoursesPage() {
                 {/* ═══════════════════════════════════════════════════════════ */}
                 {modalActiveTab === 'exam' && (
                   <div className="space-y-6 animate-fade-in-up">
-                    <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
                       <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
                             <Award className="w-5 h-5" />
                           </div>
                           <div>
-                            <h4 className="text-sm font-black text-slate-900">الاختبار النهائي الشامل للدورة</h4>
-                            <p className="text-[11px] text-slate-500 font-medium">
-                              يؤديه المتدرب بعد إكمال كافة الدروس لإصدار شهادة الإتمام المعتمدة 🎓
+                            <h4 className="text-xs font-black text-slate-800">الاختبار النهائي الشامل للدورة</h4>
+                            <p className="text-[10px] text-slate-500 font-medium">
+                              يؤدي المتدرب الاختبار وتصدر الشهادة المعتمدة فور اجتيازه بنجاح
                             </p>
                           </div>
                         </div>
@@ -2314,13 +2426,13 @@ export default function AdminCoursesPage() {
                       </div>
                       <div>
                         <label className="block text-[11px] font-black text-slate-700 mb-1">
-                          المدة التقريبية
+                          المدة (تُحسب تلقائياً)
                         </label>
                         <input
                           type="text"
                           value={newLessonDuration}
                           onChange={(e) => setNewLessonDuration(e.target.value)}
-                          placeholder="مثال: 30 دقيقة"
+                          placeholder="تُحسب تلقائياً عند رفع الفيديو"
                           className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
                         />
                       </div>
@@ -2333,7 +2445,7 @@ export default function AdminCoursesPage() {
                           اختر ملف الفيديو للرفع المباشر إلى Bunny.net Stream
                         </div>
                         <p className="text-[11px] text-slate-400 font-medium">
-                          يدعم صيغ MP4, MOV, MKV المشفرة والمحمية ضد القرصنة الرقمية
+                          يتم احتساب وتعبئة مدة الفيديو تلقائياً فور اختياره
                         </p>
 
                         <div className="pt-2">
