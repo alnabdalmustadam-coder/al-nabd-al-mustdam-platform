@@ -128,26 +128,26 @@ export const StudentNotifications: React.FC = () => {
 
       {/* Filter Tabs */}
       <div className="px-4 py-2.5 bg-slate-100/70 flex items-center justify-between border-b border-slate-200/50 shrink-0 relative z-10">
-        <div className="flex items-center gap-2">
+        <div className="premium-tabs flex items-center gap-2">
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-3 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer ${
+            className={`premium-tab px-3 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer ${
               activeTab === 'all'
                 ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
                 : 'text-slate-600 hover:text-[#173A7C] hover:bg-white/60'
             }`}
           >
-            الكل ({notifications.length})
+            <span className="premium-tab-label">الكل ({notifications.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('unread')}
-            className={`px-3 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer ${
+            className={`premium-tab px-3 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer ${
               activeTab === 'unread'
                 ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
                 : 'text-slate-600 hover:text-[#173A7C] hover:bg-white/60'
             }`}
           >
-            غير مقروء ({unreadCount})
+            <span className="premium-tab-label">غير مقروء ({unreadCount})</span>
           </button>
         </div>
 

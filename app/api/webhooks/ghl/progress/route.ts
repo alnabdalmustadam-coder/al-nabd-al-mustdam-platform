@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { stmtProgressed, stmtCompleted, storeStatement } from "@/lib/xapi";
 import { courses } from "@/data/courses";
+import { readVerifiedGhlWebhook } from "@/lib/security/integrations";
 
 /**
  * Build a lookup map: courseId/ghlCourseId/slug → lessonsCount
@@ -37,7 +38,6 @@ for (const c of courses) {
  */
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
@@ -48,7 +48,9 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = await req.json();
+    const webhook = await readVerifiedGhlWebhook(req);
+    if (!webhook.ok) return webhook.response;
+    const payload: any = webhook.payload;
 
     // ── Full payload logging for debugging ──────────────────────────
     console.log("📊 GHL Progress Webhook — FULL PAYLOAD:", JSON.stringify(payload, null, 2));

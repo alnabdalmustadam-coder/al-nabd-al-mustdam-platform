@@ -36,18 +36,18 @@ export default function NewsletterSection() {
           className="text-center"
         >
           {/* Badge */}
-          <span className="inline-flex items-center gap-2 text-[#173A7C] text-sm font-black tracking-widest uppercase bg-white px-5 py-2 rounded-full mb-6 border border-slate-200 shadow-sm">
+          <span className="section-badge-glass mb-6">
             <Mail className="w-4 h-4 text-[#5CB07C]" />
             النشرة البريدية
           </span>
 
           {/* Heading */}
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#173A7C] mt-2 leading-[1.2] tracking-tight mb-4">
+          <h2 className="section-main-title-premium mt-2 mb-4">
             ابقَ على اطلاع بأحدث{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">الدورات</span>
+            <span className="gradient-text">الدورات</span>
           </h2>
 
-          <p className="text-slate-500 text-lg max-w-xl mx-auto font-medium leading-relaxed mb-12">
+          <p className="section-desc-premium max-w-xl mx-auto mb-12">
             اشترك في النشرة البريدية واحصل على عروض حصرية وأحدث الدورات مباشرة في بريدك الإلكتروني.
           </p>
 

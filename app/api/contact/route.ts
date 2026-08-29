@@ -1,10 +1,57 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { checkRateLimit } from '@/lib/security/rate-limit';
+
+const ALLOWED_FORM_TYPES = new Set([
+  'placement-test',
+  'complaint',
+  'contact',
+  'satisfaction',
+  'evaluation-online',
+  'evaluation-offline',
+  'career-consulting',
+  'skills-applications',
+  'courses-survey',
+  'membership',
+  'subscription',
+]);
+
+function escapeHtml(value: string): string {
+  return value.slice(0, 10_000).replace(/[&<>'"]/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;',
+  })[character] || character);
+}
+
+function sanitizeValue<T>(value: T): T {
+  if (typeof value === 'string') return escapeHtml(value) as T;
+  if (Array.isArray(value)) return value.slice(0, 200).map(sanitizeValue) as T;
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, sanitizeValue(item)]),
+    ) as T;
+  }
+  return value;
+}
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = checkRateLimit(request, 'contact', 8, 15 * 60 * 1000);
+    if (rateLimited) return rateLimited;
+    const contentLength = Number(request.headers.get('content-length') || 0);
+    if (contentLength > 256 * 1024) {
+      return NextResponse.json({ success: false, error: 'Payload too large' }, { status: 413 });
+    }
+
     const data = await request.json();
-    const { type, ...payload } = data;
+    const { type, ...rawPayload } = data;
+    if (!ALLOWED_FORM_TYPES.has(type)) {
+      return NextResponse.json({ success: false, error: 'Unknown form type' }, { status: 400 });
+    }
+    const payload = sanitizeValue(rawPayload);
 
     const transporter = nodemailer.createTransport({
       service: "gmail",

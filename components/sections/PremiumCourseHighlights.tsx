@@ -107,14 +107,14 @@ export default function PremiumCourseHighlights() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="inline-flex items-center justify-center gap-2.5 text-[#173A7C] text-sm font-black tracking-wider uppercase bg-gradient-to-r from-[#173A7C]/[0.06] to-[#5CB07C]/[0.06] px-6 py-2.5 rounded-full mb-6 border border-[#173A7C]/10 shadow-sm max-w-max mx-auto">
+          <span className="section-badge-glass mb-6">
             <Sparkles className="w-4 h-4 text-[#5CB07C]" strokeWidth={2.5} />
             تدريب المؤسسات
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mt-2 mb-5 leading-tight">
-            أحدث دورات <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">الشركات</span>
+          <h2 className="section-main-title-premium mt-2 mb-5">
+            أحدث دورات <span className="gradient-text">الشركات</span>
           </h2>
-          <p className="text-slate-500 max-w-xl mx-auto text-base font-medium">
+          <p className="section-desc-premium max-w-xl mx-auto">
             برامج تدريبية متخصصة مصممة لتطوير كفاءات فريق عملك
           </p>
         </motion.div>
@@ -156,7 +156,7 @@ export default function PremiumCourseHighlights() {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-[1.05rem] leading-[1.7] font-bold text-slate-800 group-hover:text-slate-900 transition-colors relative z-10 mb-auto pb-5">
+                    <h3 className="card-title-royal-blue text-[1.05rem] leading-[1.6] relative z-10 mb-auto pb-5 group-hover:text-[#1E4D9D] transition-colors">
                       {course.title}
                     </h3>
 

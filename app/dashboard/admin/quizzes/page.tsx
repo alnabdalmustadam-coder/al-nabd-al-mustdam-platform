@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HelpCircle,
@@ -17,298 +17,339 @@ import {
   Search,
   Check,
   Layers,
+  Loader2,
 } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 interface QuizItem {
   id: string;
-  courseTitle: string;
-  quizTitle: string;
-  questionsCount: number;
-  passPercentage: number;
-  status: 'active' | 'draft';
+  course_id: string;
+  title: string;
+  questions_json: any[];
+  duration_minutes: number;
+  pass_percentage: number;
+  is_active: boolean;
 }
 
 export default function AdminQuizzesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [quizzes, setQuizzes] = useState<QuizItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
 
   // New Quiz Form State
-  const [courseTitle, setCourseTitle] = useState('دورة استخدام الحاسب الالي في الاعمال المكتبية');
-  const [quizTitle, setQuizTitle] = useState('اختبار الوحدة الأولى: المفاهيم الأساسية');
+  const [courseId, setCourseId] = useState('computer-basics-office');
+  const [quizTitle, setQuizTitle] = useState('');
   const [passPercentage, setPassPercentage] = useState('70');
+  const [durationMinutes, setDurationMinutes] = useState('30');
+  const [sampleQuestionsCount, setSampleQuestionsCount] = useState('10');
 
-  const [quizzes, setQuizzes] = useState<QuizItem[]>([
-    {
-      id: 'qz-1',
-      courseTitle: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
-      quizTitle: 'اختبار الوحدة الأولى: المفاهيم الأساسية لنظام التشغيل وWord',
-      questionsCount: 10,
-      passPercentage: 70,
-      status: 'active',
-    },
-    {
-      id: 'qz-2',
-      courseTitle: 'دورات ادخال بيانات ومعالجة نصوص',
-      quizTitle: 'الاختبار النهائي: دقة وسرعة إدخال البيانات',
-      questionsCount: 20,
-      passPercentage: 75,
-      status: 'active',
-    },
-    {
-      id: 'qz-3',
-      courseTitle: 'دورة الذكاء الاصطناعي',
-      quizTitle: 'اختبار التقييم الذاتي لنماذج الذكاء الاصطناعي التوليدي',
-      questionsCount: 15,
-      passPercentage: 80,
-      status: 'active',
-    },
-  ]);
+  const loadQuizzes = async () => {
+    try {
+      setLoading(true);
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('quizzes')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  const handleCreateQuiz = (e: React.FormEvent) => {
+      if (error) {
+        console.error('Error fetching quizzes:', error);
+      }
+
+      if (data && data.length > 0) {
+        setQuizzes(data);
+      } else {
+        // Fallback sample quizzes
+        setQuizzes([
+          {
+            id: 'qz-1',
+            course_id: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
+            title: 'اختبار الوحدة الأولى: المفاهيم الأساسية لنظام التشغيل وWord',
+            questions_json: Array(10).fill({}),
+            duration_minutes: 20,
+            pass_percentage: 70,
+            is_active: true,
+          },
+          {
+            id: 'qz-2',
+            course_id: 'دورات ادخال بيانات ومعالجة نصوص',
+            title: 'الاختبار النهائي: دقة وسرعة إدخال البيانات',
+            questions_json: Array(20).fill({}),
+            duration_minutes: 30,
+            pass_percentage: 75,
+            is_active: true,
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadQuizzes();
+  }, []);
+
+  const handleCreateQuiz = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!quizTitle.trim()) return;
 
-    const newQ: QuizItem = {
-      id: `qz-${Date.now()}`,
-      courseTitle,
-      quizTitle,
-      questionsCount: 10,
-      passPercentage: parseInt(passPercentage) || 70,
-      status: 'active',
-    };
+    try {
+      setCreating(true);
+      const supabase = createClient();
 
-    setQuizzes([newQ, ...quizzes]);
-    setIsModalOpen(false);
+      const questions = Array.from({ length: parseInt(sampleQuestionsCount) || 10 }, (_, i) => ({
+        id: `q-${i + 1}`,
+        text: `سؤال تقييمي رقم ${i + 1}`,
+        options: ['الخيار الأول (صحيح)', 'الخيار الثاني', 'الخيار الثالث', 'الخيار الرابع'],
+        correctIndex: 0,
+      }));
+
+      const { error } = await supabase.from('quizzes').insert({
+        course_id: courseId,
+        title: quizTitle,
+        questions_json: questions,
+        duration_minutes: parseInt(durationMinutes) || 30,
+        pass_percentage: parseInt(passPercentage) || 70,
+        is_active: true,
+      });
+
+      if (error) {
+        console.error(error);
+        alert(`خطأ: ${error.message}`);
+        return;
+      }
+
+      alert('تم إنشاء بنك أسئلة الاختبار بنجاح!');
+      setIsModalOpen(false);
+      setQuizTitle('');
+      loadQuizzes();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDeleteQuiz = async (id: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذا الاختبار؟')) return;
+    try {
+      const supabase = createClient();
+      await supabase.from('quizzes').delete().eq('id', id);
+      setQuizzes((prev) => prev.filter((q) => q.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const filteredQuizzes = quizzes.filter(
-    (q) => q.quizTitle.includes(searchQuery) || q.courseTitle.includes(searchQuery)
+    (q) =>
+      q.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      q.course_id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalQuestions = quizzes.reduce((acc, curr) => acc + curr.questionsCount, 0);
-
   return (
-    <div className="space-y-6" dir="rtl">
-      {/* Background Ambient Glows */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-20 right-10 w-96 h-96 bg-[#173A7C]/8 rounded-full blur-[140px]" />
-        <div className="absolute bottom-20 left-10 w-[30rem] h-[30rem] bg-[#5CB07C]/8 rounded-full blur-[160px]" />
-      </div>
-
-      {/* Header Banner - Liquid Glass Hero */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="relative overflow-hidden rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-7 liquid-glass-hero border border-white/80 student-card-accent"
-      >
-        <div className="specular-card-reflection" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-3 sm:space-y-3.5">
-            <div className="flex flex-col items-start">
-              <div className="admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15">
-                <FileQuestion className="w-4 h-4 text-[#173A7C] shrink-0" />
-                <span>إدارة بنك الأسئلة والاختبارات الأكاديمية</span>
-              </div>
-              <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">
-                إدارة بنك الاختبارات <span className="inline-block whitespace-nowrap">والتقييمات 📝</span>
-              </h1>
+    <div className="space-y-6 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
+      {/* Hero Header */}
+      <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
+              <FileQuestion className="w-3.5 h-3.5" />
+              <span>بنك الأسئلة والتقييمات الأكاديمية</span>
             </div>
-            <p className="text-[11px] sm:text-xs lg:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
-              بناء بنك الأسئلة المتعددة، تحديد معايير ونسب الاجتياز، ربط الاختبارات بالوحدات التعليمية، وأتمتة التصحيح الفوري وإصدار النتائج.
+            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
+              إدارة <span className="student-name-gradient">الاختبارات والتقييمات</span> 📝
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+              إنشاء اختبارات الدورات، ضبط نسب النجاح، وتحديد مدد الأسئلة للمتدربين.
             </p>
           </div>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={() => setIsModalOpen(true)}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#173A7C]/20 cursor-pointer border border-white/25 shrink-0 whitespace-nowrap"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer whitespace-nowrap"
           >
-            <Plus className="w-4 h-4 shrink-0" />
-            <span>إنشاء اختبار جديد ⚡</span>
-          </motion.button>
+            <Plus className="w-4 h-4" />
+            <span>إنشاء اختبار جديد</span>
+          </button>
         </div>
+      </div>
 
-        {/* Quick KPI stats strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-[#173A7C]/10">
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">إجمالي الاختبارات</p>
-            <p className="text-sm sm:text-base lg:text-lg font-black text-[#173A7C]">{quizzes.length} اختبار</p>
-          </div>
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">بنك الأسئلة</p>
-            <p className="text-sm sm:text-base lg:text-lg font-black text-emerald-700">{totalQuestions} سؤال معتمد</p>
-          </div>
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">متوسط نسبة الاجتياز</p>
-            <p className="text-sm sm:text-base lg:text-lg font-black text-amber-600">84.5% 🎯</p>
-          </div>
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">التصحيح الإلكتروني</p>
-            <p className="text-xs sm:text-sm lg:text-base font-black text-emerald-700">فوري ومؤتمت 🟢</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Filter and Search Bar */}
-      <div className="liquid-glass-card rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/60 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-        <div className="text-xs font-bold text-slate-700 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-[#173A7C]" />
-          <span>قائمة الاختبارات والوحدات التقييمية النشطة</span>
-        </div>
-
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute top-3.5 right-3.5" />
+      {/* Search */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="البحث باسم الاختبار أو المساق..."
-            className="w-full py-2.5 pr-10 pl-4 text-xs font-bold text-slate-800 bg-white/90 rounded-xl border border-slate-200/80 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all shadow-sm"
+            placeholder="بحث باسم الاختبار أو الدورة..."
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
           />
         </div>
       </div>
 
-      {/* Quizzes List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredQuizzes.map((quiz) => (
-          <motion.div
-            key={quiz.id}
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ y: -3 }}
-            transition={{ duration: 0.2 }}
-            className="liquid-glass-card liquid-glass-hover rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/70 space-y-4 relative group overflow-hidden student-card-accent"
-          >
-            <div className="specular-card-reflection" />
-
-            {/* Badges Row */}
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-[#173A7C]/8 text-[#173A7C] border border-[#173A7C]/15 leading-relaxed break-words">
-                {quiz.courseTitle}
-              </span>
-
-              <span
-                className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold border shrink-0 whitespace-nowrap ${
-                  quiz.status === 'active'
-                    ? 'bg-emerald-500/10 text-emerald-800 border-emerald-500/25'
-                    : 'bg-amber-500/10 text-amber-800 border-amber-500/25'
-                }`}
+      {loading ? (
+        <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <p className="text-xs font-bold text-slate-500">جاري تحميل الاختبارات...</p>
+        </div>
+      ) : filteredQuizzes.length === 0 ? (
+        <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
+          <FileQuestion className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
+          <h3 className="text-base font-black text-slate-900">لا توجد اختبارات مسجلة</h3>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredQuizzes.map((q) => {
+            const count = Array.isArray(q.questions_json) ? q.questions_json.length : 0;
+            return (
+              <div
+                key={q.id}
+                className="p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-4 student-card-accent"
               >
-                {quiz.status === 'active' ? 'مفعل 🟢' : 'مسودة 🟡'}
-              </span>
-            </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <span className="text-xs font-black text-emerald-700 flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span>{q.course_id}</span>
+                    </span>
+                    <h3 className="student-heading-h3">{q.title}</h3>
+                  </div>
 
-            {/* Quiz Title */}
-            <h3 className="font-extrabold text-xs sm:text-sm text-[#152C5B] student-heading-h3 leading-snug">
-              {quiz.quizTitle}
-            </h3>
+                  <button
+                    onClick={() => handleDeleteQuiz(q.id)}
+                    className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 cursor-pointer"
+                    title="حذف"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
 
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs font-bold pt-1">
-              <div className="liquid-glass-inset p-3 rounded-xl border border-white/70 flex items-center justify-between">
-                <span className="text-slate-500">عدد الأسئلة:</span>
-                <span className="font-black font-mono text-[#173A7C]">{quiz.questionsCount} أسئلة</span>
+                <div className="grid grid-cols-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-center text-xs font-black text-slate-800">
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold block">الأسئلة</span>
+                    <span>{count} سؤال</span>
+                  </div>
+                  <div className="border-r border-l border-slate-200">
+                    <span className="text-[10px] text-slate-400 font-bold block">المدة</span>
+                    <span>{q.duration_minutes || 30} دقيقة</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold block">نسبة النجاح</span>
+                    <span className="text-emerald-700">{q.pass_percentage}%</span>
+                  </div>
+                </div>
               </div>
+            );
+          })}
+        </div>
+      )}
 
-              <div className="liquid-glass-inset p-3 rounded-xl border border-white/70 flex items-center justify-between">
-                <span className="text-slate-500">درجة النجاح:</span>
-                <span className="font-black font-mono text-emerald-700">{quiz.passPercentage}%</span>
-              </div>
-            </div>
-
-            <div className="pt-2 flex items-center justify-end">
-              <button className="w-full sm:w-auto py-2.5 px-4 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1.5 shadow-sm shadow-[#173A7C]/15 transition-all cursor-pointer border border-white/20">
-                <span>إدارة الأسئلة والإجابات</span>
-                <span>📝</span>
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* CREATE QUIZ MODAL */}
+      {/* Create Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md"
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-lg bg-white/95 backdrop-blur-xl text-slate-900 rounded-xl sm:rounded-2xl border border-white/80 p-6 sm:p-8 space-y-5 shadow-2xl overflow-hidden relative my-8"
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="relative w-full max-w-lg overflow-hidden rounded-3xl p-6 sm:p-8 bg-white shadow-2xl border border-white/60 text-right space-y-4"
             >
-              <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#5CB07C] via-[#173A7C] to-emerald-400" />
-
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200/70">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20">
-                    <HelpCircle className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-lg text-[#152C5B] student-heading-h3">إنشاء اختبار أكاديمي جديد</h3>
-                    <p className="text-xs text-slate-500 font-bold">تحديد المساق وضوابط الاجتياز الآلي</p>
-                  </div>
-                </div>
+              <div className="flex items-center justify-between border-b pb-3">
+                <h3 className="student-heading-h3">إنشاء اختبار دورة جديد</h3>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <form onSubmit={handleCreateQuiz} className="space-y-4 text-xs font-bold">
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">اختيار المساق الأكاديمي</label>
+              <form onSubmit={handleCreateQuiz} className="space-y-3.5">
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-700">عنوان الاختبار</label>
                   <input
                     type="text"
                     required
-                    value={courseTitle}
-                    onChange={(e) => setCourseTitle(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">عنوان الاختبار</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="مثال: اختبار الوحدة الأولى..."
                     value={quizTitle}
                     onChange={(e) => setQuizTitle(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                    placeholder="مثال: الاختبار النصفي للمهارات الإدارية"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">نسبة درجة النجاح المطلوبة (%)</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-700">رمز الدورة / المسار</label>
                   <input
-                    type="number"
-                    value={passPercentage}
-                    onChange={(e) => setPassPercentage(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 font-mono font-black focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                    type="text"
+                    required
+                    value={courseId}
+                    onChange={(e) => setCourseId(e.target.value)}
+                    placeholder="computer-basics-office"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                   />
                 </div>
 
-                <div className="pt-4 flex items-center gap-3 border-t border-slate-200/70">
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-black text-slate-700">نسبة النجاح (%)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="100"
+                      value={passPercentage}
+                      onChange={(e) => setPassPercentage(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-black text-slate-700">المدة (بالدقائق)</label>
+                    <input
+                      type="number"
+                      min="5"
+                      value={durationMinutes}
+                      onChange={(e) => setDurationMinutes(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-black text-slate-700">عدد الأسئلة</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={sampleQuestionsCount}
+                      onChange={(e) => setSampleQuestionsCount(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200/60">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer transition-colors"
+                    className="px-4 py-2 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all border border-white/20"
+                    disabled={creating}
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-60"
                   >
-                    تأكيد وإضافة الاختبار ⚡
+                    {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                    <span>{creating ? 'جاري الحفظ...' : 'حفظ ونشر الاختبار'}</span>
                   </button>
                 </div>
               </form>

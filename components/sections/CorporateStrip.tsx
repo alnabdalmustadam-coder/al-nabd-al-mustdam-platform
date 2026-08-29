@@ -44,10 +44,10 @@ export default function CorporateStrip() {
                 </div>
 
                 <div>
-                  <h2 className="text-3xl sm:text-4xl font-black text-[#173A7C] leading-[1.3] tracking-tight mb-3">
-                    هل تبحث عن تدريب <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">لفريقك</span>؟
+                  <h2 className="section-main-title-premium leading-[1.3] mb-3">
+                    هل تبحث عن تدريب <span className="gradient-text">لفريقك</span>؟
                   </h2>
-                  <p className="text-slate-500 text-base sm:text-lg max-w-2xl font-medium leading-relaxed">
+                  <p className="section-desc-premium max-w-2xl">
                     برامج تدريبية مخصصة للمؤسسات والشركات مع تقارير أداء شاملة وشهادات معتمدة تسهم في رفع إنتاجية فريق عملك.
                   </p>
 

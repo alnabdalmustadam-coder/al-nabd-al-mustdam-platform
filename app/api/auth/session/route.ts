@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireUser } from "@/lib/security/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, name } = await req.json();
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
 
-    if (!email) {
-      return NextResponse.json({ success: false, message: "Email is required" }, { status: 400 });
-    }
+    const { data: profile } = await auth.supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', auth.user.id)
+      .maybeSingle();
+    const email = auth.user.email || '';
+    const name = profile?.full_name || auth.user.user_metadata?.full_name || '';
 
     const response = NextResponse.json({ success: true });
 
@@ -30,7 +36,7 @@ export async function POST(req: NextRequest) {
     }
 
     return response;
-  } catch (error) {
+  } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

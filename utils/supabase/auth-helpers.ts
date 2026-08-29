@@ -1,25 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-
-function toSafeByteString(val: string): string {
-  if (typeof val !== 'string') return ''
-  if (/[^\x00-\x7F]/.test(val)) {
-    return encodeURIComponent(val)
-  }
-  return val
-}
-
-function fromSafeByteString(val: string): string {
-  if (typeof val !== 'string') return ''
-  if (val.includes('%')) {
-    try {
-      return decodeURIComponent(val)
-    } catch {
-      return val
-    }
-  }
-  return val
-}
+import { ADMIN_ROLES, INSTRUCTOR_ROLES, normalizeRole } from '@/lib/security/auth'
 
 export async function updateSession(request: NextRequest) {
   try {
@@ -40,25 +21,18 @@ export async function updateSession(request: NextRequest) {
       {
         cookies: {
           getAll() {
-            try {
-              return request.cookies.getAll().map(c => ({
-                name: c.name,
-                value: fromSafeByteString(c.value),
-              }))
-            } catch {
-              return []
-            }
+            return request.cookies.getAll()
           },
           setAll(cookiesToSet) {
             try {
               cookiesToSet.forEach(({ name, value }) => {
-                request.cookies.set(name, toSafeByteString(value))
+                request.cookies.set(name, value)
               })
               supabaseResponse = NextResponse.next({
                 request,
               })
               cookiesToSet.forEach(({ name, value, options }) => {
-                supabaseResponse.cookies.set(name, toSafeByteString(value), options)
+                supabaseResponse.cookies.set(name, value, options)
               })
             } catch {
               // Ignore cookie set errors
@@ -85,6 +59,23 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
+    // Resolve effective user role (from app_metadata, user_metadata, or profiles table)
+    let userRole = normalizeRole(user?.app_metadata?.role);
+    if (user && (!user.app_metadata?.role || userRole === 'STUDENT')) {
+      if (user.user_metadata?.role && normalizeRole(user.user_metadata.role) !== 'STUDENT') {
+        userRole = normalizeRole(user.user_metadata.role);
+      } else {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (profile?.role) {
+          userRole = normalizeRole(profile.role);
+        }
+      }
+    }
+
     // 2. Protect Admin Dashboard Routes (/dashboard/admin/*)
     if (pathname.startsWith('/dashboard/admin')) {
       if (!user) {
@@ -94,43 +85,67 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
       }
 
-      // Check User Role from metadata or fallback
-      const userRole = (user.user_metadata?.role || 'STUDENT').toUpperCase();
-
-      // If user is a student, deny access to admin dashboard and redirect to student dashboard
-      if (userRole === 'STUDENT' || userRole === 'TRAINEE') {
+      if (!(ADMIN_ROLES as readonly string[]).includes(userRole)) {
         const url = request.nextUrl.clone()
-        url.pathname = '/dashboard/student'
+        url.pathname = (INSTRUCTOR_ROLES as readonly string[]).includes(userRole)
+          ? '/dashboard/instructor'
+          : '/dashboard/student'
         return NextResponse.redirect(url)
       }
     }
 
-    // 3. Protect Student Dashboard Routes (/dashboard/student/*)
-    if (pathname.startsWith('/dashboard/student')) {
+    // 3. Protect Instructor Dashboard Routes
+    if (pathname.startsWith('/dashboard/instructor')) {
       if (!user) {
         const url = request.nextUrl.clone()
         url.pathname = '/auth/login'
         url.searchParams.set('redirect', pathname)
         return NextResponse.redirect(url)
       }
+
+      const isAllowed =
+        (ADMIN_ROLES as readonly string[]).includes(userRole) ||
+        (INSTRUCTOR_ROLES as readonly string[]).includes(userRole)
+
+      if (!isAllowed) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/dashboard/student'
+        return NextResponse.redirect(url)
+      }
     }
 
-    // 4. Auto Redirect Authenticated Users Away from Auth Pages (/auth/login, /auth/register)
+    // 4. Protect Student Dashboard Routes (/dashboard/student/*)
+    if (pathname.startsWith('/dashboard/student') && !user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/login'
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+
+    // 5. Auto Redirect Authenticated Users Away from Auth Pages
     if (pathname === '/auth/login' || pathname === '/auth/register') {
       if (user) {
         const redirectParam = request.nextUrl.searchParams.get('redirect');
         if (redirectParam && redirectParam.startsWith('/')) {
-          const url = request.nextUrl.clone()
-          url.pathname = redirectParam
-          url.search = ''
-          return NextResponse.redirect(url)
+          // Only honor redirectParam if user role is authorized for it
+          const isValidTarget =
+            ((ADMIN_ROLES as readonly string[]).includes(userRole) && redirectParam.startsWith('/dashboard/admin')) ||
+            ((INSTRUCTOR_ROLES as readonly string[]).includes(userRole) && redirectParam.startsWith('/dashboard/instructor')) ||
+            (userRole === 'STUDENT' && redirectParam.startsWith('/dashboard/student'));
+
+          if (isValidTarget) {
+            const url = request.nextUrl.clone()
+            url.pathname = redirectParam
+            url.search = ''
+            return NextResponse.redirect(url)
+          }
         }
 
-        const userRole = (user.user_metadata?.role || 'STUDENT').toUpperCase();
-
         const url = request.nextUrl.clone()
-        if (userRole === 'ADMIN' || userRole === 'INSTRUCTOR' || userRole === 'TRAINER') {
+        if ((ADMIN_ROLES as readonly string[]).includes(userRole)) {
           url.pathname = '/dashboard/admin'
+        } else if ((INSTRUCTOR_ROLES as readonly string[]).includes(userRole)) {
+          url.pathname = '/dashboard/instructor'
         } else {
           url.pathname = '/dashboard/student'
         }
@@ -140,7 +155,14 @@ export async function updateSession(request: NextRequest) {
 
     return supabaseResponse
   } catch (error) {
-    console.error('Middleware updateSession error:', error)
+    console.error('Proxy updateSession error:', error)
+    const { pathname } = request.nextUrl
+    if (pathname.startsWith('/dashboard/')) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/login'
+      url.searchParams.set('message', 'تعذر التحقق من الجلسة')
+      return NextResponse.redirect(url)
+    }
     return NextResponse.next({ request })
   }
 }

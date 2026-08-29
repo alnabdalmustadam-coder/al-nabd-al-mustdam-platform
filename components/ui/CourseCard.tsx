@@ -89,11 +89,11 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
         {/* Content Section */}
         <div className="p-5 sm:p-6 flex flex-col flex-1 relative z-20 bg-white">
           <Link href={`/courses/${course.slug}`}>
-            <h3 className="text-lg sm:text-[19px] font-black text-slate-900 mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#173A7C] group-hover:to-[#5CB07C] transition-all duration-300 leading-[1.3]">
+            <h3 className="card-title-royal-blue text-lg sm:text-[19px] mb-2.5 line-clamp-2 leading-[1.3] group-hover:text-[#1E4D9D] transition-colors">
               {course.title}
             </h3>
           </Link>
-          <p className="text-[13px] sm:text-sm text-slate-500 mb-5 line-clamp-2 leading-relaxed flex-1 font-medium">
+          <p className="card-desc-premium mb-5 line-clamp-2 leading-relaxed flex-1">
             {course.description}
           </p>
 
@@ -111,13 +111,9 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
 
           {/* Price Container */}
           <div className="bg-gradient-to-r from-slate-50 to-[#f8fafc] rounded-full px-5 py-3 mb-5 border border-slate-100 flex justify-between items-center group-hover:border-slate-200 transition-colors">
-            <span className="text-xs font-black text-slate-500">{course.price === 0 ? "خيارات التسجيل" : "سعر الدورة"}</span>
+            <span className="text-xs font-black text-slate-500">إتاحة مؤقتة</span>
             <span className="text-xl font-black text-[#173A7C]">
-              {course.price === 0 ? (
-                <span className="text-sm text-[#5CB07C]">تصفح الباقات</span>
-              ) : (
-                <>{course.price} <span className="text-xs font-bold text-slate-500">ر.س</span></>
-              )}
+              <span className="text-sm text-[#5CB07C]">مجاناً الآن</span>
             </span>
           </div>
 
@@ -127,7 +123,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
               href={`/checkout?slug=${course.slug}`}
               className="flex-1 bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] text-white text-xs font-black py-2.5 px-3 rounded-xl hover:from-[#4EA06E] hover:to-[#5CB07C] transition-all shadow-md shadow-[#5CB07C]/20 hover:-translate-y-0.5 flex items-center justify-center gap-1 text-center truncate"
             >
-              سجل الآن
+              سجّل مجاناً
             </Link>
 
             <Link

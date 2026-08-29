@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/security/auth";
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
@@ -13,7 +13,9 @@ export async function OPTIONS() {
 
 export async function GET(req: NextRequest) {
   try {
-    const email = req.nextUrl.searchParams.get("email");
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
+    const email = auth.user.email;
     if (!email) {
       return NextResponse.json(
         { success: false, message: "البريد الإلكتروني مطلوب" },

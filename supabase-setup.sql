@@ -25,6 +25,5 @@ CREATE INDEX IF NOT EXISTS idx_enrollments_status ON enrollments(status);
 -- تمكين RLS (Row Level Security) - اختياري لكن مُستحسن
 ALTER TABLE enrollments ENABLE ROW LEVEL SECURITY;
 
--- سياسة: السيرفر (service_role) يقدر يقرأ ويكتب كل شيء
-CREATE POLICY "Service role full access" ON enrollments
-  FOR ALL USING (true) WITH CHECK (true);
+-- service_role bypasses RLS automatically. Never create a USING (true)
+-- "service role" policy because it also opens the table to client roles.

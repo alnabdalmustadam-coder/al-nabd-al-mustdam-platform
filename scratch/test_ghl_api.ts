@@ -1,5 +1,9 @@
 
-const GHL_TOKEN = "pit-e6515d66-ee32-4962-a702-e8aa4980653d";
+const GHL_TOKEN = process.env.GHL_API_KEY;
+
+if (!GHL_TOKEN) {
+  throw new Error('GHL_API_KEY is required');
+}
 const LOCATION_ID = "73hS2pnWQWKCJaCEjUqq";
 
 async function testGHLAPI() {

@@ -1,47 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
+import { createClient } from "@/utils/supabase/server";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: CORS });
+  return new NextResponse(null, { status: 204 });
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = checkRateLimit(req, 'auth-register', 5, 60 * 60 * 1000);
+    if (rateLimited) return rateLimited;
+
     const { fullName, email, phone, password, nationalId } = await req.json();
 
     // Validation
     if (!fullName || !email || !phone || !password) {
       return NextResponse.json(
         { message: "جميع الحقول مطلوبة" },
-        { status: 400, headers: CORS }
+        { status: 400 }
       );
     }
-    if (password.length < 8) {
+    if (
+      password.length < 8 ||
+      password.length > 128 ||
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password) ||
+      (!/[0-9]/.test(password) && !/[^A-Za-z0-9]/.test(password))
+    ) {
       return NextResponse.json(
         { message: "كلمة المرور 8 أحرف على الأقل" },
-        { status: 400, headers: CORS }
+        { status: 400 }
       );
     }
     if (nationalId && !/^[124]\d{9}$/.test(nationalId)) {
       return NextResponse.json(
         { message: "رقم وطني غير صحيح" },
-        { status: 400, headers: CORS }
+        { status: 400 }
       );
     }
 
-    // 1. إنشاء مستخدم في Supabase Auth
+    const supabase = await createClient();
     const { data: authData, error: authError } =
-      await supabase.auth.admin.createUser({
-        email,
+      await supabase.auth.signUp({
+        email: email.toLowerCase().trim(),
         password,
-        email_confirm: true,
-        user_metadata: { full_name: fullName, phone },
+        options: {
+          data: { full_name: fullName, phone, national_id: nationalId || null },
+        },
       });
 
     if (authError) {
@@ -50,71 +55,16 @@ export async function POST(req: NextRequest) {
         : "فشل إنشاء الحساب";
       return NextResponse.json(
         { message: msg },
-        { status: 400, headers: CORS }
+        { status: 400 }
       );
     }
 
-    const userId = authData.user.id;
-
-    // 2. إنشاء Contact في GHL
-    const nameParts = fullName.trim().split(" ");
-    let ghlContactId = null;
-
-    try {
-      const ghlRes = await fetch(
-        "https://services.leadconnectorhq.com/contacts/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.GHL_API_KEY}`,
-            "Content-Type": "application/json",
-            Version: "2021-07-28",
-          },
-          body: JSON.stringify({
-            firstName: nameParts[0],
-            lastName: nameParts.slice(1).join(" ") || "-",
-            email,
-            phone,
-            locationId: process.env.GHL_LOCATION_ID,
-            tags: [
-              "website-registered",
-              nationalId ? "nelc-eligible" : "no-nelc",
-            ],
-            ...(nationalId ? {
-              customFields: [
-                {
-                  id: "pJyAoTaiWlxLe5vf64c1",
-                  key: "contact.national_id",
-                  field_value: nationalId
-                }
-              ]
-            } : {})
-          }),
-        }
-      );
-      const ghlData = await ghlRes.json();
-      ghlContactId = ghlData?.contact?.id || null;
-      console.log("GHL Contact ID:", ghlContactId);
-    } catch (ghlErr) {
-      console.error("GHL error (non-fatal):", ghlErr);
-    }
-
-    // 3. حفظ البيانات في profiles
-    await supabase.from("profiles").upsert({
-      id: userId,
-      full_name: fullName,
-      phone,
-      national_id: nationalId || null,
-      ghl_contact_id: ghlContactId,
-      nelc_eligible: !!nationalId,
-    });
-
-    return NextResponse.json({ success: true }, { headers: CORS });
-  } catch (err: any) {
+    return NextResponse.json({ success: true, requiresEmailVerification: !authData.session });
+  } catch (err: unknown) {
     console.error("Register error:", err);
     return NextResponse.json(
       { message: "حدث خطأ في الخادم" },
-      { status: 500, headers: CORS }
+      { status: 500 }
     );
   }
 }

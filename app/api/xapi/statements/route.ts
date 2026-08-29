@@ -9,6 +9,7 @@ import {
   type XAPIStatement,
 } from "@/lib/xapi";
 import { supabase } from "@/lib/supabase";
+import { verifyBasicAuth, xapiUnauthorizedResponse } from "@/lib/security/integrations";
 
 /**
  * xAPI LRS Endpoint — /api/xapi/statements
@@ -44,6 +45,7 @@ export async function OPTIONS() {
  */
 export async function POST(req: NextRequest) {
   try {
+    if (!verifyBasicAuth(req)) return xapiUnauthorizedResponse();
     const body = await req.json();
 
     // ── Mode 1: Raw xAPI Statement(s) ──────────────────────────────────
@@ -258,6 +260,7 @@ export async function POST(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   try {
+    if (!verifyBasicAuth(req)) return xapiUnauthorizedResponse();
     const { searchParams } = req.nextUrl;
 
     const agent = searchParams.get("agent");

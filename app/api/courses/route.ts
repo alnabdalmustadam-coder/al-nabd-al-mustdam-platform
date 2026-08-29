@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAllCoursesAsync, saveCourseAsync, deleteCourseAsync } from '@/lib/courses-store';
+import { requireInstructorOrAdmin } from '@/lib/security/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -23,6 +24,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const auth = await requireInstructorOrAdmin(req);
+    if (!auth.ok) return auth.response;
     const body = await req.json();
     if (!body.title) {
       return NextResponse.json({ success: false, error: 'عنوان الدورة مطلوب' }, { status: 400 });
@@ -45,6 +48,8 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    const auth = await requireInstructorOrAdmin(req);
+    if (!auth.ok) return auth.response;
     const { searchParams } = new URL(req.url);
     const slug = searchParams.get('slug') || searchParams.get('id');
     

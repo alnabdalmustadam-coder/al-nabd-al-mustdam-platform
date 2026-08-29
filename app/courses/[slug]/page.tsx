@@ -102,8 +102,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
     .filter((c) => c.id !== course.id && (c.category === course.category || c.featured))
     .slice(0, 3);
 
-  const originalPrice = course.price ? Math.round(course.price * 1.35) : 0;
-  const installmentAmount = course.price ? Math.round(course.price / 4) : 0;
   const categoryLabel = CATEGORY_MAP[course.category] || course.category;
 
   const previewVideoUrl =
@@ -135,7 +133,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
     },
     {
       q: "هل يتوفر خيار التقسيط لرسوم الدورة؟",
-      a: "نعم، يمكنك تقسيط الرسوم على 4 دفعات شهرية ميسرة بدون فوائد عبر تابي أو تمارا عند صفحة الدفع.",
+      a: "التسجيل مفتوح مجاناً بصورة مؤقتة لحين اكتمال الربط مع وسائل الدفع، لذلك لا تحتاج إلى وسيلة دفع الآن.",
     },
     {
       q: "هل الدروس مسجلة أم بث مباشر؟",
@@ -147,7 +145,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
     <div className="min-h-screen bg-[#F8FAFC] font-[family-name:var(--font-cairo)] text-slate-900 selection:bg-[#5CB07C] selection:text-white" dir="rtl">
       
       {/* ═════════════════════════════════════════════════════════════════ */}
-      {/* 1. HERO SECTION (90VH, LIGHT THEME WITH BG.WEBP & GLASS CARDS)  */}
+      {/* 1. HERO SECTION (LIGHT THEME WITH BG.WEBP & GLASS CARDS)        */}
       {/* ═════════════════════════════════════════════════════════════════ */}
       <section className="relative min-h-[85vh] lg:min-h-[90vh] flex flex-col justify-center pt-20 sm:pt-28 pb-16 overflow-hidden bg-gradient-to-b from-slate-100/90 via-slate-50 to-slate-100/60 border-b border-slate-200/80">
         
@@ -165,16 +163,16 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
             
-            {/* Right Side: Course Info & Actions (Span 6) - Balanced Full Height */}
+            {/* Right Side: Course Info & Actions (Span 6) */}
             <div className="lg:col-span-6 flex flex-col justify-between gap-5">
               
               {/* Top Block: Badges, Title, and Description */}
               <div className="space-y-3.5">
                 {/* Badges with Unified Height & Padding */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="h-7 inline-flex items-center gap-1.5 px-3 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-xs">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>معتمد رسمياً من المركز الوطني</span>
+                  <span className="section-badge-glass">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 ml-1 inline" />
+                    معتمد رسمياً من المركز الوطني
                   </span>
                   <span className="h-7 inline-flex items-center px-3 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold shadow-xs">
                     {categoryLabel}
@@ -185,17 +183,17 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 </div>
 
                 {/* Course Title */}
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-snug tracking-tight">
+                <h1 className="card-title-royal-blue text-2xl sm:text-3xl lg:text-4xl leading-snug tracking-tight">
                   {course.title}
                 </h1>
 
                 {/* Course Description */}
-                <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                <p className="card-desc-premium text-xs sm:text-sm leading-relaxed">
                   {course.description}
                 </p>
               </div>
 
-              {/* Middle Block: Rich 4-Item Stats Widget (Spacious & Prominent) */}
+              {/* Middle Block: Rich 4-Item Stats Widget */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 sm:p-3.5 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-xs">
                 {/* Rating */}
                 <div className="flex items-center gap-2 p-2 rounded-xl bg-amber-50/70 border border-amber-100">
@@ -203,7 +201,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                   </div>
                   <div>
-                    <span className="text-xs font-black text-slate-900 block leading-tight">{course.rating}</span>
+                    <span className="text-xs font-black text-[#173A7C] block leading-tight">{course.rating}</span>
                     <span className="text-[10px] text-slate-500 font-bold block">تقييم المتدربين</span>
                   </div>
                 </div>
@@ -214,7 +212,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     <Users className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="text-xs font-black text-slate-900 block leading-tight">{course.studentsCount || course.enrollees || 1250}+</span>
+                    <span className="text-xs font-black text-[#173A7C] block leading-tight">{course.studentsCount || course.enrollees || 1250}+</span>
                     <span className="text-[10px] text-slate-500 font-bold block">متدرب مسجل</span>
                   </div>
                 </div>
@@ -225,7 +223,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     <Clock className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="text-xs font-black text-slate-900 block leading-tight">{course.duration}</span>
+                    <span className="text-xs font-black text-[#173A7C] block leading-tight">{course.duration}</span>
                     <span className="text-[10px] text-slate-500 font-bold block">المدة الإجمالية</span>
                   </div>
                 </div>
@@ -236,19 +234,19 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     <BookOpen className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="text-xs font-black text-slate-900 block leading-tight">{course.lessonsCount} دروس</span>
+                    <span className="text-xs font-black text-[#173A7C] block leading-tight">{course.lessonsCount} دروس</span>
                     <span className="text-[10px] text-slate-500 font-bold block">منهج تفاعلي</span>
                   </div>
                 </div>
               </div>
 
-              {/* Bottom Block: Pricing & Glass Actions Box */}
+              {/* Bottom Block: Pricing & Actions Box */}
               <div className="p-4 sm:p-5 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_8px_25px_rgba(23,58,124,0.06)] space-y-4 shrink-0">
                 
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
                     <span className="text-[11px] text-slate-500 font-bold block mb-1">
-                      {isEnrolled ? "حالة التسجيل في البرنامج:" : "الرسوم الشاملة للاشتراك والشهادة:"}
+                      {isEnrolled ? "حالة التسجيل في البرنامج:" : "حالة الإتاحة الحالية:"}
                     </span>
                     {isEnrolled ? (
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-xs">
@@ -256,35 +254,26 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                         <span>أنت مشترك بالفعل في هذه الدورة</span>
                       </div>
                     ) : (
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl sm:text-3xl font-black text-slate-900">
-                          {course.price} <span className="text-xs font-bold text-emerald-600">ر.س</span>
-                        </span>
-                        {originalPrice > course.price && (
-                          <span className="text-xs text-slate-400 line-through font-bold">
-                            {originalPrice} ر.س
-                          </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl sm:text-3xl font-black text-emerald-700">مجاناً مؤقتاً</span>
+                        {Number(course.price || 0) > 0 && (
+                          <span className="text-xs text-slate-400 line-through font-bold">{course.price} ر.س</span>
                         )}
                       </div>
                     )}
                   </div>
 
-                  {/* Tabby & Tamara Pill */}
+                  {/* Temporary free enrollment notice */}
                   {!isEnrolled && (
-                    <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200 text-[11px] text-slate-600 font-medium">
-                      <span>أو 4 دفعات <strong className="text-emerald-700 font-bold">{installmentAmount} ر.س</strong></span>
-                      <div className="flex items-center gap-1">
-                        <span className="px-1.5 py-0.5 bg-slate-900 text-white rounded text-[9px] font-black">tabby</span>
-                        <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded text-[9px] font-black">tamara</span>
-                      </div>
+                    <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1.5 rounded-xl border border-emerald-200 text-[11px] text-emerald-800 font-bold">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span>تفعيل فوري من غير بيانات دفع</span>
                     </div>
                   )}
                 </div>
 
                 {/* Primary Action Buttons */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-                  
-                  {/* Smart Enrollment Action (متابعة التعلم / سجل الآن) */}
                   <div className="flex-1">
                     <SmartCourseAction
                       ghlCourseId={course.ghlCourseId}
@@ -295,7 +284,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     />
                   </div>
 
-                  {/* Add to Cart (Only visible/active if NOT enrolled) */}
                   {!isEnrolled && (
                     <button
                       onClick={handleAddToCart}
@@ -310,7 +298,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     </button>
                   )}
 
-                  {/* Wishlist Button */}
                   <button
                     onClick={() => toggleWishlist(course)}
                     className={`p-3 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
@@ -324,7 +311,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     <Heart className={`w-4 h-4 ${isFavorited ? "fill-rose-500 text-rose-500" : ""}`} />
                   </button>
 
-                  {/* Share Button */}
                   <button
                     onClick={handleShare}
                     className="p-3 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all cursor-pointer"
@@ -344,11 +330,10 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
 
             </div>
 
-            {/* Left Side: Large Prominent Course Image Showcase (Span 6) - Equal Full Height */}
+            {/* Left Side: Course Image Showcase (Span 6) */}
             <div className="lg:col-span-6 flex flex-col">
               <div className="h-full flex flex-col justify-between rounded-3xl bg-white/95 backdrop-blur-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-[0_15px_40px_rgba(23,58,124,0.08)] group overflow-hidden">
                 
-                {/* Large Featured Image Frame with clean styling and light subtle overlay */}
                 <div className="relative flex-1 w-full min-h-[300px] sm:min-h-[360px] rounded-2xl bg-slate-100 border border-slate-200/80 flex items-center justify-center overflow-hidden">
                   <Image
                     src={course.image || "/logo.webp"}
@@ -358,10 +343,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     className="object-cover group-hover:scale-102 transition-transform duration-500"
                   />
 
-                  {/* Very light subtle overlay only on hover */}
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors pointer-events-none" />
 
-                  {/* Prominent Play Button Overlay */}
                   <button
                     onClick={() => setIsVideoModalOpen(true)}
                     className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 cursor-pointer"
@@ -376,7 +359,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                   </button>
                 </div>
 
-                {/* Bottom Trust Guarantee Bar */}
                 <div className="mt-3 flex items-center justify-between text-xs text-slate-600 px-3 py-2 bg-slate-50/90 rounded-xl border border-slate-100 font-bold shrink-0">
                   <span className="flex items-center gap-1.5 text-emerald-700">
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
@@ -397,13 +379,11 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
       </section>
 
       {/* ═════════════════════════════════════════════════════════════════ */}
-      {/* 2. CENTERED TABS NAVIGATION (NO HORIZONTAL SCROLL ON MOBILE)    */}
+      {/* 2. CENTERED TABS NAVIGATION                                      */}
       {/* ═════════════════════════════════════════════════════════════════ */}
       <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          
-          {/* Mobile Grid (2 Columns, NO Horizontal Scroll) + Desktop Centered Flex */}
-          <div className="grid grid-cols-2 sm:flex sm:justify-center sm:items-center gap-2 sm:gap-3">
+          <div className="premium-tabs grid grid-cols-2 sm:flex sm:justify-center sm:items-center gap-2 sm:gap-3">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.key;
@@ -411,24 +391,23 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+                  className={`premium-tab flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
                     isActive
                       ? "text-white bg-[#173A7C] shadow-md shadow-[#173A7C]/20"
                       : "text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/80"
                   }`}
                 >
                   <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-400" : "text-slate-400"}`} />
-                  <span className="truncate">{tab.label}</span>
+                  <span className="premium-tab-label truncate">{tab.label}</span>
                 </button>
               );
             })}
           </div>
-
         </div>
       </div>
 
       {/* ═════════════════════════════════════════════════════════════════ */}
-      {/* 3. MAIN TAB CONTENT AREA (MAX WIDTH 1400PX)                     */}
+      {/* 3. MAIN TAB CONTENT AREA                                         */}
       {/* ═════════════════════════════════════════════════════════════════ */}
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="max-w-5xl mx-auto">
@@ -453,8 +432,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                         <CheckCircle className="w-6 h-6" />
                       </div>
                       <div>
-                        <h2 className="text-lg sm:text-xl font-black text-slate-900">ماذا ستتعلم في هذه الدورة؟</h2>
-                        <p className="text-xs text-slate-500 font-medium mt-0.5">المهارات العملية والتطبيقية المتوافقة مع متطلبات سوق العمل</p>
+                        <h2 className="card-title-royal-blue text-lg sm:text-xl">ماذا ستتعلم في هذه الدورة؟</h2>
+                        <p className="card-desc-premium text-xs mt-0.5">المهارات العملية والتطبيقية المتوافقة مع متطلبات سوق العمل</p>
                       </div>
                     </div>
 
@@ -488,8 +467,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                         <Target className="w-6 h-6" />
                       </div>
                       <div>
-                        <h2 className="text-lg sm:text-xl font-black text-slate-900">الفئات المستهدفة من هذا البرنامج</h2>
-                        <p className="text-xs text-slate-500 font-medium mt-0.5">صُممت الدورة لتلبي احتياجات فئات مهنية متعددة</p>
+                        <h2 className="card-title-royal-blue text-lg sm:text-xl">الفئات المستهدفة من هذا البرنامج</h2>
+                        <p className="card-desc-premium text-xs mt-0.5">صُممت الدورة لتلبي احتياجات فئات مهنية متعددة</p>
                       </div>
                     </div>
 
@@ -503,8 +482,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                         <div key={idx} className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
                           <Briefcase className="w-5 h-5 text-[#173A7C] shrink-0 mt-0.5" />
                           <div>
-                            <h4 className="text-xs sm:text-sm font-black text-slate-900 mb-0.5">{aud.title}</h4>
-                            <p className="text-xs text-slate-500 font-medium leading-relaxed">{aud.desc}</p>
+                            <h4 className="card-title-royal-blue text-xs sm:text-sm mb-0.5">{aud.title}</h4>
+                            <p className="card-desc-premium text-xs leading-relaxed">{aud.desc}</p>
                           </div>
                         </div>
                       ))}
@@ -517,8 +496,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-sm sm:text-base font-black text-slate-900">المتطلبات المسبقة</h3>
-                      <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-1">
+                      <h3 className="card-title-royal-blue text-sm sm:text-base">المتطلبات المسبقة</h3>
+                      <p className="card-desc-premium text-xs sm:text-sm leading-relaxed mt-1">
                         {course.requirements || "لا توجد متطلبات مسبقة معقدة. الدورة تبدأ معك من الصفر خطوة بخطوة حتى الإتقان الكامل، وتحتاج فقط إلى رغبة في التعلم وجهاز كمبيوتر أو هاتف ذكي."}
                       </p>
                     </div>
@@ -532,8 +511,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
                   <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-slate-100">
                     <div>
-                      <h2 className="text-lg sm:text-xl font-black text-slate-900">منهج الدورة والدروس</h2>
-                      <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      <h2 className="card-title-royal-blue text-lg sm:text-xl">منهج الدورة والدروس</h2>
+                      <p className="card-desc-premium text-xs mt-0.5">
                         يتضمن البرنامج {course.curriculum?.length || 1} وحدات تدريبية بإجمالي {course.lessonsCount} دروس تفاعلية
                       </p>
                     </div>
@@ -542,7 +521,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     </span>
                   </div>
 
-                  {/* Lessons Accordion */}
                   <div className="space-y-3">
                     {course.curriculum && course.curriculum.length > 0 ? (
                       course.curriculum.map((section: any, idx: number) => {
@@ -565,7 +543,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                                   {idx + 1}
                                 </div>
                                 <div>
-                                  <h3 className="text-sm sm:text-base font-black text-slate-900">
+                                  <h3 className="card-title-royal-blue text-sm sm:text-base">
                                     {sectionTitle}
                                   </h3>
                                   <span className="text-xs text-slate-500 font-medium">
@@ -630,8 +608,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               {activeTab === "certificate" && (
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
                   <div>
-                    <h2 className="text-lg sm:text-xl font-black text-slate-900">الشهادة والاعتماد الرسمي</h2>
-                    <p className="text-xs text-slate-500 font-medium mt-1">شهادة مهنية معتمدة تضاف لسيرتك الذاتية وتدعم مسارك الوظيفي</p>
+                    <h2 className="card-title-royal-blue text-lg sm:text-xl">الشهادة والاعتماد الرسمي</h2>
+                    <p className="card-desc-premium text-xs mt-1">شهادة مهنية معتمدة تضاف لسيرتك الذاتية وتدعم مسارك الوظيفي</p>
                   </div>
 
                   <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
@@ -640,8 +618,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                         <Award className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-sm sm:text-base font-black text-slate-900">شهادة إتمام معتمدة برقم تحقق وطني</h3>
-                        <p className="text-xs text-slate-500 font-medium mt-0.5">تصدر الشهادة فور إكمال متطلبات الدورة ومشاهدة الدروس.</p>
+                        <h3 className="card-title-royal-blue text-sm sm:text-base">شهادة إتمام معتمدة برقم تحقق وطني</h3>
+                        <p className="card-desc-premium text-xs mt-0.5">تصدر الشهادة فور إكمال متطلبات الدورة ومشاهدة الدروس.</p>
                       </div>
                     </div>
 
@@ -667,8 +645,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               {activeTab === "instructor" && (
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-5">
                   <div>
-                    <h2 className="text-lg sm:text-xl font-black text-slate-900">عن المدرب وهيئة التدريس</h2>
-                    <p className="text-xs text-slate-500 font-medium mt-1">نخبة من الكفاءات والخبراء المعتمدين في المملكة</p>
+                    <h2 className="card-title-royal-blue text-lg sm:text-xl">عن المدرب وهيئة التدريس</h2>
+                    <p className="card-desc-premium text-xs mt-1">نخبة من الكفاءات والخبراء المعتمدين في المملكة</p>
                   </div>
 
                   <div className="flex items-start gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-200">
@@ -676,11 +654,11 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                       {course.instructor ? course.instructor[0] : "ن"}
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-base font-black text-slate-900">
+                      <h3 className="card-title-royal-blue text-base">
                         {course.instructor || "أكاديمية النبض المستدام"}
                       </h3>
                       <span className="text-xs text-emerald-700 font-bold block">مدرب معتمد واستشاري تدريب</span>
-                      <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed pt-1">
+                      <p className="card-desc-premium text-xs sm:text-sm leading-relaxed pt-1">
                         {course.instructorBio ||
                           "خبرة واسعة في تقديم البرامج التدريبية المعتمدة وتطوير مهارات الكوادر الوطنية لتلبية متطلبات سوق العمل الحديث."}
                       </p>
@@ -693,8 +671,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               {activeTab === "faq" && (
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-4">
                   <div>
-                    <h2 className="text-lg sm:text-xl font-black text-slate-900">الأسئلة الشائعة</h2>
-                    <p className="text-xs text-slate-500 font-medium mt-1">إجابات مباشرة لأبرز الاستفسارات حول الدورة</p>
+                    <h2 className="card-title-royal-blue text-lg sm:text-xl">الأسئلة الشائعة</h2>
+                    <p className="card-desc-premium text-xs mt-1">إجابات مباشرة لأبرز الاستفسارات حول الدورة</p>
                   </div>
 
                   <div className="space-y-2.5">
@@ -709,7 +687,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                             onClick={() => setOpenFaq(isOpen ? null : idx)}
                             className="w-full flex items-center justify-between p-4 text-right cursor-pointer hover:bg-slate-50 transition-colors"
                           >
-                            <span className="text-xs sm:text-sm font-black text-slate-900">{faq.q}</span>
+                            <span className="card-title-royal-blue text-xs sm:text-sm">{faq.q}</span>
                             <div className={`p-1 rounded-lg ${isOpen ? "text-[#173A7C]" : "text-slate-400"}`}>
                               {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </div>
@@ -740,15 +718,15 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
         </div>
 
         {/* ═════════════════════════════════════════════════════════════════ */}
-        {/* 4. RELATED COURSES (1400PX CONTAINER)                           */}
+        {/* 4. RELATED COURSES                                              */}
         {/* ═════════════════════════════════════════════════════════════════ */}
         {related.length > 0 && (
           <section className="mt-20 pt-12 border-t border-slate-200">
             <div className="text-center max-w-xl mx-auto mb-8">
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-                دورات تدريبية <span className="text-[#173A7C]">ذات صلة</span>
+              <h2 className="section-main-title-premium text-2xl sm:text-3xl mb-2">
+                دورات تدريبية <span className="gradient-text">ذات صلة</span>
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+              <p className="section-desc-premium text-xs sm:text-sm">
                 برامج تدريبية مكملة لتطوير مهاراتك المهنية
               </p>
             </div>
@@ -786,7 +764,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               <div className="p-4 flex items-center justify-between border-b border-slate-100 bg-slate-50">
                 <div className="flex items-center gap-2">
                   <Play className="w-4 h-4 text-emerald-600 fill-emerald-600" />
-                  <h3 className="text-xs sm:text-sm font-black text-slate-900">{course.title}</h3>
+                  <h3 className="card-title-royal-blue text-xs sm:text-sm">{course.title}</h3>
                 </div>
 
                 <button
@@ -809,14 +787,14 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
               </div>
 
               <div className="p-4 bg-slate-50 flex items-center justify-between flex-wrap gap-2 text-xs">
-                <span className="text-slate-600 font-medium">
+                <span className="card-desc-premium text-xs">
                   احصل على الشهادة المعتمدة وكامل المحتوى بعد التسجيل.
                 </span>
                 <Link
                   href={course.slug ? `/checkout?slug=${course.slug}` : "/checkout"}
                   className="px-4 py-2 rounded-xl bg-[#5CB07C] hover:bg-[#4EA06E] text-white font-black transition-colors"
                 >
-                  سجّل الآن في الدورة
+                  سجّل مجاناً في الدورة
                 </Link>
               </div>
             </motion.div>

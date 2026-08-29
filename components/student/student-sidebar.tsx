@@ -20,6 +20,7 @@ import {
   ShieldCheck,
   Heart,
   X,
+  Store,
 } from 'lucide-react';
 import { DefaultAvatar } from './default-avatar';
 import { useWishlist } from '@/context/WishlistContext';
@@ -133,6 +134,7 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
     { label: 'الدورات والكتب', href: '/dashboard/student/pathways', icon: Library },
     { label: 'المشاريع والتطبيقات', href: '/dashboard/student/projects', icon: FolderGit2 },
     { label: 'الملاحظات والمحفوظات', href: '/dashboard/student/bookmarks', icon: BookmarkCheck },
+    { label: 'متجر الخدمات', href: '/marketplace', icon: Store, badge: 'جديد' },
     { label: 'السجل المالي والفواتير', href: '/dashboard/student/billing', icon: CreditCard },
     { label: 'الدعم والمساعدة', href: '/dashboard/student/support', icon: Headphones },
     { label: 'الملف الشخصي والإعدادات', href: '/dashboard/student/profile', icon: User },
@@ -151,21 +153,22 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
           className={`relative overflow-hidden rounded-none border-l h-full flex flex-col justify-between transition-all duration-300 ${isCollapsed ? 'p-2 pt-1' : 'px-3.5 py-2.5'
             }`}
           style={{
-            background: 'rgba(255, 255, 255, 0.85)',
+            background: 'rgba(255, 255, 255, 0.94)',
             backdropFilter: 'blur(28px) saturate(1.8)',
             WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-            boxShadow: '0 0 40px rgba(0, 0, 0, 0.08)',
-            borderLeft: '1px solid rgba(255, 255, 255, 0.60)',
+            boxShadow: '0 0 40px rgba(23, 58, 124, 0.06), 0 4px 20px rgba(0, 0, 0, 0.04)',
+            borderLeft: '1px solid rgba(23, 58, 124, 0.08)',
           }}
         >
           <div className="space-y-3 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 
             {/* Student Profile Identity Card */}
             <div
-              className={`rounded-xl border border-slate-200/80 transition-all duration-300 relative group overflow-hidden ${isCollapsed ? 'p-2 flex items-center justify-center' : 'p-3.5'
+              className={`rounded-2xl border border-slate-200/90 transition-all duration-300 relative group overflow-hidden ${isCollapsed ? 'p-2 flex items-center justify-center' : 'p-3.5'
                 }`}
               style={{
-                background: 'rgba(241, 245, 249, 0.8)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%)',
+                boxShadow: '0 2px 8px rgba(23, 58, 124, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
               }}
             >
               <div className="flex items-center gap-3">
@@ -176,13 +179,13 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                 />
                 {!isCollapsed && (
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <h3 className="font-extrabold text-xs text-slate-900 truncate" title={userProfile.fullName}>
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <h3 className="font-black text-sm sm:text-[15px] text-slate-900 truncate leading-tight" title={userProfile.fullName}>
                         {userProfile.fullName}
                       </h3>
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                     </div>
-                    <p className="text-[10px] text-emerald-700 font-bold truncate">{userProfile.role}</p>
+                    <p className="text-xs text-emerald-700 font-bold truncate">{userProfile.role}</p>
                   </div>
                 )}
               </div>
@@ -202,7 +205,7 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                   },
                 },
               }}
-              className="space-y-1.5 px-0.5 py-0.5"
+              className="space-y-2 px-0.5 py-0.5"
             >
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -229,10 +232,10 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                     <Link
                       href={item.href}
                       title={isCollapsed ? item.label : undefined}
-                      className={`relative flex items-center rounded-xl font-bold text-xs transition-all duration-200 group cursor-pointer ${isCollapsed ? 'p-2.5 justify-center' : 'p-3 justify-between'
+                      className={`dashboard-nav-tab relative flex items-center rounded-xl font-bold text-xs transition-all duration-200 group cursor-pointer ${isCollapsed ? 'p-2.5 justify-center' : 'p-3 justify-between'
                         } ${isActive
                           ? 'text-white bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] border border-blue-400/40 shadow-lg shadow-[#173A7C]/30'
-                          : 'text-slate-800 hover:text-[#173A7C] hover:bg-slate-100/90 border border-slate-200/60'
+                          : 'text-slate-800 hover:text-[#173A7C] hover:bg-white border border-slate-200/90 shadow-xs'
                         }`}
                     >
                       <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
@@ -249,7 +252,7 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                           )}
                         </div>
                         {!isCollapsed && (
-                          <span className={`truncate font-extrabold ${isActive ? 'text-white' : 'text-slate-800 group-hover:text-[#173A7C]'}`}>
+                          <span className={`dashboard-nav-tab-label truncate font-extrabold ${isActive ? 'text-white' : 'text-slate-800 group-hover:text-[#173A7C]'}`}>
                             {item.label}
                           </span>
                         )}
@@ -346,29 +349,30 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
 
               {/* Student Profile Identity Card in Mobile Drawer */}
               <div
-                className="rounded-xl border border-slate-200/80 p-3 flex items-center gap-3"
+                className="rounded-2xl border border-slate-200/90 p-3.5 flex items-center gap-3"
                 style={{
-                  background: 'rgba(241, 245, 249, 0.85)',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%)',
+                  boxShadow: '0 2px 8px rgba(23, 58, 124, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
                 }}
               >
                 <DefaultAvatar
                   src={userProfile.avatarUrl}
                   name={userProfile.fullName}
-                  size="sm"
+                  size="md"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="font-extrabold text-xs text-slate-900 truncate" title={userProfile.fullName}>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <h3 className="font-black text-sm text-slate-900 truncate leading-tight" title={userProfile.fullName}>
                       {userProfile.fullName}
                     </h3>
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                   </div>
-                  <p className="text-[10px] text-emerald-700 font-bold truncate">{userProfile.role}</p>
+                  <p className="text-xs text-emerald-700 font-bold truncate">{userProfile.role}</p>
                 </div>
               </div>
 
               {/* Mobile Navigation Links */}
-              <nav className="space-y-1.5 overflow-y-auto flex-1 py-1" style={{ scrollbarWidth: 'none' }}>
+              <nav className="space-y-2 overflow-y-auto flex-1 py-1" style={{ scrollbarWidth: 'none' }}>
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
@@ -378,9 +382,9 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                       key={item.href}
                       href={item.href}
                       onClick={onCloseMobile}
-                      className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all ${isActive
+                      className={`dashboard-nav-tab flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all ${isActive
                           ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-blue-400/40'
-                          : 'text-slate-800 hover:text-[#173A7C] hover:bg-slate-100/90 border border-slate-200/60'
+                          : 'text-slate-800 hover:text-[#173A7C] hover:bg-white border border-slate-200/90 shadow-xs'
                         }`}
                     >
                       <div className="flex items-center gap-2.5">
@@ -392,7 +396,7 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                         >
                           <Icon className="w-4 h-4" />
                         </div>
-                        <span>{item.label}</span>
+                        <span className="dashboard-nav-tab-label">{item.label}</span>
                       </div>
                       {item.count && (
                         <span

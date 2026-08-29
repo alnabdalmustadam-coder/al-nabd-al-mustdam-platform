@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/security/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, email, fullName } = await req.json();
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
+    const { fullName } = await req.json();
+    const userId = auth.user.id;
+    const email = auth.user.email || '';
 
     // تحقق هل المستخدم موجود
     const { data: existing } = await supabase
@@ -47,7 +52,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    let redirectUrl = "/dashboard/student";
+    const redirectUrl = "/dashboard/student";
 
     return NextResponse.json({
       success: true,

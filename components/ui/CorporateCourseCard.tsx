@@ -51,7 +51,7 @@ export default function CorporateCourseCard({ course }: { course: CorporateCours
           </div>
 
           {/* Title */}
-          <h3 className="text-[1.05rem] leading-[1.7] font-bold text-slate-800 group-hover:text-[#173A7C] transition-colors relative z-10 mb-auto pb-5">
+          <h3 className="card-title-royal-blue text-[1.05rem] leading-[1.7] transition-colors relative z-10 mb-auto pb-5">
             {course.title}
           </h3>
 

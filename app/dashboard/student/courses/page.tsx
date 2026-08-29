@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
-import { getCompletedLessons, getCourseAllLessons } from '@/lib/actions/student-actions';
+import { getCourseAllLessons } from '@/lib/actions/student-actions';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -109,17 +109,10 @@ export default function StudentCoursesPage() {
               const allCourseLessons = getCourseAllLessons(matchedCatalog);
               const totalLessons = Math.max(1, allCourseLessons.length);
 
-              const localCompleted = getCompletedLessons(canonicalSlug);
-              const completedInCourse = allCourseLessons.filter((l) => localCompleted.has(l.id)).length;
-
-              let progress = 0;
-              if (completedInCourse > 0) {
-                progress = Math.min(100, Math.round((completedInCourse / totalLessons) * 100));
-              } else if (e.progress !== undefined && e.progress !== null) {
-                progress = Math.min(100, Math.max(0, Number(e.progress)));
-              }
-
-              const completed = completedInCourse > 0 ? completedInCourse : Math.round((progress / 100) * totalLessons);
+              const progress = e.progress !== undefined && e.progress !== null
+                ? Math.min(100, Math.max(0, Number(e.progress)))
+                : 0;
+              const completed = Math.round((progress / 100) * totalLessons);
 
               if (courseMap.has(canonicalSlug)) {
                 const existing = courseMap.get(canonicalSlug)!;
@@ -262,36 +255,36 @@ export default function StudentCoursesPage() {
         </div>
 
         {/* Tab Filters */}
-        <div className="flex items-center gap-1.5 p-1 bg-white/80 border border-slate-200/80 rounded-2xl shadow-xs self-start sm:self-auto">
+        <div className="premium-tabs flex items-center gap-1.5 p-1 bg-white/80 border border-slate-200/80 rounded-2xl shadow-xs self-start sm:self-auto">
           <button
             onClick={() => setFilterTab('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            className={`premium-tab px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
               filterTab === 'all'
                 ? 'bg-[#173A7C] text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            الكل ({myCourses.length})
+            <span className="premium-tab-label">الكل ({myCourses.length})</span>
           </button>
           <button
             onClick={() => setFilterTab('in_progress')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            className={`premium-tab px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
               filterTab === 'in_progress'
                 ? 'bg-[#173A7C] text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            قيد التقدم ({inProgressCount})
+            <span className="premium-tab-label">قيد التقدم ({inProgressCount})</span>
           </button>
           <button
             onClick={() => setFilterTab('completed')}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            className={`premium-tab px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
               filterTab === 'completed'
                 ? 'bg-[#173A7C] text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            المكتملة ({completedCount})
+            <span className="premium-tab-label">المكتملة ({completedCount})</span>
           </button>
         </div>
       </div>

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase as supabaseAdmin } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 
 const REGISTER_PAGE = "https://register.nabdtraining.com/register-page";
 
 async function handleUser(userId: string, email: string, fullName: string) {
   // تحقق لو موجود في profiles
-  const { data: profile } = await supabase
+  const { data: profile } = await supabaseAdmin
     .from("profiles")
     .select("ghl_contact_id")
     .eq("id", userId)
@@ -41,7 +42,7 @@ async function handleUser(userId: string, email: string, fullName: string) {
       console.error("GHL error:", e);
     }
 
-    await supabase.from("profiles").upsert({
+    await supabaseAdmin.from("profiles").upsert({
       id: userId,
       full_name: fullName || email.split("@")[0],
       phone: "",
@@ -82,22 +83,10 @@ async function handleUser(userId: string, email: string, fullName: string) {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
-  const accessToken = searchParams.get("access_token");
 
   try {
-    // الحالة 1: access_token (implicit flow)
-    if (accessToken) {
-      const { data: { user }, error } = await supabase.auth.getUser(accessToken);
-      if (error || !user) {
-        return NextResponse.redirect(`${REGISTER_PAGE}?error=invalid_token`);
-      }
-      const name = user.user_metadata?.full_name || user.user_metadata?.name || "";
-      const redirectUrl = await handleUser(user.id, user.email!, name);
-      return NextResponse.redirect(redirectUrl);
-    }
-
-    // الحالة 2: code (PKCE flow)
     if (code) {
+      const supabase = await createClient();
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
       if (error || !data.user) {
         return NextResponse.redirect(`${REGISTER_PAGE}?error=auth_failed`);

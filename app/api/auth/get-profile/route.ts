@@ -1,28 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { supabase as supabaseAdmin } from "@/lib/supabase";
+import { isAdminRole, requireUser } from "@/lib/security/auth";
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ message: "غير مصرح: يرجى تسجيل الدخول أولاً" }, { status: 401 });
-    }
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
+    const user = auth.user;
 
     const requestedUserId = req.nextUrl.searchParams.get("userId") || user.id;
 
     // Security Check: If requesting another user's profile, verify that caller is ADMIN
     if (requestedUserId !== user.id) {
-      const { data: callerProfile } = await supabaseAdmin
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      const callerRole = (callerProfile?.role || "").toUpperCase();
-      if (callerRole !== "ADMIN") {
+      if (!isAdminRole(auth.role)) {
         return NextResponse.json({ message: "غير مصرح بالوصول إلى بيانات هذا المستخدم" }, { status: 403 });
       }
     }

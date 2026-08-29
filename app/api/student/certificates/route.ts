@@ -3,49 +3,45 @@ import {
   getAllIssuedCertificates,
   getAllTemplates,
   issueCertificate,
-  CertificateTemplate,
-  IssuedCertificate,
 } from '@/lib/certificates-store';
-import { createClient } from '@/utils/supabase/server';
 import { supabase as adminSupabase } from '@/lib/supabase';
+import { requireUser } from '@/lib/security/auth';
 
 export const dynamic = 'force-dynamic';
 
+function normalizeEmail(value?: string | null): string {
+  return value?.trim().toLowerCase() || '';
+}
+
+function normalizeCourseTitle(value?: string | null): string {
+  return value?.trim().toLowerCase() || '';
+}
+
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const queryEmail = searchParams.get('email')?.toLowerCase().trim();
-    const queryName = searchParams.get('name')?.trim();
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
 
-    // 1. Identify student from Supabase auth session or query
-    let studentEmail = queryEmail || '';
-    let studentName = queryName || '';
-
-    try {
-      const supabase = await createClient();
-      const { data: authData } = await supabase.auth.getUser();
-      if (authData?.user) {
-        studentEmail = studentEmail || authData.user.email?.toLowerCase().trim() || '';
-        if (authData.user.user_metadata?.full_name) {
-          studentName = studentName || authData.user.user_metadata.full_name;
-        }
-
-        // Check profile table for full_name
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', authData.user.id)
-          .maybeSingle();
-
-        if (profile?.full_name) {
-          studentName = profile.full_name;
-        }
-      }
-    } catch (authErr) {
-      console.warn('Auth session check skipped or failed in student certificates GET:', authErr);
+    const studentEmail = normalizeEmail(auth.user.email);
+    if (!studentEmail) {
+      return NextResponse.json(
+        { success: false, error: 'الحساب لا يحتوي على بريد إلكتروني موثق' },
+        { status: 400 },
+      );
     }
 
-    if (!studentName && !studentEmail) {
+    let studentName = auth.user.user_metadata?.full_name || '';
+    const { data: profile } = await auth.supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', auth.user.id)
+      .maybeSingle();
+
+    if (profile?.full_name) {
+      studentName = profile.full_name;
+    }
+
+    if (!studentName) {
       studentName = 'المتدرب';
     }
 
@@ -53,76 +49,80 @@ export async function GET(req: NextRequest) {
     const allIssued = getAllIssuedCertificates();
 
     // 2. Check for completed enrollments to auto-issue any pending certificates
-    if (studentEmail) {
-      try {
-        const { data: enrollments } = await adminSupabase
+    try {
+      const [enrollmentsByUser, enrollmentsByEmail] = await Promise.all([
+        adminSupabase
           .from('enrollments')
           .select('*')
-          .eq('email', studentEmail);
+          .eq('user_id', auth.user.id),
+        adminSupabase
+          .from('enrollments')
+          .select('*')
+          .eq('email', studentEmail),
+      ]);
 
-        if (enrollments && enrollments.length > 0) {
-          for (const enroll of enrollments) {
-            const isFinished = (enroll.progress && Number(enroll.progress) >= 100) || enroll.status === 'completed';
-            if (isFinished) {
-              const courseTitle = enroll.course_title || enroll.course_id || 'دورة تدريبية معتمدة';
-              
-              // Check if already issued for this student & course
-              const alreadyIssued = allIssued.some(
-                (c) =>
-                  (c.studentEmail?.toLowerCase() === studentEmail || c.studentName === studentName) &&
-                  (c.courseTitle.toLowerCase().trim() === courseTitle.toLowerCase().trim() ||
-                   c.courseTitle.includes(courseTitle) ||
-                   courseTitle.includes(c.courseTitle))
-              );
+      if (enrollmentsByUser.error || enrollmentsByEmail.error) {
+        throw enrollmentsByUser.error || enrollmentsByEmail.error;
+      }
 
-              if (!alreadyIssued) {
-                // Find best matching template
-                const matchedTemplate =
-                  allTemplates.find(
-                    (t) =>
-                      t.courseTitle.toLowerCase().trim() === courseTitle.toLowerCase().trim() ||
-                      courseTitle.toLowerCase().includes(t.courseTitle.toLowerCase()) ||
-                      t.courseTitle.toLowerCase().includes(courseTitle.toLowerCase())
-                  ) ||
-                  allTemplates.find((t) => t.autoIssue) ||
-                  allTemplates[0];
+      const enrollments = [...new Map(
+        [...(enrollmentsByUser.data || []), ...(enrollmentsByEmail.data || [])]
+          .map((enrollment) => [enrollment.id, enrollment]),
+      ).values()];
 
-                issueCertificate({
-                  studentName: studentName || 'المتدرب المتميز',
-                  studentEmail: studentEmail,
-                  courseTitle: courseTitle,
-                  templateId: matchedTemplate ? matchedTemplate.id : 'tpl-1',
-                  grade: 'ممتاز مرتفع (%98)',
-                  hours: '30 ساعة تدريبية',
-                  imageUrl: matchedTemplate?.imageUrl || '/1.png',
-                });
-              }
+      const issuedCourseTitles = new Set(
+        allIssued
+          .filter((certificate) => normalizeEmail(certificate.studentEmail) === studentEmail)
+          .map((certificate) => normalizeCourseTitle(certificate.courseTitle)),
+      );
+
+      if (enrollments.length > 0) {
+        for (const enroll of enrollments) {
+          const isFinished = (enroll.progress && Number(enroll.progress) >= 100) || enroll.status === 'completed';
+          if (isFinished) {
+            const courseTitle = enroll.course_title || enroll.course_id || 'دورة تدريبية معتمدة';
+            const normalizedCourseTitle = normalizeCourseTitle(courseTitle);
+            const alreadyIssued = issuedCourseTitles.has(normalizedCourseTitle);
+
+            if (!alreadyIssued) {
+              // Find best matching template
+              const matchedTemplate =
+                allTemplates.find(
+                  (t) =>
+                    t.courseTitle.toLowerCase().trim() === courseTitle.toLowerCase().trim() ||
+                    courseTitle.toLowerCase().includes(t.courseTitle.toLowerCase()) ||
+                    t.courseTitle.toLowerCase().includes(courseTitle.toLowerCase())
+                ) ||
+                allTemplates.find((t) => t.autoIssue) ||
+                allTemplates[0];
+
+              const issuedCertificate = issueCertificate({
+                studentName: studentName || 'المتدرب المتميز',
+                studentEmail,
+                courseTitle,
+                templateId: matchedTemplate ? matchedTemplate.id : 'tpl-1',
+                grade: 'ممتاز مرتفع (%98)',
+                hours: '30 ساعة تدريبية',
+                imageUrl: matchedTemplate?.imageUrl || '/1.png',
+              });
+              issuedCourseTitles.add(normalizeCourseTitle(issuedCertificate.courseTitle));
             }
           }
         }
-      } catch (enrollErr) {
-        console.error('Error checking enrollments for auto certificate issuance:', enrollErr);
       }
+    } catch (enrollErr) {
+      console.error('Error checking enrollments for auto certificate issuance:', enrollErr);
     }
 
     // 3. Refresh issued list from store after potential auto-issue
     const freshIssued = getAllIssuedCertificates();
 
     // 4. Filter certificates for this student
-    let userCertificates = freshIssued.filter((cert) => {
-      if (studentEmail && cert.studentEmail?.toLowerCase().trim() === studentEmail) {
-        return true;
-      }
-      if (studentName && cert.studentName && (cert.studentName === studentName || cert.studentName.includes(studentName) || studentName.includes(cert.studentName))) {
-        return true;
-      }
-      return false;
-    });
-
-    // If user has no specific issued certs and no user was logged in, return all active ones for demonstration / preview
-    if (userCertificates.length === 0 && (!studentEmail || studentEmail === '')) {
-      userCertificates = freshIssued.filter((c) => c.status === 'active');
-    }
+    // Certificate ownership is based exclusively on the authenticated account.
+    // Never fall back to a profile name because students can edit their names.
+    const userCertificates = freshIssued.filter(
+      (certificate) => normalizeEmail(certificate.studentEmail) === studentEmail,
+    );
 
     // 5. Enrich certificates with full template configuration
     const enrichedCertificates = userCertificates.map((cert) => {
@@ -141,8 +141,9 @@ export async function GET(req: NextRequest) {
       certificates: enrichedCertificates,
       templates: allTemplates,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error in student certificates GET route:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'تعذر تحميل الشهادات';
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

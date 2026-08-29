@@ -122,8 +122,7 @@ export default function CorporatePage() {
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="mb-6"
               >
-                <span className="inline-flex items-center gap-2.5 text-[#5CB07C] text-xs sm:text-sm font-bold tracking-wide bg-white/80 shadow-[0_4px_15px_-3px_rgba(92,176,124,0.15)] border border-[#5CB07C]/10 px-5 py-2 rounded-full backdrop-blur-md">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#5CB07C] shadow-[0_0_8px_rgba(92,176,124,0.6)] animate-pulse" />
+                <span className="section-badge-glass">
                   حلول الشركات والمؤسسات
                 </span>
               </motion.div>
@@ -145,7 +144,7 @@ export default function CorporatePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
-                className="text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl font-black text-slate-900 mb-5 leading-[1.2] drop-shadow-sm tracking-tight"
+                className="section-main-title-premium text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl mb-5"
               >
                 طوّر <span className="gradient-text">فريقك</span> مع أحدث
                 <br className="hidden sm:block" />
@@ -165,7 +164,7 @@ export default function CorporatePage() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.5 }}
-                className="text-slate-600 max-w-xl mx-auto mb-8 text-sm sm:text-base lg:text-lg leading-[1.8] font-medium"
+                className="section-desc-premium max-w-xl mx-auto mb-8 text-sm sm:text-base lg:text-lg"
               >
                 نقدم أكثر من <span className="text-[#173A7C] font-bold">70</span> برنامج تدريبي متخصص يهدف إلى رفع كفاءة فريق العمل في مختلف المجالات الإدارية، التقنية، وتطوير الذات.
               </motion.p>
@@ -210,7 +209,7 @@ export default function CorporatePage() {
                     <div className="w-10 h-10 shrink-0 rounded-xl bg-white/80 flex items-center justify-center shadow-sm border border-white/90 backdrop-blur-md group-hover:scale-110 transition-transform duration-500">
                       <Icon className="w-5 h-5 text-[#173A7C]" strokeWidth={1.8} />
                     </div>
-                    <span className="text-lg sm:text-2xl font-black text-slate-900 leading-tight drop-shadow-sm tabular-nums">
+                    <span className="hero-stat-number text-lg sm:text-2xl text-slate-900 leading-tight drop-shadow-sm tabular-nums">
                       <AnimatedCounter end={stat.value} suffix={stat.suffix} />
                     </span>
                     <span className="text-[9px] sm:text-[11px] text-slate-500 font-bold tracking-wide">{stat.label}</span>
@@ -243,12 +242,12 @@ export default function CorporatePage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <span className="inline-flex items-center gap-2 text-[#173A7C] text-sm font-bold tracking-wider uppercase bg-[#173A7C]/[0.06] px-5 py-2 rounded-full mb-4">
-              <BookOpen className="w-4 h-4 text-[#5CB07C]" />
+            <span className="section-badge-glass mb-4">
+              <BookOpen className="w-4 h-4 text-[#5CB07C] ml-1 inline" />
               كتالوج الدورات
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
-              اكتشف <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">دوراتنا</span> التدريبية
+            <h2 className="section-main-title-premium text-3xl sm:text-4xl">
+              اكتشف <span className="gradient-text">دوراتنا</span> التدريبية
             </h2>
           </motion.div>
 
@@ -285,36 +284,71 @@ export default function CorporatePage() {
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             
             {/* Sidebar Filters — Desktop */}
-            <aside className="hidden lg:block w-72 shrink-0 sticky top-28 self-start">
-              <div className="bg-white rounded-[1.75rem] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-7">
-                <h3 className="text-lg font-black text-[#173A7C] mb-6 flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-[#173A7C]/[0.06] flex items-center justify-center">
-                    <SlidersHorizontal className="w-4 h-4 text-[#173A7C]" />
+            <aside className="courses-filter-sidebar hidden lg:block w-80 shrink-0 sticky top-28 self-start">
+              <div className="courses-filter-panel rounded-[2rem] p-5 xl:p-6 min-h-[calc(100vh-9rem)] flex flex-col justify-between">
+                <div className="relative z-10 flex-1 flex flex-col">
+                  {/* Header */}
+                  <div className="flex items-center justify-between gap-3 pb-4 mb-4 border-b border-[#173A7C]/10">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#2459A7] text-white flex items-center justify-center shadow-lg shadow-[#173A7C]/20 shrink-0">
+                        <SlidersHorizontal className="w-5 h-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <h2 className="card-title-royal-blue text-lg leading-tight">تصنيفات الدورات</h2>
+                        <p className="text-[11px] font-semibold text-slate-500 mt-0.5">{filtered.length} دورة متاحة</p>
+                      </div>
+                    </div>
+                    {category !== "all" && (
+                      <button
+                        onClick={() => setCategory("all")}
+                        className="text-[11px] font-bold text-[#173A7C] hover:text-[#0D8A5E] transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-[#173A7C]/5"
+                      >
+                        إعادة الضبط
+                      </button>
+                    )}
                   </div>
-                  تصنيفات الدورات
-                </h3>
-                <div className="space-y-2">
-                  {corporateCategories.map((cat) => (
-                    <button
-                      key={cat.key}
-                      onClick={() => setCategory(cat.key)}
-                      className={`w-full text-right px-5 py-3.5 rounded-2xl text-[14px] font-bold transition-all duration-300 cursor-pointer flex justify-between items-center group ${
-                        category === cat.key
-                          ? "bg-gradient-to-l from-[#173A7C] to-[#1E4D9D] text-white shadow-lg shadow-[#173A7C]/20 scale-[1.02]"
-                          : "text-slate-600 hover:text-[#173A7C] hover:bg-[#173A7C]/[0.04]"
-                      }`}
-                    >
-                      <span>{cat.label}</span>
-                      {category === cat.key && <span className="w-2 h-2 rounded-full bg-[#5CB07C] shadow-[0_0_8px_rgba(92,176,124,0.8)]" />}
-                    </button>
-                  ))}
+
+                  {/* Categories */}
+                  <div className="mb-5">
+                    <h3 className="card-title-royal-blue text-sm font-bold mb-2.5 px-1 flex items-center justify-between">
+                      <span>مجال التدريب المؤسسي</span>
+                      <span className="text-[10px] text-slate-400 font-normal">{corporateCategories.length - 1} مسارات</span>
+                    </h3>
+                    <div className="premium-tabs space-y-2">
+                      {corporateCategories.map((cat) => (
+                        <button
+                          key={cat.key}
+                          onClick={() => setCategory(cat.key)}
+                          aria-pressed={category === cat.key}
+                          className={`premium-tab course-filter-tab w-full text-right rounded-2xl transition-all duration-300 cursor-pointer flex justify-between items-center group ${
+                            category === cat.key
+                              ? "bg-gradient-to-l from-[#173A7C] via-[#2459A7] to-[#1E4D9D] text-white shadow-lg shadow-[#173A7C]/25 border-[#173A7C]/70"
+                              : "text-slate-600 hover:text-[#173A7C]"
+                          }`}
+                        >
+                          <span className="premium-tab-label line-clamp-1">{cat.label}</span>
+                          {category === cat.key && <span className="w-2 h-2 rounded-full bg-[#5CB07C] shadow-[0_0_8px_rgba(92,176,124,0.8)] shrink-0 mr-2" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Quick Stats in Sidebar */}
-                <div className="mt-8 pt-6 border-t border-slate-100">
-                  <div className="bg-gradient-to-br from-[#173A7C]/[0.04] to-[#5CB07C]/[0.04] rounded-2xl p-5 text-center">
-                    <div className="text-3xl font-black text-[#173A7C] mb-1">76+</div>
-                    <div className="text-xs font-bold text-slate-500">دورة تدريبية متاحة</div>
+                {/* Bottom Corporate Consultation Box */}
+                <div className="relative z-10 pt-4 mt-4 border-t border-[#173A7C]/10">
+                  <div className="bg-gradient-to-br from-[#173A7C]/[0.06] via-[#5CB07C]/[0.06] to-white rounded-2xl p-4 border border-[#173A7C]/10 text-center relative overflow-hidden group hover:border-[#173A7C]/20 transition-all shadow-sm">
+                    <div className="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br from-[#173A7C] to-[#5CB07C] text-white flex items-center justify-center mb-2.5 shadow-md shadow-[#173A7C]/20 group-hover:scale-105 transition-transform">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <h4 className="text-xs font-black text-[#173A7C] mb-1">تدريب مخصص لشركتك؟</h4>
+                    <p className="text-[11px] text-slate-500 mb-3 leading-relaxed">نصمم حقائب وبرامج تدريبية مخصصة لاحتياجات منشأتك بأسعار منافسة</p>
+                    <a
+                      href="/contact"
+                      className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-bold hover:shadow-md hover:shadow-[#173A7C]/20 transition-all"
+                    >
+                      <span>طلب عرض تدريب شركات</span>
+                      <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+                    </a>
                   </div>
                 </div>
               </div>
@@ -335,29 +369,36 @@ export default function CorporatePage() {
                     animate={{ y: 0 }}
                     exit={{ y: "100%" }}
                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="absolute bottom-0 inset-x-0 bg-white border-t border-slate-200 rounded-t-[2.5rem] p-7 md:p-10 max-h-[85vh] overflow-y-auto shadow-2xl"
+                    className="absolute bottom-0 inset-x-0 bg-white border-t border-slate-200 rounded-t-[2.5rem] p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl"
                   >
-                    <div className="flex items-center justify-between mb-8 sticky top-0 bg-white pt-2 pb-4 z-10">
-                      <h3 className="text-2xl font-black text-[#173A7C]">تصفية الدورات</h3>
-                      <button onClick={() => setFiltersOpen(false)} aria-label="إغلاق الفلاتر" className="text-slate-400 hover:text-red-500 cursor-pointer p-3 bg-slate-50 hover:bg-red-50 rounded-full transition-colors">
-                        <X className="w-6 h-6" />
+                    <div className="flex items-center justify-between mb-6 sticky top-0 bg-white pt-1 pb-3 z-10 border-b border-slate-100">
+                      <h3 className="card-title-royal-blue text-xl">تصفية برامج الشركات</h3>
+                      <button onClick={() => setFiltersOpen(false)} aria-label="إغلاق الفلاتر" className="text-slate-400 hover:text-red-500 cursor-pointer p-2 bg-slate-50 hover:bg-red-50 rounded-full transition-colors">
+                        <X className="w-5 h-5" />
                       </button>
                     </div>
 
-                    <h4 className="text-lg font-bold text-slate-900 mb-5">التصنيفات</h4>
-                    <div className="flex flex-col gap-3 pb-8">
+                    <h4 className="card-title-royal-blue text-base mb-3">مجال التدريب</h4>
+                    <div className="premium-tabs flex flex-wrap gap-2 mb-6">
                       {corporateCategories.map((cat) => (
                         <button
                           key={cat.key}
-                          onClick={() => { setCategory(cat.key); setFiltersOpen(false); }}
-                          className={`px-6 py-4 rounded-2xl text-base font-bold transition-all cursor-pointer text-right flex justify-between items-center ${
-                            category === cat.key ? "bg-gradient-to-l from-[#173A7C] to-[#1E4D9D] text-white shadow-lg shadow-[#173A7C]/20" : "bg-slate-50 text-slate-700 border border-slate-100 hover:bg-slate-100"
+                          onClick={() => { setCategory(cat.key); }}
+                          className={`premium-tab px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm border ${
+                            category === cat.key ? "bg-[#173A7C] text-white border-[#173A7C]" : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                           }`}
                         >
-                           {cat.label}
+                          <span className="premium-tab-label">{cat.label}</span>
                         </button>
                       ))}
                     </div>
+
+                    <button
+                      onClick={() => setFiltersOpen(false)}
+                      className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white font-bold text-sm shadow-lg shadow-[#173A7C]/20"
+                    >
+                      عرض النتائج ({filtered.length})
+                    </button>
                   </motion.div>
                 </motion.div>
               )}
@@ -373,8 +414,8 @@ export default function CorporatePage() {
                   <div className="w-24 h-24 bg-gradient-to-br from-[#173A7C]/5 to-[#5CB07C]/5 rounded-full flex items-center justify-center mb-6">
                     <Search className="w-12 h-12 text-[#173A7C]/30" />
                   </div>
-                  <h3 className="text-2xl font-black text-slate-800 mb-3">لا توجد دورات مطابقة</h3>
-                  <p className="text-slate-500 text-lg font-medium max-w-md">لم نتمكن من العثور على دورات تطابق بحثك الحالي، يرجى المحاولة بكلمات أخرى.</p>
+                  <h3 className="card-title-royal-blue text-2xl mb-3">لا توجد دورات مطابقة</h3>
+                  <p className="section-desc-premium text-lg max-w-md">لم نتمكن من العثور على دورات تطابق بحثك الحالي، يرجى المحاولة بكلمات أخرى.</p>
                   <button 
                     onClick={() => { setSearch(""); setCategory("all"); }}
                     className="mt-8 px-8 py-3 bg-slate-100 text-[#173A7C] font-bold rounded-full hover:bg-slate-200 transition-colors cursor-pointer"
@@ -441,15 +482,15 @@ export default function CorporatePage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-flex items-center gap-2 text-[#173A7C] text-sm font-bold tracking-wider uppercase bg-[#173A7C]/[0.06] px-5 py-2 rounded-full mb-4">
-              <Zap className="w-4 h-4 text-[#5CB07C]" />
+            <span className="section-badge-glass mb-4">
+              <Zap className="w-4 h-4 text-[#5CB07C] ml-1 inline" />
               مزايا الشراكة
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mt-3">
+            <h2 className="section-main-title-premium text-3xl sm:text-4xl lg:text-5xl mt-3">
               لماذا تختار{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">تدريبنا</span>؟
+              <span className="gradient-text">تدريبنا</span>؟
             </h2>
-            <p className="text-slate-500 mt-4 max-w-xl mx-auto text-lg font-medium leading-relaxed">
+            <p className="section-desc-premium mt-4 max-w-xl mx-auto text-lg leading-relaxed">
               نوفر لك تجربة تدريبية متكاملة مصممة لتحقيق أقصى عائد على استثمارك في تطوير الكوادر.
             </p>
           </motion.div>
@@ -472,8 +513,8 @@ export default function CorporatePage() {
                       <Icon className="w-8 h-8 text-[#173A7C] group-hover:text-[#5CB07C] transition-colors duration-500" strokeWidth={1.8} />
                     </div>
 
-                    <h3 className="font-black text-xl text-slate-900 mb-3">{b.title}</h3>
-                    <p className="text-[15px] font-medium text-slate-500 leading-[1.8]">{b.desc}</p>
+                    <h3 className="card-title-royal-blue text-xl mb-3">{b.title}</h3>
+                    <p className="card-desc-premium text-[15px]">{b.desc}</p>
 
                     {/* Bottom accent line */}
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-1/2 h-[3px] bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-t-full transition-all duration-500" />
@@ -507,15 +548,15 @@ export default function CorporatePage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-flex items-center gap-2 text-[#173A7C] text-sm font-bold tracking-wider uppercase bg-[#173A7C]/[0.06] px-5 py-2 rounded-full mb-4">
-              <Rocket className="w-4 h-4 text-[#5CB07C]" />
+            <span className="section-badge-glass mb-4">
+              <Rocket className="w-4 h-4 text-[#5CB07C] ml-1 inline" />
               آلية العمل
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mt-3">
+            <h2 className="section-main-title-premium text-3xl sm:text-4xl lg:text-5xl mt-3">
               كيف{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">نعمل</span>؟
+              <span className="gradient-text">نعمل</span>؟
             </h2>
-            <p className="text-slate-500 mt-4 max-w-lg mx-auto text-lg font-medium">
+            <p className="section-desc-premium mt-4 max-w-lg mx-auto text-lg">
               أربع خطوات بسيطة لتحويل أداء فريقك
             </p>
           </motion.div>
@@ -548,8 +589,8 @@ export default function CorporatePage() {
                     </div>
 
                     {/* Content */}
-                    <h3 className="relative z-10 text-lg font-black text-slate-900 mb-3">{s.title}</h3>
-                    <p className="relative z-10 text-sm font-medium text-slate-500 leading-[1.8]">{s.desc}</p>
+                    <h3 className="card-title-royal-blue relative z-10 text-lg mb-3">{s.title}</h3>
+                    <p className="card-desc-premium relative z-10 text-sm">{s.desc}</p>
 
                     {/* Bottom accent line */}
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-1/2 h-[3px] bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-t-full transition-all duration-500" />
@@ -587,7 +628,7 @@ export default function CorporatePage() {
             className="text-center mb-12"
           >
             <span className="text-slate-400 text-sm font-bold tracking-wider uppercase">يثقون بنا</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">شركاء <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">النجاح</span></h3>
+            <h3 className="section-main-title-premium text-2xl sm:text-3xl mt-2">شركاء <span className="gradient-text">النجاح</span></h3>
           </motion.div>
 
           {/* Marquee */}
@@ -624,14 +665,14 @@ export default function CorporatePage() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <span className="inline-flex items-center gap-2 text-[#173A7C] text-sm font-bold tracking-wider uppercase bg-[#173A7C]/[0.06] px-5 py-2 rounded-full mb-4">
-              <Send className="w-4 h-4 text-[#5CB07C]" />
+            <span className="section-badge-glass mb-4">
+              <Send className="w-4 h-4 text-[#5CB07C] ml-1 inline" />
               تواصل معنا
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-3">
+            <h2 className="section-main-title-premium text-3xl sm:text-4xl mt-3">
               تواصل معنا للشكاوى والاقتراحات
             </h2>
-            <p className="text-slate-500 mt-3 text-base font-medium">(سيتم الرد عليكم في خلال 24 ساعة)</p>
+            <p className="section-desc-premium mt-3 text-base">(سيتم الرد عليكم في خلال 24 ساعة)</p>
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -671,7 +712,7 @@ export default function CorporatePage() {
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2" />
                 
                 <div className="relative z-10">
-                  <h3 className="text-2xl font-black mb-3">تواصل معنا</h3>
+                  <h3 className="card-title-royal-blue text-2xl mb-3 text-white">تواصل معنا</h3>
                   <p className="text-white/60 text-sm font-medium mb-8 leading-relaxed">نسعد بتواصلكم ونحرص على الرد في أسرع وقت ممكن</p>
 
                   <div className="space-y-5">
@@ -763,7 +804,7 @@ export default function CorporatePage() {
                 <Headphones className="w-10 h-10 text-[#173A7C]" strokeWidth={1.5} />
               </div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-[3.25rem] font-black text-slate-900 mb-6 leading-[1.15] tracking-tight">
+              <h2 className="section-main-title-premium text-3xl sm:text-4xl lg:text-[3.25rem] mb-6">
                 هل أنت مستعد لتطوير
                 <br className="hidden sm:block" />
                 <span className="gradient-text">فريقك</span>؟
@@ -777,7 +818,7 @@ export default function CorporatePage() {
                 className="w-20 h-[2px] mx-auto bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full mb-6"
               />
 
-              <p className="text-slate-500 mb-12 text-lg lg:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
+              <p className="section-desc-premium mb-12 text-lg lg:text-xl max-w-2xl mx-auto">
                 تواصل معنا اليوم واحصل على عرض مخصص لمؤسستك يتناسب مع احتياجاتك الخاصة وميزانيتك.
               </p>
               

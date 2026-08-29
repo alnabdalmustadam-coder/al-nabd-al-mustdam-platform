@@ -21,6 +21,7 @@ const policiesAndGuides = [
 
 const supportLinks = [
   { label: "من نحن", href: "/about" },
+  { label: "المدونة الأكاديمية", href: "/blog" },
   { label: "قنوات الدعم الفني", href: "/support-channels" },
   { label: "رفع الشكاوى والمقترحات", href: "/complaints" },
   { label: "سياسة الحضور", href: "/attendance-policy" },

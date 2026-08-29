@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/security/auth";
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
@@ -13,16 +13,11 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, userId, fullName, phone, nationalId, professionalId } = await req.json();
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
 
-    // Support both email and userId as identifiers
-    const identifier = email || userId;
-    if (!identifier) {
-      return NextResponse.json(
-        { message: "البريد الإلكتروني أو معرّف المستخدم مطلوب" },
-        { status: 400, headers: CORS }
-      );
-    }
+    const { fullName, phone, nationalId, professionalId } = await req.json();
+    const userId = auth.user.id;
 
     if (nationalId && !/^[124]\d{9}$/.test(nationalId)) {
       return NextResponse.json(
@@ -31,15 +26,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Determine which field to match on
-    const matchField = email ? "email" : "id";
-    const matchValue = email ? email.toLowerCase().trim() : userId;
-
     // Check if profile exists
     const { data: existingProfile } = await supabase
       .from("profiles")
       .select("id, ghl_contact_id")
-      .eq(matchField, matchValue)
+      .eq('id', userId)
       .maybeSingle();
 
     let result;
@@ -55,26 +46,19 @@ export async function POST(req: NextRequest) {
           professional_id: professionalId || null,
           nelc_eligible: !!nationalId,
         })
-        .eq(matchField, matchValue);
-    } else if (email) {
-      // Create new profile if searching by email
-      const crypto = await import("crypto");
+        .eq('id', userId);
+    } else {
       result = await supabase
         .from("profiles")
         .insert({
-          id: crypto.randomUUID(),
-          email: email.toLowerCase().trim(),
+          id: userId,
+          email: auth.user.email?.toLowerCase().trim(),
           full_name: fullName || null,
           phone: phone || null,
           national_id: nationalId || null,
           professional_id: professionalId || null,
           nelc_eligible: !!nationalId,
         });
-    } else {
-      return NextResponse.json(
-        { message: "البروفايل غير موجود" },
-        { status: 404, headers: CORS }
-      );
     }
 
     if (result?.error) {

@@ -1,138 +1,104 @@
-import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-import { getCourseBySlug, courses } from "@/data/courses";
+import { NextResponse } from 'next/server';
+import { requireUser } from '@/lib/security/auth';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { getCourseBySlugAsync } from '@/lib/courses-store';
 
-export async function POST(req: NextRequest) {
+type EnrollmentRow = {
+  id: string;
+  course_id: string;
+  status: string | null;
+};
+
+function uniqueById<T extends { id: string }>(rows: T[]): T[] {
+  return [...new Map(rows.map((row) => [row.id, row])).values()];
+}
+
+export async function POST(request: Request) {
+  const auth = await requireUser(request);
+  if (!auth.ok) return auth.response;
+
   try {
-    const { email, courseSlug, progress, courseTitle } = await req.json();
+    const body = await request.json();
+    const courseSlug = typeof body.courseSlug === 'string'
+      ? body.courseSlug.replace(/^course-/, '').trim()
+      : '';
 
-    if (!email || (!courseSlug && !courseTitle)) {
-      return NextResponse.json(
-        { success: false, error: "البريد الإلكتروني ومعرف الدورة مطلوبان" },
-        { status: 400 }
-      );
+    if (!/^[a-zA-Z0-9_-]{1,120}$/.test(courseSlug)) {
+      return NextResponse.json({ success: false, error: 'معرف الدورة غير صالح' }, { status: 400 });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-    const cleanSlug = (courseSlug || "").replace(/^course-/, "").trim();
-    const matchedCourse = getCourseBySlug(cleanSlug) || getCourseBySlug(courseSlug) || (courseTitle ? courses.find(c => c.title === courseTitle) : undefined);
-    
-    const progressVal = Math.min(100, Math.max(0, Number(progress) || 0));
-    const isCompleted = progressVal >= 100;
-
-    // Collect all possible course identifier variants
-    const matchIds = new Set<string>();
-    if (courseSlug) {
-      matchIds.add(courseSlug);
-      matchIds.add(`course-${cleanSlug}`);
-      matchIds.add(cleanSlug);
-    }
-    if (matchedCourse) {
-      matchIds.add(matchedCourse.slug);
-      matchIds.add(`course-${matchedCourse.slug}`);
-      if (matchedCourse.ghlCourseId) {
-        matchIds.add(matchedCourse.ghlCourseId);
-        matchIds.add(matchedCourse.ghlCourseId.replace(/^course-/, ""));
-      }
+    const course = await getCourseBySlugAsync(courseSlug);
+    if (!course) {
+      return NextResponse.json({ success: false, error: 'الدورة غير موجودة' }, { status: 404 });
     }
 
-    const orClauses = Array.from(matchIds).filter(Boolean).map(id => `course_id.eq.${id}`);
-    if (matchedCourse?.title) {
-      orClauses.push(`course_title.eq.${matchedCourse.title}`);
-    }
-    if (courseTitle) {
-      orClauses.push(`course_title.eq.${courseTitle}`);
+    const progressValue = Number(body.progress);
+    if (!Number.isFinite(progressValue) || progressValue < 0 || progressValue > 100) {
+      return NextResponse.json({ success: false, error: 'قيمة التقدم غير صالحة' }, { status: 400 });
     }
 
-    const orString = orClauses.join(",");
-
-    // Update any enrollment matching the email and courseSlug/title variants
-    const { data, error } = await supabase
-      .from("enrollments")
-      .update({
-        progress: progressVal,
-        status: isCompleted ? "completed" : "active",
-        completed_at: isCompleted ? new Date().toISOString() : null,
-      })
-      .eq("email", normalizedEmail)
-      .or(orString)
-      .select();
-
-    if (error) {
-      console.error("Supabase enrollment update error:", error);
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    const email = auth.user.email?.trim().toLowerCase();
+    if (!email) {
+      return NextResponse.json({ success: false, error: 'الحساب لا يحتوي على بريد إلكتروني' }, { status: 400 });
     }
 
-    // Auto-issue certificate if course is completed
-    let issuedCert = null;
-    if (isCompleted) {
-      try {
-        const { getAllIssuedCertificates, getAllTemplates, issueCertificate } = await import('@/lib/certificates-store');
-        const finalTitle = matchedCourse?.title || courseTitle || "دورة تدريبية معتمدة";
-        const allIssued = getAllIssuedCertificates();
-        const allTemplates = getAllTemplates();
+    const identifiers = [...new Set([
+      courseSlug,
+      course.slug,
+      `course-${courseSlug}`,
+      `course-${course.slug}`,
+      course.ghlCourseId,
+      course.ghlCourseId?.replace(/^course-/, ''),
+      String(course.id),
+    ].filter((value): value is string => Boolean(value)))];
 
-        const alreadyIssued = allIssued.some(
-          c =>
-            c.studentEmail?.toLowerCase() === normalizedEmail &&
-            (c.courseTitle.toLowerCase().trim() === finalTitle.toLowerCase().trim() ||
-             c.courseTitle.includes(finalTitle) ||
-             finalTitle.includes(c.courseTitle))
-        );
+    const admin = getSupabaseAdmin();
+    const [byUser, byEmail] = await Promise.all([
+      admin
+        .from('enrollments')
+        .select('id, course_id, status')
+        .eq('user_id', auth.user.id)
+        .in('course_id', identifiers),
+      admin
+        .from('enrollments')
+        .select('id, course_id, status')
+        .eq('email', email)
+        .in('course_id', identifiers),
+    ]);
 
-        if (!alreadyIssued) {
-          // Look up student name from profiles or user metadata
-          let resolvedStudentName = 'المتدرب المتميز';
-          try {
-            const { data: prof } = await supabase
-              .from('profiles')
-              .select('full_name')
-              .eq('email', normalizedEmail)
-              .maybeSingle();
-            if (prof?.full_name) {
-              resolvedStudentName = prof.full_name;
-            }
-          } catch (pErr) {
-            console.warn('Profile fetch error during auto-issue:', pErr);
-          }
+    if (byUser.error || byEmail.error) throw byUser.error || byEmail.error;
 
-          const matchedTpl =
-            allTemplates.find(
-              t =>
-                t.courseTitle.toLowerCase().trim() === finalTitle.toLowerCase().trim() ||
-                finalTitle.toLowerCase().includes(t.courseTitle.toLowerCase()) ||
-                t.courseTitle.toLowerCase().includes(finalTitle.toLowerCase())
-            ) ||
-            allTemplates.find(t => t.autoIssue) ||
-            allTemplates[0];
+    const enrollments = uniqueById([
+      ...((byUser.data || []) as EnrollmentRow[]),
+      ...((byEmail.data || []) as EnrollmentRow[]),
+    ]).filter(
+      (row) => !['REVOKED', 'CANCELLED', 'CANCELED'].includes(String(row.status || '').toUpperCase()),
+    );
 
-          issuedCert = issueCertificate({
-            studentName: resolvedStudentName,
-            studentEmail: normalizedEmail,
-            courseTitle: finalTitle,
-            templateId: matchedTpl ? matchedTpl.id : 'tpl-1',
-            grade: 'ممتاز مرتفع (%98)',
-            hours: '30 ساعة تدريبية معتمدة',
-            imageUrl: matchedTpl?.imageUrl || '/1.png',
-          });
-        }
-      } catch (certErr) {
-        console.error('Error auto-issuing certificate on course completion:', certErr);
-      }
+    if (enrollments.length === 0) {
+      return NextResponse.json({ success: false, error: 'غير مسجل في هذه الدورة' }, { status: 403 });
     }
+
+    // The current UI progress is client telemetry. Keep it below the completion
+    // threshold so it can never issue a certificate or grant an academic result.
+    // Final completion will be enabled with the future server-graded assessment.
+    const safeProgress = Math.min(99, Math.round(progressValue));
+    const { data, error } = await admin
+      .from('enrollments')
+      .update({ progress: safeProgress, status: 'active', completed_at: null })
+      .in('id', enrollments.map((row) => row.id))
+      .select('id, course_id, progress, status');
+
+    if (error) throw error;
 
     return NextResponse.json({
       success: true,
       updatedCount: data?.length || 0,
-      progress: progressVal,
-      matchedCourses: data?.map(d => d.course_id) || [],
-      issuedCertificate: issuedCert,
+      progress: safeProgress,
+      completionPendingAssessment: progressValue >= 100,
     });
-  } catch (err: any) {
-    console.error("Error in update-progress route:", err);
-    return NextResponse.json(
-      { success: false, error: err?.message || "Internal server error" },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error('Secure progress update error:', error);
+    return NextResponse.json({ success: false, error: 'تعذر تحديث التقدم' }, { status: 500 });
   }
 }

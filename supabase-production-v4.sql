@@ -187,10 +187,9 @@ BEGIN
     NEW.id,
     LOWER(TRIM(NEW.email)),
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'مستخدم جديد'),
-    CASE 
-      WHEN NEW.raw_user_meta_data->>'role' IN ('ADMIN', 'INSTRUCTOR', 'STUDENT') THEN NEW.raw_user_meta_data->>'role'
-      WHEN NEW.raw_user_meta_data->>'role' IN ('TRAINER', 'TEACHER') THEN 'INSTRUCTOR'
-      WHEN NEW.raw_user_meta_data->>'role' = 'SUPER_ADMIN' THEN 'ADMIN'
+    CASE
+      WHEN UPPER(NEW.raw_app_meta_data->>'role') IN ('ADMIN', 'SUPERADMIN', 'SUPER_ADMIN') THEN 'ADMIN'
+      WHEN UPPER(NEW.raw_app_meta_data->>'role') IN ('INSTRUCTOR', 'TRAINER', 'TEACHER') THEN 'INSTRUCTOR'
       ELSE 'STUDENT'
     END,
     NEW.raw_user_meta_data->>'phone',
@@ -229,12 +228,9 @@ CREATE INDEX IF NOT EXISTS idx_orders_user ON public.orders(user_id);
 -- Security Helper Function
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.profiles 
-    WHERE (id = auth.uid() OR email = (auth.jwt() ->> 'email'))
-    AND role = 'ADMIN'
-  );
-$$ LANGUAGE sql SECURITY DEFINER STABLE;
+  SELECT UPPER(COALESCE(auth.jwt() -> 'app_metadata' ->> 'role', ''))
+    IN ('ADMIN', 'SUPERADMIN', 'SUPER_ADMIN');
+$$ LANGUAGE sql STABLE SET search_path = public;
 
 -- Enable RLS on all tables
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
@@ -252,61 +248,114 @@ ALTER TABLE public.ticket_replies ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users view own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users update own profile" ON public.profiles;
 CREATE POLICY "Users view own profile" ON public.profiles FOR SELECT USING (
-  id = auth.uid() OR email = (auth.jwt() ->> 'email') OR public.is_admin()
+  id = auth.uid() OR public.is_admin()
 );
 CREATE POLICY "Users update own profile" ON public.profiles FOR UPDATE USING (
-  id = auth.uid() OR email = (auth.jwt() ->> 'email') OR public.is_admin()
-);
+  id = auth.uid() OR public.is_admin()
+) WITH CHECK (id = auth.uid() OR public.is_admin());
 
 -- 5.2 Enrollments
 DROP POLICY IF EXISTS "User views enrollments" ON public.enrollments;
 DROP POLICY IF EXISTS "User creates enrollments" ON public.enrollments;
 DROP POLICY IF EXISTS "Admins manage enrollments" ON public.enrollments;
 CREATE POLICY "User views enrollments" ON public.enrollments FOR SELECT USING (
-  email = (auth.jwt() ->> 'email') OR user_id = auth.uid() OR public.is_admin()
+  user_id = auth.uid()
+  OR (user_id IS NULL AND LOWER(email) = LOWER(auth.jwt() ->> 'email'))
+  OR public.is_admin()
 );
-CREATE POLICY "User creates enrollments" ON public.enrollments FOR INSERT WITH CHECK (
-  email = (auth.jwt() ->> 'email') OR user_id = auth.uid() OR public.is_admin()
-);
-CREATE POLICY "Admins manage enrollments" ON public.enrollments FOR ALL USING (public.is_admin());
+-- Enrollment creation/progress is server-managed so users cannot grant
+-- themselves access to paid or restricted courses.
+CREATE POLICY "Admins manage enrollments" ON public.enrollments FOR ALL
+  USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- 5.3 Wishlists & Cart
 DROP POLICY IF EXISTS "Wishlist access" ON public.wishlists;
 DROP POLICY IF EXISTS "Cart access" ON public.cart_items;
-CREATE POLICY "Wishlist access" ON public.wishlists FOR ALL USING (
-  user_id = auth.uid() OR email = (auth.jwt() ->> 'email') OR public.is_admin()
+CREATE POLICY "Wishlist access" ON public.wishlists FOR SELECT USING (
+  user_id = auth.uid()
+  OR (user_id IS NULL AND LOWER(email) = LOWER(auth.jwt() ->> 'email'))
+  OR public.is_admin()
 );
-CREATE POLICY "Cart access" ON public.cart_items FOR ALL USING (
-  user_id = auth.uid() OR email = (auth.jwt() ->> 'email') OR public.is_admin()
+CREATE POLICY "Cart access" ON public.cart_items FOR SELECT USING (
+  user_id = auth.uid()
+  OR (user_id IS NULL AND LOWER(email) = LOWER(auth.jwt() ->> 'email'))
+  OR public.is_admin()
 );
 
 -- 5.4 Certificates
 DROP POLICY IF EXISTS "Public certificate verification" ON public.certificates;
 DROP POLICY IF EXISTS "Admins manage certificates" ON public.certificates;
-CREATE POLICY "Public certificate verification" ON public.certificates FOR SELECT USING (true);
-CREATE POLICY "Admins manage certificates" ON public.certificates FOR ALL USING (public.is_admin());
+CREATE POLICY "Public certificate verification" ON public.certificates FOR SELECT USING (
+  user_id = auth.uid()
+  OR (user_id IS NULL AND LOWER(email) = LOWER(auth.jwt() ->> 'email'))
+  OR public.is_admin()
+);
+CREATE POLICY "Admins manage certificates" ON public.certificates FOR ALL
+  USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- 5.5 Coupons, Orders & Invoices
 DROP POLICY IF EXISTS "View coupons" ON public.coupons;
 DROP POLICY IF EXISTS "Manage coupons" ON public.coupons;
-CREATE POLICY "View coupons" ON public.coupons FOR SELECT USING (is_active = true OR public.is_admin());
-CREATE POLICY "Manage coupons" ON public.coupons FOR ALL USING (public.is_admin());
+-- Coupon codes must not be enumerable by anonymous clients.
+CREATE POLICY "View coupons" ON public.coupons FOR SELECT USING (public.is_admin());
+CREATE POLICY "Manage coupons" ON public.coupons FOR ALL
+  USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 DROP POLICY IF EXISTS "Orders access" ON public.orders;
 DROP POLICY IF EXISTS "Invoices access" ON public.invoices;
-CREATE POLICY "Orders access" ON public.orders FOR ALL USING (
-  user_id = auth.uid() OR email = (auth.jwt() ->> 'email') OR public.is_admin()
+CREATE POLICY "Orders access" ON public.orders FOR SELECT USING (
+  user_id = auth.uid()
+  OR (user_id IS NULL AND LOWER(email) = LOWER(auth.jwt() ->> 'email'))
+  OR public.is_admin()
 );
-CREATE POLICY "Invoices access" ON public.invoices FOR ALL USING (
-  user_id = auth.uid() OR email = (auth.jwt() ->> 'email') OR public.is_admin()
+CREATE POLICY "Invoices access" ON public.invoices FOR SELECT USING (
+  user_id = auth.uid()
+  OR (user_id IS NULL AND LOWER(email) = LOWER(auth.jwt() ->> 'email'))
+  OR public.is_admin()
 );
 
 -- 5.6 Support Tickets & Replies
 DROP POLICY IF EXISTS "Tickets access" ON public.support_tickets;
 DROP POLICY IF EXISTS "Replies access" ON public.ticket_replies;
-CREATE POLICY "Tickets access" ON public.support_tickets FOR ALL USING (
-  user_id = auth.uid() OR email = (auth.jwt() ->> 'email') OR public.is_admin()
+DROP POLICY IF EXISTS "Users create tickets" ON public.support_tickets;
+DROP POLICY IF EXISTS "Admins manage tickets" ON public.support_tickets;
+DROP POLICY IF EXISTS "Users create replies" ON public.ticket_replies;
+DROP POLICY IF EXISTS "Admins manage replies" ON public.ticket_replies;
+CREATE POLICY "Tickets access" ON public.support_tickets FOR SELECT USING (
+  user_id = auth.uid()
+  OR (user_id IS NULL AND LOWER(email) = LOWER(auth.jwt() ->> 'email'))
+  OR public.is_admin()
 );
-CREATE POLICY "Replies access" ON public.ticket_replies FOR ALL USING (
-  user_id = auth.uid() OR public.is_admin()
+CREATE POLICY "Users create tickets" ON public.support_tickets FOR INSERT WITH CHECK (
+  user_id = auth.uid()
+  AND LOWER(email) = LOWER(auth.jwt() ->> 'email')
+  AND status = 'OPEN'
+  AND priority = 'NORMAL'
 );
+CREATE POLICY "Admins manage tickets" ON public.support_tickets FOR ALL
+  USING (public.is_admin()) WITH CHECK (public.is_admin());
+CREATE POLICY "Replies access" ON public.ticket_replies FOR SELECT USING (
+  public.is_admin()
+  OR EXISTS (
+    SELECT 1 FROM public.support_tickets AS ticket
+    WHERE ticket.id = ticket_replies.ticket_id
+      AND (
+        ticket.user_id = auth.uid()
+        OR (ticket.user_id IS NULL AND LOWER(ticket.email) = LOWER(auth.jwt() ->> 'email'))
+      )
+  )
+);
+CREATE POLICY "Users create replies" ON public.ticket_replies FOR INSERT WITH CHECK (
+  user_id = auth.uid()
+  AND is_admin_reply = false
+  AND EXISTS (
+    SELECT 1 FROM public.support_tickets AS ticket
+    WHERE ticket.id = ticket_replies.ticket_id
+      AND (
+        ticket.user_id = auth.uid()
+        OR (ticket.user_id IS NULL AND LOWER(ticket.email) = LOWER(auth.jwt() ->> 'email'))
+      )
+  )
+);
+CREATE POLICY "Admins manage replies" ON public.ticket_replies FOR ALL
+  USING (public.is_admin()) WITH CHECK (public.is_admin());

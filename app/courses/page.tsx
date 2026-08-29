@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import CourseCard from "@/components/ui/CourseCard";
 import { courses, courseCategories } from "@/data/courses";
-import { Search, SlidersHorizontal, Grid3X3, List, X } from "lucide-react";
+import { Search, SlidersHorizontal, Grid3X3, List, X, Headphones, ArrowLeft } from "lucide-react";
 
 const levels = [
   { key: "all", label: "الكل" },
@@ -87,21 +87,17 @@ export default function CoursesPage() {
             transition={{ duration: 0.7 }}
             className="text-center"
           >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-slate-100 shadow-[0_4px_20px_rgba(23,58,124,0.05)] mb-6">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5CB07C] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#5CB07C]"></span>
-              </span>
-              <span className="text-sm font-bold text-slate-700 tracking-wide">أكثر من {courseList.length} دورة تدريبية</span>
-            </div>
+            <span className="section-badge-glass mb-6">
+              أكثر من {courseList.length} دورة تدريبية
+            </span>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-[4rem] font-black text-slate-900 mb-6 leading-[1.15] tracking-tight">
-              تصفح أحدث <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] via-[#2F66D6] to-[#5CB07C]">الدورات</span>
+            <h1 className="section-main-title-premium mb-6">
+              تصفح أحدث <span className="gradient-text">الدورات</span>
             </h1>
             
             <div className="w-24 h-[3px] mx-auto bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full mb-6 opacity-80" />
             
-            <p className="text-slate-500 max-w-2xl mx-auto text-lg sm:text-xl font-medium leading-relaxed">
+            <p className="section-desc-premium max-w-2xl mx-auto text-lg sm:text-xl">
               اختر الدورة المناسبة لك وطوّر مهاراتك مع أفضل الخبراء في مختلف المجالات، نحن نوفر لك تجربة تدريبية متكاملة لضمان مستقبلك المشرق.
             </p>
           </motion.div>
@@ -188,102 +184,172 @@ export default function CoursesPage() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 align-start">
+        <div className="flex flex-col lg:flex-row items-start gap-8">
           {/* Sidebar Filters — Desktop */}
-          <aside className="hidden lg:block w-72 shrink-0 sticky top-28 self-start">
-            <div className="bg-white rounded-[1.75rem] border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-7">
-              <div className="mb-8">
-                <h3 className="text-lg font-black text-[#173A7C] mb-5">الفئة</h3>
-                <div className="space-y-2">
-                  {courseCategories.map((cat) => (
+          <aside className="courses-filter-sidebar hidden lg:block w-80 shrink-0 sticky top-28 self-start">
+            <div className="courses-filter-panel rounded-[2rem] p-5 xl:p-6 min-h-[calc(100vh-9rem)] flex flex-col justify-between">
+              <div className="relative z-10 flex-1 flex flex-col">
+                {/* Header */}
+                <div className="flex items-center justify-between gap-3 pb-4 mb-4 border-b border-[#173A7C]/10">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#2459A7] text-white flex items-center justify-center shadow-lg shadow-[#173A7C]/20 shrink-0">
+                      <SlidersHorizontal className="w-5 h-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <h2 className="card-title-royal-blue text-lg leading-tight">فلترة الدورات</h2>
+                      <p className="text-[11px] font-semibold text-slate-500 mt-0.5">{filtered.length} دورة متاحة</p>
+                    </div>
+                  </div>
+                  {(category !== "all" || level !== "all") && (
                     <button
-                      key={cat.key}
-                      onClick={() => setCategory(cat.key)}
-                      className={`w-full text-right px-5 py-3.5 rounded-2xl text-[14px] font-bold transition-all duration-300 cursor-pointer flex justify-between items-center group ${
-                        category === cat.key
-                          ? "bg-gradient-to-l from-[#173A7C] to-[#1E4D9D] text-white shadow-lg shadow-[#173A7C]/20 scale-[1.02]"
-                          : "text-slate-600 hover:text-[#173A7C] hover:bg-[#173A7C]/[0.04]"
-                      }`}
+                      onClick={() => { setCategory("all"); setLevel("all"); }}
+                      className="text-[11px] font-bold text-[#173A7C] hover:text-[#0D8A5E] transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-[#173A7C]/5"
                     >
-                      <span className="line-clamp-1">{cat.label}</span>
-                      {category === cat.key && <span className="w-2 h-2 rounded-full bg-[#5CB07C] shadow-[0_0_8px_rgba(92,176,124,0.8)] shrink-0 mr-2" />}
+                      إعادة الضبط
                     </button>
-                  ))}
+                  )}
+                </div>
+
+                {/* Categories */}
+                <div className="mb-5">
+                  <h3 className="card-title-royal-blue text-sm font-bold mb-2.5 px-1 flex items-center justify-between">
+                    <span>الفئة التدريبية</span>
+                    <span className="text-[10px] text-slate-400 font-normal">{courseCategories.length - 1} فئات</span>
+                  </h3>
+                  <div className="premium-tabs space-y-2">
+                    {courseCategories.map((cat) => (
+                      <button
+                        key={cat.key}
+                        onClick={() => setCategory(cat.key)}
+                        aria-pressed={category === cat.key}
+                        className={`premium-tab course-filter-tab w-full text-right rounded-2xl transition-all duration-300 cursor-pointer flex justify-between items-center group ${
+                          category === cat.key
+                            ? "bg-gradient-to-l from-[#173A7C] via-[#2459A7] to-[#1E4D9D] text-white shadow-lg shadow-[#173A7C]/25 border-[#173A7C]/70"
+                            : "text-slate-600 hover:text-[#173A7C]"
+                        }`}
+                      >
+                        <span className="premium-tab-label line-clamp-1">{cat.label}</span>
+                        {category === cat.key && <span className="w-2 h-2 rounded-full bg-[#5CB07C] shadow-[0_0_8px_rgba(92,176,124,0.8)] shrink-0 mr-2" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-[#173A7C]/15 to-transparent mb-5" />
+
+                {/* Level */}
+                <div className="mb-4">
+                  <h3 className="card-title-royal-blue text-sm font-bold mb-2.5 px-1">المستوى التعليمي</h3>
+                  <div className="premium-tabs space-y-2">
+                    {levels.map((l) => (
+                      <button
+                        key={l.key}
+                        onClick={() => setLevel(l.key)}
+                        aria-pressed={level === l.key}
+                        className={`premium-tab course-filter-tab w-full text-right rounded-2xl transition-all duration-300 cursor-pointer flex justify-between items-center group ${
+                          level === l.key
+                            ? "bg-gradient-to-l from-[#152C5B] to-[#1E3E73] text-white shadow-lg shadow-[#152C5B]/20 border-[#152C5B]/70"
+                            : "text-slate-600 hover:text-[#173A7C]"
+                        }`}
+                      >
+                        <span className="premium-tab-label">{l.label}</span>
+                        {level === l.key && <span className="w-2 h-2 rounded-full bg-[#A8E6BE] shadow-[0_0_8px_rgba(168,230,190,0.65)] shrink-0 mr-2" />}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="w-full h-px bg-slate-100 mb-8" />
-
-              <div>
-                <h3 className="text-lg font-black text-[#173A7C] mb-5">المستوى</h3>
-                <div className="space-y-2">
-                  {levels.map((l) => (
-                    <button
-                      key={l.key}
-                      onClick={() => setLevel(l.key)}
-                      className={`w-full text-right px-5 py-3.5 rounded-2xl text-[14px] font-bold transition-all duration-300 cursor-pointer flex justify-between items-center group ${
-                        level === l.key
-                          ? "bg-slate-800 text-white shadow-lg scale-[1.02]"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/50"
-                      }`}
-                    >
-                      <span>{l.label}</span>
-                      {level === l.key && <span className="w-2 h-2 rounded-full bg-slate-300 shrink-0 mr-2" />}
-                    </button>
-                  ))}
+              {/* Bottom Educational Advisory Box */}
+              <div className="relative z-10 pt-4 mt-4 border-t border-[#173A7C]/10">
+                <div className="bg-gradient-to-br from-[#173A7C]/[0.06] via-[#5CB07C]/[0.06] to-white rounded-2xl p-4 border border-[#173A7C]/10 text-center relative overflow-hidden group hover:border-[#173A7C]/20 transition-all shadow-sm">
+                  <div className="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br from-[#173A7C] to-[#5CB07C] text-white flex items-center justify-center mb-2.5 shadow-md shadow-[#173A7C]/20 group-hover:scale-105 transition-transform">
+                    <Headphones className="w-5 h-5" />
+                  </div>
+                  <h4 className="text-xs font-black text-[#173A7C] mb-1">محتار في اختيار الدورة؟</h4>
+                  <p className="text-[11px] text-slate-500 mb-3 leading-relaxed">تواصل مع مستشارنا التعليمي لمساعدتك في تحديد المسار الأنسب</p>
+                  <a
+                    href="/contact"
+                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-bold hover:shadow-md hover:shadow-[#173A7C]/20 transition-all"
+                  >
+                    <span>استشارة تعليمية مجانية</span>
+                    <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+                  </a>
                 </div>
               </div>
             </div>
           </aside>
 
           {/* Mobile Filters Bottom Sheet */}
-          {filtersOpen && (
-            <div className="fixed inset-0 z-[100] lg:hidden">
-              <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setFiltersOpen(false)} />
-              <div className="absolute bottom-0 inset-x-0 bg-white border-t border-slate-200 rounded-t-3xl p-6 md:p-8 max-h-[80vh] overflow-y-auto shadow-2xl">
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-xl font-bold text-slate-900">الفلاتر</h3>
-                  <button onClick={() => setFiltersOpen(false)} aria-label="إغلاق الفلاتر" className="text-slate-400 hover:text-slate-600 cursor-pointer p-2 bg-slate-100 rounded-full"><X className="w-5 h-5" /></button>
-                </div>
-
-                <h4 className="text-base font-bold text-slate-900 mb-4">الفئة</h4>
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {courseCategories.map((cat) => (
-                    <button
-                      key={cat.key}
-                      onClick={() => setCategory(cat.key)}
-                      className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer shadow-sm border ${
-                        category === cat.key ? "bg-[#173A7C] text-white border-[#173A7C]" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                      }`}
-                    >
-                      {cat.label}
+          <AnimatePresence>
+            {filtersOpen && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100] lg:hidden"
+              >
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setFiltersOpen(false)} />
+                <motion.div 
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{ y: "100%" }}
+                  transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                  className="absolute bottom-0 inset-x-0 bg-white border-t border-slate-200 rounded-t-[2.5rem] p-6 md:p-8 max-h-[85vh] overflow-y-auto shadow-2xl"
+                >
+                  <div className="flex items-center justify-between mb-6 sticky top-0 bg-white pt-1 pb-3 z-10 border-b border-slate-100">
+                    <h3 className="card-title-royal-blue text-xl">فلترة الدورات</h3>
+                    <button onClick={() => setFiltersOpen(false)} aria-label="إغلاق الفلاتر" className="text-slate-400 hover:text-red-500 cursor-pointer p-2 bg-slate-50 hover:bg-red-50 rounded-full transition-colors">
+                      <X className="w-5 h-5" />
                     </button>
-                  ))}
-                </div>
+                  </div>
 
-                <h4 className="text-base font-bold text-slate-900 mb-4">المستوى</h4>
-                <div className="flex flex-wrap gap-2">
-                  {levels.map((l) => (
-                    <button
-                      key={l.key}
-                      onClick={() => setLevel(l.key)}
-                      className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer shadow-sm border ${
-                        level === l.key ? "bg-slate-800 text-white border-slate-800" : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                      }`}
-                    >
-                      {l.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+                  <h4 className="card-title-royal-blue text-base mb-3">الفئة التدريبية</h4>
+                  <div className="premium-tabs flex flex-wrap gap-2 mb-6">
+                    {courseCategories.map((cat) => (
+                      <button
+                        key={cat.key}
+                        onClick={() => { setCategory(cat.key); }}
+                        className={`premium-tab px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm border ${
+                          category === cat.key ? "bg-[#173A7C] text-white border-[#173A7C]" : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        <span className="premium-tab-label">{cat.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <h4 className="card-title-royal-blue text-base mb-3">المستوى التعليمي</h4>
+                  <div className="premium-tabs flex flex-wrap gap-2 mb-6">
+                    {levels.map((l) => (
+                      <button
+                        key={l.key}
+                        onClick={() => { setLevel(l.key); }}
+                        className={`premium-tab px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm border ${
+                          level === l.key ? "bg-[#152C5B] text-white border-[#152C5B]" : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        <span className="premium-tab-label">{l.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setFiltersOpen(false)}
+                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white font-bold text-sm shadow-lg shadow-[#173A7C]/20"
+                  >
+                    عرض النتائج ({filtered.length})
+                  </button>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Course Grid */}
           <div className="flex-1">
             {filtered.length === 0 ? (
               <div className="text-center py-24 bg-white rounded-3xl border border-slate-200 shadow-sm">
-                <p className="text-slate-500 text-lg font-medium">لا توجد دورات مطابقة للبحث أو الفلتر المختار.</p>
+                <p className="section-desc-premium text-lg">لا توجد دورات مطابقة للبحث أو الفلتر المختار.</p>
                 <button 
                   onClick={() => { setSearch(""); setCategory("all"); setLevel("all"); }}
                   className="mt-4 text-[#173A7C] font-bold hover:underline"
@@ -294,7 +360,7 @@ export default function CoursesPage() {
             ) : (
               <div className={view === "grid"
                 ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-8 xl:gap-10"
-                : "flex flex-col gap-8" // List view would require a CourseListCard, but we reuse CourseCard with flex-col 
+                : "flex flex-col gap-8"
               }>
                 {filtered.map((c, i) => (
                   <CourseCard key={c.id} course={c} index={i} />

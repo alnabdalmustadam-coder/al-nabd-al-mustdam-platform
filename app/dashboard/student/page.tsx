@@ -23,7 +23,7 @@ import {
 import { ProgressCard } from '@/components/student/progress-card';
 import { createClient } from '@/utils/supabase/client';
 import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
-import { getCompletedLessons, getCourseAllLessons } from '@/lib/actions/student-actions';
+import { getCourseAllLessons } from '@/lib/actions/student-actions';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -113,17 +113,11 @@ export default function StudentDashboardPage() {
               const allCourseLessons = getCourseAllLessons(matchedCatalog);
               const totalLessons = Math.max(1, allCourseLessons.length);
 
-              // Check if localStorage has completed lessons for this course
-              const localCompleted = getCompletedLessons(canonicalSlug);
-              const completedInCourse = allCourseLessons.filter(l => localCompleted.has(l.id)).length;
-
-              let progress = 0;
-              if (completedInCourse > 0) {
-                // Adopt the exact count from the player!
-                progress = Math.min(100, Math.round((completedInCourse / totalLessons) * 100));
-              } else if (e.progress !== undefined && e.progress !== null) {
-                progress = Math.min(100, Math.max(0, Number(e.progress)));
-              }
+              // Enrollment progress is the authoritative server value. Browser
+              // storage is only a cache and must never grant completion.
+              const progress = e.progress !== undefined && e.progress !== null
+                ? Math.min(100, Math.max(0, Number(e.progress)))
+                : 0;
 
               if (courseMap.has(canonicalSlug)) {
                 const existing = courseMap.get(canonicalSlug)!;

@@ -90,17 +90,19 @@ export default function AntiPlagiarismPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm mb-8 hover:shadow-md transition-shadow">
-            <ShieldAlert className="w-4 h-4 text-[#173A7C]" />
-            <span className="text-xs font-extrabold text-slate-700 tracking-wide uppercase">نزاهة وشفافية التقييم</span>
+          <div className="mb-8">
+            <span className="section-badge-glass">
+              <ShieldAlert className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              نزاهة وشفافية التقييم
+            </span>
           </div>
           
-          <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black text-slate-900 mb-6 leading-[1.35] tracking-tight">
+          <h1 className="section-main-title-premium text-3xl sm:text-4xl lg:text-[2.75rem] mb-6 leading-[1.35]">
             آلية فحص أعمال المتدربين <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C] inline-block mt-3">ومنع الغش الإلكتروني</span>
+            <span className="gradient-text inline-block mt-3">ومنع الغش الإلكتروني</span>
           </h1>
           
-          <p className="text-slate-500 text-base sm:text-lg font-medium leading-[1.8] max-w-3xl mx-auto mb-10">
+          <p className="section-desc-premium text-base sm:text-lg max-w-3xl mx-auto mb-10">
             لضمان مصداقية شهاداتنا وقوة مخرجاتنا التعليمية، نطبق المعيار الأقوى من الآليات والسياسات التقنية المتطورة للتأكد من المجهود العلمي الحقيقي لكل متدرب، والحفاظ على موثوقية عالية لمنظومة التعليم عن بُعد.
           </p>
 
@@ -131,7 +133,7 @@ export default function AntiPlagiarismPage() {
                 <img src="/logo.svg" alt="Sustain Pulse Logo" className="h-[4.5rem] w-auto object-contain hover:scale-105 transition-transform duration-300" />
               </div>
 
-              <h3 className="font-extrabold text-lg text-slate-800 mb-6 flex items-center gap-3">
+              <h3 className="card-title-royal-blue text-lg mb-6 flex items-center gap-3">
                 <ShieldHalf className="w-5 h-5 text-[#173A7C]" />
                 مراحل الحماية
               </h3>
@@ -200,8 +202,8 @@ export default function AntiPlagiarismPage() {
                       <Icon className={`w-7 h-7 ${policy.iconColor}`} />
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-4">{policy.title}</h2>
-                      <p className="text-slate-500 text-[15.5px] leading-[2] font-medium mb-4">
+                      <h2 className="card-title-royal-blue text-xl sm:text-2xl mb-4">{policy.title}</h2>
+                      <p className="card-desc-premium text-[15.5px] leading-[2] mb-4">
                         {policy.content}
                       </p>
                       

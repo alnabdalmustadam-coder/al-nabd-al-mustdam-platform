@@ -3,6 +3,7 @@ import {
   stmtRegistered,
   sendToNelcLRS,
 } from "@/lib/xapi";
+import { requireAdmin } from "@/lib/security/auth";
 
 /**
  * GET /api/nelc/test-lrs
@@ -12,8 +13,10 @@ import {
  *
  * ⚠️ For testing only — remove or protect before production
  */
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
     // Build a test statement
     const testStatement = stmtRegistered({
       email: "test@nabdtraining.com",

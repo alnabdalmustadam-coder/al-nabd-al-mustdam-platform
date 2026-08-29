@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
-import { User, Mail, Phone, Key, Shield, Calendar, Laptop, Smartphone, Trash2, CheckCircle2, UserCheck, RefreshCw, Loader2, Save } from 'lucide-react';
+import { User, Mail, Phone, Key, Shield, Laptop, Smartphone, Trash2, CheckCircle2, UserCheck, RefreshCw, Loader2, Save, AlertCircle } from 'lucide-react';
 import { DefaultAvatar } from '@/components/student/default-avatar';
-import { getOrCreateDeviceId, getDeviceInfo } from '@/utils/device';
+import type { RegisteredDevice } from '@/components/student/device-limit-modal';
+import { getDeviceInfo } from '@/utils/device';
 import { createClient } from '@/utils/supabase/client';
 
 const sectionFadeVariants: Variants = {
@@ -54,6 +55,8 @@ export default function StudentProfilePage() {
 
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [passSuccess, setPassSuccess] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -100,7 +103,7 @@ export default function StudentProfilePage() {
     loadStudentProfile();
   }, []);
 
-  const [devices, setDevices] = useState<any[]>([]);
+  const [devices, setDevices] = useState<RegisteredDevice[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState('');
   const [loadingDevices, setLoadingDevices] = useState(true);
   const [deletingDeviceId, setDeletingDeviceId] = useState<string | null>(null);
@@ -162,12 +165,61 @@ export default function StudentProfilePage() {
     }
   };
 
-  const handleSavePassword = (e: React.FormEvent) => {
+  const handleSavePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!passwords.current || !passwords.newPass) return;
-    setPassSuccess(true);
-    setPasswords({ current: '', newPass: '', confirmPass: '' });
-    setTimeout(() => setPassSuccess(false), 3000);
+    setPassSuccess(false);
+    setPasswordError(null);
+
+    if (!passwords.current || !passwords.newPass || !passwords.confirmPass) {
+      setPasswordError('يرجى إدخال كلمة المرور الحالية والجديدة وتأكيدها.');
+      return;
+    }
+    if (passwords.newPass.length < 8) {
+      setPasswordError('كلمة المرور الجديدة يجب ألا تقل عن 8 أحرف.');
+      return;
+    }
+    if (passwords.newPass !== passwords.confirmPass) {
+      setPasswordError('كلمة المرور الجديدة وتأكيدها غير متطابقين.');
+      return;
+    }
+    if (passwords.current === passwords.newPass) {
+      setPasswordError('كلمة المرور الجديدة يجب أن تختلف عن كلمة المرور الحالية.');
+      return;
+    }
+
+    try {
+      setIsSavingPassword(true);
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user?.email) {
+        throw new Error('تعذر التحقق من حساب المستخدم الحالي.');
+      }
+
+      const { error: reauthError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: passwords.current,
+      });
+      if (reauthError) {
+        throw new Error('كلمة المرور الحالية غير صحيحة، أو أن الحساب مسجل عبر مزود دخول خارجي.');
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: passwords.newPass,
+      });
+      if (updateError) {
+        throw new Error(updateError.message || 'تعذر تحديث كلمة المرور.');
+      }
+
+      setPassSuccess(true);
+      setPasswords({ current: '', newPass: '', confirmPass: '' });
+      setTimeout(() => setPassSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error updating password:', error);
+      setPasswordError(error instanceof Error ? error.message : 'تعذر تحديث كلمة المرور.');
+    } finally {
+      setIsSavingPassword(false);
+    }
   };
 
   const handleRemoveDevice = async (targetDevId: string) => {
@@ -231,10 +283,10 @@ export default function StudentProfilePage() {
                 <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{student.role}</span>
               </motion.div>
-              <motion.h1 variants={textItemVariants} className="student-heading-h1">
+              <motion.h1 variants={textItemVariants} className="student-heading-h1 text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                 {student.fullName || (isLoading ? 'جاري التحميل...' : 'المتدرب')}
               </motion.h1>
-              <motion.p variants={textItemVariants} className="text-xs text-slate-500 font-medium">
+              <motion.p variants={textItemVariants} className="text-xs sm:text-sm text-slate-500 font-bold">
                 عضو معتمد في معهد النبض المستدام العالي منذ {student.joinedDate}
               </motion.p>
             </div>
@@ -356,11 +408,20 @@ export default function StudentProfilePage() {
         </div>
 
         <form onSubmit={handleSavePassword} className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          {passwordError && (
+            <div className="sm:col-span-3 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-bold text-red-700" role="alert">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{passwordError}</span>
+            </div>
+          )}
+
           <div className="space-y-2">
             <label className="text-slate-700 font-bold block mb-1">كلمة المرور الحالية</label>
             <input
               type="password"
               placeholder="••••••••"
+              autoComplete="current-password"
+              required
               value={passwords.current}
               onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
               className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400"
@@ -372,6 +433,9 @@ export default function StudentProfilePage() {
             <input
               type="password"
               placeholder="••••••••"
+              autoComplete="new-password"
+              minLength={8}
+              required
               value={passwords.newPass}
               onChange={(e) => setPasswords({ ...passwords, newPass: e.target.value })}
               className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400"
@@ -383,6 +447,9 @@ export default function StudentProfilePage() {
             <input
               type="password"
               placeholder="••••••••"
+              autoComplete="new-password"
+              minLength={8}
+              required
               value={passwords.confirmPass}
               onChange={(e) => setPasswords({ ...passwords, confirmPass: e.target.value })}
               className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400"
@@ -393,9 +460,11 @@ export default function StudentProfilePage() {
           <div className="sm:col-span-3 flex justify-end pt-2">
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-[#173A7C] text-white font-black text-xs hover:bg-[#1E4D9D] transition-colors"
+              disabled={isSavingPassword}
+              className="px-6 py-2.5 rounded-xl bg-[#173A7C] text-white font-black text-xs hover:bg-[#1E4D9D] transition-colors disabled:cursor-wait disabled:opacity-70 inline-flex items-center gap-2"
             >
-              تحديث كلمة المرور
+              {isSavingPassword && <Loader2 className="h-4 w-4 animate-spin" />}
+              <span>{isSavingPassword ? 'جاري التحقق والتحديث...' : 'تحديث كلمة المرور'}</span>
             </button>
           </div>
         </form>

@@ -2,15 +2,38 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
-import { supabase as supabaseAdmin } from '@/lib/supabase';
+import { isAdminRole, isInstructorRole, normalizeRole } from '@/lib/security/auth';
+import { consumeRateLimit } from '@/lib/security/rate-limit';
+
+function isStrongPassword(password: string): boolean {
+  return (
+    typeof password === 'string' &&
+    password.length >= 8 &&
+    password.length <= 128 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password))
+  );
+}
 
 export async function login(formData: FormData) {
+  const requestHeaders = await headers();
+  const clientIp = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const limit = consumeRateLimit(`auth-action-login:${clientIp}`, 10, 15 * 60 * 1000);
+  if (!limit.allowed) {
+    return { error: `محاولات كثيرة، حاول بعد ${limit.retryAfter} ثانية` };
+  }
+
   const supabase = await createClient();
 
   const email = (formData.get('email') as string)?.toLowerCase().trim();
   const password = formData.get('password') as string;
   const requestedRedirect = formData.get('redirect') as string;
+  if (!/^\S+@\S+\.\S+$/.test(email || '') || typeof password !== 'string') {
+    return { error: 'بيانات تسجيل الدخول غير صالحة' };
+  }
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -21,38 +44,51 @@ export async function login(formData: FormData) {
     return { error: error.message };
   }
 
-  let finalDestination = requestedRedirect;
-
-  if (!finalDestination || finalDestination === '/dashboard/student' || finalDestination === '/dashboard/admin') {
-    let userRole = (data.user?.user_metadata?.role || 'STUDENT').toUpperCase();
-
-    // Check profiles table for role update by admin
-    if (data.user?.id) {
-      try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-        if (profile?.role) {
-          userRole = profile.role.toUpperCase();
-        }
-      } catch (err) {
-        // Fallback to metadata
+  let roleSource: unknown = data.user?.app_metadata?.role;
+  if (!roleSource || normalizeRole(roleSource) === 'STUDENT') {
+    if (data.user?.user_metadata?.role && normalizeRole(data.user.user_metadata.role) !== 'STUDENT') {
+      roleSource = data.user.user_metadata.role;
+    } else if (data.user?.id) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .maybeSingle();
+      if (profile?.role) {
+        roleSource = profile.role;
       }
     }
-
-    if (userRole === 'ADMIN' || userRole === 'INSTRUCTOR' || userRole === 'TRAINER' || userRole === 'TEACHER') {
-      finalDestination = '/dashboard/admin';
-    } else {
-      finalDestination = '/dashboard/student/courses';
-    }
   }
+
+  const userRole = normalizeRole(roleSource);
+  const roleHome = isAdminRole(userRole)
+    ? '/dashboard/admin'
+    : isInstructorRole(userRole)
+      ? '/dashboard/instructor'
+      : '/dashboard/student';
+
+  const safeRequestedRedirect =
+    requestedRedirect?.startsWith('/') && !requestedRedirect.startsWith('//')
+      ? requestedRedirect
+      : '';
+  const canUseRequestedRedirect =
+    (isAdminRole(userRole) && safeRequestedRedirect.startsWith('/dashboard/admin')) ||
+    (isInstructorRole(userRole) && safeRequestedRedirect.startsWith('/dashboard/instructor')) ||
+    (!isAdminRole(userRole) && !isInstructorRole(userRole) && safeRequestedRedirect.startsWith('/dashboard/student'));
+
+  const finalDestination = canUseRequestedRedirect ? safeRequestedRedirect : roleHome;
 
   return { success: true, redirectUrl: finalDestination };
 }
 
 export async function signup(formData: FormData) {
+  const requestHeaders = await headers();
+  const clientIp = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const limit = consumeRateLimit(`auth-action-signup:${clientIp}`, 5, 60 * 60 * 1000);
+  if (!limit.allowed) {
+    return { error: `محاولات كثيرة، حاول بعد ${limit.retryAfter} ثانية` };
+  }
+
   const supabase = await createClient();
 
   const email = (formData.get('email') as string)?.toLowerCase().trim();
@@ -60,8 +96,14 @@ export async function signup(formData: FormData) {
   const fullName = formData.get('fullName') as string;
   const nationalId = formData.get('nationalId') as string;
   const phone = formData.get('phone') as string;
-  const requestedRole = (formData.get('role') as string)?.toUpperCase() === 'INSTRUCTOR' ? 'INSTRUCTOR' : 'STUDENT';
-
+  if (
+    !/^\S+@\S+\.\S+$/.test(email || '') ||
+    !isStrongPassword(password) ||
+    !fullName?.trim() ||
+    (nationalId && !/^[124]\d{9}$/.test(nationalId.trim()))
+  ) {
+    return { error: 'بيانات التسجيل أو قوة كلمة المرور غير صالحة' };
+  }
   const { error } = await supabase.auth.signUp({
     email,
     password,
@@ -70,7 +112,6 @@ export async function signup(formData: FormData) {
         full_name: fullName,
         national_id: nationalId,
         phone: phone,
-        role: requestedRole,
       },
     },
   });
@@ -84,6 +125,13 @@ export async function signup(formData: FormData) {
 }
 
 export async function resetPasswordRequest(email: string) {
+  const requestHeaders = await headers();
+  const clientIp = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const limit = consumeRateLimit(`auth-action-reset:${clientIp}`, 5, 60 * 60 * 1000);
+  if (!limit.allowed || !/^\S+@\S+\.\S+$/.test(email || '')) {
+    return { error: 'تعذر إرسال طلب إعادة التعيين الآن' };
+  }
+
   const supabase = await createClient();
   const cleanEmail = email.toLowerCase().trim();
 
@@ -99,6 +147,10 @@ export async function resetPasswordRequest(email: string) {
 }
 
 export async function updatePasswordAction(password: string) {
+  if (!isStrongPassword(password)) {
+    return { error: 'كلمة المرور لا تطابق متطلبات الأمان' };
+  }
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.updateUser({
@@ -118,4 +170,3 @@ export async function signout() {
   revalidatePath('/', 'layout');
   redirect('/');
 }
-

@@ -1,35 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
-
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
+import { createClient } from "@/utils/supabase/server";
+import { checkRateLimit } from "@/lib/security/rate-limit";
+import { isAdminRole, isInstructorRole, normalizeRole } from "@/lib/security/auth";
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: CORS });
+  return new NextResponse(null, { status: 204 });
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = checkRateLimit(req, 'auth-login', 10, 15 * 60 * 1000);
+    if (rateLimited) return rateLimited;
+
     const { email, password } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json(
         { message: "أدخل البريد الإلكتروني وكلمة المرور" },
-        { status: 400, headers: CORS }
+        { status: 400 }
       );
     }
 
-    // 1. تحقق من Supabase Auth
+    const supabase = await createClient();
     const { data: authData, error } =
-      await supabase.auth.signInWithPassword({ email, password });
+      await supabase.auth.signInWithPassword({ email: email.toLowerCase().trim(), password });
 
     if (error) {
       return NextResponse.json(
         { message: "بيانات غير صحيحة" },
-        { status: 401, headers: CORS }
+        { status: 401 }
       );
     }
 
@@ -41,19 +40,20 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     // 3. Determine redirect URL based on user role
-    const userRole = (profile?.role || authData.user?.user_metadata?.role || "STUDENT").toUpperCase();
-    const isAdmin = userRole === "ADMIN" || userRole === "SUPERADMIN" || userRole === "INSTRUCTOR" || userRole === "TRAINER";
-    const redirectUrl = isAdmin ? "/dashboard/admin" : "/dashboard/student";
+    const userRole = normalizeRole(authData.user?.app_metadata?.role || profile?.role);
+    let redirectUrl = "/dashboard/student";
+    if (isAdminRole(userRole)) {
+      redirectUrl = "/dashboard/admin";
+    } else if (isInstructorRole(userRole)) {
+      redirectUrl = "/dashboard/instructor";
+    }
 
-    return NextResponse.json(
-      { success: true, redirectUrl },
-      { headers: CORS }
-    );
-  } catch (err: any) {
+    return NextResponse.json({ success: true, redirectUrl });
+  } catch (err: unknown) {
     console.error("Login error:", err);
     return NextResponse.json(
       { message: "حدث خطأ في الخادم" },
-      { status: 500, headers: CORS }
+      { status: 500 }
     );
   }
 }

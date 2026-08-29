@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, Variants } from 'framer-motion';
 import {
@@ -81,47 +81,92 @@ const cardItemVariants: Variants = {
 export default function AdminDashboardPage() {
   const [timeRange, setTimeRange] = useState<'today' | 'week' | 'month' | 'year'>('year');
 
-  // Full 12-Months Revenue Bar Data (From January to December)
-  const yearlyRevenueData: BarChartDataPoint[] = [
-    { id: 1, name: 'يناير', shortName: 'يناير', revText: '210k', rawAmount: 210000, amount: '210,000 ر.س', growth: '+12.5%', studentsCount: '1,120 متدرب', txCount: 168, heightPercent: 32, status: 'completed' },
-    { id: 2, name: 'فبراير', shortName: 'فبراير', revText: '245k', rawAmount: 245000, amount: '245,000 ر.س', growth: '+16.7%', studentsCount: '1,280 متدرب', txCount: 196, heightPercent: 37, status: 'completed' },
-    { id: 3, name: 'مارس', shortName: 'مارس', revText: '290k', rawAmount: 290000, amount: '290,000 ر.س', growth: '+18.4%', studentsCount: '1,450 متدرب', txCount: 232, heightPercent: 44, status: 'completed' },
-    { id: 4, name: 'أبريل', shortName: 'أبريل', revText: '320k', rawAmount: 320000, amount: '320,000 ر.س', growth: '+10.3%', studentsCount: '1,590 متدرب', txCount: 256, heightPercent: 49, status: 'completed' },
-    { id: 5, name: 'مايو', shortName: 'مايو', revText: '380k', rawAmount: 380000, amount: '380,000 ر.س', growth: '+18.8%', studentsCount: '1,820 متدرب', txCount: 304, heightPercent: 58, status: 'completed' },
-    { id: 6, name: 'يونيو', shortName: 'يونيو', revText: '418k', rawAmount: 417900, amount: '417,900 ر.س', growth: '+24.5%', studentsCount: '2,100 متدرب', txCount: 334, heightPercent: 64, status: 'completed' },
-    { id: 7, name: 'يوليو', shortName: 'يوليو', revText: '450k', rawAmount: 450000, amount: '450,000 ر.س', growth: '+7.7%', studentsCount: '2,350 متدرب', txCount: 360, heightPercent: 69, status: 'current' },
-    { id: 8, name: 'أغسطس', shortName: 'أغسطس', revText: '480k', rawAmount: 480000, amount: '480,000 ر.س', growth: '+6.6%', studentsCount: '2,480 متدرب', txCount: 384, heightPercent: 74, status: 'forecast' },
-    { id: 9, name: 'سبتمبر', shortName: 'سبتمبر', revText: '520k', rawAmount: 520000, amount: '520,000 ر.س', growth: '+8.3%', studentsCount: '2,650 متدرب', txCount: 416, heightPercent: 80, status: 'forecast' },
-    { id: 10, name: 'أكتوبر', shortName: 'أكتوبر', revText: '570k', rawAmount: 570000, amount: '570,000 ر.س', growth: '+9.6%', studentsCount: '2,820 متدرب', txCount: 456, heightPercent: 87, status: 'forecast' },
-    { id: 11, name: 'نوفمبر', shortName: 'نوفمبر', revText: '610k', rawAmount: 610000, amount: '610,000 ر.س', growth: '+7.0%', studentsCount: '2,980 متدرب', txCount: 488, heightPercent: 93, status: 'forecast' },
-    { id: 12, name: 'ديسمبر', shortName: 'ديسمبر', revText: '680k', rawAmount: 680000, amount: '680,000 ر.س', growth: '+11.5%', studentsCount: '3,250 متدرب', txCount: 544, heightPercent: 100, status: 'forecast' },
-  ];
+  // Real-Time Dynamic Date & Timing Calculations
+  const now = new Date();
+  const currentMonthIdx = now.getMonth(); // 0..11
+  const currentWeekIdx = Math.min(3, Math.max(0, Math.ceil(now.getDate() / 7) - 1)); // 0..3
+  const jsDay = now.getDay(); // 0=Sun..6=Sat
+  const saudiDayIdx = (jsDay + 1) % 7; // Sat=0, Sun=1, Mon=2, Tue=3, Wed=4, Thu=5, Fri=6
+  const currentHour = now.getHours(); // 0..23
 
-  const monthlyWeekData: BarChartDataPoint[] = [
-    { id: 1, name: 'الأسبوع 1', shortName: 'أ 1', revText: '95k', rawAmount: 95000, amount: '95,000 ر.س', growth: '+8.2%', studentsCount: '520 متدرب', txCount: 76, heightPercent: 45, status: 'completed' },
-    { id: 2, name: 'الأسبوع 2', shortName: 'أ 2', revText: '110k', rawAmount: 110000, amount: '110,000 ر.س', growth: '+15.8%', studentsCount: '610 متدرب', txCount: 88, heightPercent: 55, status: 'completed' },
-    { id: 3, name: 'الأسبوع 3', shortName: 'أ 3', revText: '135k', rawAmount: 135000, amount: '135,000 ر.س', growth: '+22.7%', studentsCount: '740 متدرب', txCount: 108, heightPercent: 72, status: 'completed' },
-    { id: 4, name: 'الأسبوع 4', shortName: 'أ 4', revText: '177k', rawAmount: 177900, amount: '177,900 ر.س', growth: '+31.4%', studentsCount: '980 متدرب', txCount: 142, heightPercent: 100, status: 'current' },
-  ];
+  let activeHourIdx = 0;
+  if (currentHour < 10) activeHourIdx = 0; // 8:00 ص
+  else if (currentHour < 14) activeHourIdx = 1; // 12:00 ظ
+  else if (currentHour < 18) activeHourIdx = 2; // 4:00 ع
+  else if (currentHour < 21) activeHourIdx = 3; // 8:00 م
+  else if (currentHour < 23) activeHourIdx = 4; // 10:00 م
+  else activeHourIdx = 5; // 12:00 ل
 
-  const weeklyDayData: BarChartDataPoint[] = [
-    { id: 1, name: 'السبت', shortName: 'سبت', revText: '14k', rawAmount: 14000, amount: '14,000 ر.س', growth: '+5.1%', studentsCount: '65 متدرب', txCount: 12, heightPercent: 35, status: 'completed' },
-    { id: 2, name: 'الأحد', shortName: 'أحد', revText: '22k', rawAmount: 22000, amount: '22,000 ر.س', growth: '+12.4%', studentsCount: '110 متدرب', txCount: 18, heightPercent: 55, status: 'completed' },
-    { id: 3, name: 'الاثنين', shortName: 'اثنين', revText: '28k', rawAmount: 28000, amount: '28,000 ر.س', growth: '+18.0%', studentsCount: '145 متدرب', txCount: 24, heightPercent: 70, status: 'completed' },
-    { id: 4, name: 'الثلاثاء', shortName: 'ثلاثاء', revText: '35k', rawAmount: 35000, amount: '35,000 ر.س', growth: '+25.0%', studentsCount: '180 متدرب', txCount: 30, heightPercent: 88, status: 'completed' },
-    { id: 5, name: 'الأربعاء', shortName: 'أربعاء', revText: '40k', rawAmount: 40000, amount: '40,000 ر.س', growth: '+14.3%', studentsCount: '210 متدرب', txCount: 36, heightPercent: 100, status: 'current' },
-    { id: 6, name: 'الخميس', shortName: 'خميس', revText: '32k', rawAmount: 32000, amount: '32,000 ر.س', growth: '+8.0%', studentsCount: '160 متدرب', txCount: 28, heightPercent: 80, status: 'forecast' },
-    { id: 7, name: 'الجمعة', shortName: 'جمعة', revText: '18k', rawAmount: 18000, amount: '18,000 ر.س', growth: '+4.5%', studentsCount: '90 متدرب', txCount: 16, heightPercent: 45, status: 'forecast' },
-  ];
+  const monthNames = useMemo(
+    () => [
+      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    ],
+    []
+  );
 
-  const todayHourData: BarChartDataPoint[] = [
-    { id: 1, name: '8:00 ص', shortName: '8 ص', revText: '3.2k', rawAmount: 3200, amount: '3,200 ر.س', growth: '+4.0%', studentsCount: '12 متدرب', txCount: 3, heightPercent: 25, status: 'completed' },
-    { id: 2, name: '12:00 ظ', shortName: '12 ظ', revText: '5.8k', rawAmount: 5800, amount: '5,800 ر.س', growth: '+11.5%', studentsCount: '24 متدرب', txCount: 5, heightPercent: 45, status: 'completed' },
-    { id: 3, name: '4:00 ع', shortName: '4 ع', revText: '8.4k', rawAmount: 8400, amount: '8,400 ر.س', growth: '+20.1%', studentsCount: '42 متدرب', txCount: 8, heightPercent: 65, status: 'completed' },
-    { id: 4, name: '8:00 م', shortName: '8 م', revText: '12.9k', rawAmount: 12900, amount: '12,900 ر.س', growth: '+45.0%', studentsCount: '68 متدرب', txCount: 14, heightPercent: 100, status: 'current' },
-    { id: 5, name: '10:00 م', shortName: '10 م', revText: '9.1k', rawAmount: 9100, amount: '9,100 ر.س', growth: '+15.2%', studentsCount: '48 متدرب', txCount: 9, heightPercent: 72, status: 'forecast' },
-    { id: 6, name: '12:00 ل', shortName: '12 ل', revText: '4.5k', rawAmount: 4500, amount: '4,500 ر.س', growth: '+6.0%', studentsCount: '20 متدرب', txCount: 4, heightPercent: 35, status: 'forecast' },
-  ];
+  // Full 12-Months Revenue Bar Data (Dynamically synched with current active month)
+  const yearlyRevenueData: BarChartDataPoint[] = useMemo(() => {
+    const rawValues = [
+      { rev: '210k', raw: 210000, growth: '+12.5%', students: '1,120 متدرب', tx: 168, h: 32 },
+      { rev: '245k', raw: 245000, growth: '+16.7%', students: '1,280 متدرب', tx: 196, h: 37 },
+      { rev: '290k', raw: 290000, growth: '+18.4%', students: '1,450 متدرب', tx: 232, h: 44 },
+      { rev: '320k', raw: 320000, growth: '+10.3%', students: '1,590 متدرب', tx: 256, h: 49 },
+      { rev: '380k', raw: 380000, growth: '+18.8%', students: '1,820 متدرب', tx: 304, h: 58 },
+      { rev: '418k', raw: 417900, growth: '+24.5%', students: '2,100 متدرب', tx: 334, h: 64 },
+      { rev: '450k', raw: 450000, growth: '+7.7%', students: '2,350 متدرب', tx: 360, h: 69 },
+      { rev: '480k', raw: 480000, growth: '+6.6%', students: '2,480 متدرب', tx: 384, h: 74 },
+      { rev: '520k', raw: 520000, growth: '+8.3%', students: '2,650 متدرب', tx: 416, h: 80 },
+      { rev: '570k', raw: 570000, growth: '+9.6%', students: '2,820 متدرب', tx: 456, h: 87 },
+      { rev: '610k', raw: 610000, growth: '+7.0%', students: '2,980 متدرب', tx: 488, h: 93 },
+      { rev: '680k', raw: 680000, growth: '+11.5%', students: '3,250 متدرب', tx: 544, h: 100 },
+    ];
+
+    return monthNames.map((name, i) => {
+      const v = rawValues[i];
+      const status: 'completed' | 'current' | 'forecast' =
+        i < currentMonthIdx ? 'completed' : i === currentMonthIdx ? 'current' : 'forecast';
+      return {
+        id: i + 1,
+        name,
+        shortName: name,
+        revText: v.rev,
+        rawAmount: v.raw,
+        amount: `${v.raw.toLocaleString('en-US')} ر.س`,
+        growth: v.growth,
+        studentsCount: v.students,
+        txCount: v.tx,
+        heightPercent: v.h,
+        status,
+      };
+    });
+  }, [monthNames, currentMonthIdx]);
+
+  const monthlyWeekData: BarChartDataPoint[] = useMemo(() => [
+    { id: 1, name: 'الأسبوع 1', shortName: 'أ 1', revText: '95k', rawAmount: 95000, amount: '95,000 ر.س', growth: '+8.2%', studentsCount: '520 متدرب', txCount: 76, heightPercent: 45, status: 0 < currentWeekIdx ? 'completed' : 0 === currentWeekIdx ? 'current' : 'forecast' },
+    { id: 2, name: 'الأسبوع 2', shortName: 'أ 2', revText: '110k', rawAmount: 110000, amount: '110,000 ر.س', growth: '+15.8%', studentsCount: '610 متدرب', txCount: 88, heightPercent: 55, status: 1 < currentWeekIdx ? 'completed' : 1 === currentWeekIdx ? 'current' : 'forecast' },
+    { id: 3, name: 'الأسبوع 3', shortName: 'أ 3', revText: '135k', rawAmount: 135000, amount: '135,000 ر.س', growth: '+22.7%', studentsCount: '740 متدرب', txCount: 108, heightPercent: 72, status: 2 < currentWeekIdx ? 'completed' : 2 === currentWeekIdx ? 'current' : 'forecast' },
+    { id: 4, name: 'الأسبوع 4', shortName: 'أ 4', revText: '177k', rawAmount: 177900, amount: '177,900 ر.س', growth: '+31.4%', studentsCount: '980 متدرب', txCount: 142, heightPercent: 100, status: 3 <= currentWeekIdx ? 'current' : 'forecast' },
+  ], [currentWeekIdx]);
+
+  const weeklyDayData: BarChartDataPoint[] = useMemo(() => [
+    { id: 1, name: 'السبت', shortName: 'سبت', revText: '14k', rawAmount: 14000, amount: '14,000 ر.س', growth: '+5.1%', studentsCount: '65 متدرب', txCount: 12, heightPercent: 35, status: 0 < saudiDayIdx ? 'completed' : 0 === saudiDayIdx ? 'current' : 'forecast' },
+    { id: 2, name: 'الأحد', shortName: 'أحد', revText: '22k', rawAmount: 22000, amount: '22,000 ر.س', growth: '+12.4%', studentsCount: '110 متدرب', txCount: 18, heightPercent: 55, status: 1 < saudiDayIdx ? 'completed' : 1 === saudiDayIdx ? 'current' : 'forecast' },
+    { id: 3, name: 'الاثنين', shortName: 'اثنين', revText: '28k', rawAmount: 28000, amount: '28,000 ر.س', growth: '+18.0%', studentsCount: '145 متدرب', txCount: 24, heightPercent: 70, status: 2 < saudiDayIdx ? 'completed' : 2 === saudiDayIdx ? 'current' : 'forecast' },
+    { id: 4, name: 'الثلاثاء', shortName: 'ثلاثاء', revText: '35k', rawAmount: 35000, amount: '35,000 ر.س', growth: '+25.0%', studentsCount: '180 متدرب', txCount: 30, heightPercent: 88, status: 3 < saudiDayIdx ? 'completed' : 3 === saudiDayIdx ? 'current' : 'forecast' },
+    { id: 5, name: 'الأربعاء', shortName: 'أربعاء', revText: '40k', rawAmount: 40000, amount: '40,000 ر.س', growth: '+14.3%', studentsCount: '210 متدرب', txCount: 36, heightPercent: 100, status: 4 < saudiDayIdx ? 'completed' : 4 === saudiDayIdx ? 'current' : 'forecast' },
+    { id: 6, name: 'الخميس', shortName: 'خميس', revText: '32k', rawAmount: 32000, amount: '32,000 ر.س', growth: '+8.0%', studentsCount: '160 متدرب', txCount: 28, heightPercent: 80, status: 5 < saudiDayIdx ? 'completed' : 5 === saudiDayIdx ? 'current' : 'forecast' },
+    { id: 7, name: 'الجمعة', shortName: 'جمعة', revText: '18k', rawAmount: 18000, amount: '18,000 ر.س', growth: '+4.5%', studentsCount: '90 متدرب', txCount: 16, heightPercent: 45, status: 6 <= saudiDayIdx ? 'current' : 'forecast' },
+  ], [saudiDayIdx]);
+
+  const todayHourData: BarChartDataPoint[] = useMemo(() => [
+    { id: 1, name: '8:00 ص', shortName: '8 ص', revText: '3.2k', rawAmount: 3200, amount: '3,200 ر.س', growth: '+4.0%', studentsCount: '12 متدرب', txCount: 3, heightPercent: 25, status: 0 < activeHourIdx ? 'completed' : 0 === activeHourIdx ? 'current' : 'forecast' },
+    { id: 2, name: '12:00 ظ', shortName: '12 ظ', revText: '5.8k', rawAmount: 5800, amount: '5,800 ر.س', growth: '+11.5%', studentsCount: '24 متدرب', txCount: 5, heightPercent: 45, status: 1 < activeHourIdx ? 'completed' : 1 === activeHourIdx ? 'current' : 'forecast' },
+    { id: 3, name: '4:00 ع', shortName: '4 ع', revText: '8.4k', rawAmount: 8400, amount: '8,400 ر.س', growth: '+20.1%', studentsCount: '42 متدرب', txCount: 8, heightPercent: 65, status: 2 < activeHourIdx ? 'completed' : 2 === activeHourIdx ? 'current' : 'forecast' },
+    { id: 4, name: '8:00 م', shortName: '8 م', revText: '12.9k', rawAmount: 12900, amount: '12,900 ر.س', growth: '+45.0%', studentsCount: '68 متدرب', txCount: 14, heightPercent: 100, status: 3 < activeHourIdx ? 'completed' : 3 === activeHourIdx ? 'current' : 'forecast' },
+    { id: 5, name: '10:00 م', shortName: '10 م', revText: '9.1k', rawAmount: 9100, amount: '9,100 ر.س', growth: '+15.2%', studentsCount: '48 متدرب', txCount: 9, heightPercent: 72, status: 4 < activeHourIdx ? 'completed' : 4 === activeHourIdx ? 'current' : 'forecast' },
+    { id: 6, name: '12:00 ل', shortName: '12 ل', revText: '4.5k', rawAmount: 4500, amount: '4,500 ر.س', growth: '+6.0%', studentsCount: '20 متدرب', txCount: 4, heightPercent: 35, status: 5 <= activeHourIdx ? 'current' : 'forecast' },
+  ], [activeHourIdx]);
 
   const currentChartData =
     timeRange === 'year'
@@ -132,7 +177,22 @@ export default function AdminDashboardPage() {
       ? weeklyDayData
       : todayHourData;
 
-  const [selectedPoint, setSelectedPoint] = useState<BarChartDataPoint>(yearlyRevenueData[6]);
+  const [selectedPoint, setSelectedPoint] = useState<BarChartDataPoint>(
+    yearlyRevenueData[currentMonthIdx] || yearlyRevenueData[0]
+  );
+
+  // Sync selectedPoint automatically when timeRange changes
+  useEffect(() => {
+    if (timeRange === 'year') {
+      setSelectedPoint(yearlyRevenueData[currentMonthIdx] || yearlyRevenueData[0]);
+    } else if (timeRange === 'month') {
+      setSelectedPoint(monthlyWeekData[currentWeekIdx] || monthlyWeekData[0]);
+    } else if (timeRange === 'week') {
+      setSelectedPoint(weeklyDayData[saudiDayIdx] || weeklyDayData[0]);
+    } else {
+      setSelectedPoint(todayHourData[activeHourIdx] || todayHourData[0]);
+    }
+  }, [timeRange, yearlyRevenueData, monthlyWeekData, weeklyDayData, todayHourData, currentMonthIdx, currentWeekIdx, saudiDayIdx, activeHourIdx]);
 
   const kpiData = [
     {
@@ -293,7 +353,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Time Range Filter Controls - Single Row Grid on 360px Mobile */}
-          <motion.div variants={textItemVariants} className="grid grid-cols-4 sm:flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-slate-200/80 bg-white/90 backdrop-blur-md w-full sm:w-auto shrink-0 shadow-xs">
+          <motion.div variants={textItemVariants} className="premium-tabs grid grid-cols-4 sm:flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-slate-200/80 bg-white/90 backdrop-blur-md w-full sm:w-auto shrink-0 shadow-xs">
             {[
               { key: 'year', label: 'العام (12ش)', desktopLabel: 'هذا العام (12 شهراً)' },
               { key: 'month', label: 'الشهر', desktopLabel: 'هذا الشهر' },
@@ -302,21 +362,15 @@ export default function AdminDashboardPage() {
             ].map((t) => (
               <button
                 key={t.key}
-                onClick={() => {
-                  setTimeRange(t.key as any);
-                  if (t.key === 'year') setSelectedPoint(yearlyRevenueData[6]);
-                  else if (t.key === 'month') setSelectedPoint(monthlyWeekData[3]);
-                  else if (t.key === 'week') setSelectedPoint(weeklyDayData[4]);
-                  else setSelectedPoint(todayHourData[3]);
-                }}
-                className={`py-1.5 px-1 sm:px-3 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold text-center transition-all cursor-pointer truncate ${
+                onClick={() => setTimeRange(t.key as any)}
+                className={`premium-tab py-1.5 px-1 sm:px-3 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold text-center transition-all cursor-pointer truncate ${
                   timeRange === t.key
                     ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-sm shadow-[#173A7C]/25 border border-white/20'
                     : 'text-[#173A7C] hover:text-[#173A7C] hover:bg-slate-100/80'
                 }`}
               >
-                <span className="sm:hidden">{t.label}</span>
-                <span className="hidden sm:inline">{t.desktopLabel}</span>
+                <span className="premium-tab-label sm:hidden">{t.label}</span>
+                <span className="premium-tab-label hidden sm:inline">{t.desktopLabel}</span>
               </button>
             ))}
           </motion.div>
@@ -407,7 +461,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          {/* Selected Month Deep Stats Banner (Instant Live Insight) */}
+          {/* Selected Deep Stats Banner (Instant Live Insight) */}
           <motion.div
             key={selectedPoint.id}
             initial={{ opacity: 0, y: -4 }}
@@ -422,7 +476,14 @@ export default function AdminDashboardPage() {
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="font-black text-xs sm:text-sm text-[#173A7C]">
-                    إحصاءات: شهر {selectedPoint.name}
+                    إحصاءات:{' '}
+                    {timeRange === 'year'
+                      ? `شهر ${selectedPoint.name}`
+                      : timeRange === 'month'
+                      ? selectedPoint.name
+                      : timeRange === 'week'
+                      ? `يوم ${selectedPoint.name}`
+                      : `توقيت ${selectedPoint.name}`}
                   </span>
                   <span
                     className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[9.5px] font-black border shrink-0 whitespace-nowrap ${
@@ -436,7 +497,13 @@ export default function AdminDashboardPage() {
                     {selectedPoint.status === 'completed'
                       ? 'إيراد فعلي ✓'
                       : selectedPoint.status === 'current'
-                      ? 'الشهر الجاري ⚡'
+                      ? timeRange === 'year'
+                        ? 'الشهر الحالي ⚡'
+                        : timeRange === 'month'
+                        ? 'الأسبوع الحالي ⚡'
+                        : timeRange === 'week'
+                        ? 'اليوم الحالي ⚡'
+                        : 'التوقيت الحالي ⚡'
                       : 'مستهدف متوقع 🎯'}
                   </span>
                 </div>

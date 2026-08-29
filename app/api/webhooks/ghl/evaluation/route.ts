@@ -7,9 +7,9 @@ import {
   buildActivity,
   XAPI_VERBS,
 } from "@/lib/xapi";
+import { readVerifiedGhlWebhook } from "@/lib/security/integrations";
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
@@ -20,7 +20,9 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = await req.json();
+    const webhook = await readVerifiedGhlWebhook(req);
+    if (!webhook.ok) return webhook.response;
+    const payload: any = webhook.payload;
     console.log("⭐ GHL Evaluation Webhook received:", JSON.stringify(payload).slice(0, 500));
 
     const email = (payload.email || payload.contact?.email || payload.contact_email || "").toLowerCase().trim();

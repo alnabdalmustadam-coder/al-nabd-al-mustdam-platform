@@ -25,7 +25,11 @@ BEGIN
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'مستخدم جديد'),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'TRAINEE')
+    CASE
+      WHEN UPPER(NEW.raw_app_meta_data->>'role') = 'ADMIN' THEN 'ADMIN'
+      WHEN UPPER(NEW.raw_app_meta_data->>'role') IN ('INSTRUCTOR', 'TRAINER', 'TEACHER') THEN 'TRAINER'
+      ELSE 'TRAINEE'
+    END
   );
   RETURN NEW;
 END;
@@ -127,39 +131,67 @@ ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SET search_path = public
+AS $$
+  SELECT UPPER(COALESCE(auth.jwt() -> 'app_metadata' ->> 'role', ''))
+    IN ('ADMIN', 'SUPERADMIN', 'SUPER_ADMIN');
+$$;
+
 -- Profiles: Users can read their own. Admins can read all.
 CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Admins can view all profiles" ON public.profiles FOR SELECT USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'ADMIN')
+  public.is_admin()
 );
-CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE
+  USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
 -- Courses: Anyone can view published courses. Trainers can view their own. Admins view all.
 CREATE POLICY "Anyone can view published courses" ON public.courses FOR SELECT USING (is_published = true);
 CREATE POLICY "Trainers can manage own courses" ON public.courses FOR ALL USING (
-  trainer_id = auth.uid() OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
+  trainer_id = auth.uid() OR public.is_admin()
+) WITH CHECK (trainer_id = auth.uid() OR public.is_admin());
 
--- Lessons: Anyone can view lessons of published courses (metadata). 
-CREATE POLICY "Anyone can view lessons" ON public.lessons FOR SELECT USING (true);
+-- Lessons can contain unlisted video identifiers, so only previews are public.
+CREATE POLICY "Anyone can view lessons" ON public.lessons FOR SELECT USING (
+  is_free_preview = true
+  OR public.is_admin()
+  OR EXISTS (
+    SELECT 1 FROM public.courses
+    WHERE courses.id = lessons.course_id AND courses.trainer_id = auth.uid()
+  )
+);
 CREATE POLICY "Trainers can manage own course lessons" ON public.lessons FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.courses WHERE courses.id = lessons.course_id AND (courses.trainer_id = auth.uid() OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'ADMIN')))
+  EXISTS (
+    SELECT 1 FROM public.courses
+    WHERE courses.id = lessons.course_id
+      AND (courses.trainer_id = auth.uid() OR public.is_admin())
+  )
+) WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM public.courses
+    WHERE courses.id = lessons.course_id
+      AND (courses.trainer_id = auth.uid() OR public.is_admin())
+  )
 );
 
 -- Enrollments: Users can see their own enrollments. Admins/Trainers can see enrollments for their courses.
 CREATE POLICY "Users can view own enrollments" ON public.enrollments FOR SELECT USING (user_id = auth.uid());
 CREATE POLICY "Admins can view all enrollments" ON public.enrollments FOR SELECT USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'ADMIN')
+  public.is_admin()
 );
 
 -- Services: Anyone can view published services. Admins manage them.
 CREATE POLICY "Anyone can view published services" ON public.services FOR SELECT USING (is_published = true);
 CREATE POLICY "Admins can manage services" ON public.services FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
+  public.is_admin()
+) WITH CHECK (public.is_admin());
 
 -- Orders: Users can view own orders. Admins can view all.
 CREATE POLICY "Users can view own orders" ON public.orders FOR SELECT USING (user_id = auth.uid());
 CREATE POLICY "Admins can view all orders" ON public.orders FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'ADMIN')
-);
+  public.is_admin()
+) WITH CHECK (public.is_admin());

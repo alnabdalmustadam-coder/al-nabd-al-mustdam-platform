@@ -19,7 +19,7 @@ export interface DirectUploadSignature {
   videoId: string;
   libraryId: string;
   uploadUrl: string;
-  authorizationHeader?: string;
+  signature: string;
   expirationTimestamp: number;
 }
 

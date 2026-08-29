@@ -100,10 +100,11 @@ function LoginForm() {
 
       window.dispatchEvent(new Event('nabd_user_updated'));
 
-      // If role is instructor or admin, redirect to admin
-      const role = (profile?.role || data.user?.user_metadata?.role || 'STUDENT').toUpperCase();
-      if (role === 'ADMIN' || role === 'INSTRUCTOR' || role === 'TRAINER') {
+      const role = (data.user?.app_metadata?.role || profile?.role || 'STUDENT').toUpperCase();
+      if (role === 'ADMIN' || role === 'SUPERADMIN' || role === 'SUPER_ADMIN') {
         window.location.href = '/dashboard/admin';
+      } else if (role === 'INSTRUCTOR' || role === 'TRAINER' || role === 'TEACHER') {
+        window.location.href = '/dashboard/instructor';
       } else {
         window.location.href = redirectParam;
       }

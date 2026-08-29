@@ -72,7 +72,7 @@ export default function Navbar() {
             setLocalUserName(null);
           }
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
           setLocalUserEmail(null);
           setLocalUserName(null);
@@ -103,22 +103,17 @@ export default function Navbar() {
     setMobileMegaMenuOpen(false);
   }, [pathname]);
 
-  const isDarkPage = pathname?.startsWith('/auth/');
+  const isDarkPage = false;
 
   return (
     <>
       <nav
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 font-[family-name:var(--font-cairo)] ${
-          isDarkPage
-            ? scrolled
-              ? "py-3 bg-[#0A1128]/95 backdrop-blur-md border-b border-white/10 shadow-lg"
-              : "py-5 bg-transparent"
-            : scrolled
-              ? "py-3 bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-[0_10px_30px_-10px_rgba(23,58,124,0.08)]"
-              : "py-5 bg-transparent"
+        data-scrolled={scrolled ? "true" : "false"}
+        className={`premium-navbar fixed top-0 inset-x-0 z-50 transition-all duration-500 font-[family-name:var(--font-cairo)] ${
+          isDarkPage ? "premium-navbar-dark" : "premium-navbar-light"
         }`}
       >
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-4 xl:px-12 flex items-center justify-between">
+        <div className="premium-navbar-inner max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-5 xl:px-12 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
             <img src="/logo.svg" alt="TTi Logo" className="h-12 w-auto object-contain" />
@@ -139,27 +134,29 @@ export default function Navbar() {
                     onMouseLeave={() => setMegaMenuOpen(false)}
                   >
                     <button
-                      className={`flex items-center gap-1.5 px-3 py-6 -my-4 rounded-xl text-[14px] xl:text-[15px] font-black font-[family-name:var(--font-cairo)] transition-all duration-300 whitespace-nowrap group ${
+                      className={`premium-nav-link flex items-center gap-1.5 px-3 py-2 rounded-xl text-[14px] xl:text-[15px] font-black font-[family-name:var(--font-cairo)] transition-all duration-300 whitespace-nowrap group ${
                         isActive || megaMenuOpen
                           ? isDarkPage
                             ? "text-[#5CB07C] bg-white/10"
                             : "bg-gradient-to-r from-[#173A7C]/10 via-[#1E4D9D]/10 to-[#5CB07C]/10 border border-[#173A7C]/15 shadow-xs"
                           : isDarkPage
                             ? "text-slate-300 hover:text-white hover:bg-white/5"
-                            : "text-slate-700 hover:bg-slate-50/80"
+                            : "text-[#173A7C] hover:bg-white/65"
                       }`}
                     >
                       <Icon className={`w-4 h-4 transition-colors duration-300 ${
                         isActive || megaMenuOpen
                           ? isDarkPage ? "text-[#5CB07C]" : "text-[#173A7C]"
-                          : isDarkPage ? "text-slate-400" : "text-slate-400 group-hover:text-[#173A7C]"
+                          : isDarkPage ? "text-slate-400" : "text-[#173A7C]/55 group-hover:text-[#173A7C]"
                       }`} strokeWidth={2.5} />
                       <span className={`${
                         isActive || megaMenuOpen
                           ? isDarkPage
                             ? "text-[#5CB07C]"
-                            : "bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] bg-clip-text text-transparent"
-                          : "group-hover:bg-gradient-to-r group-hover:from-[#173A7C] group-hover:via-[#1E4D9D] group-hover:to-[#5CB07C] group-hover:bg-clip-text group-hover:text-transparent"
+                            : "text-[#173A7C]"
+                          : isDarkPage
+                            ? "text-slate-300 group-hover:text-white"
+                            : "text-[#173A7C]"
                       }`}>
                         {link.label}
                       </span>
@@ -168,7 +165,7 @@ export default function Navbar() {
 
                     {/* Desktop Mega Menu Dropdown */}
                     <div
-                      className={`absolute top-full right-1/2 translate-x-1/2 pt-6 w-[850px] transition-all duration-300 transform origin-top ${
+                      className={`absolute top-full right-1/2 translate-x-1/2 pt-2 w-[850px] transition-all duration-300 transform origin-top ${
                         megaMenuOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                       }`}
                     >
@@ -206,27 +203,29 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[14px] xl:text-[15px] font-black font-[family-name:var(--font-cairo)] transition-all duration-300 whitespace-nowrap group ${
+                  className={`premium-nav-link flex items-center gap-1.5 px-3 py-2 rounded-xl text-[14px] xl:text-[15px] font-black font-[family-name:var(--font-cairo)] transition-all duration-300 whitespace-nowrap group ${
                     isActive
                       ? isDarkPage
                         ? "text-[#5CB07C] bg-white/10"
                         : "bg-gradient-to-r from-[#173A7C]/10 via-[#1E4D9D]/10 to-[#5CB07C]/10 border border-[#173A7C]/15 shadow-xs"
                       : isDarkPage
                         ? "text-slate-300 hover:text-white hover:bg-white/5"
-                        : "text-slate-700 hover:bg-slate-50/80"
+                        : "text-[#173A7C] hover:bg-white/65"
                   }`}
                 >
                   <Icon className={`w-4 h-4 transition-colors duration-300 ${
                     isActive
                       ? isDarkPage ? "text-[#5CB07C]" : "text-[#173A7C]"
-                      : isDarkPage ? "text-slate-400" : "text-slate-400 group-hover:text-[#173A7C]"
+                      : isDarkPage ? "text-slate-400" : "text-[#173A7C]/55 group-hover:text-[#173A7C]"
                   }`} strokeWidth={2.5} />
                   <span className={`${
                     isActive
                       ? isDarkPage
                         ? "text-[#5CB07C]"
-                        : "bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] bg-clip-text text-transparent"
-                      : "group-hover:bg-gradient-to-r group-hover:from-[#173A7C] group-hover:via-[#1E4D9D] group-hover:to-[#5CB07C] group-hover:bg-clip-text group-hover:text-transparent"
+                        : "text-[#173A7C]"
+                      : isDarkPage
+                        ? "text-slate-300 group-hover:text-white"
+                        : "text-[#173A7C]"
                   }`}>
                     {link.label}
                   </span>
@@ -243,7 +242,7 @@ export default function Navbar() {
               className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border ${
                 isDarkPage
                   ? "bg-white/5 border-white/10 text-slate-300 hover:text-rose-400 hover:bg-white/10"
-                  : "bg-slate-50 border-slate-200/80 text-slate-600 hover:text-rose-500 hover:bg-white hover:shadow-sm"
+                  : "bg-white/70 border-[#173A7C]/12 text-[#173A7C] hover:text-rose-500 hover:bg-white hover:shadow-md"
               }`}
               title="المفضلة"
               aria-label="المفضلة"
@@ -262,7 +261,7 @@ export default function Navbar() {
               className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border cursor-pointer ${
                 isDarkPage
                   ? "bg-white/5 border-white/10 text-slate-300 hover:text-[#5CB07C] hover:bg-white/10"
-                  : "bg-slate-50 border-slate-200/80 text-slate-700 hover:text-[#173A7C] hover:bg-white hover:shadow-sm"
+                  : "bg-white/70 border-[#173A7C]/12 text-[#173A7C] hover:bg-white hover:shadow-md"
               }`}
               title="سلة المشتريات"
               aria-label="سلة المشتريات"
@@ -291,7 +290,7 @@ export default function Navbar() {
                 }`}>
                   <User className="w-4 h-4" />
                 </div>
-                <span className={`text-sm font-bold ${isDarkPage ? "text-slate-200" : "text-slate-700"}`}>
+                <span className={`text-sm font-bold ${isDarkPage ? "text-slate-200" : "text-[#173A7C] engraved-nav-text"}`}>
                   {localUserName?.split(' ')[0] || localUserEmail.split('@')[0]}
                 </span>
               </Link>
@@ -307,7 +306,7 @@ export default function Navbar() {
             <button
               onClick={openCart}
               className={`relative p-2 rounded-xl transition-colors ${
-                isDarkPage ? "text-slate-200 bg-white/5" : "text-slate-700 bg-slate-100"
+                isDarkPage ? "text-slate-200 bg-white/5" : "text-[#173A7C] bg-white/75 border border-[#173A7C]/10 shadow-sm"
               }`}
               aria-label="السلة"
             >
@@ -324,7 +323,7 @@ export default function Navbar() {
               className={`p-2 transition-colors ${
                 isDarkPage
                   ? "text-slate-300 hover:text-white"
-                  : "text-slate-800 hover:text-[#173A7C]"
+                  : "text-[#173A7C] hover:text-[#0D2B61]"
               }`}
               aria-label="القائمة"
             >
@@ -382,15 +381,15 @@ export default function Navbar() {
                   <div key={link.label} className="flex flex-col border-b border-slate-100 pb-2 mb-2">
                     <button
                       onClick={() => setMobileMegaMenuOpen(!mobileMegaMenuOpen)}
-                      className={`flex items-center justify-between px-4 py-3 rounded-xl text-base font-black transition-all w-full ${
+                      className={`premium-nav-link flex items-center justify-between px-4 py-3 rounded-xl text-base font-black transition-all w-full ${
                         isActive || mobileMegaMenuOpen
                           ? "bg-gradient-to-r from-[#173A7C]/10 via-[#1E4D9D]/10 to-[#5CB07C]/10 border border-[#173A7C]/10 text-[#173A7C]"
-                          : "text-slate-700 hover:bg-slate-50"
+                          : "text-[#173A7C] hover:bg-[#173A7C]/5"
                       }`}
                     >
                       <span className="flex items-center gap-3">
-                        <Icon className={`w-5 h-5 ${isActive || mobileMegaMenuOpen ? "text-[#173A7C]" : "text-slate-400"}`} />
-                        <span className={isActive || mobileMegaMenuOpen ? "bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] bg-clip-text text-transparent" : ""}>
+                        <Icon className={`w-5 h-5 ${isActive || mobileMegaMenuOpen ? "text-[#173A7C]" : "text-[#173A7C]/55"}`} />
+                        <span className="text-[#173A7C]">
                           {link.label}
                         </span>
                       </span>
@@ -419,14 +418,14 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-black transition-all ${
+                  className={`premium-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-base font-black transition-all ${
                     isActive
                       ? "bg-gradient-to-r from-[#173A7C]/10 via-[#1E4D9D]/10 to-[#5CB07C]/10 border border-[#173A7C]/10 text-[#173A7C]"
-                      : "text-slate-700 hover:bg-slate-50"
+                      : "text-[#173A7C] hover:bg-[#173A7C]/5"
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? "text-[#173A7C]" : "text-slate-400"}`} />
-                  <span className={isActive ? "bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] bg-clip-text text-transparent" : ""}>
+                  <Icon className={`w-5 h-5 ${isActive ? "text-[#173A7C]" : "text-[#173A7C]/55"}`} />
+                  <span className="text-[#173A7C]">
                     {link.label}
                   </span>
                 </Link>

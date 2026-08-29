@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/security/auth";
 
 /**
  * GET /api/ghl/sync-contact?email=xxx
@@ -10,7 +11,9 @@ import { supabase } from "@/lib/supabase";
  * Returns: { synced: true, profile: { full_name, phone, ghl_contact_id } }
  */
 export async function GET(req: NextRequest) {
-  const email = req.nextUrl.searchParams.get("email");
+  const auth = await requireUser(req);
+  if (!auth.ok) return auth.response;
+  const email = auth.user.email;
 
   if (!email) {
     return NextResponse.json({ message: "البريد الإلكتروني مطلوب" }, { status: 400 });

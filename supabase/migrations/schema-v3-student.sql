@@ -25,7 +25,11 @@ BEGIN
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'طالب جديد'),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'STUDENT')
+    CASE
+      WHEN UPPER(NEW.raw_app_meta_data->>'role') IN ('ADMIN', 'SUPERADMIN', 'SUPER_ADMIN') THEN 'ADMIN'
+      WHEN UPPER(NEW.raw_app_meta_data->>'role') IN ('INSTRUCTOR', 'TRAINER', 'TEACHER') THEN 'TEACHER'
+      ELSE 'STUDENT'
+    END
   )
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
@@ -216,7 +220,13 @@ CREATE POLICY "Anyone can view chapters of published courses" ON public.chapters
   EXISTS (SELECT 1 FROM public.courses WHERE courses.id = chapters.course_id AND is_published = true)
 );
 CREATE POLICY "Anyone can view lessons of published courses" ON public.lessons FOR SELECT USING (
-  EXISTS (SELECT 1 FROM public.courses WHERE courses.id = lessons.course_id AND is_published = true)
+  is_free_preview = true
+  OR EXISTS (
+    SELECT 1 FROM public.enrollments
+    WHERE enrollments.course_id = lessons.course_id
+      AND enrollments.user_id = auth.uid()
+      AND enrollments.status = 'ACTIVE'
+  )
 );
 
 -- Videos: Students can only access video metadata if enrolled OR if lesson is free preview
@@ -234,8 +244,7 @@ CREATE POLICY "User can view own enrollments" ON public.enrollments FOR SELECT U
 
 -- Lesson Progress: User can manage own lesson progress
 CREATE POLICY "User can view own lesson progress" ON public.lesson_progress FOR SELECT USING (user_id = auth.uid());
-CREATE POLICY "User can insert own lesson progress" ON public.lesson_progress FOR INSERT WITH CHECK (user_id = auth.uid());
-CREATE POLICY "User can update own lesson progress" ON public.lesson_progress FOR UPDATE USING (user_id = auth.uid());
+-- Completion is recorded by the authenticated server API, not direct clients.
 
 -- Lesson Notes: User manages own notes
 CREATE POLICY "User can manage own notes" ON public.lesson_notes FOR ALL USING (user_id = auth.uid());
@@ -256,14 +265,9 @@ CREATE POLICY "Enrolled students can view quizzes" ON public.quizzes FOR SELECT 
     SELECT 1 FROM public.enrollments WHERE enrollments.course_id = quizzes.course_id AND enrollments.user_id = auth.uid()
   )
 );
-CREATE POLICY "Enrolled students can view quiz questions" ON public.quiz_questions FOR SELECT USING (
-  EXISTS (
-    SELECT 1 FROM public.quizzes
-    JOIN public.enrollments ON enrollments.course_id = quizzes.course_id AND enrollments.user_id = auth.uid()
-    WHERE quizzes.id = quiz_questions.quiz_id
-  )
-);
-CREATE POLICY "User can manage own quiz attempts" ON public.quiz_attempts FOR ALL USING (user_id = auth.uid());
+-- quiz_questions contains correct_option_index and is server-only. Attempts are
+-- graded by the server; students may read only their own recorded result.
+CREATE POLICY "User can view own quiz attempts" ON public.quiz_attempts FOR SELECT USING (user_id = auth.uid());
 
 -- Certificates: User can view own certificates
 CREATE POLICY "User can view own certificates" ON public.certificates FOR SELECT USING (user_id = auth.uid());

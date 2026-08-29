@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
@@ -24,6 +24,12 @@ import {
   GraduationCap,
   Sparkles,
   ChevronLeft,
+  Lock,
+  Copy,
+  Check,
+  Loader2,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 
 interface UserRecord {
@@ -45,96 +51,131 @@ export default function AdminUsersPage() {
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [selectedUserForLogs, setSelectedUserForLogs] = useState<UserRecord | null>(null);
 
-  // New Student Form State
+  const [users, setUsers] = useState<UserRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // New User Form State
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPhone, setNewPhone] = useState('');
+  const [newPassword, setNewPassword] = useState('12345678');
+  const [newNationalId, setNewNationalId] = useState('');
+  const [newRole, setNewRole] = useState<'STUDENT' | 'INSTRUCTOR' | 'ADMIN'>('STUDENT');
 
-  const [users, setUsers] = useState<UserRecord[]>([
-    {
-      id: 'u-superadmin',
-      name: 'المدير العام (Super Admin)',
-      email: 'superadmin@admin.com',
-      phone: '+966 50 000 0000',
-      role: 'أدمن',
-      enrolledCourses: 24,
-      certificatesCount: 24,
-      status: 'active',
-      lastActive: 'نشط الآن',
-      attendanceRate: '100%',
-    },
-    {
-      id: 'u-1',
-      name: 'عبدالله الشمري',
-      email: 'abdullah@example.com',
-      phone: '+966 50 123 4567',
-      role: 'طالب',
-      enrolledCourses: 3,
-      certificatesCount: 2,
-      status: 'active',
-      lastActive: 'منذ 10 دقائق',
-      attendanceRate: '96%',
-    },
-    {
-      id: 'u-2',
-      name: 'سارة العتيبي',
-      email: 'sara@example.com',
-      phone: '+966 55 987 6543',
-      role: 'طالب',
-      enrolledCourses: 2,
-      certificatesCount: 1,
-      status: 'active',
-      lastActive: 'اليوم، 09:30 ص',
-      attendanceRate: '100%',
-    },
-    {
-      id: 'u-3',
-      name: 'د. محمد القحطاني',
-      email: 'm.qahtani@tti.edu.sa',
-      phone: '+966 51 000 1122',
-      role: 'مدرب',
-      enrolledCourses: 12,
-      certificatesCount: 15,
-      status: 'active',
-      lastActive: 'منذ ساعة',
-      attendanceRate: '98%',
-    },
-    {
-      id: 'u-4',
-      name: 'سعود السبيعي',
-      email: 'saud@example.com',
-      phone: '+966 54 333 2211',
-      role: 'طالب',
-      enrolledCourses: 1,
-      certificatesCount: 0,
-      status: 'suspended',
-      lastActive: 'منذ 5 أيام',
-      attendanceRate: '60%',
-    },
-  ]);
+  // Deletion Modal State
+  const [userToDelete, setUserToDelete] = useState<UserRecord | null>(null);
 
-  const handleAddUser = (e: React.FormEvent) => {
+  // Created Success Credentials Modal
+  const [createdCredentials, setCreatedCredentials] = useState<{
+    email: string;
+    password: string;
+    name: string;
+    role?: string;
+  } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/users');
+      const data = await res.json();
+      if (res.ok && data.users) {
+        setUsers(data.users);
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName.trim() || !newEmail.trim()) return;
+    if (!newName.trim() || !newEmail.trim() || !newPassword.trim()) {
+      alert('يرجى ملء الاسم الكامل، البريد الإلكتروني، وكلمة المرور');
+      return;
+    }
 
-    const newU: UserRecord = {
-      id: `u-${Date.now()}`,
-      name: newName,
-      email: newEmail,
-      phone: newPhone || '+966 50 000 0000',
-      role: 'طالب',
-      enrolledCourses: 1,
-      certificatesCount: 0,
-      status: 'active',
-      lastActive: 'الآن',
-      attendanceRate: '100%',
-    };
+    try {
+      setSaving(true);
+      const res = await fetch('/api/admin/users/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: newName,
+          email: newEmail,
+          password: newPassword,
+          phone: newPhone,
+          nationalId: newNationalId,
+          role: newRole,
+        }),
+      });
 
-    setUsers([newU, ...users]);
-    setNewName('');
-    setNewEmail('');
-    setNewPhone('');
-    setIsAddUserModalOpen(false);
+      const json = await res.json();
+
+      if (!res.ok) {
+        alert(json.message || 'حدث خطأ أثناء تسجيل المستخدم');
+        return;
+      }
+
+      setCreatedCredentials({
+        name: newName,
+        email: newEmail,
+        password: newPassword,
+        role: newRole === 'ADMIN' ? 'أدمن ومدير نظام' : newRole === 'INSTRUCTOR' ? 'مدرب ومعلم' : 'متدرب وطالب',
+      });
+
+      setIsAddUserModalOpen(false);
+      setNewName('');
+      setNewEmail('');
+      setNewPhone('');
+      setNewNationalId('');
+      setNewPassword('12345678');
+      setNewRole('STUDENT');
+      loadUsers();
+    } catch (err) {
+      console.error('Add user error:', err);
+      alert('حدث خطأ في الاتصال بالخادم');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    try {
+      setIsDeleting(true);
+      const res = await fetch(`/api/admin/users?userId=${userToDelete.id}&email=${encodeURIComponent(userToDelete.email)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message || 'حدث خطأ أثناء حذف الحساب');
+        return;
+      }
+
+      setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id && u.email !== userToDelete.email));
+      setUserToDelete(null);
+    } catch (err) {
+      console.error('Delete user error:', err);
+      alert('حدث خطأ في الاتصال بالخادم');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCopyCredentials = () => {
+    if (!createdCredentials) return;
+    const text = `بيانات الدخول للوحة تحكم المتدرب:\nالاسم: ${createdCredentials.name}\nالبريد: ${createdCredentials.email}\nكلمة المرور: ${createdCredentials.password}\nالرابط: ${window.location.origin}/auth/login`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const toggleUserStatus = (id: string) => {
@@ -231,7 +272,7 @@ export default function AdminUsersPage() {
 
       {/* Filter Tabs & Search Bar */}
       <div className="liquid-glass-card rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/60 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-        <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+        <div className="premium-tabs flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
           {[
             { id: 'all', label: 'الجميع' },
             { id: 'طالب', label: 'الطلاب والمتدربين 🎓' },
@@ -242,12 +283,12 @@ export default function AdminUsersPage() {
               <button
                 key={tab.id}
                 onClick={() => setRoleFilter(tab.id as any)}
-                className={`flex-1 sm:flex-none px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${isActive
+                className={`premium-tab flex-1 sm:flex-none px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${isActive
                     ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-[#173A7C]'
                     : 'bg-white/80 text-slate-700 hover:bg-white hover:text-[#173A7C] border border-slate-200/80'
                   }`}
               >
-                {tab.label}
+                <span className="premium-tab-label">{tab.label}</span>
               </button>
             );
           })}
@@ -340,12 +381,22 @@ export default function AdminUsersPage() {
                     </button>
                   </td>
                   <td className="p-4 text-center">
-                    <button
-                      onClick={() => setSelectedUserForLogs(user)}
-                      className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-[#173A7C] hover:text-white text-[#173A7C] font-bold text-[11px] transition-all cursor-pointer border border-[#173A7C]/20 shadow-sm"
-                    >
-                      سجل الأنشطة 📋
-                    </button>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button
+                        onClick={() => setSelectedUserForLogs(user)}
+                        className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#173A7C] hover:text-white text-[#173A7C] font-bold text-[11px] transition-all cursor-pointer border border-[#173A7C]/20 shadow-xs whitespace-nowrap"
+                        title="سجل الأنشطة"
+                      >
+                        سجل الأنشطة 📋
+                      </button>
+                      <button
+                        onClick={() => setUserToDelete(user)}
+                        className="p-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white transition-all cursor-pointer border border-rose-200 shadow-xs"
+                        title="حذف الحساب نهائياً"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -416,12 +467,21 @@ export default function AdminUsersPage() {
               </div>
 
               {/* Actions */}
-              <button
-                onClick={() => setSelectedUserForLogs(user)}
-                className="w-full py-2 rounded-lg bg-white hover:bg-[#173A7C] hover:text-white text-[#173A7C] font-bold text-[11px] transition-all cursor-pointer border border-[#173A7C]/20 shadow-sm text-center"
-              >
-                سجل الأنشطة 📋
-              </button>
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={() => setSelectedUserForLogs(user)}
+                  className="flex-1 py-2 rounded-lg bg-white hover:bg-[#173A7C] hover:text-white text-[#173A7C] font-bold text-[11px] transition-all cursor-pointer border border-[#173A7C]/20 shadow-xs text-center"
+                >
+                  سجل الأنشطة 📋
+                </button>
+                <button
+                  onClick={() => setUserToDelete(user)}
+                  className="px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white transition-all cursor-pointer border border-rose-200 shadow-xs flex items-center justify-center"
+                  title="حذف الحساب"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -450,8 +510,8 @@ export default function AdminUsersPage() {
                     <Plus className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg text-[#152C5B] student-heading-h3">تسجيل متدرب جديد في النظام</h3>
-                    <p className="text-xs text-slate-500 font-bold">إضافة حساب طالب وتعيين بيانات الاعتماد</p>
+                    <h3 className="font-black text-lg text-[#152C5B] student-heading-h3">تسجيل مستخدم جديد في النظام</h3>
+                    <p className="text-xs text-slate-500 font-bold">إنشاء حساب (طالب / مدرب / أدمن) وتعيين الصلاحية</p>
                   </div>
                 </div>
                 <button
@@ -463,8 +523,51 @@ export default function AdminUsersPage() {
               </div>
 
               <form onSubmit={handleAddUser} className="space-y-3.5 text-xs font-bold">
+                {/* Role Selection */}
                 <div className="space-y-1.5">
-                  <label className="text-slate-700 block">الاسم الكامل للمتدرب</label>
+                  <label className="text-slate-700 block">نوع الحساب والصلاحية <span className="text-rose-500">*</span></label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setNewRole('STUDENT')}
+                      className={`py-2.5 px-3 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        newRole === 'STUDENT'
+                          ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white border-[#173A7C] shadow-sm'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
+                      }`}
+                    >
+                      <GraduationCap className="w-3.5 h-3.5" />
+                      <span>طالب</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewRole('INSTRUCTOR')}
+                      className={`py-2.5 px-3 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        newRole === 'INSTRUCTOR'
+                          ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-sm'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
+                      }`}
+                    >
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>مدرب / معلم</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewRole('ADMIN')}
+                      className={`py-2.5 px-3 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        newRole === 'ADMIN'
+                          ? 'bg-gradient-to-r from-purple-700 to-indigo-800 text-white border-purple-700 shadow-sm'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
+                      }`}
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>أدمن (مدير)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-slate-700 block">الاسم الكامل <span className="text-rose-500">*</span></label>
                   <input
                     type="text"
                     required
@@ -476,24 +579,49 @@ export default function AdminUsersPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-slate-700 block">البريد الإلكتروني الأكاديمي</label>
+                  <label className="text-slate-700 block">البريد الإلكتروني <span className="text-rose-500">*</span></label>
                   <input
                     type="email"
                     required
-                    placeholder="ahmed@example.com"
+                    placeholder="name@example.com"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
                   />
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-slate-700 block">كلمة المرور <span className="text-rose-500">*</span></label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="12345678"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 font-mono focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-slate-700 block">رقم الجوال</label>
+                    <input
+                      type="text"
+                      placeholder="+966 50 000 0000"
+                      value={newPhone}
+                      onChange={(e) => setNewPhone(e.target.value)}
+                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
-                  <label className="text-slate-700 block">رقم الجوال</label>
+                  <label className="text-slate-700 block">رقم الهوية الوطنية / الإقامة (اختياري)</label>
                   <input
                     type="text"
-                    placeholder="+966 50 000 0000"
-                    value={newPhone}
-                    onChange={(e) => setNewPhone(e.target.value)}
+                    placeholder="10 أرقام"
+                    value={newNationalId}
+                    onChange={(e) => setNewNationalId(e.target.value)}
                     className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
                   />
                 </div>
@@ -508,12 +636,148 @@ export default function AdminUsersPage() {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all border border-white/20"
+                    disabled={saving}
+                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all border border-white/20 flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    تأكيد الإضافة ⚡
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>جاري الحفظ...</span>
+                      </>
+                    ) : (
+                      <span>تأكيد وتسجيل الحساب ⚡</span>
+                    )}
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* CREATED CREDENTIALS MODAL */}
+      <AnimatePresence>
+        {createdCredentials && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-2xl relative text-right font-[family-name:var(--font-cairo)]"
+            >
+              <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div className="p-3 rounded-xl bg-emerald-100 text-emerald-700">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-slate-900">تم إنشاء الحساب بنجاح!</h3>
+                  <p className="text-xs text-slate-500 font-bold">يمكن للمستخدم تسجيل الدخول فوراً عبر البيانات التالية</p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs font-bold text-slate-700">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500">الاسم:</span>
+                  <span className="text-slate-900 font-black">{createdCredentials.name}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500">نوع الصلاحية:</span>
+                  <span className="text-emerald-700 font-black">{createdCredentials.role || 'متدرب'}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500">البريد الإلكتروني:</span>
+                  <span className="text-[#173A7C] font-mono">{createdCredentials.email}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500">كلمة المرور:</span>
+                  <span className="text-emerald-700 font-mono font-black">{createdCredentials.password}</span>
+                </div>
+                <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
+                  <span className="text-slate-500">رابط الدخول:</span>
+                  <span className="text-slate-800 font-mono text-[11px]">/auth/login</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  onClick={handleCopyCredentials}
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 hover:opacity-95 transition-all cursor-pointer"
+                >
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  <span>{copied ? 'تم النسخ بنجاح!' : 'نسخ بيانات الدخول'}</span>
+                </button>
+                <button
+                  onClick={() => setCreatedCredentials(null)}
+                  className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  إغلاق
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <AnimatePresence>
+        {userToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md bg-white rounded-2xl border border-rose-200 p-6 space-y-4 shadow-2xl relative text-right font-[family-name:var(--font-cairo)]"
+            >
+              <div className="flex items-center gap-3 pb-3 border-b border-rose-100">
+                <div className="p-3 rounded-xl bg-rose-100 text-rose-600">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-slate-900">تأكيد حذف الحساب نهائياً</h3>
+                  <p className="text-xs text-rose-600 font-bold">هذا الإجراء لا يمكن التراجع عنه</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-600 font-bold leading-relaxed">
+                هل أنت متأكد من رغبتك في حذف حساب <strong className="text-slate-900">{userToDelete.name}</strong> ({userToDelete.email})؟ سيتم حذف بيانات الحساب بالكامل من النظام ومن قاعدة البيانات.
+              </p>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  onClick={handleDeleteUser}
+                  disabled={isDeleting}
+                  className="flex-1 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-600/25 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>جاري الحذف...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      <span>نعم، احذف الحساب الآن</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setUserToDelete(null)}
+                  disabled={isDeleting}
+                  className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  إلغاء
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

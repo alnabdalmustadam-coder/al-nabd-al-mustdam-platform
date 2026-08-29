@@ -4,11 +4,14 @@ import {
   toggleCertificateStatus,
   deleteIssuedCertificate,
 } from '@/lib/certificates-store';
+import { requireAdmin } from '@/lib/security/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
     const body = await req.json();
     if (!body.studentName || !body.studentName.trim()) {
       return NextResponse.json({ success: false, error: 'اسم المتدرب مطلوب' }, { status: 400 });
@@ -37,6 +40,8 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
     const body = await req.json();
     if (!body.id) {
       return NextResponse.json({ success: false, error: 'معرّف الشهادة مطلوب' }, { status: 400 });
@@ -56,6 +61,8 @@ export async function PATCH(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     if (!id) {

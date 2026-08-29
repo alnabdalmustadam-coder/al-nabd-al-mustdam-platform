@@ -4,18 +4,18 @@ import {
   getAllTemplates,
   issueCertificate,
 } from '@/lib/certificates-store';
+import { requireUser } from '@/lib/security/auth';
+import { supabase } from '@/lib/supabase';
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
+
     const body = await req.json();
     const {
-      studentName,
-      studentEmail,
       courseTitle,
       courseSlug,
-      grade,
-      hours,
-      templateId,
     } = body;
 
     if (!courseTitle && !courseSlug) {
@@ -25,9 +25,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const name = studentName || 'المتدرب المتميز';
-    const title = courseTitle || 'الدورة التدريبية المعتمدة';
-    const email = studentEmail ? studentEmail.toLowerCase().trim() : undefined;
+    const email = auth.user.email?.toLowerCase().trim();
+    if (!email) {
+      return NextResponse.json({ success: false, error: 'البريد الإلكتروني غير متاح' }, { status: 400 });
+    }
+
+    const enrollmentIds = [courseSlug, courseSlug ? `course-${courseSlug.replace(/^course-/, '')}` : null]
+      .filter(Boolean) as string[];
+    let enrollmentQuery = supabase
+      .from('enrollments')
+      .select('course_id, course_title, progress, status')
+      .eq('email', email);
+    if (enrollmentIds.length > 0) enrollmentQuery = enrollmentQuery.in('course_id', enrollmentIds);
+    else enrollmentQuery = enrollmentQuery.eq('course_title', courseTitle);
+    const { data: enrollment } = await enrollmentQuery.maybeSingle();
+
+    if (!enrollment || (Number(enrollment.progress) < 100 && enrollment.status !== 'completed')) {
+      return NextResponse.json({ success: false, error: 'لا يمكن إصدار الشهادة قبل إكمال الدورة' }, { status: 403 });
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', auth.user.id)
+      .maybeSingle();
+    const name = profile?.full_name || auth.user.user_metadata?.full_name || 'المتدرب المتميز';
+    const title = enrollment.course_title || courseTitle || 'الدورة التدريبية المعتمدة';
 
     const allIssued = getAllIssuedCertificates();
     const allTemplates = getAllTemplates();
@@ -54,7 +77,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Determine best template
-    let targetTemplateId = templateId;
+    let targetTemplateId: string | undefined;
     if (!targetTemplateId) {
       const matchedTpl =
         allTemplates.find(
@@ -76,8 +99,8 @@ export async function POST(req: NextRequest) {
       studentEmail: email,
       courseTitle: title,
       templateId: targetTemplateId,
-      grade: grade || 'ممتاز مرتفع (%98)',
-      hours: hours || '30 ساعة تدريبية معتمدة',
+      grade: 'ممتاز مرتفع (%98)',
+      hours: '30 ساعة تدريبية معتمدة',
       imageUrl: matchedTemplate?.imageUrl || '/1.png',
     });
 

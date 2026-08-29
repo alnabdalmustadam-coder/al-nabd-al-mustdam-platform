@@ -16,7 +16,3 @@ export async function POST() {
 
   return response;
 }
-
-export async function GET() {
-  return POST();
-}

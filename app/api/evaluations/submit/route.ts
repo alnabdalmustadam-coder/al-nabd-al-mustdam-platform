@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { stmtEvaluated, storeStatement } from "@/lib/xapi";
+import { requireUser } from "@/lib/security/auth";
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
+
     const payload = await req.json();
-    const { email, courseId, courseTitle, rating, feedback } = payload;
+    const { courseId, courseTitle, rating, feedback } = payload;
+    const email = auth.user.email;
 
     if (!email || !courseId || !rating) {
       return NextResponse.json({ message: "البيانات غير مكتملة" }, { status: 400 });

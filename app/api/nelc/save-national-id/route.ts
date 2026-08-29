@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import crypto from "crypto";
+import { requireUser } from "@/lib/security/auth";
 
 /**
  * POST /api/nelc/save-national-id
@@ -10,7 +10,6 @@ import crypto from "crypto";
  */
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
@@ -21,7 +20,11 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, nationalId, fullName, professionalId } = await req.json();
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
+
+    const { nationalId, fullName, professionalId } = await req.json();
+    const email = auth.user.email;
 
     if (!email) {
       return NextResponse.json(
@@ -61,11 +64,10 @@ export async function POST(req: NextRequest) {
         .eq("email", cleanEmail);
     } else {
       // 3. Create new profile
-      const tempId = crypto.randomUUID();
       result = await supabase
         .from("profiles")
         .insert({
-          id: tempId,
+          id: auth.user.id,
           email: cleanEmail,
           nelc_eligible: !!nationalId,
           ...(nationalId ? { national_id: nationalId } : {}),

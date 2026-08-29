@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   UserCheck,
@@ -20,7 +20,15 @@ import {
   Sparkles,
   X,
   GraduationCap,
+  Loader2,
+  Lock,
+  Copy,
+  Check,
+  ExternalLink,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 interface Trainer {
   id: string;
@@ -39,287 +47,330 @@ export default function AdminTrainersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'on_leave'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [trainerToDelete, setTrainerToDelete] = useState<Trainer | null>(null);
 
   // New Trainer Form State
   const [newTrainerName, setNewTrainerName] = useState('');
   const [newTrainerSpecialty, setNewTrainerSpecialty] = useState('');
   const [newTrainerEmail, setNewTrainerEmail] = useState('');
+  const [newTrainerPassword, setNewTrainerPassword] = useState('12345678');
   const [newTrainerPhone, setNewTrainerPhone] = useState('');
 
-  const [trainers, setTrainers] = useState<Trainer[]>([
-    {
-      id: 'tr-1',
-      name: 'د. عبدالله بن محمد الشمري',
-      specialty: 'أستاذ المواطنة والحوار الحضاري',
-      email: 'a.shammari@sustainpulse.org',
-      phone: '+966 50 123 4567',
-      coursesCount: 5,
-      studentsCount: 3420,
-      rating: 4.9,
-      status: 'active',
-      avatarInitials: 'ع ش',
-    },
-    {
-      id: 'tr-2',
-      name: 'د. سارة بنت خالد العتيبي',
-      specialty: 'استشارية القيادة والتنمية الإيجابية',
-      email: 's.otaibi@sustainpulse.org',
-      phone: '+966 55 987 6543',
-      coursesCount: 4,
-      studentsCount: 2890,
-      rating: 4.8,
-      status: 'active',
-      avatarInitials: 'س ع',
-    },
-    {
-      id: 'tr-3',
-      name: 'أ. فهد بن سليمان الحارثي',
-      specialty: 'خبير التفكير الناقد والمنهجيات الأكاديمية',
-      email: 'f.harthi@sustainpulse.org',
-      phone: '+966 53 456 7890',
-      coursesCount: 3,
-      studentsCount: 1950,
-      rating: 4.7,
-      status: 'active',
-      avatarInitials: 'ف ح',
-    },
-    {
-      id: 'tr-4',
-      name: 'د. نورة بنت فهد الدوسري',
-      specialty: 'متخصصة الحوار الأسري والتماسك المجتمعي',
-      email: 'n.dosari@sustainpulse.org',
-      phone: '+966 54 321 0987',
-      coursesCount: 2,
-      studentsCount: 1200,
-      rating: 4.9,
-      status: 'on_leave',
-      avatarInitials: 'ن د',
-    },
-  ]);
+  // Created Success Credentials Modal
+  const [createdCredentials, setCreatedCredentials] = useState<{
+    email: string;
+    password: string;
+    name: string;
+  } | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  const handleAddTrainer = (e: React.FormEvent) => {
+  const handleDeleteTrainer = async () => {
+    if (!trainerToDelete) return;
+    try {
+      setIsDeleting(true);
+      const res = await fetch(`/api/admin/users?userId=${trainerToDelete.id}&email=${encodeURIComponent(trainerToDelete.email)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message || 'حدث خطأ أثناء حذف حساب المدرب');
+        return;
+      }
+      setTrainers((prev) => prev.filter((t) => t.id !== trainerToDelete.id && t.email !== trainerToDelete.email));
+      setTrainerToDelete(null);
+    } catch (err) {
+      console.error('Delete trainer error:', err);
+      alert('حدث خطأ في الاتصال بالخادم');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const loadTrainers = async () => {
+    try {
+      setLoading(true);
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'INSTRUCTOR')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching trainers:', error);
+      }
+
+      if (data && data.length > 0) {
+        const mapped: Trainer[] = data.map((p: any) => {
+          const name = p.full_name || 'مدرب معتمد';
+          const initials = name
+            .split(' ')
+            .slice(0, 2)
+            .map((n: string) => n[0])
+            .join(' ');
+
+          return {
+            id: p.id,
+            name,
+            specialty: p.bio || 'مدرب ومحاضر معتمد',
+            email: p.email,
+            phone: p.phone || 'غير مسجل',
+            coursesCount: 3,
+            studentsCount: 150,
+            rating: 4.9,
+            status: 'active',
+            avatarInitials: initials || 'م د',
+          };
+        });
+        setTrainers(mapped);
+      } else {
+        setTrainers([
+          {
+            id: 'tr-1',
+            name: 'د. عبدالله بن محمد الشمري',
+            specialty: 'أستاذ المواطنة والحوار الحضاري',
+            email: 'a.shammari@sustainpulse.org',
+            phone: '+966 50 123 4567',
+            coursesCount: 5,
+            studentsCount: 3420,
+            rating: 4.9,
+            status: 'active',
+            avatarInitials: 'ع ش',
+          },
+          {
+            id: 'tr-2',
+            name: 'د. سارة بنت خالد العتيبي',
+            specialty: 'استشارية القيادة والتنمية الإيجابية',
+            email: 's.otaibi@sustainpulse.org',
+            phone: '+966 55 987 6543',
+            coursesCount: 4,
+            studentsCount: 2890,
+            rating: 4.8,
+            status: 'active',
+            avatarInitials: 'س ع',
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTrainers();
+  }, []);
+
+  const handleAddTrainer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTrainerName.trim() || !newTrainerEmail.trim()) return;
+    if (!newTrainerName.trim() || !newTrainerEmail.trim() || !newTrainerPassword.trim()) {
+      alert('يرجى ملء الاسم، البريد الإلكتروني، وكلمة المرور');
+      return;
+    }
 
-    const initials = newTrainerName
-      .split(' ')
-      .slice(0, 2)
-      .map((n) => n.charAt(0))
-      .join(' ');
+    try {
+      setSaving(true);
+      const res = await fetch('/api/admin/trainers/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: newTrainerName,
+          email: newTrainerEmail,
+          password: newTrainerPassword,
+          specialty: newTrainerSpecialty,
+          phone: newTrainerPhone,
+        }),
+      });
 
-    const newTr: Trainer = {
-      id: `tr-${Date.now()}`,
-      name: newTrainerName,
-      specialty: newTrainerSpecialty || 'خبير التنمية الأكاديمية',
-      email: newTrainerEmail,
-      phone: newTrainerPhone || '+966 50 000 0000',
-      coursesCount: 1,
-      studentsCount: 0,
-      rating: 5.0,
-      status: 'active',
-      avatarInitials: initials || 'م خ',
-    };
+      const json = await res.json();
 
-    setTrainers([newTr, ...trainers]);
-    setNewTrainerName('');
-    setNewTrainerSpecialty('');
-    setNewTrainerEmail('');
-    setNewTrainerPhone('');
-    setShowAddModal(false);
+      if (!res.ok) {
+        alert(json.message || 'حدث خطأ أثناء إنشاء حساب المدرب');
+        return;
+      }
+
+      setCreatedCredentials({
+        name: newTrainerName,
+        email: newTrainerEmail,
+        password: newTrainerPassword,
+      });
+
+      setShowAddModal(false);
+      setNewTrainerName('');
+      setNewTrainerSpecialty('');
+      setNewTrainerEmail('');
+      setNewTrainerPhone('');
+      setNewTrainerPassword('12345678');
+      loadTrainers();
+    } catch (err) {
+      console.error(err);
+      alert('حدث خطأ في الاتصال بالخادم');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCopyCredentials = () => {
+    if (!createdCredentials) return;
+    const text = `بيانات الدخول للوحة تحكم المدرب:\nالبريد: ${createdCredentials.email}\nكلمة المرور: ${createdCredentials.password}\nالرابط: ${window.location.origin}/auth/login`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const filteredTrainers = trainers.filter((t) => {
     const matchesSearch =
-      t.name.includes(searchTerm) || t.specialty.includes(searchTerm) || t.email.includes(searchTerm);
-    const matchesStatus = statusFilter === 'all' ? true : t.status === statusFilter;
+      t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || t.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const totalStudents = trainers.reduce((acc, curr) => acc + curr.studentsCount, 0);
-
   return (
-    <div className="space-y-6" dir="rtl">
-      {/* Background Ambient Glows */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-20 right-10 w-96 h-96 bg-[#173A7C]/8 rounded-full blur-[140px]" />
-        <div className="absolute bottom-20 left-10 w-[30rem] h-[30rem] bg-[#5CB07C]/8 rounded-full blur-[160px]" />
+    <div className="space-y-6 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
+      {/* Hero Header */}
+      <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
+              <GraduationCap className="w-3.5 h-3.5" />
+              <span>الهيئة التدريبية والأكاديمية</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
+              إدارة <span className="student-name-gradient">المدربين والمحاضرين</span> 👨‍🏫
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+              إضافة مدربين جدد، إنشاء حساباتهم الرسمية، وتعيين بيانات الدخول الخاصة بهم للوحة تحكم المدرب.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            <span>إضافة وتفعيل مدرب جديد</span>
+          </button>
+        </div>
       </div>
 
-      {/* Header Banner - Liquid Glass Hero */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="relative overflow-hidden rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-7 liquid-glass-hero border border-white/80 student-card-accent"
-      >
-        <div className="specular-card-reflection" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-3 sm:space-y-3.5">
-            <div className="flex flex-col items-start">
-              <div className="admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15">
-                <UserCheck className="w-4 h-4 text-[#173A7C] shrink-0" />
-                <span>إدارة الهيئة التدريبية والأكاديمية</span>
-              </div>
-              <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">
-                المدربين والمحاضرين <span className="inline-block whitespace-nowrap">والخبراء 👨‍🏫</span>
-              </h1>
-            </div>
-            <p className="text-[11px] sm:text-xs lg:text-sm text-slate-600 font-medium max-w-xl leading-relaxed">
-              إدارة صلاحيات المحاضرين المعتمدين، متابعة التقييمات والأداء الأكاديمي، وإسناد الجلسات التدريبية المباشرة.
-            </p>
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setShowAddModal(true)}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#173A7C]/20 cursor-pointer border border-white/25 shrink-0 whitespace-nowrap"
-          >
-            <Plus className="w-4 h-4 shrink-0" />
-            <span>إضافة مدرب جديد ⚡</span>
-          </motion.button>
-        </div>
-
-        {/* Quick KPI stats strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-[#173A7C]/10">
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">هيئة التدريس</p>
-            <p className="text-sm sm:text-base lg:text-lg font-black text-[#173A7C]">{trainers.length} مدرب معتمد</p>
-          </div>
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">إجمالي المتدربين</p>
-            <p className="text-sm sm:text-base lg:text-lg font-black text-emerald-700">{totalStudents.toLocaleString('en-US')} طالب</p>
-          </div>
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">متوسط التقييم</p>
-            <p className="text-sm sm:text-base lg:text-lg font-black text-amber-600 flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
-              <span>4.85 / 5.0</span>
-            </p>
-          </div>
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">حالة الاعتماد</p>
-            <p className="text-xs sm:text-sm lg:text-base font-black text-emerald-700">موثقين رسمياً 🟢</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Filter and Search Bar */}
-      <div className="liquid-glass-card rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/60 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-        <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-          {[
-            { key: 'all', label: `الكل (${trainers.length})` },
-            { key: 'active', label: `نشط (${trainers.filter((t) => t.status === 'active').length})` },
-            { key: 'on_leave', label: `إجازة (${trainers.filter((t) => t.status === 'on_leave').length})` },
-          ].map((tab) => {
-            const isActive = statusFilter === tab.key;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setStatusFilter(tab.key as any)}
-                className={`flex-1 sm:flex-none px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${isActive
-                    ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-[#173A7C]'
-                    : 'bg-white/80 text-slate-700 hover:bg-white hover:text-[#173A7C] border border-slate-200/80'
-                  }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 absolute top-3.5 right-3.5 text-slate-400" />
+      {/* Filter and Search */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="بحث باسم المدرب، التخصص، البريد..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full py-2.5 pr-10 pl-4 text-xs font-bold text-slate-800 bg-white/90 rounded-xl border border-slate-200/80 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all shadow-sm"
+            placeholder="بحث بالاسم، التخصص، أو البريد الإلكتروني..."
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
           />
+        </div>
+
+        <div className="flex items-center gap-2">
+          {['all', 'active', 'on_leave'].map((st) => (
+            <button
+              key={st}
+              onClick={() => setStatusFilter(st as any)}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                statusFilter === st
+                  ? 'bg-[#173A7C] text-white'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              {st === 'all' ? 'جميع المدربين' : st === 'active' ? 'على رأس العمل' : 'إجازة / غير متاح'}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Trainers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredTrainers.map((trainer) => (
-          <motion.div
-            key={trainer.id}
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ y: -2 }}
-            transition={{ duration: 0.2 }}
-            className="liquid-glass-card liquid-glass-hover rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/70 space-y-4 relative group overflow-hidden student-card-accent"
-          >
-            <div className="specular-card-reflection" />
-
-            {/* Header / Avatar */}
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-sm sm:text-base shadow-md shadow-[#173A7C]/20 border border-white/25 shrink-0">
-                  {trainer.avatarInitials}
+      {loading ? (
+        <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <p className="text-xs font-bold text-slate-500">جاري تحميل بيانات المدربين...</p>
+        </div>
+      ) : filteredTrainers.length === 0 ? (
+        <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
+          <Users className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
+          <h3 className="text-base font-black text-slate-900">لا يوجد مدربون يطابقون البحث</h3>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+          {filteredTrainers.map((t) => (
+            <div
+              key={t.id}
+              className="p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-4 student-card-accent"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-sm shadow-md">
+                    {t.avatarInitials}
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900">{t.name}</h3>
+                    <p className="text-xs text-[#0D5C3A] font-bold">{t.specialty}</p>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <h3 className="font-black text-xs sm:text-sm text-[#152C5B] student-heading-h3 leading-snug">
-                    {trainer.name}
-                  </h3>
-                  <p className="text-[11px] sm:text-xs text-emerald-700 font-bold">{trainer.specialty}</p>
+
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-3 py-1 rounded-full text-[10px] font-black border ${
+                      t.status === 'active'
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                        : 'bg-amber-50 text-amber-800 border-amber-300'
+                    }`}
+                  >
+                    {t.status === 'active' ? 'حساب نشط' : 'إجازة'}
+                  </span>
+                  <button
+                    onClick={() => setTrainerToDelete(t)}
+                    className="p-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white transition-all cursor-pointer border border-rose-200"
+                    title="حذف حساب المدرب"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
 
-              <span
-                className={`px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-bold border shrink-0 whitespace-nowrap ${trainer.status === 'active'
-                    ? 'bg-emerald-500/10 text-emerald-800 border-emerald-500/25'
-                    : 'bg-amber-500/10 text-amber-800 border-amber-500/25'
-                  }`}
-              >
-                {trainer.status === 'active' ? 'نشط 🟢' : 'إجازة 🟡'}
-              </span>
-            </div>
+              <div className="space-y-1.5 text-xs text-slate-600 font-bold">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-slate-400" />
+                  <span>{t.email}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-slate-400" />
+                  <span>{t.phone}</span>
+                </div>
+              </div>
 
-            {/* Stats row */}
-            <div className="grid grid-cols-3 gap-2 p-3 rounded-xl text-center liquid-glass-inset border border-white/70">
-              <div>
-                <span className="block text-[10px] text-slate-500 font-bold">المساقات</span>
-                <span className="text-xs font-black text-[#173A7C]">{trainer.coursesCount} دورات</span>
-              </div>
-              <div className="border-r border-l border-[#173A7C]/10">
-                <span className="block text-[10px] text-slate-500 font-bold">المتدربين</span>
-                <span className="text-xs font-black text-emerald-700">{trainer.studentsCount.toLocaleString('en-US')}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] text-slate-500 font-bold">التقييم العام</span>
-                <span className="text-xs font-black text-amber-600 flex items-center justify-center gap-1">
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  {trainer.rating}
-                </span>
-              </div>
-            </div>
-
-            {/* Contact details */}
-            <div className="space-y-2 text-xs text-slate-600 font-bold border-t border-[#173A7C]/10 pt-3">
-              <div className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-[#173A7C]" />
-                <span className="font-mono text-[11px]">{trainer.email}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="font-mono" dir="ltr">{trainer.phone}</span>
+              <div className="grid grid-cols-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-center text-xs font-black text-slate-800">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block">الدورات</span>
+                  <span>{t.coursesCount}</span>
+                </div>
+                <div className="border-r border-l border-slate-200">
+                  <span className="text-[10px] text-slate-400 font-bold block">الطلاب</span>
+                  <span>{t.studentsCount}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block">التقييم</span>
+                  <span className="text-amber-600 flex items-center justify-center gap-1">
+                    <Star className="w-3 h-3 fill-current" />
+                    <span>{t.rating}</span>
+                  </span>
+                </div>
               </div>
             </div>
-
-            {/* Footer actions */}
-            <div className="flex items-center justify-between pt-2 gap-2">
-              <button className="px-4 py-2 rounded-xl text-xs font-bold border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-sm">
-                تعديل الصلاحيات
-              </button>
-              <button className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white transition-all shadow-md shadow-[#173A7C]/15 border border-white/20">
-                عرض الملف الكامل
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Add Trainer Modal */}
       <AnimatePresence>
@@ -328,94 +379,237 @@ export default function AdminTrainersPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md"
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="relative w-full max-w-lg overflow-hidden rounded-xl sm:rounded-2xl p-6 sm:p-8 bg-white/95 backdrop-blur-xl shadow-2xl space-y-5 text-right border border-white/80 my-8"
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="relative w-full max-w-lg overflow-hidden rounded-3xl p-6 sm:p-8 bg-white shadow-2xl border border-white/60 text-right space-y-5"
             >
-              <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#5CB07C] via-[#173A7C] to-emerald-400" />
-
-              <div className="flex justify-between items-center border-b border-slate-200/70 pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20">
-                    <UserCheck className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-lg text-[#152C5B] student-heading-h3">إضافة مدرب جديد للنظام</h3>
-                    <p className="text-xs text-slate-500 font-bold">تسجيل محاضر معتمد وتعيين بيانات الاعتماد</p>
-                  </div>
+              <div className="flex items-center justify-between border-b pb-4">
+                <div>
+                  <h3 className="student-heading-h3">إضافة وتفعيل مدرب جديد</h3>
+                  <p className="text-xs text-slate-400 font-bold">سيتم إنشاء حساب رسمي له للوصول إلى لوحة المدرب</p>
                 </div>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <form onSubmit={handleAddTrainer} className="space-y-3.5 text-xs font-bold">
-                <div className="space-y-1.5">
-                  <label className="font-bold text-slate-700 block">اسم المدرب ثلاثي</label>
+              <form onSubmit={handleAddTrainer} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-700">الاسم الكامل / اللقب الأكاديمي</label>
                   <input
                     type="text"
                     required
-                    placeholder="د. أحمد الفضلي"
                     value={newTrainerName}
                     onChange={(e) => setNewTrainerName(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-bold text-slate-700 block">التخصص / المسار التدريبي</label>
-                  <input
-                    type="text"
-                    placeholder="خبير التسامح والحوار الأكاديمي"
-                    value={newTrainerSpecialty}
-                    onChange={(e) => setNewTrainerSpecialty(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-bold text-slate-700 block">البريد الإلكتروني الرسمي</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="trainer@sustainpulse.org"
-                    value={newTrainerEmail}
-                    onChange={(e) => setNewTrainerEmail(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-bold text-slate-700 block">رقم الجوال</label>
-                  <input
-                    type="text"
-                    placeholder="+966 50 000 0000"
-                    value={newTrainerPhone}
-                    onChange={(e) => setNewTrainerPhone(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                    placeholder="مثال: د. محمد بن إبراهيم القحطاني"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                   />
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-slate-200/70">
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-700">التخصص والمسمى التدريبي</label>
+                  <input
+                    type="text"
+                    value={newTrainerSpecialty}
+                    onChange={(e) => setNewTrainerSpecialty(e.target.value)}
+                    placeholder="مثال: استشاري الحوار والمسؤولية المجتمعية"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-black text-slate-700">البريد الإلكتروني (لتسجيل الدخول)</label>
+                    <input
+                      type="email"
+                      required
+                      value={newTrainerEmail}
+                      onChange={(e) => setNewTrainerEmail(e.target.value)}
+                      placeholder="trainer@sustainpulse.org"
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-black text-slate-700">كلمة المرور للحساب</label>
+                    <input
+                      type="text"
+                      required
+                      value={newTrainerPassword}
+                      onChange={(e) => setNewTrainerPassword(e.target.value)}
+                      placeholder="8 أحرف على الأقل"
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-700">رقم الهاتف (اختياري)</label>
+                  <input
+                    type="text"
+                    value={newTrainerPhone}
+                    onChange={(e) => setNewTrainerPhone(e.target.value)}
+                    placeholder="+966 50 000 0000"
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200/60">
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer transition-colors"
+                    className="px-5 py-2.5 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all border border-white/20"
+                    disabled={saving}
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer disabled:opacity-60"
                   >
-                    إضافة وحفظ ⚡
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                    <span>{saving ? 'جاري الإنشاء والتفعيل...' : 'إنشاء وتفعيل حساب المدرب'}</span>
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Success Credentials Modal */}
+      <AnimatePresence>
+        {createdCredentials && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="relative w-full max-w-md overflow-hidden rounded-3xl p-6 sm:p-8 bg-white shadow-2xl border border-white/60 text-right space-y-4"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-sm">
+                <CheckCircle2 className="w-7 h-7" />
+              </div>
+
+              <div className="text-center space-y-1">
+                <h3 className="student-heading-h3 !text-base">تم إنشاء وتفعيل حساب المدرب بنجاح! 🎉</h3>
+                <p className="text-xs text-slate-500 font-bold">
+                  يمكن للمدرب ({createdCredentials.name}) الآن تسجيل الدخول مباشرة للوحة تحكم المدرب.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold space-y-2 text-right">
+                <div>
+                  <span className="text-slate-400 block text-[10px]">البريد الإلكتروني:</span>
+                  <span className="font-mono text-[#173A7C] font-black">{createdCredentials.email}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[10px]">كلمة المرور:</span>
+                  <span className="font-mono text-slate-900 font-black">{createdCredentials.password}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[10px]">الصلاحية:</span>
+                  <span className="text-emerald-700 font-black">مدرب ومحاضر معتمد (INSTRUCTOR)</span>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-2">
+                <button
+                  onClick={handleCopyCredentials}
+                  className="w-full py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                  <span>{copied ? 'تم نسخ بيانات الدخول!' : 'نسخ بيانات الدخول للمدرب'}</span>
+                </button>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCreatedCredentials(null)}
+                    className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black cursor-pointer"
+                  >
+                    إغلاق
+                  </button>
+                  <a
+                    href="/auth/login"
+                    target="_blank"
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-md hover:opacity-95"
+                  >
+                    <span>صفحة الدخول</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Trainer Confirmation Modal */}
+      <AnimatePresence>
+        {trainerToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md bg-white rounded-2xl border border-rose-200 p-6 space-y-4 shadow-2xl relative text-right font-[family-name:var(--font-cairo)]"
+            >
+              <div className="flex items-center gap-3 pb-3 border-b border-rose-100">
+                <div className="p-3 rounded-xl bg-rose-100 text-rose-600">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-slate-900">تأكيد حذف حساب المدرب</h3>
+                  <p className="text-xs text-rose-600 font-bold">هذا الإجراء سيحذف حساب المعلم بالكامل</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-600 font-bold leading-relaxed">
+                هل أنت متأكد من رغبتك في حذف حساب المدرب <strong className="text-slate-900">{trainerToDelete.name}</strong> ({trainerToDelete.email})؟
+              </p>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  onClick={handleDeleteTrainer}
+                  disabled={isDeleting}
+                  className="flex-1 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-600/25 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>جاري الحذف...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      <span>نعم، احذف الحساب الآن</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setTrainerToDelete(null)}
+                  disabled={isDeleting}
+                  className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+                >
+                  إلغاء
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

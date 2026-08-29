@@ -1,24 +1,26 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
   Award,
   CheckCircle2,
   Clock,
-  HelpCircle,
+  AlertCircle,
   Play,
   RotateCcw,
   FileCheck,
-  AlertCircle,
+  HelpCircle,
   ChevronLeft,
   BookOpen,
+  Loader2,
 } from 'lucide-react';
+import Link from 'next/link';
 
 interface QuizItem {
   id: string;
   title: string;
+  course_id: string;
   courseTitle: string;
   questionsCount: number;
   durationMinutes: number;
@@ -27,7 +29,6 @@ interface QuizItem {
   score?: number;
   attemptsUsed: number;
   maxAttempts: number;
-  dueDate: string;
 }
 
 const sectionFadeVariants: Variants = {
@@ -60,59 +61,32 @@ const textItemVariants: Variants = {
 export default function StudentQuizzesPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all');
   const [activeQuizModal, setActiveQuizModal] = useState<QuizItem | null>(null);
+  const [quizzes, setQuizzes] = useState<QuizItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const quizzes: QuizItem[] = [
-    {
-      id: 'q-1',
-      title: 'اختبار المفاهيم الأساسية للتسامح والسلام',
-      courseTitle: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      questionsCount: 15,
-      durationMinutes: 20,
-      passPercentage: 70,
-      status: 'passed',
-      score: 95,
-      attemptsUsed: 1,
-      maxAttempts: 3,
-      dueDate: 'مكتمل - 25 يوليو 2026',
-    },
-    {
-      id: 'q-2',
-      title: 'التقييم الشامل لمهارات التفكير الناقد والإبداعي',
-      courseTitle: 'المهارات الأكاديمية والتفكير الناقد',
-      questionsCount: 20,
-      durationMinutes: 30,
-      passPercentage: 75,
-      status: 'pending',
-      attemptsUsed: 0,
-      maxAttempts: 2,
-      dueDate: 'متبقي 3 أيام (قبل 3 أغسطس 2026)',
-    },
-    {
-      id: 'q-3',
-      title: 'اختبار تطبيقات الحوار والتعايش المجتمعي',
-      courseTitle: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      questionsCount: 10,
-      durationMinutes: 15,
-      passPercentage: 70,
-      status: 'pending',
-      attemptsUsed: 0,
-      maxAttempts: 3,
-      dueDate: 'متبقي 5 أيام',
-    },
-    {
-      id: 'q-4',
-      title: 'اختبار وحدة إدارة النزاعات وبناء التوافق',
-      courseTitle: 'دورة القيادة الإيجابية وبناء الفريق',
-      questionsCount: 12,
-      durationMinutes: 25,
-      passPercentage: 80,
-      status: 'failed',
-      score: 58,
-      attemptsUsed: 1,
-      maxAttempts: 3,
-      dueDate: 'يمكنك إعادة الاختبار',
-    },
-  ];
+  useEffect(() => {
+    async function loadQuizzes() {
+      try {
+        const response = await fetch('/api/quizzes', {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+        });
+        const payload = await response.json();
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.message || 'تعذر تحميل الاختبارات');
+        }
+
+        setQuizzes(payload.quizzes as QuizItem[]);
+      } catch (err) {
+        console.error('Error loading quizzes:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadQuizzes();
+  }, []);
 
   const filteredQuizzes = quizzes.filter((q) => {
     if (filter === 'pending') return q.status === 'pending';
@@ -120,10 +94,14 @@ export default function StudentQuizzesPage() {
     return true;
   });
 
+  const totalQuizzes = quizzes.length;
+  const pendingCount = quizzes.filter(q => q.status === 'pending').length;
+  const bestScore = quizzes.reduce((max, q) => Math.max(max, q.score || 0), 0);
+
   return (
     <div className="space-y-6 pt-2.5 sm:pt-0 font-[family-name:var(--font-cairo)]" dir="rtl">
 
-      {/* Header Banner Ultra Premium - Liquid Glass Theme */}
+      {/* Header Banner */}
       <motion.div
         variants={sectionFadeVariants}
         initial="hidden"
@@ -149,36 +127,35 @@ export default function StudentQuizzesPage() {
             </motion.p>
           </div>
 
-          {/* Quick Stats Pill */}
           <motion.div variants={textItemVariants} className="flex items-center justify-around gap-2 sm:gap-4 liquid-glass-inner p-3.5 sm:p-4 rounded-2xl shadow-xs">
             <div className="text-center px-2 sm:px-3 border-l border-slate-200/60">
-              <span className="block text-base sm:text-lg font-black text-[#5CB07C]">4</span>
+              <span className="block text-base sm:text-lg font-black text-[#5CB07C]">{totalQuizzes}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">إجمالي الاختبارات</span>
             </div>
             <div className="text-center px-2 sm:px-3 border-l border-slate-200/60">
-              <span className="block text-base sm:text-lg font-black text-amber-600">2</span>
-              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">متبقية لليوم</span>
+              <span className="block text-base sm:text-lg font-black text-amber-600">{pendingCount}</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">متبقية</span>
             </div>
             <div className="text-center px-2 sm:px-3">
-              <span className="block text-base sm:text-lg font-black text-[#173A7C]">95%</span>
+              <span className="block text-base sm:text-lg font-black text-[#173A7C]">{bestScore > 0 ? `${bestScore}%` : '—'}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">أعلى درجة</span>
             </div>
           </motion.div>
         </div>
       </motion.div>
 
-      {/* Filter Tabs & Crisp Light Text Header Line */}
+      {/* Filter Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-1.5 p-1.5 rounded-2xl border border-white/80 bg-white/90 backdrop-blur-md shadow-sm w-full sm:w-auto">
+        <div className="premium-tabs grid grid-cols-2 sm:flex sm:flex-row items-center gap-1.5 p-1.5 rounded-2xl border border-white/80 bg-white/90 backdrop-blur-md shadow-sm w-full sm:w-auto">
           {[
-            { key: 'all', label: 'كافة الاختبارات (4)' },
-            { key: 'pending', label: 'المطلوبة قريباً (2)' },
-            { key: 'completed', label: 'المكتملة والنتائج (2)' },
+            { key: 'all', label: `كافة الاختبارات (${totalQuizzes})` },
+            { key: 'pending', label: `المطلوبة (${pendingCount})` },
+            { key: 'completed', label: `المكتملة (${totalQuizzes - pendingCount})` },
           ].map((tab, idx) => (
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key as any)}
-              className={`px-3 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-200 text-center cursor-pointer flex-1 sm:flex-none ${
+              className={`premium-tab px-3 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-200 text-center cursor-pointer flex-1 sm:flex-none ${
                 idx === 2 ? 'col-span-2 sm:col-span-1' : ''
               } ${
                 filter === tab.key
@@ -186,22 +163,38 @@ export default function StudentQuizzesPage() {
                   : 'text-slate-600 hover:text-[#173A7C] hover:bg-white/60 bg-slate-50/60 sm:bg-transparent'
               }`}
             >
-              {tab.label}
+              <span className="premium-tab-label">{tab.label}</span>
             </button>
           ))}
         </div>
 
-        {/* High-Contrast Clear Text on Background */}
         <div className="text-[10px] sm:text-xs text-slate-700 font-extrabold flex items-center gap-1.5 drop-shadow-xs">
           <CheckCircle2 className="w-3.5 h-3.5 text-[#0D5C3A] shrink-0" />
           <span>فرص الإعادة متاحة للاختبارات غير المجتازة</span>
         </div>
       </div>
 
-      {/* Quizzes List Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        {filteredQuizzes.map((quiz, idx) => {
-          return (
+      {/* Content */}
+      {loading ? (
+        <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <p className="text-xs font-bold text-slate-500">جاري تحميل الاختبارات...</p>
+        </div>
+      ) : filteredQuizzes.length === 0 ? (
+        <div className="p-10 sm:p-14 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-4">
+          <div className="w-16 h-16 rounded-3xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center mx-auto">
+            <Award className="w-8 h-8" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-lg font-black text-slate-900">لا توجد اختبارات {filter !== 'all' ? 'في هذا التصنيف' : 'متاحة حالياً'}</h3>
+            <p className="text-xs font-bold text-slate-500 max-w-md mx-auto">
+              ستظهر هنا الاختبارات المرتبطة بالدورات المسجل فيها بمجرد إضافتها من المدرب.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          {filteredQuizzes.map((quiz, idx) => (
             <motion.div
               key={quiz.id}
               initial={{ opacity: 0, y: 24 }}
@@ -209,7 +202,6 @@ export default function StudentQuizzesPage() {
               transition={{ delay: 0.25 + idx * 0.14, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
               className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 liquid-glass-card liquid-glass-hover flex flex-col justify-between group student-card-accent min-h-[320px]"
             >
-              {/* Card Header & Status Badge Ribbon */}
               <div className="space-y-3.5 mb-5">
                 <div className="flex items-center justify-between gap-2.5 flex-wrap">
                   <span className="inline-flex items-center gap-1.5 text-xs font-black text-[#0D5C3A] leading-relaxed break-words" style={{ textShadow: '0 1px 0px rgba(255,255,255,0.6)' }}>
@@ -217,7 +209,6 @@ export default function StudentQuizzesPage() {
                     <span>{quiz.courseTitle}</span>
                   </span>
 
-                  {/* Vivid Crisp Status Badges */}
                   {quiz.status === 'passed' && (
                     <span className="shrink-0 px-4 py-1.5 rounded-full text-xs font-black bg-emerald-500 text-white border border-emerald-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
                       <CheckCircle2 className="w-3.5 h-3.5" />
@@ -238,13 +229,11 @@ export default function StudentQuizzesPage() {
                   )}
                 </div>
 
-                {/* Spaced Quiz Title */}
                 <h3 className="student-heading-h3 group-hover:text-[#173A7C] transition-colors pt-1">
                   {quiz.title}
                 </h3>
               </div>
 
-              {/* Quiz Info Details - Engraved Vertical Separators */}
               <div className="grid grid-cols-3 p-4 rounded-2xl mb-5 text-center border border-slate-200/90 bg-slate-100/90 shadow-inner">
                 <div className="px-2">
                   <span className="block text-[11px] text-slate-500 font-bold mb-0.5">عدد الأسئلة</span>
@@ -260,11 +249,10 @@ export default function StudentQuizzesPage() {
                 </div>
               </div>
 
-              {/* Card Footer Actions */}
               <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-3 pt-4 border-t border-slate-200/60">
                 <span className="text-xs text-slate-600 font-bold flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>تاريخ الاستحقاق: {quiz.dueDate}</span>
+                  <span>المحاولات: {quiz.attemptsUsed} / {quiz.maxAttempts}</span>
                 </span>
 
                 {quiz.status === 'pending' && (
@@ -307,11 +295,11 @@ export default function StudentQuizzesPage() {
                 )}
               </div>
             </motion.div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* Quiz Modal / Instructions Preview */}
+      {/* Quiz Modal */}
       <AnimatePresence>
         {activeQuizModal && (
           <motion.div
@@ -338,13 +326,12 @@ export default function StudentQuizzesPage() {
                 </div>
                 <button
                   onClick={() => setActiveQuizModal(null)}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
-              {/* Instructions */}
               <div className="space-y-3 text-xs text-slate-600 font-bold leading-relaxed p-4 rounded-2xl bg-slate-50 border border-slate-200/60">
                 <h4 className="font-black text-slate-800 text-sm">تعليمات الاختبار المهمة:</h4>
                 <ul className="list-disc list-inside space-y-1.5 text-slate-600">
@@ -355,7 +342,6 @@ export default function StudentQuizzesPage() {
                 </ul>
               </div>
 
-              {/* Buttons */}
               <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   onClick={() => setActiveQuizModal(null)}
@@ -363,19 +349,18 @@ export default function StudentQuizzesPage() {
                 >
                   إلغاء
                 </button>
-                <Link
-                  href={`/dashboard/student/courses/diploma-tolerance-citizenship/lessons/lesson-1`}
+                <button
+                  onClick={() => { setActiveQuizModal(null); alert('سيتم تفعيل واجهة الاختبار التفاعلية قريباً'); }}
                   className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 hover:opacity-95 cursor-pointer"
                 >
                   <span>تأكيد والبدء الآن</span>
                   <ChevronLeft className="w-4 h-4" />
-                </Link>
+                </button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }

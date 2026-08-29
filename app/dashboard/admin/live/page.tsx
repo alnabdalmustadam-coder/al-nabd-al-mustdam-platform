@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Radio,
@@ -17,354 +17,385 @@ import {
   Check,
   Sparkles,
   X,
+  Trash2,
+  Loader2,
 } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 interface LiveSession {
   id: string;
   title: string;
-  courseTitle: string;
-  instructor: string;
-  dateTime: string;
-  durationMinutes: number;
-  registeredStudents: number;
-  status: 'upcoming' | 'live' | 'ended';
-  meetingUrl: string;
+  course_id?: string;
+  meeting_url?: string;
+  platform?: string;
+  scheduled_at: string;
+  duration_minutes: number;
+  status: string;
+  recording_url?: string;
 }
 
 export default function AdminLiveSessionsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [sessions, setSessions] = useState<LiveSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
 
-  // New Session Form State
+  // Form State
   const [sessionTitle, setSessionTitle] = useState('');
-  const [sessionCourse, setSessionCourse] = useState('دبلوم التسامح والسلام والمواطنة الصالحة');
-  const [sessionInstructor, setSessionInstructor] = useState('د. عبدالله بن محمد الشمري');
-  const [sessionDate, setSessionDate] = useState('اليوم، 8:00 مساءً');
-  const [sessionDuration, setSessionDuration] = useState('90');
-  const [sessionUrl, setSessionUrl] = useState('https://sustainpulse.org/live/room-101');
+  const [sessionCourse, setSessionCourse] = useState('general-course');
+  const [sessionDate, setSessionDate] = useState('');
+  const [sessionTime, setSessionTime] = useState('20:00');
+  const [sessionDuration, setSessionDuration] = useState('60');
+  const [sessionUrl, setSessionUrl] = useState('');
+  const [sessionPlatform, setSessionPlatform] = useState('Zoom');
 
-  const [sessions, setSessions] = useState<LiveSession[]>([
-    {
-      id: 'ls-1',
-      title: 'اللقاء المباشر التفاعلي: ورشة عمل الحوار وتطبيقات التسامح',
-      courseTitle: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      instructor: 'د. عبدالله بن محمد الشمري',
-      dateTime: 'اليوم، 8:00 مساءً بتوقيت مكة',
-      durationMinutes: 90,
-      registeredStudents: 420,
-      status: 'live',
-      meetingUrl: 'https://sustainpulse.org/live/room-101',
-    },
-    {
-      id: 'ls-2',
-      title: 'الجلسة الإرشادية لمهارات التفكير الناقد والمواطنة',
-      courseTitle: 'المهارات الأكاديمية والتفكير الناقد',
-      instructor: 'د. سارة بنت خالد العتيبي',
-      dateTime: 'غداً، 7:30 مساءً بتوقيت مكة',
-      durationMinutes: 60,
-      registeredStudents: 280,
-      status: 'upcoming',
-      meetingUrl: 'https://sustainpulse.org/live/room-102',
-    },
-    {
-      id: 'ls-3',
-      title: 'محاضرة ختامية: مراجعة المنهج واجابة الاستفسارات',
-      courseTitle: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      instructor: 'د. عبدالله بن محمد الشمري',
-      dateTime: '25 يوليو 2026 (مسجلة)',
-      durationMinutes: 120,
-      registeredStudents: 510,
-      status: 'ended',
-      meetingUrl: 'https://sustainpulse.org/live/recording-103',
-    },
-  ]);
+  const loadSessions = async () => {
+    try {
+      setLoading(true);
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('live_sessions')
+        .select('*')
+        .order('scheduled_at', { ascending: false });
 
-  const handleCopyLink = (url: string, id: string) => {
+      if (error) {
+        console.error('Error fetching live sessions:', error);
+      }
+
+      if (data && data.length > 0) {
+        setSessions(data);
+      } else {
+        // Fallback samples if empty
+        setSessions([
+          {
+            id: 'ls-1',
+            title: 'اللقاء المباشر التفاعلي: ورشة عمل الحوار وتطبيقات التسامح',
+            course_id: 'دبلوم التسامح والسلام والمواطنة الصالحة',
+            meeting_url: 'https://zoom.us',
+            platform: 'Zoom',
+            scheduled_at: new Date().toISOString(),
+            duration_minutes: 90,
+            status: 'scheduled',
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSessions();
+  }, []);
+
+  const handleCreateSession = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sessionTitle.trim()) return;
+
+    try {
+      setCreating(true);
+      const supabase = createClient();
+
+      const scheduledDateTime = sessionDate
+        ? new Date(`${sessionDate}T${sessionTime || '20:00'}:00`).toISOString()
+        : new Date().toISOString();
+
+      const { error } = await supabase.from('live_sessions').insert({
+        title: sessionTitle,
+        course_id: sessionCourse,
+        meeting_url: sessionUrl || 'https://zoom.us',
+        platform: sessionPlatform,
+        scheduled_at: scheduledDateTime,
+        duration_minutes: parseInt(sessionDuration) || 60,
+        status: 'scheduled',
+      });
+
+      if (error) {
+        console.error(error);
+        alert(`خطأ: ${error.message}`);
+        return;
+      }
+
+      alert('تمت جدولة الجلسة المباشرة بنجاح!');
+      setIsScheduleModalOpen(false);
+      setSessionTitle('');
+      setSessionUrl('');
+      loadSessions();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDeleteSession = async (id: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذه الجلسة المباشرة؟')) return;
+    try {
+      const supabase = createClient();
+      await supabase.from('live_sessions').delete().eq('id', id);
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCopyLink = (id: string, url?: string) => {
+    if (!url) return;
     navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleScheduleSession = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!sessionTitle.trim()) return;
-
-    const newSess: LiveSession = {
-      id: `ls-${Date.now()}`,
-      title: sessionTitle,
-      courseTitle: sessionCourse,
-      instructor: sessionInstructor,
-      dateTime: sessionDate,
-      durationMinutes: parseInt(sessionDuration) || 60,
-      registeredStudents: 0,
-      status: 'upcoming',
-      meetingUrl: sessionUrl,
-    };
-
-    setSessions([newSess, ...sessions]);
-    setSessionTitle('');
-    setIsScheduleModalOpen(false);
-  };
-
-  const totalRegistered = sessions.reduce((acc, curr) => acc + curr.registeredStudents, 0);
-
   return (
-    <div className="space-y-6" dir="rtl">
-      {/* Background Ambient Glows */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-20 right-10 w-96 h-96 bg-[#173A7C]/8 rounded-full blur-[140px]" />
-        <div className="absolute bottom-20 left-10 w-[30rem] h-[30rem] bg-rose-500/8 rounded-full blur-[160px]" />
-      </div>
-
-      {/* Header Banner - Liquid Glass Hero */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="relative overflow-hidden rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-7 liquid-glass-hero border border-white/80 student-card-accent"
-      >
-        <div className="specular-card-reflection" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-3 sm:space-y-3.5">
-            <div className="flex flex-col items-start">
-              <div className="admin-hero-tag bg-rose-500/10 text-rose-800 border border-rose-500/20">
-                <Radio className="w-4 h-4 text-rose-600 animate-pulse shrink-0" />
-                <span>إدارة البث المباشر واللقاءات التفاعلية الافتراضية</span>
-              </div>
-              <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">
-                اللقاءات والقاعات <span className="inline-block whitespace-nowrap">الافتراضية المباشرة 🔴</span>
-              </h1>
+    <div className="space-y-6 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
+      {/* Hero Header */}
+      <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-black border border-red-200">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+              <span>القاعات الافتراضية واللقاءات الحية</span>
             </div>
-            <p className="text-[11px] sm:text-xs lg:text-sm text-slate-600 font-medium max-w-xl leading-relaxed">
-              جدولة جلسات البث المباشر عبر الغرف التفاعلية، توزيع روابط القاعات، ومتابعة تسجيل الحضور والتسجيل الآلي.
+            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
+              إدارة <span className="student-name-gradient">البث المباشر والورش الحية</span> 🔴
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+              جدولة اللقاءات التفاعلية، ربط قاعات Zoom / Teams، وإدارة روابط البث المباشر للمتدربين.
             </p>
           </div>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={() => setIsScheduleModalOpen(true)}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#173A7C]/20 cursor-pointer border border-white/25 shrink-0 whitespace-nowrap"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer whitespace-nowrap"
           >
-            <Plus className="w-4 h-4 shrink-0" />
-            <span>جدولة بث مباشر جديد ⚡</span>
-          </motion.button>
+            <Plus className="w-4 h-4" />
+            <span>جدولة لقاء مباشر</span>
+          </button>
         </div>
-
-        {/* Quick KPI stats strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-[#173A7C]/10">
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">إجمالي الجلسات</p>
-            <p className="text-sm sm:text-base lg:text-lg font-black text-[#173A7C]">{sessions.length} جلسات</p>
-          </div>
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">الطلاب المسجلين</p>
-            <p className="text-sm sm:text-base lg:text-lg font-black text-emerald-700">{totalRegistered.toLocaleString('en-US')} حضور</p>
-          </div>
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">الجلسات الحالية</p>
-            <p className="text-sm sm:text-base lg:text-lg font-black text-rose-700">1 بث مباشر الآن 🔴</p>
-          </div>
-          <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">التسجيل والأرشفة</p>
-            <p className="text-xs sm:text-sm lg:text-base font-black text-emerald-700">تلقائي 100% 🟢</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Live Sessions Grid */}
-      <div className="space-y-4">
-        {sessions.map((session) => (
-          <motion.div
-            key={session.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -2 }}
-            transition={{ duration: 0.2 }}
-            className="liquid-glass-card liquid-glass-hover rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/70 space-y-4 relative group overflow-hidden student-card-accent"
-          >
-            <div className="specular-card-reflection" />
-
-            <div className="space-y-2 pb-1">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-[#173A7C]/8 text-[#173A7C] border border-[#173A7C]/15 leading-relaxed break-words">
-                  {session.courseTitle}
-                </span>
-
-                {session.status === 'live' && (
-                  <span className="px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-rose-500/10 text-rose-800 border border-rose-500/30 flex items-center gap-1.5 animate-pulse shrink-0 whitespace-nowrap">
-                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-ping" />
-                    <span>بث مباشر الآن 🔴</span>
-                  </span>
-                )}
-
-                {session.status === 'upcoming' && (
-                  <span className="px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-amber-500/10 text-amber-900 border border-amber-500/30 flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-                    <Clock className="w-3 h-3 text-amber-600" />
-                    <span>قادم قريباً 🟡</span>
-                  </span>
-                )}
-
-                {session.status === 'ended' && (
-                  <span className="px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-                    <CheckCircle2 className="w-3 h-3 text-slate-500" />
-                    <span>منتهي (مسجلة) ⚪</span>
-                  </span>
-                )}
-              </div>
-
-              <h3 className="text-xs sm:text-sm font-extrabold text-[#152C5B] student-heading-h3 leading-snug">
-                {session.title}
-              </h3>
-            </div>
-
-            {/* Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl text-xs font-bold liquid-glass-inset border border-white/70">
-              <div>
-                <span className="block text-[10px] text-slate-500 font-bold">المحاضر المسؤول</span>
-                <span className="text-[#152C5B] font-extrabold text-xs sm:text-sm">{session.instructor}</span>
-              </div>
-              <div className="border-r border-l border-[#173A7C]/10 sm:px-3">
-                <span className="block text-[10px] text-slate-500 font-bold">موعد الجلسة والمدة</span>
-                <span className="text-slate-800 font-extrabold">{session.dateTime} ({session.durationMinutes} دقيقة)</span>
-              </div>
-              <div className="sm:px-3">
-                <span className="block text-[10px] text-slate-500 font-bold">المؤكد حضورهم</span>
-                <span className="text-[#173A7C] font-black">{session.registeredStudents} طالب مسجل</span>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-2">
-              <button
-                onClick={() => handleCopyLink(session.meetingUrl, session.id)}
-                className="w-full py-2 px-2.5 sm:px-4 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer min-h-[38px]"
-              >
-                {copiedId === session.id ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                ) : (
-                  <Copy className="w-3.5 h-3.5 text-[#173A7C] shrink-0" />
-                )}
-                <span className="truncate">{copiedId === session.id ? 'تم النسخ!' : 'نسخ رابط القاعة'}</span>
-              </button>
-
-              <a
-                href={session.meetingUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full py-2 px-2.5 sm:px-4 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm shadow-[#173A7C]/20 border border-white/20 transition-all min-h-[38px]"
-              >
-                <span className="truncate">دخول القاعة الافتراضية</span>
-                <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-              </a>
-            </div>
-          </motion.div>
-        ))}
       </div>
 
-      {/* SCHEDULE MODAL */}
+      {/* Sessions List */}
+      {loading ? (
+        <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <p className="text-xs font-bold text-slate-500">جاري تحميل الجلسات المباشرة...</p>
+        </div>
+      ) : sessions.length === 0 ? (
+        <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
+          <Radio className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
+          <h3 className="text-base font-black text-slate-900">لا توجد جلسات مباشرة مجدولة</h3>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {sessions.map((s) => {
+            const schedDate = new Date(s.scheduled_at);
+            const dateStr = schedDate.toLocaleDateString('ar-SA', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            });
+            const timeStr = schedDate.toLocaleTimeString('ar-SA', {
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+
+            return (
+              <div
+                key={s.id}
+                className="p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-4 student-card-accent"
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200/60 pb-3">
+                  <div>
+                    <span className="text-xs font-black text-emerald-700">{s.course_id || 'عام'}</span>
+                    <h3 className="student-heading-h3 pt-1">{s.title}</h3>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-black border ${
+                        s.status === 'live'
+                          ? 'bg-red-50 text-red-700 border-red-300 animate-pulse'
+                          : 'bg-blue-50 text-[#173A7C] border-blue-300'
+                      }`}
+                    >
+                      {s.status === 'live' ? 'مباشر الآن 🔴' : 'مجدول 📅'}
+                    </span>
+                    <button
+                      onClick={() => handleDeleteSession(s.id)}
+                      className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 cursor-pointer"
+                      title="حذف"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-bold text-slate-600">
+                  <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="w-4 h-4 text-[#173A7C]" />
+                      <span>{dateStr}</span>
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-[#173A7C]" />
+                      <span>{timeStr} ({s.duration_minutes} دقيقة)</span>
+                    </span>
+                  </div>
+
+                  {s.meeting_url && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleCopyLink(s.id, s.meeting_url)}
+                        className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-black flex items-center gap-1.5 cursor-pointer"
+                      >
+                        {copiedId === s.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>نسخ الرابط</span>
+                      </button>
+                      <a
+                        href={s.meeting_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-1.5 rounded-xl bg-[#173A7C] text-white text-xs font-black flex items-center gap-1.5 hover:bg-[#1E4D9D]"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>فتح القاعة ({s.platform || 'Zoom'})</span>
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Schedule Modal */}
       <AnimatePresence>
         {isScheduleModalOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md"
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-lg bg-white/95 backdrop-blur-xl text-slate-900 rounded-xl sm:rounded-2xl border border-white/80 p-6 sm:p-8 space-y-5 shadow-2xl overflow-hidden relative my-8"
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="relative w-full max-w-lg overflow-hidden rounded-3xl p-6 sm:p-8 bg-white shadow-2xl border border-white/60 text-right space-y-4"
             >
-              <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-rose-500 via-[#173A7C] to-emerald-400" />
-
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200/70">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20">
-                    <Radio className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-lg text-[#152C5B] student-heading-h3">جدولة بث مباشر جديد</h3>
-                    <p className="text-xs text-slate-500 font-bold">تحديد موعد الجلسة ورابط القاعة الافتراضية</p>
-                  </div>
-                </div>
+              <div className="flex items-center justify-between border-b pb-3">
+                <h3 className="student-heading-h3">جدولة جلسة بث مباشر جديدة</h3>
                 <button
                   onClick={() => setIsScheduleModalOpen(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <form onSubmit={handleScheduleSession} className="space-y-4 text-xs font-bold">
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">عنوان اللقاء التفاعلي</label>
+              <form onSubmit={handleCreateSession} className="space-y-3.5">
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-700">عنوان الجلسة / الورشة</label>
                   <input
                     type="text"
                     required
-                    placeholder="مثال: ورشة عمل الحوار وتطبيقات التسامح..."
                     value={sessionTitle}
                     onChange={(e) => setSessionTitle(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                    placeholder="مثال: ورشة التطبيقات العملية في الحوار"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">المساق أو الدبلوم المرتبط</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-700">رمز الدورة / المسار</label>
                   <input
                     type="text"
                     value={sessionCourse}
                     onChange={(e) => setSessionCourse(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                    placeholder="diploma-tolerance-citizenship"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-slate-700 block">المحاضر المسؤول</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-black text-slate-700">تاريخ الجلسة</label>
                     <input
-                      type="text"
-                      value={sessionInstructor}
-                      onChange={(e) => setSessionInstructor(e.target.value)}
-                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                      type="date"
+                      required
+                      value={sessionDate}
+                      onChange={(e) => setSessionDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                     />
                   </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-black text-slate-700">وقت البدء</label>
+                    <input
+                      type="time"
+                      value={sessionTime}
+                      onChange={(e) => setSessionTime(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    />
+                  </div>
+                </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-slate-700 block">المدة المقدرة (بالدقائق)</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-black text-slate-700">المدة (بالدقائق)</label>
                     <input
                       type="number"
+                      min="15"
                       value={sessionDuration}
                       onChange={(e) => setSessionDuration(e.target.value)}
-                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                     />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-black text-slate-700">المنصة</label>
+                    <select
+                      value={sessionPlatform}
+                      onChange={(e) => setSessionPlatform(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    >
+                      <option value="Zoom">Zoom Meeting</option>
+                      <option value="Microsoft Teams">Microsoft Teams</option>
+                      <option value="Google Meet">Google Meet</option>
+                      <option value="YouTube Live">YouTube Live</option>
+                    </select>
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">رابط القاعة الافتراضية (Zoom / Teams / Live Room)</label>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-700">رابط القاعة (URL)</label>
                   <input
-                    type="text"
+                    type="url"
                     value={sessionUrl}
                     onChange={(e) => setSessionUrl(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all font-mono"
+                    placeholder="https://zoom.us/j/1234567890"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                   />
                 </div>
 
-                <div className="pt-4 flex gap-3 border-t border-slate-200/70">
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200/60">
                   <button
                     type="button"
                     onClick={() => setIsScheduleModalOpen(false)}
-                    className="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer transition-colors"
+                    className="px-4 py-2 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all border border-white/20"
+                    disabled={creating}
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-60"
                   >
-                    جدولة وتأكيد البث ⚡
+                    {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                    <span>{creating ? 'جاري الحفظ...' : 'جدولة ونشر الجلسة'}</span>
                   </button>
                 </div>
               </form>

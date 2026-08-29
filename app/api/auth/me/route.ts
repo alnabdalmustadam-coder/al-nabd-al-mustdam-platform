@@ -1,29 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { supabase as supabaseAdmin } from "@/lib/supabase";
+import { requireUser } from "@/lib/security/auth";
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      // Fallback to legacy cookies for backward compatibility
-      const email = req.cookies.get("nabd_session_email")?.value;
-      const name = req.cookies.get("nabd_session_name")?.value;
-
-      if (!email) {
-        return NextResponse.json({ success: false, message: "No session found" }, { status: 401 });
-      }
-
-      return NextResponse.json({
-        success: true,
-        user: {
-          email,
-          name: name ? decodeURIComponent(name) : "",
-        },
-      });
-    }
+    const auth = await requireUser(req);
+    if (!auth.ok) return auth.response;
+    const user = auth.user;
 
     // Fetch full name from profiles using admin client
     let { data: profile } = await supabaseAdmin
@@ -56,7 +39,7 @@ export async function GET(req: NextRequest) {
             id: user.id,
             email: user.email.toLowerCase().trim(),
             full_name: user.user_metadata?.full_name || "",
-            role: "TRAINEE",
+            role: "STUDENT",
             nelc_eligible: false
           })
           .select()
@@ -75,7 +58,7 @@ export async function GET(req: NextRequest) {
         name: profile?.full_name || user.user_metadata?.full_name || "",
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

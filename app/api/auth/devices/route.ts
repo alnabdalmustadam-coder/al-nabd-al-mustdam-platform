@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { supabase as supabaseAdmin } from "@/lib/supabase";
+import { requireUser } from "@/lib/security/auth";
 
 function getClientIp(req: NextRequest): string {
   const forwarded = req.headers.get("x-forwarded-for");
@@ -43,37 +43,15 @@ function getApproxLocation(req: NextRequest): string {
   return "الموقع الجغرافي للشبكة";
 }
 
-async function getAuthenticatedUser(req: NextRequest, bodyEmail?: string) {
+async function getAuthenticatedUser(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user && user.email) {
-      return { id: user.id, email: user.email.toLowerCase().trim() };
+    const auth = await requireUser(req);
+    if (auth.ok && auth.user.email) {
+      return { id: auth.user.id, email: auth.user.email.toLowerCase().trim() };
     }
-  } catch (err) {
-    // Continue to fallback checks
+  } catch {
+    return null;
   }
-
-  const cookieEmail = req.cookies.get("nabd_session_email")?.value;
-  if (cookieEmail) {
-    return { id: null, email: cookieEmail.toLowerCase().trim() };
-  }
-
-  const headerEmail = req.headers.get("x-user-email");
-  if (headerEmail) {
-    return { id: null, email: headerEmail.toLowerCase().trim() };
-  }
-
-  const { searchParams } = new URL(req.url);
-  const paramEmail = searchParams.get("email");
-  if (paramEmail) {
-    return { id: null, email: paramEmail.toLowerCase().trim() };
-  }
-
-  if (bodyEmail && typeof bodyEmail === "string" && bodyEmail.includes("@")) {
-    return { id: null, email: bodyEmail.toLowerCase().trim() };
-  }
-
   return null;
 }
 
@@ -156,7 +134,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const user = await getAuthenticatedUser(req, body.email);
+    const user = await getAuthenticatedUser(req);
     if (!user) {
       return NextResponse.json({ success: false, message: "غير مصرح" }, { status: 401 });
     }
@@ -257,7 +235,7 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const user = await getAuthenticatedUser(req, body.email);
+    const user = await getAuthenticatedUser(req);
     if (!user) {
       return NextResponse.json({ success: false, message: "غير مصرح" }, { status: 401 });
     }

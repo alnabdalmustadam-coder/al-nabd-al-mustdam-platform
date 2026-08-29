@@ -8,9 +8,9 @@ export class BunnyStreamProvider implements IVideoProvider {
   private embedHost: string;
 
   constructor() {
-    this.libraryId = process.env.BUNNY_STREAM_LIBRARY_ID || '729792';
-    this.apiKey = process.env.BUNNY_STREAM_API_KEY || '6887d568-bc32-4e3a-94e34bab80e6-2cd2-450d';
-    this.tokenKey = process.env.BUNNY_STREAM_TOKEN_KEY || 'c12446aa-69f3-4f18-b607-dd9d2b7c4865';
+    this.libraryId = process.env.BUNNY_STREAM_LIBRARY_ID || '';
+    this.apiKey = process.env.BUNNY_STREAM_API_KEY || '';
+    this.tokenKey = process.env.BUNNY_STREAM_TOKEN_KEY || '';
     this.embedHost = process.env.BUNNY_STREAM_EMBED_HOST || 'https://iframe.mediadelivery.net';
   }
 
@@ -22,23 +22,16 @@ export class BunnyStreamProvider implements IVideoProvider {
     userIp?: string,
     expirationSeconds: number = 7200 // 2 hours default
   ): Promise<PlaybackTokenResponse> {
+    if (!this.libraryId || !this.tokenKey) {
+      throw new Error('Bunny Stream playback is not configured');
+    }
     const expires = Math.floor(Date.now() / 1000) + expirationSeconds;
     
     // Bunny Stream Token Hash Formula
     // Official standard: SHA256(tokenKey + videoId + expires)
-    let tokenParam = '';
-    if (this.tokenKey) {
-      const hashInput = `${this.tokenKey}${videoId}${expires}`;
-      
-      const token = crypto
-        .createHash('sha256')
-        .update(hashInput)
-        .digest('hex');
-        
-      tokenParam = `?token=${token}&expires=${expires}&autoplay=true&preload=true`;
-    } else {
-      tokenParam = `?expires=${expires}&autoplay=true&preload=true`;
-    }
+    const hashInput = `${this.tokenKey}${videoId}${expires}`;
+    const token = crypto.createHash('sha256').update(hashInput).digest('hex');
+    const tokenParam = `?token=${token}&expires=${expires}&autoplay=true&preload=true`;
 
     const iframeUrl = `${this.embedHost}/embed/${this.libraryId}/${videoId}${tokenParam}`;
     const embedUrl = `${this.embedHost}/play/${this.libraryId}/${videoId}${tokenParam}`;
@@ -54,17 +47,7 @@ export class BunnyStreamProvider implements IVideoProvider {
    * Fetches video details from Bunny Stream REST API.
    */
   async getVideoDetails(videoId: string): Promise<VideoDetails> {
-    if (!this.apiKey || !this.libraryId) {
-      return {
-        videoId,
-        libraryId: this.libraryId,
-        title: 'فيديو تجريبي',
-        durationSeconds: 300,
-        status: 'ready',
-        thumbnailUrl: `https://vz-${this.libraryId}.b-cdn.net/${videoId}/thumbnail.jpg`,
-        encodingProgress: 100,
-      };
-    }
+    if (!this.apiKey || !this.libraryId) throw new Error('Bunny Stream is not configured');
 
     try {
       const res = await fetch(
@@ -120,15 +103,7 @@ export class BunnyStreamProvider implements IVideoProvider {
   async generateUploadSignature(title: string): Promise<DirectUploadSignature> {
     const expirationTimestamp = Math.floor(Date.now() / 1000) + 3600; // 1 hour
 
-    if (!this.apiKey || !this.libraryId) {
-      const mockId = `mock_vid_${Date.now()}`;
-      return {
-        videoId: mockId,
-        libraryId: 'mock_lib',
-        uploadUrl: `https://video.bunnycdn.com/library/mock_lib/videos/${mockId}`,
-        expirationTimestamp,
-      };
-    }
+    if (!this.apiKey || !this.libraryId) throw new Error('Bunny Stream is not configured');
 
     // 1. Create Video Object in Bunny Stream
     const createRes = await fetch(
@@ -143,14 +118,20 @@ export class BunnyStreamProvider implements IVideoProvider {
       }
     );
 
+    if (!createRes.ok) {
+      throw new Error(`Bunny API error: ${createRes.status}`);
+    }
     const videoData = await createRes.json();
     const videoId = videoData.guid;
 
     return {
       videoId,
       libraryId: this.libraryId,
-      uploadUrl: `https://video.bunnycdn.com/library/${this.libraryId}/videos/${videoId}`,
-      authorizationHeader: this.apiKey,
+      uploadUrl: 'https://video.bunnycdn.com/tusupload',
+      signature: crypto
+        .createHash('sha256')
+        .update(`${this.libraryId}${this.apiKey}${expirationTimestamp}${videoId}`)
+        .digest('hex'),
       expirationTimestamp,
     };
   }
@@ -159,7 +140,7 @@ export class BunnyStreamProvider implements IVideoProvider {
    * Deletes a video from Bunny Stream.
    */
   async deleteVideo(videoId: string): Promise<boolean> {
-    if (!this.apiKey || !this.libraryId) return true;
+    if (!this.apiKey || !this.libraryId) return false;
 
     try {
       const res = await fetch(
@@ -181,11 +162,13 @@ export class BunnyStreamProvider implements IVideoProvider {
    * Verifies Webhook signature from Bunny.
    */
   verifyWebhookSignature(signature: string, rawBody: string): boolean {
-    if (!this.tokenKey) return true;
+    if (!this.tokenKey || !signature) return false;
     const computed = crypto
       .createHmac('sha256', this.tokenKey)
       .update(rawBody)
       .digest('hex');
-    return computed === signature;
+    const computedBuffer = Buffer.from(computed);
+    const signatureBuffer = Buffer.from(signature);
+    return computedBuffer.length === signatureBuffer.length && crypto.timingSafeEqual(computedBuffer, signatureBuffer);
   }
 }

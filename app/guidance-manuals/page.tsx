@@ -49,17 +49,19 @@ export default function GuidanceManualsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm mb-8">
-            <BookOpen className="w-4 h-4 text-[#173A7C]" />
-            <span className="text-xs font-extrabold text-slate-700 tracking-wide uppercase">مرجعك التدريبي الموثوق</span>
+          <div className="mb-8">
+            <span className="section-badge-glass">
+              <BookOpen className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              مرجعك التدريبي الموثوق
+            </span>
           </div>
           
-          <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black text-slate-900 mb-6 leading-[1.35] tracking-tight">
+          <h1 className="section-main-title-premium text-3xl sm:text-4xl lg:text-[2.75rem] mb-6 leading-[1.35]">
             الأدلة الإرشادية والدعم <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C] inline-block mt-3">لتدريب إلكتروني متكامل</span>
+            <span className="gradient-text inline-block mt-3">لتدريب إلكتروني متكامل</span>
           </h1>
           
-          <p className="text-slate-500 text-base sm:text-lg font-medium leading-[1.8] max-w-3xl mx-auto mb-10">
+          <p className="section-desc-premium text-base sm:text-lg max-w-3xl mx-auto mb-10">
             يقدم <span className="font-bold text-slate-700">معهد النبض المستدام للتدريب</span> دليلاً رقمياً شاملاً لتحقيق أفضل استفادة وتجربة تعليمية معنا، يغطي الدعم والتدريب لكلا النمطين التزامني وغير التزامني لضمان مسيرة مهنية خالية من العوائق.
           </p>
 
@@ -90,7 +92,7 @@ export default function GuidanceManualsPage() {
                 <img src="/logo.svg" alt="Sustain Pulse Logo" className="h-[4.5rem] w-auto object-contain hover:scale-105 transition-transform duration-300" />
               </div>
 
-              <h3 className="font-extrabold text-lg text-slate-800 mb-6 flex items-center gap-3">
+              <h3 className="card-title-royal-blue text-lg mb-6 flex items-center gap-3">
                 <LayoutTemplate className="w-5 h-5 text-[#173A7C]" />
                 محتويات الدليل
               </h3>
@@ -159,9 +161,9 @@ export default function GuidanceManualsPage() {
                       <Icon className={`w-7 h-7 ${manual.iconColor}`} />
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-1">{manual.title}</h2>
+                      <h2 className="card-title-royal-blue text-xl sm:text-2xl mb-1">{manual.title}</h2>
                       <h3 className="text-sm font-bold text-[#173A7C] mb-4">{manual.subtitle}</h3>
-                      <p className="text-slate-500 text-[15.5px] leading-[2] font-medium mb-8">
+                      <p className="card-desc-premium text-[15.5px] leading-[2] mb-8">
                         {manual.description}
                       </p>
                       

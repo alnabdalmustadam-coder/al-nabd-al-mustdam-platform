@@ -10,6 +10,7 @@ import {
   Sparkles,
   Download,
   Eye,
+  EyeOff,
   CheckCircle2,
   XCircle,
   FileCheck,
@@ -33,8 +34,28 @@ import {
   Image as ImageIcon,
   Loader2,
   ExternalLink,
+  Move,
+  AlignCenter,
+  AlignRight,
+  AlignLeft,
+  Underline,
+  Grid,
+  Copy,
+  RotateCcw,
+  SlidersHorizontal,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  Maximize2,
+  Sparkle,
 } from 'lucide-react';
-import type { CertificateTemplate, IssuedCertificate } from '@/lib/certificates-store';
+import {
+  CertificateTemplate,
+  IssuedCertificate,
+  CertificateCanvasElement,
+  DEFAULT_CERTIFICATE_ELEMENTS,
+} from '@/types/certificates';
 
 export default function AdminCertificatesPage() {
   const [selectedTab, setSelectedTab] = useState<'templates' | 'registry'>('templates');
@@ -71,9 +92,55 @@ export default function AdminCertificatesPage() {
   const [newIssueHours, setNewIssueHours] = useState('30 ساعة');
   const [isSubmittingIssue, setIsSubmittingIssue] = useState(false);
 
+  // Visual Drag & Drop Canvas State
+  const [canvasElements, setCanvasElements] = useState<CertificateCanvasElement[]>(DEFAULT_CERTIFICATE_ELEMENTS);
+  const [selectedElementId, setSelectedElementId] = useState<string | null>('el-student-name');
+  const [draggingElementId, setDraggingElementId] = useState<string | null>(null);
+  const [resizingState, setResizingState] = useState<{
+    elementId: string;
+    handle: 'nw' | 'ne' | 'se' | 'sw';
+    startX: number;
+    startY: number;
+    initialFontSize?: number;
+    initialWidth?: number;
+  } | null>(null);
+  const [showLayersDrawer, setShowLayersDrawer] = useState<boolean>(false);
+  const [showGridGuides, setShowGridGuides] = useState<boolean>(false);
+  const [snapGuidelineX, setSnapGuidelineX] = useState<number | null>(null);
+  const [sampleStudentIdx, setSampleStudentIdx] = useState<number>(0);
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Sample Previews for live canvas testing
+  const SAMPLE_PREVIEWS = [
+    {
+      studentName: 'أحمد بن محمد السالم',
+      courseTitle: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
+      certCode: 'SA-TTI-2026-98421',
+      grade: 'ممتاز مرتفع (%98)',
+      hours: '40 ساعة تدريبية',
+      issueDate: '15 مايو 2026',
+    },
+    {
+      studentName: 'سارة بنت عبدالله العتيبي',
+      courseTitle: 'دورات ادخال بيانات ومعالجة نصوص',
+      certCode: 'SA-TTI-2026-44109',
+      grade: 'ممتاز (%95)',
+      hours: '30 ساعة تدريبية',
+      issueDate: '28 يونيو 2026',
+    },
+    {
+      studentName: 'د. فيصل بن خالد القحطاني',
+      courseTitle: 'دبلوم الأمن السيبراني والذكاء الاصطناعي',
+      certCode: 'SA-TTI-2026-11880',
+      grade: 'مرتبة الشرف الأولى (%100)',
+      hours: '60 ساعة تدريبية',
+      issueDate: '10 أغسطس 2026',
+    },
+  ];
+
   // Designer Form State
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
-  const [designerActiveTab, setDesignerActiveTab] = useState<'bg' | 'text' | 'signatories'>('bg');
+  const [designerActiveTab, setDesignerActiveTab] = useState<'elements' | 'inspector' | 'bg'>('elements');
   const [designerForm, setDesignerForm] = useState<Partial<CertificateTemplate>>({
     name: 'قالب شهادة معتمد جديد',
     courseTitle: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
@@ -150,6 +217,8 @@ export default function AdminCertificatesPage() {
   // Open Designer for New Template
   const handleOpenNewTemplate = () => {
     setEditingTemplateId(null);
+    setCanvasElements([...DEFAULT_CERTIFICATE_ELEMENTS]);
+    setSelectedElementId('el-student-name');
     setDesignerForm({
       name: `قالب شهادة معتمد #${templates.length + 1}`,
       courseTitle: availableCourses[0] || 'كافة المساقات التدريبية',
@@ -171,7 +240,7 @@ export default function AdminCertificatesPage() {
       accentColor: '#173A7C',
       autoIssue: true,
     });
-    setDesignerActiveTab('bg');
+    setDesignerActiveTab('elements');
     setIsDesignerModalOpen(true);
   };
 
@@ -179,7 +248,13 @@ export default function AdminCertificatesPage() {
   const handleEditTemplate = (tpl: CertificateTemplate) => {
     setEditingTemplateId(tpl.id);
     setDesignerForm({ ...tpl });
-    setDesignerActiveTab('bg');
+    if (tpl.elementsLayout && tpl.elementsLayout.length > 0) {
+      setCanvasElements([...tpl.elementsLayout]);
+    } else {
+      setCanvasElements([...DEFAULT_CERTIFICATE_ELEMENTS]);
+    }
+    setSelectedElementId('el-student-name');
+    setDesignerActiveTab('elements');
     setIsDesignerModalOpen(true);
   };
 
@@ -195,6 +270,7 @@ export default function AdminCertificatesPage() {
       setIsSavingTemplate(true);
       const payload = {
         ...designerForm,
+        elementsLayout: canvasElements,
         id: editingTemplateId || undefined,
       };
 
@@ -217,6 +293,201 @@ export default function AdminCertificatesPage() {
       showToast('حدث خطأ في الاتصال بالسيرفر أثناء الحفظ', 'error');
     } finally {
       setIsSavingTemplate(false);
+    }
+  };
+
+  // Canvas Element Helpers & Handlers
+  const resolveElementText = (el: CertificateCanvasElement) => {
+    const sample = SAMPLE_PREVIEWS[sampleStudentIdx] || SAMPLE_PREVIEWS[0];
+    let text = el.content || '';
+    text = text.replace(/{student_name}/g, sample.studentName);
+    text = text.replace(/{course_title}/g, designerForm.courseTitle || sample.courseTitle);
+    text = text.replace(/{cert_code}/g, sample.certCode);
+    text = text.replace(/{grade}/g, sample.grade);
+    text = text.replace(/{hours}/g, sample.hours);
+    text = text.replace(/{issue_date}/g, sample.issueDate);
+    text = text.replace(/{header_title}/g, designerForm.headerTitle || 'شهادة إتمام وتفوق معتمدة');
+    text = text.replace(/{subtitle}/g, designerForm.subtitle || 'CERTIFICATE OF ACHIEVEMENT');
+    text = text.replace(/{issuer_name}/g, designerForm.issuerName || 'معهد النبض المستدام العالي للتدريب');
+    return text;
+  };
+
+  const handleSelectElement = (id: string) => {
+    setSelectedElementId(id);
+    setDesignerActiveTab('inspector');
+  };
+
+  const handleUpdateElement = (id: string, patch: Partial<CertificateCanvasElement>) => {
+    setCanvasElements((prev) =>
+      prev.map((el) => (el.id === id ? { ...el, ...patch } : el))
+    );
+  };
+
+  const handleToggleVisibility = (id: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setCanvasElements((prev) =>
+      prev.map((el) => (el.id === id ? { ...el, visible: !el.visible } : el))
+    );
+  };
+
+  const handleDuplicateElement = (id: string) => {
+    const target = canvasElements.find((e) => e.id === id);
+    if (!target) return;
+    const newEl: CertificateCanvasElement = {
+      ...target,
+      id: `el-custom-${Date.now()}`,
+      label: `${target.label} (نسخة)`,
+      x: Math.min(92, target.x + 4),
+      y: Math.min(92, target.y + 4),
+    };
+    setCanvasElements((prev) => [...prev, newEl]);
+    setSelectedElementId(newEl.id);
+    setDesignerActiveTab('inspector');
+    showToast('تم تكرار العنصر بنجاح ✨');
+  };
+
+  const handleDeleteElement = (id: string) => {
+    setCanvasElements((prev) => prev.filter((el) => el.id !== id));
+    if (selectedElementId === id) {
+      setSelectedElementId(null);
+      setDesignerActiveTab('elements');
+    }
+    showToast('تم حذف العنصر من القالب');
+  };
+
+  const handleAddNewCustomText = () => {
+    const newId = `el-text-${Date.now()}`;
+    const newEl: CertificateCanvasElement = {
+      id: newId,
+      type: 'custom_text',
+      label: `نص مخصص #${canvasElements.length + 1}`,
+      content: 'نص إضافي مخصص بالشهادة',
+      x: 50,
+      y: 50,
+      fontSize: 14,
+      fontWeight: 'bold',
+      fontFamily: 'cairo',
+      color: '#173A7C',
+      textAlign: 'center',
+      visible: true,
+    };
+    setCanvasElements((prev) => [...prev, newEl]);
+    setSelectedElementId(newId);
+    setDesignerActiveTab('inspector');
+    showToast('تمت إضافة حقل نصي جديد إلى منتصف الشهادة 🎯');
+  };
+
+  const handleResetLayout = () => {
+    if (!window.confirm('هل تريد استعادة الترتيب والمواقع الافتراضية لعناصر الشهادة؟')) return;
+    setCanvasElements([...DEFAULT_CERTIFICATE_ELEMENTS]);
+    setSelectedElementId('el-student-name');
+    showToast('تمت استعادة المواقع الافتراضية بنجاح 🔄');
+  };
+
+  const handleCenterElementX = (id: string) => {
+    handleUpdateElement(id, { x: 50 });
+    showToast('تم توسيط العنصر أفقياً 🎯');
+  };
+
+  // Pointer Dragging & Direct Mouse Resizing on Visual Canvas
+  const handlePointerDownElement = (e: React.PointerEvent, elementId: string) => {
+    e.stopPropagation();
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    } catch (_) {}
+    setSelectedElementId(elementId);
+    setDraggingElementId(elementId);
+  };
+
+  const handlePointerDownResize = (
+    e: React.PointerEvent,
+    elementId: string,
+    handle: 'nw' | 'ne' | 'se' | 'sw'
+  ) => {
+    e.stopPropagation();
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    } catch (_) {}
+    const el = canvasElements.find((item) => item.id === elementId);
+    if (!el) return;
+
+    setSelectedElementId(elementId);
+    setResizingState({
+      elementId,
+      handle,
+      startX: e.clientX,
+      startY: e.clientY,
+      initialFontSize: el.fontSize || 16,
+      initialWidth: el.width || 60,
+    });
+  };
+
+  const handleCanvasPointerMove = (e: React.PointerEvent) => {
+    // 1. Direct Mouse Resizing
+    if (resizingState) {
+      const deltaX = e.clientX - resizingState.startX;
+      const deltaY = e.clientY - resizingState.startY;
+
+      let distanceDelta = 0;
+      if (resizingState.handle === 'se') {
+        distanceDelta = (deltaX + deltaY) / 2;
+      } else if (resizingState.handle === 'sw') {
+        distanceDelta = (-deltaX + deltaY) / 2;
+      } else if (resizingState.handle === 'ne') {
+        distanceDelta = (deltaX - deltaY) / 2;
+      } else if (resizingState.handle === 'nw') {
+        distanceDelta = (-deltaX - deltaY) / 2;
+      }
+
+      const targetEl = canvasElements.find((el) => el.id === resizingState.elementId);
+      if (!targetEl) return;
+
+      if (targetEl.type === 'seal' || targetEl.type === 'qr' || targetEl.type === 'badge') {
+        const newWidth = Math.max(
+          28,
+          Math.min(220, Math.round((resizingState.initialWidth || 60) + distanceDelta * 1.1))
+        );
+        handleUpdateElement(targetEl.id, { width: newWidth, height: newWidth });
+      } else {
+        const newFontSize = Math.max(
+          9,
+          Math.min(64, Math.round((resizingState.initialFontSize || 16) + distanceDelta / 3.2))
+        );
+        handleUpdateElement(targetEl.id, { fontSize: newFontSize });
+      }
+      return;
+    }
+
+    // 2. Dragging Position
+    if (!draggingElementId || !canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    let newX = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+    let newY = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+
+    // Bounding constraints
+    newX = Math.max(4, Math.min(96, newX));
+    newY = Math.max(4, Math.min(96, newY));
+
+    // Snapping guideline to horizontal center (50%)
+    if (Math.abs(newX - 50) <= 1.8) {
+      newX = 50;
+      setSnapGuidelineX(50);
+    } else {
+      setSnapGuidelineX(null);
+    }
+
+    setCanvasElements((prev) =>
+      prev.map((el) => (el.id === draggingElementId ? { ...el, x: newX, y: newY } : el))
+    );
+  };
+
+  const handleCanvasPointerUp = () => {
+    if (draggingElementId) {
+      setDraggingElementId(null);
+      setSnapGuidelineX(null);
+    }
+    if (resizingState) {
+      setResizingState(null);
     }
   };
 
@@ -455,17 +726,17 @@ export default function AdminCertificatesPage() {
       </div>
 
       {/* ── TABS NAVIGATION ── */}
-      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2">
+      <div className="premium-tabs flex items-center gap-2 border-b border-slate-200/80 pb-2">
         <button
           onClick={() => setSelectedTab('templates')}
-          className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+          className={`premium-tab px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
             selectedTab === 'templates'
               ? 'bg-[#173A7C] text-white shadow-md shadow-[#173A7C]/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <Layers className="w-4 h-4" />
-          <span>قوالب الشهادات والتصاميم</span>
+          <span className="premium-tab-label">قوالب الشهادات والتصاميم</span>
           <span className="px-1.5 py-0.2 rounded-md bg-white/20 text-[10px] font-mono">
             {templates.length}
           </span>
@@ -473,14 +744,14 @@ export default function AdminCertificatesPage() {
 
         <button
           onClick={() => setSelectedTab('registry')}
-          className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+          className={`premium-tab px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
             selectedTab === 'registry'
               ? 'bg-[#173A7C] text-white shadow-md shadow-[#173A7C]/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <FileCheck className="w-4 h-4" />
-          <span>سجل الشهادات الصادرة</span>
+          <span className="premium-tab-label">سجل الشهادات الصادرة</span>
           <span className="px-1.5 py-0.2 rounded-md bg-white/20 text-[10px] font-mono">
             {issuedCertificates.length}
           </span>
@@ -668,7 +939,7 @@ export default function AdminCertificatesPage() {
                           {cert.grade} {cert.hours && `(${cert.hours})`}
                         </td>
                         <td className="p-4">
-                          <span
+<span
                             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold border ${
                               cert.status === 'active'
                                 ? 'bg-emerald-500/10 text-emerald-800 border-emerald-500/30'
@@ -777,458 +1048,668 @@ export default function AdminCertificatesPage() {
         </div>
       )}
 
-      {/* ── CERTIFICATE VISUAL DESIGNER & STUDIO MODAL ── */}
+      {/* ── CERTIFICATE VISUAL DRAG & DROP CANVAS STUDIO MODAL ── */}
       <AnimatePresence>
         {isDesignerModalOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto font-[family-name:var(--font-cairo)]"
+            className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto font-[family-name:var(--font-cairo)]"
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.97, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-6xl bg-white text-slate-900 rounded-2xl sm:rounded-3xl border border-white/80 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] my-auto"
+              exit={{ scale: 0.97, opacity: 0 }}
+              className="w-full max-w-6xl bg-slate-900 text-white rounded-2xl sm:rounded-3xl border border-white/20 shadow-2xl overflow-hidden flex flex-col max-h-[95vh] my-auto"
             >
-              {/* Header */}
-              <div className="p-4 sm:p-5 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] text-white flex items-center justify-between border-b border-white/10 shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-white/15 text-amber-300 font-black shadow-md">
-                    <Palette className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h2 className="font-black text-base sm:text-lg">
-                      {editingTemplateId ? 'استوديو تعديل وتخصيص قالب الشهادة' : 'استوديو تصميم قالب شهادة جديد'}
-                    </h2>
-                    <p className="text-xs text-blue-100 font-bold">
-                      تحكم كامل في الخلفيات والنصوص والأختام مع معاينة حية وحفظ فوري
-                    </p>
+              {/* ── 1. CLEAN TOP HEADER BAR ── */}
+              <div className="p-3 sm:p-4 bg-slate-950 border-b border-white/10 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                {/* Right: Close & Template Name */}
+                <div className="flex items-center gap-3 flex-1 min-w-[260px]">
+                  <button
+                    type="button"
+                    onClick={() => setIsDesignerModalOpen(false)}
+                    className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                    title="إغلاق"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center gap-2 flex-1">
+                    <input
+                      type="text"
+                      value={designerForm.name || ''}
+                      onChange={(e) => setDesignerForm({ ...designerForm, name: e.target.value })}
+                      placeholder="اسم القالب..."
+                      className="w-full max-w-[280px] bg-white/10 hover:bg-white/15 focus:bg-white/20 text-white font-black text-xs sm:text-sm px-3 py-1.5 rounded-xl border border-white/20 focus:border-amber-400 outline-none transition-all"
+                    />
+                    <select
+                      value={designerForm.courseTitle || ''}
+                      onChange={(e) => setDesignerForm({ ...designerForm, courseTitle: e.target.value })}
+                      className="hidden sm:block bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold px-2.5 py-1.5 rounded-xl border border-white/20 outline-none max-w-[200px] truncate cursor-pointer"
+                    >
+                      {availableCourses.map((c) => (
+                        <option key={c} value={c} className="bg-slate-900 text-white">
+                          {c}
+                        </option>
+                      ))}
+                      <option value="كافة الدورات التدريبية" className="bg-slate-900 text-white">
+                        كافة الدورات التدريبية
+                      </option>
+                    </select>
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setIsDesignerModalOpen(false)}
-                  className="p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/15 transition-colors cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                {/* Center: Background Switcher */}
+                <div className="flex items-center gap-1.5 bg-white/5 p-1 rounded-xl border border-white/10 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setDesignerForm({ ...designerForm, imageUrl: '/1.png' })}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                      designerForm.imageUrl === '/1.png'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    الإطار الملكي (1)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDesignerForm({ ...designerForm, imageUrl: '/2.png' })}
+                    className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                      designerForm.imageUrl === '/2.png'
+                        ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    الإطار الأخضر (2)
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/png, image/jpeg, image/webp"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    disabled={isUploadingBg}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-2.5 py-1 rounded-lg font-bold text-blue-300 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                    title="رفع صورة إطار مخصص"
+                  >
+                    {isUploadingBg ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="w-3.5 h-3.5" />
+                    )}
+                    <span className="hidden md:inline">رفع إطار</span>
+                  </button>
+                </div>
+
+                {/* Left: Reset & Save Actions */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResetLayout}
+                    className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    title="إعادة ضبط المواقع الافتراضية"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveTemplate}
+                    disabled={isSavingTemplate}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer transition-all border border-emerald-400/30 disabled:opacity-50"
+                  >
+                    {isSavingTemplate ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                        <span>جاري الحفظ...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>حفظ القالب 💾</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
-              {/* Main Body (Split into Controls on Left & Live Preview on Right) */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-y-auto">
-                {/* 1. Left Form Controls (5 cols) */}
-                <div className="lg:col-span-5 p-5 sm:p-6 border-b lg:border-b-0 lg:border-l border-slate-200 space-y-5 overflow-y-auto bg-slate-50/70">
-                  {/* Designer Sub-Tabs */}
-                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/80 text-xs font-bold">
-                    <button
-                      type="button"
-                      onClick={() => setDesignerActiveTab('bg')}
-                      className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                        designerActiveTab === 'bg'
-                          ? 'bg-white text-[#173A7C] shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      <ImageIcon className="w-3.5 h-3.5" />
-                      <span>الخلفية والدورة</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDesignerActiveTab('text')}
-                      className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                        designerActiveTab === 'text'
-                          ? 'bg-white text-[#173A7C] shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      <Type className="w-3.5 h-3.5" />
-                      <span>النصوص والعناوين</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDesignerActiveTab('signatories')}
-                      className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                        designerActiveTab === 'signatories'
-                          ? 'bg-white text-[#173A7C] shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      <Stamp className="w-3.5 h-3.5" />
-                      <span>الأختام والتوقيعات</span>
-                    </button>
-                  </div>
+              {/* ── 2. SMART FLOATING CONTEXT TOOLBAR (CANVA-STYLE) ── */}
+              {(() => {
+                const currentEl = canvasElements.find((e) => e.id === selectedElementId && e.visible);
 
-                  <form onSubmit={handleSaveTemplate} id="designer-form" className="space-y-4 text-xs font-bold">
-                    {/* TAB 1: Background & Course */}
-                    {designerActiveTab === 'bg' && (
-                      <div className="space-y-4">
-                        <div className="space-y-1.5">
-                          <label className="text-slate-700 block">اسم القالب الداخلي في النظام</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="مثال: قالب دبلوم الأمن السيبراني المعتمد"
-                            value={designerForm.name || ''}
-                            onChange={(e) => setDesignerForm({ ...designerForm, name: e.target.value })}
-                            className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-slate-700 block">ربط القالب بالمساق / الدورة التدريبية</label>
-                          <select
-                            value={designerForm.courseTitle || ''}
-                            onChange={(e) => setDesignerForm({ ...designerForm, courseTitle: e.target.value })}
-                            className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                          >
-                            {availableCourses.map((c) => (
-                              <option key={c} value={c}>
-                                {c}
-                              </option>
-                            ))}
-                            <option value="كافة المساقات والدورات التدريبية">كافة المساقات والدورات التدريبية</option>
-                          </select>
-                        </div>
-
-                        {/* Background Selection / Upload */}
-                        <div className="space-y-2 pt-2 border-t border-slate-200">
-                          <label className="text-slate-700 block">خلفية وإطار الشهادة</label>
-                          <div className="grid grid-cols-2 gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setDesignerForm({ ...designerForm, bgType: 'image', imageUrl: '/1.png' })}
-                              className={`p-2.5 rounded-xl border flex items-center gap-2 transition-all cursor-pointer ${
-                                designerForm.imageUrl === '/1.png'
-                                  ? 'border-[#173A7C] bg-[#173A7C]/10 text-[#173A7C]'
-                                  : 'border-slate-200 bg-white text-slate-700'
-                              }`}
-                            >
-                              <div className="w-7 h-5 rounded bg-amber-100 border border-amber-300 shrink-0" />
-                              <span className="truncate">الإطار الكلاسيكي الملكي (1)</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => setDesignerForm({ ...designerForm, bgType: 'image', imageUrl: '/2.png' })}
-                              className={`p-2.5 rounded-xl border flex items-center gap-2 transition-all cursor-pointer ${
-                                designerForm.imageUrl === '/2.png'
-                                  ? 'border-[#173A7C] bg-[#173A7C]/10 text-[#173A7C]'
-                                  : 'border-slate-200 bg-white text-slate-700'
-                              }`}
-                            >
-                              <div className="w-7 h-5 rounded bg-emerald-100 border border-emerald-300 shrink-0" />
-                              <span className="truncate">الإطار المعتمد الأخضر (2)</span>
-                            </button>
-                          </div>
-
-                          {/* Upload Custom Background */}
-                          <div className="pt-2">
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              onChange={handleImageUpload}
-                              accept="image/png, image/jpeg, image/webp"
-                              className="hidden"
-                            />
-                            <button
-                              type="button"
-                              disabled={isUploadingBg}
-                              onClick={() => fileInputRef.current?.click()}
-                              className="w-full py-2.5 px-4 rounded-xl border-2 border-dashed border-[#173A7C]/40 hover:border-[#173A7C] bg-white text-[#173A7C] font-bold flex items-center justify-center gap-2 transition-all cursor-pointer hover:bg-[#173A7C]/5 disabled:opacity-50"
-                            >
-                              {isUploadingBg ? (
-                                <>
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                  <span>جاري رفع صورة الخلفية...</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Upload className="w-4 h-4" />
-                                  <span>رفع صورة/تصميم إطار مخصص من جهازك (A4)</span>
-                                </>
-                              )}
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="pt-2 border-t border-slate-200">
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={designerForm.autoIssue || false}
-                              onChange={(e) => setDesignerForm({ ...designerForm, autoIssue: e.target.checked })}
-                              className="w-4 h-4 accent-[#173A7C] rounded cursor-pointer"
-                            />
-                            <span className="text-slate-800">
-                              تفعيل الإصدار التلقائي فور إكمال المتدرب للدورة 100%
+                return (
+                  <div className="bg-slate-950/90 border-b border-white/10 px-3 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 text-xs shrink-0">
+                    {currentEl ? (
+                      <div className="w-full flex flex-wrap items-center justify-between gap-3">
+                        {/* Right: Quick text editor / tags */}
+                        <div className="flex items-center gap-2 flex-1 min-w-[280px]">
+                          {currentEl.type === 'qr' ? (
+                            <span className="text-slate-400 font-bold flex items-center gap-1.5">
+                              <QrCode className="w-4 h-4 text-amber-400" />
+                              <span>رمز التحقق الذكي QR Code</span>
                             </span>
-                          </label>
+                          ) : currentEl.type === 'seal' || currentEl.type === 'badge' ? (
+                            <span className="text-slate-400 font-bold flex items-center gap-1.5">
+                              <Stamp className="w-4 h-4 text-amber-400" />
+                              <span>ختم / شارة الاعتماد الموثقة</span>
+                            </span>
+                          ) : (
+                            <div className="flex items-center gap-1.5 flex-1">
+                              <input
+                                type="text"
+                                value={currentEl.content || ''}
+                                onChange={(e) =>
+                                  handleUpdateElement(currentEl.id, { content: e.target.value })
+                                }
+                                placeholder="نص الحقل..."
+                                className="w-full bg-slate-800 border border-slate-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold focus:border-blue-400 outline-none"
+                              />
+                              {/* Quick variable tags */}
+                              <div className="hidden xl:flex items-center gap-1">
+                                {[
+                                  { label: 'طالب', tag: '{student_name}' },
+                                  { label: 'دورة', tag: '{course_title}' },
+                                  { label: 'تقدير', tag: '{grade}' },
+                                  { label: 'ساعات', tag: '{hours}' },
+                                ].map((v) => (
+                                  <button
+                                    key={v.tag}
+                                    type="button"
+                                    onClick={() =>
+                                      handleUpdateElement(currentEl.id, {
+                                        content: (currentEl.content || '') + ' ' + v.tag,
+                                      })
+                                    }
+                                    className="px-1.5 py-0.5 rounded bg-white/10 hover:bg-blue-600 text-[10px] text-slate-300 font-bold transition-colors cursor-pointer"
+                                  >
+                                    +{v.label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Middle: Font, Size, Color & Align Controls */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {/* Font Family (for text) */}
+                          {currentEl.fontSize !== undefined && (
+                            <select
+                              value={currentEl.fontFamily || 'cairo'}
+                              onChange={(e) =>
+                                handleUpdateElement(currentEl.id, { fontFamily: e.target.value as any })
+                              }
+                              className="bg-slate-800 text-slate-200 px-2 py-1 rounded-lg border border-slate-700 text-xs font-bold cursor-pointer"
+                            >
+                              <option value="cairo">خط القاهرة (Cairo)</option>
+                              <option value="amiri">خط النسخ (Amiri)</option>
+                              <option value="tajawal">خط تجوال (Tajawal)</option>
+                              <option value="alexandria">خط الإسكندرية</option>
+                            </select>
+                          )}
+
+                          {/* Font Size Stepper */}
+                          {currentEl.fontSize !== undefined ? (
+                            <div className="flex items-center bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateElement(currentEl.id, {
+                                    fontSize: Math.max(9, (currentEl.fontSize || 14) - 1),
+                                  })
+                                }
+                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-black cursor-pointer"
+                                title="تصغير الخط"
+                              >
+                                -
+                              </button>
+                              <span className="px-2 text-xs font-mono font-bold text-amber-300 min-w-[36px] text-center">
+                                {currentEl.fontSize}px
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateElement(currentEl.id, {
+                                    fontSize: Math.min(64, (currentEl.fontSize || 14) + 1),
+                                  })
+                                }
+                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-black cursor-pointer"
+                                title="تكبير الخط"
+                              >
+                                +
+                              </button>
+                            </div>
+                          ) : currentEl.width !== undefined ? (
+                            <div className="flex items-center bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const nw = Math.max(30, (currentEl.width || 60) - 5);
+                                  handleUpdateElement(currentEl.id, { width: nw, height: nw });
+                                }}
+                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-black cursor-pointer"
+                                title="تصغير الحجم"
+                              >
+                                -
+                              </button>
+                              <span className="px-2 text-xs font-mono font-bold text-amber-300 min-w-[40px] text-center">
+                                {currentEl.width}px
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const nw = Math.min(200, (currentEl.width || 60) + 5);
+                                  handleUpdateElement(currentEl.id, { width: nw, height: nw });
+                                }}
+                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-black cursor-pointer"
+                                title="تكبير الحجم"
+                              >
+                                +
+                              </button>
+                            </div>
+                          ) : null}
+
+                          {/* Bold Toggle */}
+                          {currentEl.fontSize !== undefined && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateElement(currentEl.id, {
+                                  fontWeight: currentEl.fontWeight === 'bold' || currentEl.fontWeight === 'black' ? 'normal' : 'bold',
+                                })
+                              }
+                              className={`px-2.5 py-1 rounded-lg border text-xs font-black transition-colors cursor-pointer ${
+                                currentEl.fontWeight === 'bold' || currentEl.fontWeight === 'black'
+                                  ? 'bg-blue-600 text-white border-blue-500'
+                                  : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                              }`}
+                              title="سُمك عريض"
+                            >
+                              B
+                            </button>
+                          )}
+
+                          {/* Text Align */}
+                          {currentEl.textAlign !== undefined && (
+                            <div className="hidden sm:flex items-center bg-slate-800 border border-slate-700 rounded-lg p-0.5">
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateElement(currentEl.id, { textAlign: 'right' })}
+                                className={`p-1 rounded cursor-pointer ${
+                                  currentEl.textAlign === 'right' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                                }`}
+                              >
+                                <AlignRight className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateElement(currentEl.id, { textAlign: 'center' })}
+                                className={`p-1 rounded cursor-pointer ${
+                                  currentEl.textAlign === 'center' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                                }`}
+                              >
+                                <AlignCenter className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateElement(currentEl.id, { textAlign: 'left' })}
+                                className={`p-1 rounded cursor-pointer ${
+                                  currentEl.textAlign === 'left' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+                                }`}
+                              >
+                                <AlignLeft className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Color Palette Dots */}
+                          {currentEl.color !== undefined && (
+                            <div className="flex items-center gap-1 bg-slate-800 border border-slate-700 p-1 rounded-lg">
+                              {['#173A7C', '#152C5B', '#B45309', '#065F46', '#1E293B', '#B91C1C'].map((c) => (
+                                <button
+                                  key={c}
+                                  type="button"
+                                  onClick={() => handleUpdateElement(currentEl.id, { color: c })}
+                                  className={`w-4 h-4 rounded-full transition-transform cursor-pointer ${
+                                    currentEl.color === c ? 'scale-125 ring-2 ring-white' : 'hover:scale-110'
+                                  }`}
+                                  style={{ backgroundColor: c }}
+                                />
+                              ))}
+                              <input
+                                type="color"
+                                value={currentEl.color || '#173A7C'}
+                                onChange={(e) => handleUpdateElement(currentEl.id, { color: e.target.value })}
+                                className="w-4 h-4 rounded cursor-pointer border-0 bg-transparent p-0"
+                                title="اختر لوناً مخصصاً"
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Left: Quick Actions (Center, Duplicate, Delete) */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleCenterElementX(currentEl.id)}
+                            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                            title="توسيط العنصر أفقياً في منتصف الشهادة"
+                          >
+                            <AlignCenter className="w-3 h-3" />
+                            <span>توسيط 🎯</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDuplicateElement(currentEl.id)}
+                            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 transition-colors cursor-pointer"
+                            title="تكرار العنصر"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteElement(currentEl.id)}
+                            className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 transition-colors cursor-pointer"
+                            title="حذف العنصر"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </div>
-                    )}
-
-                    {/* TAB 2: Text & Statements */}
-                    {designerActiveTab === 'text' && (
-                      <div className="space-y-3.5">
-                        <div className="space-y-1.5">
-                          <label className="text-slate-700 block">عنوان الشهادة الرئيسي</label>
-                          <input
-                            type="text"
-                            value={designerForm.headerTitle || ''}
-                            onChange={(e) => setDesignerForm({ ...designerForm, headerTitle: e.target.value })}
-                            className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:border-[#173A7C] transition-all"
-                          />
+                    ) : (
+                      /* If No Element Selected: Helpful Tips & Add Button */
+                      <div className="w-full flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 text-slate-400 text-xs">
+                          <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                          <span>اضغط على أي نص أو ختم لتحريكه، واسحب زوايا المربع بالماوس لتكبير وتصغير الحجم مباشرة.</span>
                         </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-slate-700 block">المسمى الثانوي بالإنجليزية</label>
-                          <input
-                            type="text"
-                            value={designerForm.subtitle || ''}
-                            onChange={(e) => setDesignerForm({ ...designerForm, subtitle: e.target.value })}
-                            className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:border-[#173A7C] transition-all font-mono"
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-slate-700 block">صيغة التصدير والتهنئة</label>
-                          <input
-                            type="text"
-                            value={designerForm.statement || ''}
-                            onChange={(e) => setDesignerForm({ ...designerForm, statement: e.target.value })}
-                            className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:border-[#173A7C] transition-all"
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-slate-700 block">نص الإنجاز والاعتماد</label>
-                          <textarea
-                            rows={3}
-                            value={designerForm.bodyText || ''}
-                            onChange={(e) => setDesignerForm({ ...designerForm, bodyText: e.target.value })}
-                            className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:border-[#173A7C] transition-all resize-none"
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-slate-700 block">اسم الجهة المانحة</label>
-                          <input
-                            type="text"
-                            value={designerForm.issuerName || ''}
-                            onChange={(e) => setDesignerForm({ ...designerForm, issuerName: e.target.value })}
-                            className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:border-[#173A7C] transition-all"
-                          />
-                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAddNewCustomText}
+                          className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer transition-colors"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>إضافة نص جديد</span>
+                        </button>
                       </div>
                     )}
-
-                    {/* TAB 3: Signatories & Seals */}
-                    {designerActiveTab === 'signatories' && (
-                      <div className="space-y-3.5">
-                        <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
-                          <span className="text-slate-500 font-bold block text-[11px]">المعتمد الأول (اليمين)</span>
-                          <div className="grid grid-cols-2 gap-2">
-                            <input
-                              type="text"
-                              placeholder="المسمى الوظيفي"
-                              value={designerForm.signatory1Title || ''}
-                              onChange={(e) => setDesignerForm({ ...designerForm, signatory1Title: e.target.value })}
-                              className="p-2 rounded-lg border border-slate-300 text-xs"
-                            />
-                            <input
-                              type="text"
-                              placeholder="اسم المعتمد"
-                              value={designerForm.signatory1Name || ''}
-                              onChange={(e) => setDesignerForm({ ...designerForm, signatory1Name: e.target.value })}
-                              className="p-2 rounded-lg border border-slate-300 text-xs"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
-                          <span className="text-slate-500 font-bold block text-[11px]">المعتمد الثاني (اليسار)</span>
-                          <div className="grid grid-cols-2 gap-2">
-                            <input
-                              type="text"
-                              placeholder="المسمى الوظيفي"
-                              value={designerForm.signatory2Title || ''}
-                              onChange={(e) => setDesignerForm({ ...designerForm, signatory2Title: e.target.value })}
-                              className="p-2 rounded-lg border border-slate-300 text-xs"
-                            />
-                            <input
-                              type="text"
-                              placeholder="اسم المعتمد"
-                              value={designerForm.signatory2Name || ''}
-                              onChange={(e) => setDesignerForm({ ...designerForm, signatory2Name: e.target.value })}
-                              className="p-2 rounded-lg border border-slate-300 text-xs"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="space-y-2 pt-2 border-t border-slate-200">
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={designerForm.showInstituteSeal || false}
-                              onChange={(e) => setDesignerForm({ ...designerForm, showInstituteSeal: e.target.checked })}
-                              className="w-4 h-4 accent-[#173A7C] rounded cursor-pointer"
-                            />
-                            <span className="text-slate-800">إظهار ختم المعهد الرسمي المذهب</span>
-                          </label>
-
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={designerForm.showNationalSeal || false}
-                              onChange={(e) => setDesignerForm({ ...designerForm, showNationalSeal: e.target.checked })}
-                              className="w-4 h-4 accent-[#173A7C] rounded cursor-pointer"
-                            />
-                            <span className="text-slate-800">إظهار شارة اعتماد المركز الوطني NELC</span>
-                          </label>
-
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={designerForm.showQrCode || false}
-                              onChange={(e) => setDesignerForm({ ...designerForm, showQrCode: e.target.checked })}
-                              className="w-4 h-4 accent-[#173A7C] rounded cursor-pointer"
-                            />
-                            <span className="text-slate-800">إظهار كود التحقق الرقمي الذكي (QR Code)</span>
-                          </label>
-                        </div>
-                      </div>
-                    )}
-                  </form>
-                </div>
-
-                {/* 2. Right Live Canvas Preview (7 cols) */}
-                <div className="lg:col-span-7 p-5 sm:p-6 bg-slate-900 flex flex-col items-center justify-center space-y-4">
-                  <div className="w-full flex items-center justify-between text-xs text-slate-400 font-bold px-2">
-                    <span className="flex items-center gap-1.5 text-amber-300">
-                      <Sparkles className="w-4 h-4" />
-                      <span>معاينة حية ومباشرة لحظياً (A4 Landscape)</span>
-                    </span>
-                    <span className="text-[11px] bg-white/10 px-2 py-0.5 rounded font-mono">
-                      دقة الطباعة 300 DPI
-                    </span>
                   </div>
+                );
+              })()}
 
-                  {/* Certificate Live Render Canvas */}
-                  <div className="w-full aspect-[1.414/1] bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/20 relative overflow-hidden flex flex-col justify-between p-6 sm:p-8 text-center select-none">
-                    {/* Background template frame */}
-                    {designerForm.imageUrl && (
-                      <img
-                        src={designerForm.imageUrl}
-                        alt="Background frame"
-                        className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90"
-                      />
-                    )}
-
-                    {/* Top accreditation bar */}
-                    <div className="relative z-10 flex items-center justify-between text-[9px] sm:text-[10px] text-slate-700 font-bold">
-                      <div className="text-right">
-                        <span className="font-black text-[#173A7C] block text-xs">{designerForm.issuerName}</span>
-                        <span className="text-slate-500">سجل اعتماد رقم: 2026/88421</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {designerForm.showNationalSeal && (
-                          <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-black">
-                            معتمد رسمياً
-                          </span>
-                        )}
-                        <img src="/logo.webp" alt="Logo" className="w-7 h-7 sm:w-8 sm:h-8 object-contain" />
-                      </div>
-                    </div>
-
-                    {/* Certificate Core Content */}
-                    <div className="relative z-10 space-y-2 sm:space-y-3 my-auto py-2">
-                      <h2 className="text-base sm:text-xl font-black text-[#173A7C] tracking-wide">
-                        {designerForm.headerTitle || 'شهادة إتمام وتفوق معتمدة'}
-                      </h2>
-                      <p className="text-[9px] sm:text-[10px] text-slate-500 font-mono tracking-widest uppercase">
-                        {designerForm.subtitle || 'CERTIFICATE OF ACHIEVEMENT'}
-                      </p>
-
-                      <div className="pt-1">
-                        <p className="text-[10px] sm:text-xs text-slate-600 font-bold">
-                          {designerForm.statement || 'يشهد معهد النبض المستدام بأن المتدرب/ـة:'}
-                        </p>
-                        <div className="my-1.5 inline-block border-b-2 border-[#173A7C] pb-1 px-8">
-                          <span className="text-sm sm:text-lg font-black text-[#152C5B]">
-                            أحمد بن محمد السالم
-                          </span>
-                        </div>
-                        <p className="text-[9px] sm:text-[11px] text-slate-700 font-bold max-w-md mx-auto leading-relaxed">
-                          {designerForm.bodyText}
-                        </p>
-                        <div className="mt-1">
-                          <span className="text-[10px] sm:text-xs font-black text-amber-700 bg-amber-50 px-3 py-1 rounded-md border border-amber-200">
-                            {designerForm.courseTitle}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bottom Signatures & QR */}
-                    <div className="relative z-10 flex items-end justify-between pt-2 border-t border-slate-300/60 text-[8px] sm:text-[10px] text-slate-700">
-                      <div className="text-right space-y-0.5">
-                        <span className="text-slate-500 block">{designerForm.signatory1Title}</span>
-                        <span className="font-black text-slate-900 block">{designerForm.signatory1Name}</span>
-                        <span className="text-emerald-700 font-serif italic block text-[9px]">توقيع إلكتروني موثق ✔</span>
-                      </div>
-
-                      {designerForm.showQrCode && (
-                        <div className="flex flex-col items-center">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white p-1 rounded border border-slate-300 flex items-center justify-center shadow-xs">
-                            <QrCode className="w-full h-full text-slate-800" />
-                          </div>
-                          <span className="font-mono text-[7px] sm:text-[8px] text-slate-500 mt-0.5">
-                            SA-TTI-2026-98421
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="text-left space-y-0.5">
-                        <span className="text-slate-500 block">{designerForm.signatory2Title}</span>
-                        <span className="font-black text-slate-900 block">{designerForm.signatory2Name}</span>
-                        <span className="text-emerald-700 font-serif italic block text-[9px]">توقيع إلكتروني موثق ✔</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer Actions */}
-              <div className="p-4 sm:p-5 bg-white border-t border-slate-200 flex items-center justify-between gap-4 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setIsDesignerModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
+              {/* ── 3. MAIN INTERACTIVE CANVAS VIEWPORT ── */}
+              <div className="relative flex-1 bg-slate-950 p-4 sm:p-8 flex items-center justify-center overflow-auto min-h-[460px] select-none">
+                {/* ── THE A4 CERTIFICATE CANVAS ── */}
+                <div
+                  ref={canvasRef}
+                  onPointerMove={handleCanvasPointerMove}
+                  onPointerUp={handleCanvasPointerUp}
+                  className="w-full max-w-[820px] aspect-[1.414/1] bg-white rounded-xl sm:rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-amber-400/40 relative overflow-hidden text-slate-900 select-none touch-none cursor-default"
+                  style={{
+                    backgroundImage: `url(${designerForm.imageUrl || '/1.png'})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
                 >
-                  إلغاء
-                </button>
+                  {/* Readability Overlay */}
+                  <div className="absolute inset-0 bg-white/60 pointer-events-none" />
 
-                <button
-                  type="submit"
-                  form="designer-form"
-                  disabled={isSavingTemplate}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-[#173A7C] hover:from-[#173A7C] hover:to-emerald-600 text-white font-black text-xs shadow-lg shadow-emerald-700/25 flex items-center gap-2 cursor-pointer transition-all border border-white/20 disabled:opacity-50"
-                >
-                  {isSavingTemplate ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>جاري حفظ القالب فورياً...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>حفظ القالب واعتماده فوراً 💾</span>
-                    </>
+                  {/* Grid Guides */}
+                  {showGridGuides && (
+                    <div
+                      className="absolute inset-0 pointer-events-none opacity-15"
+                      style={{
+                        backgroundImage:
+                          'linear-gradient(to right, #173A7C 1px, transparent 1px), linear-gradient(to bottom, #173A7C 1px, transparent 1px)',
+                        backgroundSize: '10% 10%',
+                      }}
+                    />
                   )}
-                </button>
+
+                  {/* Center Snap Guideline */}
+                  {snapGuidelineX !== null && (
+                    <div
+                      className="absolute top-0 bottom-0 w-[1.5px] bg-blue-500 z-30 pointer-events-none shadow-[0_0_6px_rgba(59,130,246,0.9)]"
+                      style={{ left: `${snapGuidelineX}%` }}
+                    />
+                  )}
+
+                  {/* ── DYNAMIC ELEMENTS WITH SLEEK 1PX BOUNDARY & 4 CORNER RESIZE HANDLES ── */}
+                  {canvasElements
+                    .filter((el) => el.visible)
+                    .map((el) => {
+                      const isSelected = selectedElementId === el.id;
+
+                      const fontFamilyClass =
+                        el.fontFamily === 'amiri'
+                          ? 'font-serif'
+                          : el.fontFamily === 'tajawal'
+                          ? 'font-sans'
+                          : el.fontFamily === 'alexandria'
+                          ? 'font-mono'
+                          : 'font-[family-name:var(--font-cairo)]';
+
+                      return (
+                        <div
+                          key={el.id}
+                          onPointerDown={(e) => handlePointerDownElement(e, el.id)}
+                          className={`absolute transition-shadow z-20 group cursor-move ${
+                            isSelected
+                              ? 'border border-blue-500 bg-blue-500/[0.04] rounded-sm'
+                              : 'hover:border hover:border-blue-400/40 hover:bg-black/[0.02] rounded-sm'
+                          }`}
+                          style={{
+                            left: `${el.x}%`,
+                            top: `${el.y}%`,
+                            transform: 'translate(-50%, -50%)',
+                            textAlign: el.textAlign || 'center',
+                            color: el.color || '#173A7C',
+                            userSelect: 'none',
+                            padding: isSelected ? '2px 4px' : '2px 4px',
+                          }}
+                        >
+                          {/* Selected Element Mini Top Tag */}
+                          {isSelected && (
+                            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm pointer-events-none whitespace-nowrap z-30 flex items-center gap-1">
+                              <span>{el.label}</span>
+                              {el.fontSize && <span className="opacity-80">({el.fontSize}px)</span>}
+                            </div>
+                          )}
+
+                          {/* 4 Minimalist Corner Resize Handles (Direct Mouse Drag to Scale!) */}
+                          {isSelected && (
+                            <>
+                              {/* Top-Left Corner Handle */}
+                              <div
+                                onPointerDown={(e) => handlePointerDownResize(e, el.id, 'nw')}
+                                className="absolute -top-1.5 -left-1.5 w-2.5 h-2.5 rounded-full bg-white border-[1.5px] border-blue-600 shadow-sm cursor-nwse-resize hover:scale-125 transition-transform z-30"
+                                title="اسحب لتكبير/تصغير الحجم بالماوس"
+                              />
+                              {/* Top-Right Corner Handle */}
+                              <div
+                                onPointerDown={(e) => handlePointerDownResize(e, el.id, 'ne')}
+                                className="absolute -top-1.5 -right-1.5 w-2.5 h-2.5 rounded-full bg-white border-[1.5px] border-blue-600 shadow-sm cursor-nesw-resize hover:scale-125 transition-transform z-30"
+                                title="اسحب لتكبير/تصغير الحجم بالماوس"
+                              />
+                              {/* Bottom-Left Corner Handle */}
+                              <div
+                                onPointerDown={(e) => handlePointerDownResize(e, el.id, 'sw')}
+                                className="absolute -bottom-1.5 -left-1.5 w-2.5 h-2.5 rounded-full bg-white border-[1.5px] border-blue-600 shadow-sm cursor-nesw-resize hover:scale-125 transition-transform z-30"
+                                title="اسحب لتكبير/تصغير الحجم بالماوس"
+                              />
+                              {/* Bottom-Right Corner Handle */}
+                              <div
+                                onPointerDown={(e) => handlePointerDownResize(e, el.id, 'se')}
+                                className="absolute -bottom-1.5 -right-1.5 w-2.5 h-2.5 rounded-full bg-white border-[1.5px] border-blue-600 shadow-sm cursor-nwse-resize hover:scale-125 transition-transform z-30"
+                                title="اسحب لتكبير/تصغير الحجم بالماوس"
+                              />
+                            </>
+                          )}
+
+                          {/* Element Render Body */}
+                          {el.type === 'qr' ? (
+                            <div
+                              className="bg-white p-1 rounded border border-slate-300 shadow-xs flex flex-col items-center justify-center pointer-events-none"
+                              style={{ width: `${el.width || 60}px`, height: `${el.height || 60}px` }}
+                            >
+                              <QrCode className="w-full h-full text-slate-800" />
+                              <span className="font-mono text-[7px] text-slate-600 mt-0.5 truncate max-w-full font-bold">
+                                {SAMPLE_PREVIEWS[sampleStudentIdx].certCode}
+                              </span>
+                            </div>
+                          ) : el.type === 'seal' ? (
+                            <div
+                              className="rounded-full bg-gradient-to-br from-amber-500 via-amber-600 to-amber-800 text-white flex flex-col items-center justify-center border-2 border-amber-300 shadow-md text-center pointer-events-none"
+                              style={{ width: `${el.width || 75}px`, height: `${el.height || 75}px` }}
+                            >
+                              <Award className="w-5 h-5 text-amber-200" />
+                              <span className="text-[7px] font-black leading-tight mt-0.5">ختم المعهد</span>
+                              <span className="text-[6px] opacity-80">معتمد</span>
+                            </div>
+                          ) : el.type === 'badge' ? (
+                            <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs flex items-center gap-1 font-black text-[10px] pointer-events-none">
+                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>{el.content || 'معتمد رسمياً'}</span>
+                            </div>
+                          ) : el.type === 'signature' ? (
+                            <div className="text-center space-y-0.5 min-w-[110px] pointer-events-none">
+                              <div className="whitespace-pre-line text-[10px] font-bold text-slate-700">
+                                {el.content || 'المشرف الأكاديمي'}
+                              </div>
+                              <span className="text-emerald-700 font-serif italic block text-[8px]">توقيع إلكتروني موثق ✔</span>
+                            </div>
+                          ) : (
+                            <div
+                              className={`whitespace-pre-line leading-snug ${fontFamilyClass} ${
+                                el.borderBottom ? 'border-b-2 border-current pb-0.5' : ''
+                              }`}
+                              style={{
+                                fontSize: `${el.fontSize || 14}px`,
+                                fontWeight:
+                                  el.fontWeight === 'black'
+                                    ? 900
+                                    : el.fontWeight === 'bold'
+                                    ? 700
+                                    : el.fontWeight === 'medium'
+                                    ? 600
+                                    : 400,
+                              }}
+                            >
+                              {resolveElementText(el)}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
+
+              {/* ── 4. STREAMLINED BOTTOM STATUS & LAYERS BAR ── */}
+              <div className="p-3 bg-slate-950 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs shrink-0">
+                {/* Right: Sample Student Switcher */}
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-400 text-[11px]">معاينة باسم:</span>
+                  <select
+                    value={sampleStudentIdx}
+                    onChange={(e) => setSampleStudentIdx(Number(e.target.value))}
+                    className="bg-slate-800 text-amber-300 px-2 py-1 rounded-lg border border-slate-700 text-xs font-bold cursor-pointer"
+                  >
+                    {SAMPLE_PREVIEWS.map((s, idx) => (
+                      <option key={idx} value={idx}>
+                        {s.studentName}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowGridGuides(!showGridGuides)}
+                    className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition-all cursor-pointer ${
+                      showGridGuides
+                        ? 'bg-blue-600/30 text-blue-300 border-blue-500/40'
+                        : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
+                    }`}
+                  >
+                    شبكة المحاذاة
+                  </button>
+                </div>
+
+                {/* Left: Layers Drawer Toggle & Auto-Issue Checkbox */}
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 text-[11px]">
+                    <input
+                      type="checkbox"
+                      checked={designerForm.autoIssue || false}
+                      onChange={(e) => setDesignerForm({ ...designerForm, autoIssue: e.target.checked })}
+                      className="w-3.5 h-3.5 accent-emerald-500 rounded cursor-pointer"
+                    />
+                    <span>إصدار تلقائي عند إكمال 100%</span>
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowLayersDrawer(!showLayersDrawer)}
+                    className={`px-3 py-1 rounded-lg border font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
+                      showLayersDrawer
+                        ? 'bg-blue-600 text-white border-blue-500'
+                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>الطبقات ({canvasElements.filter((e) => e.visible).length})</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleAddNewCustomText}
+                    className="px-3 py-1 rounded-lg bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs flex items-center gap-1 shadow-sm cursor-pointer transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>إضافة نص</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* ── 5. OPTIONAL COLLAPSIBLE LAYERS LIST ── */}
+              {showLayersDrawer && (
+                <div className="p-3 bg-slate-900 border-t border-white/10 max-h-36 overflow-y-auto flex flex-wrap gap-2 text-xs">
+                  {canvasElements.map((el) => {
+                    const isSelected = selectedElementId === el.id;
+                    return (
+                      <div
+                        key={el.id}
+                        onClick={() => setSelectedElementId(el.id)}
+                        className={`px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ${
+                          isSelected
+                            ? 'bg-blue-600 text-white border-blue-400 font-black shadow-xs'
+                            : el.visible
+                            ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                            : 'bg-slate-900 text-slate-500 border-slate-800 opacity-60'
+                        }`}
+                      >
+                        <span className="truncate max-w-[130px]">{el.label}</span>
+                        <button
+                          type="button"
+                          onClick={(e) => handleToggleVisibility(el.id, e)}
+                          className="text-slate-400 hover:text-white"
+                          title={el.visible ? 'إخفاء' : 'إظهار'}
+                        >
+                          {el.visible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}

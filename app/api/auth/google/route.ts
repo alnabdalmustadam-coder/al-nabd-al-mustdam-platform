@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase as supabaseAdmin } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -11,6 +12,7 @@ export async function GET(req: NextRequest) {
 
   try {
     // استبدل الـ code بـ session
+    const supabase = await createClient();
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error || !data.user) {
@@ -20,7 +22,7 @@ export async function GET(req: NextRequest) {
     const user = data.user;
 
     // تحقق لو موجود في profiles
-    const { data: profile } = await supabase
+    const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("ghl_contact_id")
       .eq("id", user.id)
@@ -53,7 +55,7 @@ export async function GET(req: NextRequest) {
       ghlContactId = ghlData?.contact?.id || null;
 
       // احفظ في profiles
-      await supabase.from("profiles").upsert({
+      await supabaseAdmin.from("profiles").upsert({
         id: user.id,
         full_name: name,
         phone: "",

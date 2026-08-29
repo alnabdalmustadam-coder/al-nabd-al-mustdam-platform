@@ -288,17 +288,19 @@ export default function CareerConsultingPage() {
         {/* ═══════════ HERO HEADER ═══════════ */}
         <section className="relative px-4 sm:px-6 mb-12 max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 shadow-sm mb-6">
-              <Sparkles className="w-4 h-4 text-[#173A7C]" />
-              <span className="text-xs font-extrabold text-slate-700 tracking-wide">الاستشارات والتدريب</span>
+            <div className="mb-6">
+              <span className="section-badge-glass">
+                <Sparkles className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+                الاستشارات والتدريب
+              </span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-slate-900 mb-5 tracking-tight leading-tight">
+            <h1 className="section-main-title-premium text-4xl sm:text-5xl lg:text-[3.5rem] mb-5 tracking-tight leading-tight">
               استمارة استشارة{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">
+              <span className="gradient-text inline-block">
                 التطوير الوظيفي
               </span>
             </h1>
-            <p className="text-slate-500 text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
+            <p className="section-desc-premium text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
               نهدف من خلال هذا النموذج إلى فهم طموحاتك المهنية ومساعدتك في رسم مسار تدريبي مخصص يضمن وصولك لهدفك الوظيفي.
             </p>
 

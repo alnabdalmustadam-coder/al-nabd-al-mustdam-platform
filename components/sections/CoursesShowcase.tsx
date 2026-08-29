@@ -24,32 +24,32 @@ export default function CoursesShowcase() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <span className="text-[#5CB07C] text-sm font-bold tracking-wide uppercase bg-[#5CB07C]/10 px-4 py-1.5 rounded-full inline-block mb-4">
+          <span className="text-[#5CB07C] text-xs sm:text-sm font-bold mb-4 tracking-wide bg-white/90 shadow-sm border border-slate-200/80 inline-block px-5 py-2 rounded-full backdrop-blur-md">
             أحدث دورات المعهد
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-2 mb-4 leading-tight">
+          <h2 className="section-main-title-premium mt-2 mb-5">
             اختر مسارك نحو <span className="gradient-text">التميز</span>
           </h2>
-          <p className="text-slate-500 max-w-2xl mx-auto text-lg">
+          <p className="section-desc-premium max-w-2xl mx-auto">
             دورات متنوعة تناسب جميع المستويات، مصممة بعناية لتأهيلك لسوق العمل وتطوير مهاراتك.
           </p>
         </motion.div>
 
         {/* Category Tabs */}
-        <div className="flex items-center justify-center gap-3 mb-12 flex-wrap">
+        <div className="premium-tabs flex items-center justify-center gap-3 mb-12 flex-wrap">
           {courseCategories
             .filter((c) => courses.some((course) => c.key === "all" || course.category === c.key))
             .map((cat) => (
               <button
                 key={cat.key}
                 onClick={() => setActiveCategory(cat.key)}
-                className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                className={`premium-tab px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 cursor-pointer ${
                   activeCategory === cat.key
                     ? "bg-[#5CB07C] text-white shadow-md shadow-[#5CB07C]/20 border border-[#5CB07C]"
                     : "bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200 shadow-sm"
                 }`}
               >
-                {cat.label}
+                <span className="premium-tab-label">{cat.label}</span>
               </button>
             ))}
         </div>

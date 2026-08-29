@@ -5,18 +5,15 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { getCourseBySlug, courses } from "@/data/courses";
 import Button from "@/components/ui/Button";
-import { 
-  CreditCard, 
+import {
   Shield, 
   CheckCircle, 
   ArrowLeft, 
   BookOpen, 
   Loader2, 
   User, 
-  Lock, 
   Sparkles,
   Smartphone,
-  Check,
   AlertCircle,
   ShoppingBag
 } from "lucide-react";
@@ -45,7 +42,6 @@ function CheckoutContent() {
         duration: singleCourse.duration,
       }];
 
-  const [paymentMethod, setPaymentMethod] = useState("card");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -158,9 +154,7 @@ function CheckoutContent() {
     }
   };
 
-  const rawSubtotal = checkoutItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
-  const vat = parseFloat((rawSubtotal * 0.15).toFixed(2));
-  const total = parseFloat((rawSubtotal + vat).toFixed(2));
+  const originalSubtotal = checkoutItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
 
   if (authLoading) {
     return (
@@ -184,11 +178,13 @@ function CheckoutContent() {
         {/* Navigation / Header */}
         <div className="mb-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-6">
           <div className="text-right">
-            <span className="text-[#0D5C3A] text-xs font-black tracking-widest uppercase bg-emerald-50 px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-3 border border-emerald-200">
-              <Sparkles className="w-3.5 h-3.5 text-[#0D5C3A]" />
-              بوابة الدفع والتسجيل الآمنة
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-black text-[#173A7C]">إتمام <span className="text-[#0D5C3A]">الطلب والاشتراك</span></h1>
+            <div className="mb-3">
+              <span className="section-badge-glass">
+                <Sparkles className="w-3.5 h-3.5 text-[#173A7C] ml-1 inline" />
+                التسجيل المفتوح مؤقتاً
+              </span>
+            </div>
+            <h1 className="section-main-title-premium text-3xl sm:text-4xl">تفعيل <span className="gradient-text">الدورات المختارة</span></h1>
           </div>
           <Link 
             href={isCartCheckout ? "/courses" : `/courses/${singleCourse.slug}`} 
@@ -233,25 +229,21 @@ function CheckoutContent() {
                       <span className="text-[10px] text-slate-500 font-bold">{item.duration || 'دورة تدريبية معتمدة'}</span>
                     </div>
                     <span className="text-xs font-black text-[#173A7C] shrink-0">
-                      {Number(item.price) === 0 ? 'مجاناً' : `${item.price} ر.س`}
+                      <span className="text-emerald-700">متاحة مجاناً مؤقتاً</span>
                     </span>
                   </div>
                 ))}
               </div>
 
-              {/* Price Calculation */}
+              {/* Temporary free-access summary */}
               <div className="space-y-2.5 pt-4 border-t border-slate-100 text-xs font-bold text-slate-600">
                 <div className="flex justify-between">
-                  <span>المجموع الفرعي:</span>
-                  <span>{rawSubtotal} ر.س</span>
-                </div>
-                <div className="flex justify-between text-slate-500">
-                  <span>ضريبة القيمة المضافة (15%):</span>
-                  <span>{vat} ر.س</span>
+                  <span>القيمة الأصلية:</span>
+                  <span className="line-through text-slate-400">{originalSubtotal} ر.س</span>
                 </div>
                 <div className="flex justify-between items-center text-base font-black text-slate-900 pt-2 border-t border-slate-100">
-                  <span>المبلغ الإجمالي المطلوب:</span>
-                  <span className="text-xl text-[#173A7C]">{total} ر.س</span>
+                  <span>المطلوب دفعه الآن:</span>
+                  <span className="text-xl text-emerald-700">0 ر.س</span>
                 </div>
               </div>
             </div>
@@ -262,7 +254,7 @@ function CheckoutContent() {
               <div className="space-y-1">
                 <h4 className="text-xs font-black text-emerald-950">ضمان الاعتماد والجودة الرسمية</h4>
                 <p className="text-[11px] text-emerald-800 leading-relaxed font-bold">
-                  شهاداتك الممنوحة بعد استكمال الدورة موثقة رسمياً ومعتمدة برقم تتبع رقمي فريد.
+                  التسجيل متاح مجاناً بصورة مؤقتة لحين تفعيل وسائل الدفع، مع بقاء متطلبات إتمام الدورة والشهادة كما هي.
                 </p>
               </div>
             </div>
@@ -319,34 +311,10 @@ function CheckoutContent() {
                 </div>
               </div>
 
-              {/* Payment Method Selector */}
-              <div className="pt-4 border-t border-slate-100 space-y-3">
-                <label className="block text-xs font-black text-slate-700">طريقة الدفع</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("card")}
-                    className={`p-3.5 rounded-2xl border text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                      paymentMethod === "card"
-                        ? "border-[#173A7C] bg-[#173A7C]/5 text-[#173A7C] shadow-sm"
-                        : "border-slate-200 hover:border-slate-300 text-slate-600 bg-white"
-                    }`}
-                  >
-                    <CreditCard className="w-4 h-4" />
-                    <span>بطاقة مدى / ائتمان</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("apple")}
-                    className={`p-3.5 rounded-2xl border text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                      paymentMethod === "apple"
-                        ? "border-[#173A7C] bg-[#173A7C]/5 text-[#173A7C] shadow-sm"
-                        : "border-slate-200 hover:border-slate-300 text-slate-600 bg-white"
-                    }`}
-                  >
-                    <span>Apple Pay</span>
-                  </button>
+              <div className="pt-4 border-t border-slate-100">
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-bold text-emerald-900 flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>لا تحتاج لإدخال بيانات دفع. اضغط التأكيد لتفعيل جميع الدورات المحددة فوراً.</span>
                 </div>
               </div>
 
@@ -363,8 +331,8 @@ function CheckoutContent() {
                   </>
                 ) : (
                   <>
-                    <Lock className="w-4 h-4" />
-                    <span>تأكيد التسجيل والبدء الفوري</span>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>تفعيل الدورات مجاناً والبدء الفوري</span>
                   </>
                 )}
               </button>

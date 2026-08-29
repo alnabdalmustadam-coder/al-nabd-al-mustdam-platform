@@ -34,7 +34,7 @@ export default function CtaSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-flex items-center gap-2 text-[#173A7C] text-sm font-black tracking-widest uppercase bg-white px-5 py-2.5 rounded-full mb-8 border border-slate-200 shadow-sm">
+          <span className="section-badge-glass mb-8">
             <Rocket className="w-4 h-4 text-[#5CB07C]" />
             ابدأ رحلتك الآن
           </span>
@@ -46,10 +46,10 @@ export default function CtaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#173A7C] leading-[1.2] tracking-tight mb-6"
+          className="section-main-title-premium mb-6"
         >
           جاهز لتطوير{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">
+          <span className="gradient-text">
             مسيرتك المهنية
           </span>
           ؟
@@ -61,7 +61,7 @@ export default function CtaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-slate-500 text-lg sm:text-xl max-w-2xl mx-auto font-medium leading-relaxed mb-12"
+          className="section-desc-premium max-w-2xl mx-auto mb-12"
         >
           انضم إلى آلاف المتدربين الذين غيّروا مسارهم المهني مع النبض المستدام. سجّل الآن واحصل على شهادات معتمدة.
         </motion.p>
@@ -107,8 +107,8 @@ export default function CtaSection() {
                   <StatIcon className="w-5 h-5 sm:w-7 sm:h-7 text-white" strokeWidth={1.5} />
                 </div>
                 <div className="flex flex-col items-center text-center">
-                  <div className="text-lg sm:text-3xl font-black text-[#173A7C] leading-none mb-1 sm:mb-2">{stat.value}</div>
-                  <div className="text-slate-400 text-[10px] sm:text-sm font-bold tracking-tight">{stat.label}</div>
+                  <div className="hero-stat-number mb-1 sm:mb-2">{stat.value}</div>
+                  <div className="text-slate-500 text-[10px] sm:text-sm font-bold tracking-tight">{stat.label}</div>
                 </div>
               </div>
             );

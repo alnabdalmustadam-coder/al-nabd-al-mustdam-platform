@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/security/auth";
 
 /**
  * GET /api/ghl/get-courses?email=xxx
@@ -33,7 +34,9 @@ const DEFAULT_COURSES = [
 ];
 
 export async function GET(req: NextRequest) {
-  const email = req.nextUrl.searchParams.get("email");
+  const auth = await requireUser(req);
+  if (!auth.ok) return auth.response;
+  const email = auth.user.email;
 
   if (!email) {
     return NextResponse.json({ message: "البريد الإلكتروني مطلوب" }, { status: 400 });

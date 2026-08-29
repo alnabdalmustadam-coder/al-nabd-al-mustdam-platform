@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { addOrUpdateLessonAsync, deleteLessonAsync, getCourseBySlugAsync } from '@/lib/courses-store';
+import { requireInstructorOrAdmin } from '@/lib/security/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -9,6 +10,8 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const auth = await requireInstructorOrAdmin(req);
+    if (!auth.ok) return auth.response;
     const { slug } = await params;
     const course = await getCourseBySlugAsync(slug);
     if (!course) {
@@ -38,6 +41,8 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const auth = await requireInstructorOrAdmin(req);
+    if (!auth.ok) return auth.response;
     const { slug } = await params;
     const body = await req.json();
     
@@ -87,6 +92,8 @@ export async function DELETE(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const auth = await requireInstructorOrAdmin(req);
+    if (!auth.ok) return auth.response;
     const { slug } = await params;
     const { searchParams } = new URL(req.url);
     const lessonId = searchParams.get('lessonId');

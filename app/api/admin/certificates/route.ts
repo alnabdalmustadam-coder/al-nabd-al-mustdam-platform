@@ -5,11 +5,14 @@ import {
   saveTemplate,
   deleteTemplate,
 } from '@/lib/certificates-store';
+import { requireAdmin } from '@/lib/security/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
     const templates = getAllTemplates();
     const issued = getAllIssuedCertificates();
 
@@ -26,6 +29,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
     const body = await req.json();
     if (!body.name || !body.name.trim()) {
       return NextResponse.json({ success: false, error: 'اسم قالب الشهادة مطلوب' }, { status: 400 });
@@ -41,6 +46,8 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     if (!id) {

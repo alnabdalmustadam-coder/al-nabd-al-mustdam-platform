@@ -58,14 +58,14 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 xs:mb-10 sm:mb-16 lg:mb-20 pt-2 sm:pt-0"
         >
-          <span className="inline-flex items-center gap-1.5 sm:gap-2 text-[#173A7C] text-xs sm:text-sm font-black tracking-wider uppercase bg-white px-4 py-1.5 sm:px-5 sm:py-2 rounded-full mb-3 sm:mb-5 border border-slate-200 shadow-xs mx-auto">
+          <span className="section-badge-glass mb-3 sm:mb-5">
             <MessageSquareQuote className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#5CB07C]" />
             آراء المتدربين
           </span>
-          <h2 className="text-[20px] xs:text-[24px] sm:text-3xl lg:text-4xl font-black text-[#173A7C] mt-1.5 sm:mt-2 leading-tight tracking-tight whitespace-nowrap">
-            ماذا يقول <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">متدربونا</span>؟
+          <h2 className="section-main-title-premium mt-1.5 sm:mt-2 whitespace-nowrap">
+            ماذا يقول <span className="gradient-text">متدربونا</span>؟
           </h2>
-          <p className="mt-2 sm:mt-4 text-slate-500 text-xs sm:text-base max-w-xl mx-auto font-medium leading-relaxed px-2">
+          <p className="section-desc-premium mt-2 sm:mt-4 max-w-xl mx-auto px-2">
             قصص نجاح حقيقية من متدربين انطلقوا في مسيراتهم المهنية.
           </p>
         </motion.div>
@@ -143,7 +143,7 @@ export default function TestimonialsSection() {
                     
                     {/* Header: Name + Role */}
                     <div className="mb-3 sm:mb-5">
-                      <h4 className={`font-black text-base sm:text-lg lg:text-xl tracking-tight mb-1.5 transition-all duration-700 ${isActive ? 'text-[#173A7C]' : 'text-slate-500'}`}>
+                      <h4 className={`card-title-royal-blue text-base sm:text-lg lg:text-xl mb-1.5 transition-all duration-700 ${isActive ? 'text-[#173A7C]' : 'text-slate-500'}`}>
                         {t.name}
                       </h4>
                       <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors duration-700 ${isActive ? 'bg-slate-100/70 border border-slate-200/80 shadow-2xs' : 'bg-transparent'}`}>

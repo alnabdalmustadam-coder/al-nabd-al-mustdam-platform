@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
-import { ChevronDown, ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 import { courses } from "@/data/courses";
 
 const typewriterWords = ["التقني", "الإداري", "الرقمي", "اللغوي", "القيادي"];
@@ -77,8 +77,8 @@ export default function HeroSection() {
       {/* Hero Content Container */}
       <div className="relative z-10 w-full max-w-[1700px] mx-auto px-3 sm:px-6 lg:px-6 xl:px-12 2xl:px-16 flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-4 sm:gap-10 lg:gap-4 xl:gap-8 min-h-0 lg:min-h-[450px] xl:min-h-[550px] py-1 sm:py-8 lg:py-16 xl:py-20 pointer-events-none mt-0 lg:mt-0 xl:mt-4 translate-y-0 lg:-translate-y-[3vh]">
 
-        {/* Left Side (Text content) */}
-        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-3 lg:order-1 flex items-stretch justify-center pointer-events-none mb-0 lg:mb-0">
+        {/* Left Side in LTR / Right Side in RTL (Course Card) */}
+        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[30.5%] xl:w-[30%] 2xl:w-[29.5%] order-3 lg:order-1 flex items-stretch justify-center pointer-events-none mb-0 lg:mb-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -88,17 +88,19 @@ export default function HeroSection() {
               transition={{ delay: 0.3, duration: 0.7 }}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
-              className="w-full h-full min-h-[300px] lg:min-h-0 text-right pointer-events-auto bg-white/40 backdrop-blur-md p-6 sm:p-10 lg:p-5 xl:p-8 2xl:p-12 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl flex flex-col justify-between cursor-pointer"
+              className="hero-fixed-side-card w-full h-full text-right pointer-events-auto bg-white/40 backdrop-blur-md p-6 sm:p-10 lg:p-6 xl:p-8 2xl:p-10 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl grid grid-rows-[auto_1fr_auto] gap-4 sm:gap-6 lg:gap-4 xl:gap-5 cursor-pointer"
             >
-              <div>
-                <h2 className="text-2xl sm:text-3xl lg:text-lg xl:text-3xl 2xl:text-4xl font-black mb-4 sm:mb-6 lg:mb-3 xl:mb-6 leading-tight text-[#173A7C] drop-shadow-sm line-clamp-2">
-                  {heroCourses[currentSlide].title}
-                </h2>
-                <p className="text-slate-600 text-sm sm:text-base lg:text-xs xl:text-sm 2xl:text-base leading-relaxed font-medium line-clamp-3 sm:line-clamp-4 lg:line-clamp-3 xl:line-clamp-4 2xl:line-clamp-5">
+              <h2 className="hero-course-title-premium">
+                {heroCourses[currentSlide].title}
+              </h2>
+
+              <div className="flex items-center border-y border-[#173A7C]/8 py-3 sm:py-4 lg:py-3 xl:py-4">
+                <p className="hero-course-description-premium">
                   {heroCourses[currentSlide].description}
                 </p>
               </div>
-              <Button href={`/courses/${heroCourses[currentSlide].slug}`} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full mt-6 lg:mt-4 xl:mt-6 transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
+
+              <Button href={`/courses/${heroCourses[currentSlide].slug}`} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
                 اشترك الآن وادفع بالتقسيط
               </Button>
             </motion.div>
@@ -106,7 +108,7 @@ export default function HeroSection() {
         </div>
 
         {/* Center Side (Glass Block + Stats) */}
-        <div className="w-full max-w-[550px] lg:max-w-none lg:w-[36%] xl:w-[40%] flex-1 order-1 lg:order-2 flex flex-col items-stretch justify-center gap-4 sm:gap-6 lg:gap-3 xl:gap-8 pointer-events-auto">
+        <div className="w-full max-w-[550px] lg:max-w-none lg:w-[39%] xl:w-[40%] 2xl:w-[41%] flex-1 order-1 lg:order-2 flex flex-col items-stretch justify-center gap-4 sm:gap-6 lg:gap-3 xl:gap-8 pointer-events-auto">
           {/* Main Glass Panel */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -124,16 +126,16 @@ export default function HeroSection() {
               </p>
 
               {/* Main Title */}
-              <h1 className="text-2xl sm:text-4xl lg:text-xl xl:text-3xl 2xl:text-5xl font-black leading-tight mb-2 sm:mb-6 lg:mb-3 xl:mb-6 text-slate-900 drop-shadow-sm">
+              <h1 className="hero-main-title-premium mb-3 sm:mb-6 lg:mb-4 xl:mb-6">
                 ابدأ رحلتك نحو
                 <br className="hidden sm:block lg:hidden xl:block" />
                 <span className="gradient-text sm:mt-2 lg:mt-1 xl:mt-2 inline-block">التميز المهني</span>
               </h1>
 
               {/* Typewriter */}
-              <div className="text-base sm:text-2xl lg:text-sm xl:text-xl 2xl:text-2xl text-slate-800 mb-4 sm:mb-8 lg:mb-4 xl:mb-8 h-8 sm:h-12 lg:h-6 xl:h-10 flex items-center justify-center gap-2 font-bold">
-                <span className="opacity-80">في المجال</span>
-                <span className="text-[#173A7C] font-black min-w-[65px] sm:min-w-[100px] lg:min-w-[60px] xl:min-w-[90px] inline-block text-right tracking-tight drop-shadow-sm">
+              <div className="hero-typewriter-premium mb-5 sm:mb-8 lg:mb-5 xl:mb-8 h-9 sm:h-12 lg:h-8 xl:h-11 flex items-center justify-center gap-2">
+                <span>في المجال</span>
+                <span className="font-black min-w-[72px] sm:min-w-[110px] lg:min-w-[80px] xl:min-w-[105px] inline-block text-right tracking-tight">
                   {displayed}
                   <span className="animate-pulse font-normal opacity-40">|</span>
                 </span>
@@ -168,7 +170,7 @@ export default function HeroSection() {
                 </svg>
               </div>
               <div className="flex flex-col text-right w-auto">
-                <span className="text-2xl sm:text-4xl lg:text-lg xl:text-3xl 2xl:text-4xl font-black text-slate-900 leading-tight mb-0.5 drop-shadow-sm">+50</span>
+                <span className="hero-stat-number mb-0.5">+50</span>
                 <span className="text-[10px] sm:text-sm lg:text-[8px] xl:text-[11px] 2xl:text-sm text-slate-600 font-bold tracking-wide">دورة معتمدة</span>
               </div>
             </div>
@@ -184,15 +186,15 @@ export default function HeroSection() {
                 </svg>
               </div>
               <div className="flex flex-col text-right w-auto">
-                <span className="text-2xl sm:text-4xl lg:text-lg xl:text-3xl 2xl:text-4xl font-black text-slate-900 leading-tight mb-0.5 drop-shadow-sm">+5000</span>
+                <span className="hero-stat-number mb-0.5">+5000</span>
                 <span className="text-[10px] sm:text-sm lg:text-[8px] xl:text-[11px] 2xl:text-sm text-slate-600 font-bold tracking-wide">متدرب ومتدربة</span>
               </div>
             </div>
           </motion.div>
         </div>
 
-        {/* Right Side (Image Area) */}
-        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[32%] xl:w-[30%] order-2 lg:order-3 flex items-stretch justify-center pointer-events-none">
+        {/* Right Side in LTR / Left Side in RTL (Image Area) */}
+        <div className="w-full max-w-[500px] lg:max-w-none lg:w-[30.5%] xl:w-[30%] 2xl:w-[29.5%] order-2 lg:order-3 flex items-stretch justify-center pointer-events-none">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -202,7 +204,7 @@ export default function HeroSection() {
               transition={{ delay: 0.5, duration: 0.7 }}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
-              className="relative w-full h-full aspect-[4/3] sm:aspect-square lg:aspect-auto min-h-[300px] lg:min-h-[250px] flex items-center justify-center pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
+              className="hero-fixed-side-card relative w-full h-full flex items-center justify-center pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
             >
               <div className="w-full h-full relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem]">
                 <img src={heroCourses[currentSlide].image} alt={heroCourses[currentSlide].title} className="w-full h-full object-cover sm:object-cover transition-transform duration-[1.5s] ease-out hover:scale-[1.08]" />

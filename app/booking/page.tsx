@@ -15,13 +15,15 @@ export default function BookingPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden mb-0 z-10">
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center pt-2 pb-0">
-          <span className="text-[#173A7C] text-xs font-bold tracking-wide uppercase bg-[#173A7C]/5 px-3 py-1 rounded-full inline-block mb-3 border border-[#173A7C]/10">
-            الاستشارات والتدريب
-          </span>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 mb-2 leading-tight">
-            حجز <span className="text-[#5CB07C]">موعد</span>
+          <div className="mb-3">
+            <span className="section-badge-glass">
+              الاستشارات والتدريب
+            </span>
+          </div>
+          <h1 className="section-main-title-premium text-2xl sm:text-3xl lg:text-4xl mb-2 leading-tight">
+            حجز <span className="gradient-text">موعد</span>
           </h1>
-          <p className="text-slate-600 max-w-full mx-auto text-base font-medium">
+          <p className="section-desc-premium max-w-full mx-auto text-base">
             نسعد بتواصلك معنا. يرجى اختيار الوقت المناسب لك من التقويم أدناه وسنقوم بتأكيد موعدك في أقرب وقت.
           </p>
         </div>

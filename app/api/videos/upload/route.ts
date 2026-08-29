@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { BunnyStreamProvider } from '@/lib/video/providers/bunny-provider';
+import { requireInstructorOrAdmin } from '@/lib/security/auth';
+import { VIDEO_UPLOAD_POLICY, validateUpload } from '@/lib/security/uploads';
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireInstructorOrAdmin(req);
+    if (!auth.ok) return auth.response;
+
     const contentType = req.headers.get('content-type') || '';
     const provider = new BunnyStreamProvider();
 
@@ -17,8 +20,12 @@ export async function POST(req: NextRequest) {
       if (!file) {
         return NextResponse.json({ error: 'لم يتم إرفاق ملف فيديو' }, { status: 400 });
       }
+      const validationError = validateUpload(file, VIDEO_UPLOAD_POLICY);
+      if (validationError) {
+        return NextResponse.json({ error: validationError }, { status: 400 });
+      }
 
-      const libraryId = process.env.BUNNY_STREAM_LIBRARY_ID || '729792';
+      const libraryId = process.env.BUNNY_STREAM_LIBRARY_ID || '';
       const apiKey = process.env.BUNNY_STREAM_API_KEY || '';
 
       if (!apiKey || !libraryId) {
@@ -86,11 +93,11 @@ export async function POST(req: NextRequest) {
       videoId: signature.videoId,
       libraryId: signature.libraryId,
       uploadUrl: signature.uploadUrl,
-      authorizationHeader: signature.authorizationHeader,
+      signature: signature.signature,
+      expirationTime: signature.expirationTimestamp,
     });
   } catch (err: any) {
     console.error('Error in Bunny video upload:', err);
     return NextResponse.json({ error: err.message || 'فشل رفع الفيديو' }, { status: 500 });
   }
 }
-

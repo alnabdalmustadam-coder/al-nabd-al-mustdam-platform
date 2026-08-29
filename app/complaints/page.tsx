@@ -62,17 +62,19 @@ export default function ComplaintsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm mb-8 hover:shadow-md transition-shadow">
-            <MessageSquarePlus className="w-4 h-4 text-[#173A7C]" />
-            <span className="text-xs font-extrabold text-slate-700 tracking-wide uppercase">صوتك مسموع ويهمنا</span>
+          <div className="mb-8">
+            <span className="section-badge-glass">
+              <MessageSquarePlus className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              صوتك مسموع ويهمنا
+            </span>
           </div>
           
-          <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black text-slate-900 mb-6 leading-[1.35] tracking-tight">
+          <h1 className="section-main-title-premium text-3xl sm:text-4xl lg:text-[2.75rem] mb-6 leading-[1.35]">
             رفع الشكاوى <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C] inline-block mt-3">والمقترحات التطويرية</span>
+            <span className="gradient-text inline-block mt-3">والمقترحات التطويرية</span>
           </h1>
           
-          <p className="text-slate-500 text-base sm:text-lg font-medium leading-[1.8] max-w-3xl mx-auto mb-10">
+          <p className="section-desc-premium text-base sm:text-lg max-w-3xl mx-auto mb-10">
             نسعد ونرحب دائماً باستقبال اقتراحاتكم البنّاءة لسماع آرائكم، كما نلتزم بمعالجة أي شكاوى قد تواجهكم بكل شفافية واحترافية لضمان تقديم أفضل تجربة تدريبية ممكنة في معهد النبض المستدام.
           </p>
 
@@ -100,7 +102,7 @@ export default function ComplaintsPage() {
             <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-[#5CB07C]/[0.03] to-transparent rounded-br-full pointer-events-none" />
             
             <div className="mb-10 relative z-10">
-              <h2 className="text-2xl font-black text-slate-900 mb-3">تواصل معنا للشكاوى والاقتراحات</h2>
+              <h2 className="card-title-royal-blue text-2xl mb-3">تواصل معنا للشكاوى والاقتراحات</h2>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 text-sm font-bold">
                 <Clock className="w-4 h-4" />
                 <span>سيتم الرد عليكم في خلال 24 ساعة</span>

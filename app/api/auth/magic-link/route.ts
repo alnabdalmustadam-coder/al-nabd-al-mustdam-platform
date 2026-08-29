@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { requireUser } from "@/lib/security/auth";
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
@@ -12,7 +12,9 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: NextRequest) {
-  const { userId } = await req.json();
+  const auth = await requireUser(req);
+  if (!auth.ok) return auth.response;
+  const userId = auth.user.id;
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -46,5 +48,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ redirectUrl }, { headers: CORS });
+  return NextResponse.json({ redirectUrl });
 }

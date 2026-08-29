@@ -22,7 +22,7 @@ import Image from 'next/image';
 import { courses as allCatalogCourses } from '@/data/courses';
 import { Course } from '@/types';
 import { createClient } from '@/utils/supabase/client';
-import { getCompletedLessons, getCourseAllLessons } from '@/lib/actions/student-actions';
+import { getCourseAllLessons } from '@/lib/actions/student-actions';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -219,18 +219,9 @@ export default function StudentPathwaysPage() {
               );
 
               const canonicalSlug = matchedCatalog?.slug || cleanSlug;
-              const allLessons = getCourseAllLessons(matchedCatalog);
-              const totalLessons = Math.max(1, allLessons.length);
-
-              const localCompleted = getCompletedLessons(canonicalSlug);
-              const completedCount = allLessons.filter((l: any) => localCompleted.has(l.id)).length;
-
-              let progress = 0;
-              if (completedCount > 0) {
-                progress = Math.min(100, Math.round((completedCount / totalLessons) * 100));
-              } else if (e.progress !== undefined && e.progress !== null) {
-                progress = Math.min(100, Math.max(0, Number(e.progress)));
-              }
+              const progress = e.progress !== undefined && e.progress !== null
+                ? Math.min(100, Math.max(0, Number(e.progress)))
+                : 0;
 
               if (progressMap.has(canonicalSlug)) {
                 if (progress > progressMap.get(canonicalSlug)!) {
@@ -335,29 +326,29 @@ export default function StudentPathwaysPage() {
       {/* Control Bar: Search & Section Switcher */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         {/* Section Switcher Tabs */}
-        <div className="flex items-center gap-2 p-1.5 rounded-2xl border border-white/80 bg-white/90 backdrop-blur-md shadow-sm">
+        <div className="premium-tabs flex items-center gap-2 p-1.5 rounded-2xl border border-white/80 bg-white/90 backdrop-blur-md shadow-sm">
           <button
             onClick={() => setActiveSection('courses')}
-            className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none ${
+            className={`premium-tab px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none ${
               activeSection === 'courses'
                 ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
                 : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60'
             }`}
           >
             <GraduationCap className="w-4 h-4 shrink-0" />
-            <span>الدورات المعتمدة ({accreditedCourses.length})</span>
+            <span className="premium-tab-label">الدورات المعتمدة ({accreditedCourses.length})</span>
           </button>
 
           <button
             onClick={() => setActiveSection('books')}
-            className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none ${
+            className={`premium-tab px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none ${
               activeSection === 'books'
                 ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
                 : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60'
             }`}
           >
             <BookOpen className="w-4 h-4 shrink-0" />
-            <span>الكتب والمراجع ({digitalBooks.length})</span>
+            <span className="premium-tab-label">الكتب والمراجع ({digitalBooks.length})</span>
           </button>
         </div>
 

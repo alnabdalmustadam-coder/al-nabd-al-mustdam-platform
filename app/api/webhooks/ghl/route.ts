@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { readVerifiedGhlWebhook } from "@/lib/security/integrations";
 
 /**
  * GHL Webhook — يستقبل بيانات الطالب من GoHighLevel عند إنشاء contact جديد
@@ -10,7 +11,6 @@ import { supabase } from "@/lib/supabase";
  */
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
@@ -21,7 +21,9 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = await req.json();
+    const webhook = await readVerifiedGhlWebhook(req);
+    if (!webhook.ok) return webhook.response;
+    const payload: any = webhook.payload;
 
     // GHL webhook payload structure
     // Standard fields: email, firstName, lastName, phone, name, id

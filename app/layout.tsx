@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Alexandria } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -7,10 +7,37 @@ import ClientLayoutWrapper from "@/components/layout/ClientLayoutWrapper";
 import Script from "next/script";
 import { Providers } from "./providers";
 
-const alexandria = Alexandria({
-  subsets: ["arabic", "latin"],
-  variable: "--font-alexandria",
+const thmanyah = localFont({
+  src: [
+    {
+      path: "../public/fonts/thmanyah/thmanyahsans-Light.woff2",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/thmanyah/thmanyahsans-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/thmanyah/thmanyahsans-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/thmanyah/thmanyahsans-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/thmanyah/thmanyahsans-Black.woff2",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+  variable: "--font-thmanyah",
   display: "swap",
+  fallback: ["Arial", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -62,10 +89,10 @@ export default function RootLayout({
       lang="ar"
       dir="rtl"
       suppressHydrationWarning
-      className={`${alexandria.variable} ${alexandria.className}`}
+      className={thmanyah.variable}
       data-scroll-behavior="smooth"
     >
-      <body className="min-h-screen flex flex-col font-[family-name:var(--font-alexandria)]">
+      <body className="min-h-screen flex flex-col font-[family-name:var(--font-body)]">
         <Providers>
           <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
         </Providers>

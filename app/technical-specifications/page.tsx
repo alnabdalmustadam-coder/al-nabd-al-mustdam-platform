@@ -87,17 +87,19 @@ export default function TechnicalSpecificationsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm mb-8 hover:shadow-md transition-shadow">
-            <Server className="w-4 h-4 text-[#173A7C]" />
-            <span className="text-xs font-extrabold text-slate-700 tracking-wide uppercase">البنية التحتية والبيانات</span>
+          <div className="mb-8">
+            <span className="section-badge-glass">
+              <Server className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              البنية التحتية والبيانات
+            </span>
           </div>
           
-          <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black text-slate-900 mb-6 leading-[1.35] tracking-tight">
+          <h1 className="section-main-title-premium text-3xl sm:text-4xl lg:text-[2.75rem] mb-6 leading-[1.35]">
             مواصفات البنية التقنية <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C] inline-block mt-3">للنظام والمنصة التدريبية</span>
+            <span className="gradient-text inline-block mt-3">للنظام والمنصة التدريبية</span>
           </h1>
           
-          <p className="text-slate-500 text-base sm:text-lg font-medium leading-[1.8] max-w-3xl mx-auto mb-10">
+          <p className="section-desc-premium text-base sm:text-lg max-w-3xl mx-auto mb-10">
             يمتلك <span className="font-bold text-slate-700">معهد النبض المستدام للتدريب</span> البنية التقنية القوية والمتطورة اللازمة لدعم وسلاسة عملية التدريب الإلكتروني، ولديها القدرة الفائقة على تحمل مختلف أعداد المستفيدين داخل الجهة دون التأثير على جودة الاتصال أو الخدمة.
           </p>
 
@@ -129,8 +131,8 @@ export default function TechnicalSpecificationsPage() {
               <div className={`w-14 h-14 rounded-2xl ${spec.bgColor} flex items-center justify-center mb-6 border border-white shadow-inner`}>
                 <spec.icon className={`w-6 h-6 ${spec.iconColor}`} />
               </div>
-              <h3 className="text-xl font-black text-slate-800 mb-3">{spec.title}</h3>
-              <p className="text-slate-500 font-bold text-[15px]" dir="auto">{spec.value}</p>
+              <h3 className="card-title-royal-blue text-xl mb-3">{spec.title}</h3>
+              <p className="card-desc-premium text-[15px]" dir="auto">{spec.value}</p>
             </motion.div>
           ))}
 
@@ -175,14 +177,14 @@ export default function TechnicalSpecificationsPage() {
                     <div className={`w-14 h-14 shrink-0 rounded-2xl ${spec.bgColor} flex items-center justify-center border border-white shadow-inner group-hover:-translate-y-1 transition-transform duration-300`}>
                       <spec.icon className={`w-6 h-6 ${spec.iconColor}`} />
                     </div>
-                    <h3 className="text-xl sm:text-2xl font-black text-slate-800">{spec.title}</h3>
+                    <h3 className="card-title-royal-blue text-xl sm:text-2xl">{spec.title}</h3>
                   </div>
 
                   <ul className="space-y-4 relative z-10">
                      {spec.list?.map((item, idx) => (
                         <li key={idx} className="flex items-center gap-4 bg-slate-50/50 p-4 rounded-xl border border-slate-100/50 hover:bg-slate-50 hover:border-slate-200 transition-colors">
                            <ShieldCheck className={`w-5 h-5 shrink-0 ${spec.iconColor} opacity-80`} />
-                           <span className="text-slate-600 font-bold text-[15px]">{item}</span>
+                           <span className="card-desc-premium text-[15px]">{item}</span>
                         </li>
                      ))}
                   </ul>

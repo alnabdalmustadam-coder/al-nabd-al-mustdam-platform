@@ -43,21 +43,17 @@ export default function AboutPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-slate-100 shadow-[0_4px_20px_rgba(23,58,124,0.05)] mb-8">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#173A7C] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#173A7C]"></span>
-              </span>
-              <span className="text-sm font-bold text-slate-700 tracking-wide uppercase">من نحن</span>
-            </div>
+            <span className="section-badge-glass mb-8">
+              من نحن
+            </span>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-[4rem] font-black text-slate-900 mb-6 leading-[1.2] tracking-tight">
-              تعرّف على <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] via-[#2F66D6] to-[#5CB07C]">النبض المستدام</span>
+            <h1 className="section-main-title-premium mb-6">
+              تعرّف على <span className="gradient-text">النبض المستدام</span>
             </h1>
             
             <div className="w-24 h-[3px] mx-auto bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full mb-8 opacity-80" />
             
-            <p className="text-slate-500 max-w-3xl mx-auto text-lg sm:text-2xl font-medium leading-relaxed">
+            <p className="section-desc-premium max-w-3xl mx-auto text-lg sm:text-2xl">
               منصة تعليمية رائدة نشأت من رحم خبرة تزيد عن 15 عاماً في التدريب المهني والتقني. 
               نؤمن بأن كل فرد يستحق فرصة حقيقية لتطوير مهاراته والوصول إلى التميز في مسيرته.
             </p>
@@ -86,11 +82,11 @@ export default function AboutPage() {
           
           <div className="relative z-10 flex flex-col md:flex-row gap-12 items-start">
             <div className="md:w-1/3 shrink-0">
-              <h2 className="text-3xl lg:text-4xl font-black text-[#173A7C] mb-4">قصتنا</h2>
-              <p className="text-slate-400 font-semibold text-sm">كيف بدأت رحلة الإلهام والتدريب</p>
+              <h2 className="card-title-royal-blue text-3xl lg:text-4xl mb-4">قصتنا</h2>
+              <p className="card-desc-premium text-sm">كيف بدأت رحلة الإلهام والتدريب</p>
             </div>
             
-            <div className="md:w-2/3 space-y-6 text-slate-600 leading-relaxed text-lg sm:text-[19px] font-medium border-r-2 border-[#173A7C]/10 pr-6 sm:pr-10">
+            <div className="md:w-2/3 space-y-6 text-[#465A78] leading-relaxed text-lg sm:text-[19px] font-medium border-r-2 border-[#173A7C]/10 pr-6 sm:pr-10">
               <p>
                 بدأت رحلتنا من إيمان عميق بأن التعليم هو المحرك الأساسي للتنمية المستدامة.
                 أسسنا <span className="font-bold text-[#173A7C]">النبض المستدام</span> ليكون جسراً يربط بين الطموح والفرصة، بين المعرفة والتطبيق الفعلي في سوق العمل.
@@ -121,8 +117,8 @@ export default function AboutPage() {
               <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#173A7C] to-[#2F66D6] flex items-center justify-center mb-8 shadow-lg shadow-[#173A7C]/20 text-white transform group-hover:rotate-12 transition-transform duration-500">
                 <Target className="w-10 h-10" />
               </div>
-              <h3 className="text-3xl font-black text-slate-900 mb-6 group-hover:text-[#173A7C] transition-colors">رسالتنا</h3>
-              <p className="text-slate-500 leading-relaxed font-medium text-lg">
+              <h3 className="card-title-royal-blue text-3xl mb-6">رسالتنا</h3>
+              <p className="card-desc-premium leading-relaxed text-lg">
                 تقديم تجربة تعليمية متميزة تمكّن الأفراد والمؤسسات من اكتساب المهارات
                 اللازمة للنجاح في سوق العمل المعاصر، استناداً إلى الجودة والابتكار 
                 والتدريب الممنهج الفعّال.
@@ -143,8 +139,8 @@ export default function AboutPage() {
               <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#5CB07C] to-[#4EA06E] flex items-center justify-center mb-8 shadow-lg shadow-[#5CB07C]/20 text-white transform group-hover:-rotate-12 transition-transform duration-500">
                 <Eye className="w-10 h-10" />
               </div>
-              <h3 className="text-3xl font-black text-slate-900 mb-6 group-hover:text-[#5CB07C] transition-colors">رؤيتنا</h3>
-              <p className="text-slate-500 leading-relaxed font-medium text-lg">
+              <h3 className="card-title-royal-blue text-3xl mb-6">رؤيتنا</h3>
+              <p className="card-desc-premium leading-relaxed text-lg">
                 أن نصبح احد افضل شركات التدريب بالمملكة بجودة ومصداقية حتى نصل إلى أعلى مستويات التدريب وفقاً لرؤية 2030 .
               </p>
             </div>
@@ -159,8 +155,8 @@ export default function AboutPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#5CB07C]/10 to-[#173A7C]/10 text-[#5CB07C] mb-6 shadow-inner">
             <ShieldCheck className="w-8 h-8" strokeWidth={2.5} />
           </div>
-          <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-6">الاعتماد <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">والموثوقية</span></h2>
-          <p className="text-slate-500 font-medium text-lg max-w-2xl mx-auto">
+          <h2 className="section-main-title-premium mb-6">الاعتماد <span className="gradient-text">والموثوقية</span></h2>
+          <p className="section-desc-premium max-w-2xl mx-auto">
             نعمل وفق الإجراءات والتنظيمات الرسمية في المملكة العربية السعودية، وحاصلين على الرخص المعتمدة من الجهات المعنية لنقدم لكم خدمات تدريبية موثوقة وآمنة تتوافق مع أعلى المعايير.
           </p>
         </div>
@@ -181,15 +177,15 @@ export default function AboutPage() {
                 <FileCheck className="w-10 h-10" />
               </div>
               <div>
-                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-[#173A7C] transition-colors mb-2">السجل التجاري</h3>
-                <p className="text-slate-500 font-semibold text-sm sm:text-base">وزارة التجارة</p>
+                <h3 className="card-title-royal-blue text-2xl sm:text-3xl mb-2">السجل التجاري</h3>
+                <p className="card-desc-premium text-sm sm:text-base">وزارة التجارة</p>
               </div>
             </div>
 
             <div className="bg-slate-50/80 rounded-[1.5rem] p-6 sm:p-8 border border-white shadow-inner space-y-5 relative z-10">
               <div className="flex justify-between items-center border-b border-slate-200/60 pb-5">
                 <span className="text-sm font-bold text-slate-400">اسم الكيان</span>
-                <span className="text-base sm:text-lg font-black text-slate-900 text-left">معهد النبض المستدام للتدريب</span>
+                <span className="text-base sm:text-lg font-black text-[#173A7C] text-left">معهد النبض المستدام للتدريب</span>
               </div>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200/60 pb-5 gap-2 sm:gap-0">
                 <span className="text-sm font-bold text-slate-400">الرقم الوطني الموحد</span>
@@ -223,8 +219,8 @@ export default function AboutPage() {
                 <BadgePercent className="w-10 h-10" />
               </div>
               <div>
-                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-[#0C8983] transition-colors mb-2">القيمة المضافة</h3>
-                <p className="text-slate-500 font-semibold text-sm sm:text-base">هيئة الزكاة والضريبة والجمارك</p>
+                <h3 className="card-title-royal-blue text-2xl sm:text-3xl mb-2">القيمة المضافة</h3>
+                <p className="card-desc-premium text-sm sm:text-base">هيئة الزكاة والضريبة والجمارك</p>
               </div>
             </div>
 
@@ -235,7 +231,7 @@ export default function AboutPage() {
               </div>
               <div className="flex justify-between items-center border-b border-slate-200/60 pb-5">
                 <span className="text-sm font-bold text-slate-400">تاريخ النفاذ</span>
-                <span className="text-base sm:text-lg font-black text-slate-900">2026/03/01</span>
+                <span className="text-base sm:text-lg font-black text-[#173A7C]">2026/03/01</span>
               </div>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
                 <span className="text-sm font-bold text-slate-400">الرقم الموحد المميز</span>
@@ -259,8 +255,8 @@ export default function AboutPage() {
                 <Building className="w-10 h-10" />
               </div>
               <div>
-                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-[#76B82A] transition-colors mb-2">رخصة بلدي</h3>
-                <p className="text-slate-500 font-semibold text-sm sm:text-base">وزارة الشؤون البلدية والقروية</p>
+                <h3 className="card-title-royal-blue text-2xl sm:text-3xl mb-2">رخصة بلدي</h3>
+                <p className="card-desc-premium text-sm sm:text-base">وزارة الشؤون البلدية والقروية</p>
               </div>
             </div>
 
@@ -271,7 +267,7 @@ export default function AboutPage() {
               </div>
               <div className="flex justify-between items-center border-b border-slate-200/60 pb-5">
                 <span className="text-sm font-bold text-slate-400">النشاط التفصيلي</span>
-                <span className="text-base sm:text-lg font-black text-slate-900">معهد التدريب</span>
+                <span className="text-base sm:text-lg font-black text-[#173A7C]">معهد التدريب</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm font-bold text-slate-400">تاريخ الإنتهاء</span>
@@ -295,8 +291,8 @@ export default function AboutPage() {
                 <ShieldCheck className="w-10 h-10" />
               </div>
               <div>
-                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-[#E3A832] transition-colors mb-2">ترخيص سلامة</h3>
-                <p className="text-slate-500 font-semibold text-sm sm:text-base">المديرية العامة للدفاع المدني</p>
+                <h3 className="card-title-royal-blue text-2xl sm:text-3xl mb-2">ترخيص سلامة</h3>
+                <p className="card-desc-premium text-sm sm:text-base">المديرية العامة للدفاع المدني</p>
               </div>
             </div>
 
@@ -307,7 +303,7 @@ export default function AboutPage() {
               </div>
               <div className="flex justify-between items-center border-b border-slate-200/60 pb-5">
                 <span className="text-sm font-bold text-slate-400">تاريخ الإصدار</span>
-                <span className="text-base sm:text-lg font-black text-slate-900">1447/09/23 هـ</span>
+                <span className="text-base sm:text-lg font-black text-[#173A7C]">1447/09/23 هـ</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm font-bold text-slate-400">تاريخ الإنتهاء</span>
@@ -323,8 +319,8 @@ export default function AboutPage() {
       <section className="py-24 bg-white border-y border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-20">
-            <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-6">مبادئنا <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">الأساسية</span></h2>
-            <p className="text-slate-500 font-medium text-lg max-w-2xl mx-auto">
+            <h2 className="section-main-title-premium mb-6">مبادئنا <span className="gradient-text">الأساسية</span></h2>
+            <p className="section-desc-premium max-w-2xl mx-auto">
               الأسس والقيم التي نبني عليها كل برامجنا وتوجهاتنا، لضمان أعلى درجات الثقة والمصداقية لعملائنا.
             </p>
           </div>
@@ -347,8 +343,8 @@ export default function AboutPage() {
                     <div className="w-20 h-20 mx-auto mb-6 bg-white shadow-md shadow-slate-200/50 border border-slate-100 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                       <Icon className="w-9 h-9 text-[#173A7C] group-hover:text-[#5CB07C] transition-colors duration-500" />
                     </div>
-                    <h3 className="font-black text-xl text-slate-900 mb-4 group-hover:text-[#173A7C] transition-colors">{v.title}</h3>
-                    <p className="text-sm font-semibold text-slate-500 leading-relaxed">{v.desc}</p>
+                    <h3 className="card-title-royal-blue text-xl mb-4 group-hover:text-[#1E4D9D] transition-colors">{v.title}</h3>
+                    <p className="card-desc-premium">{v.desc}</p>
                   </div>
                 </motion.div>
               );
@@ -365,8 +361,8 @@ export default function AboutPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">هل أنت مستعد لتطوير قدراتك؟</h2>
-            <p className="text-slate-500 text-lg sm:text-xl font-medium mb-12 max-w-2xl mx-auto">
+            <h2 className="section-main-title-premium mb-6">هل أنت مستعد <span className="gradient-text">لتطوير قدراتك</span>؟</h2>
+            <p className="section-desc-premium max-w-2xl mx-auto mb-12">
               انضم إلينا اليوم واكتشف باقة متميزة من البرامج التدريبية التي صُممت لمواكبة تطلعاتك.
             </p>
             
@@ -409,7 +405,7 @@ export default function AboutPage() {
             <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 text-center">
               {achievements.map((a, i) => (
                 <div key={i} className="bg-[#f8fafc]/80 backdrop-blur-md rounded-[2rem] p-8 border border-slate-100/60 shadow-sm hover:shadow-md hover:bg-white hover:-translate-y-2 transition-all duration-500">
-                  <div className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#2F66D6] mb-3 tracking-tight">{a.value}</div>
+                  <div className="hero-stat-number mb-2">{a.value}</div>
                   <div className="text-sm sm:text-base font-bold text-slate-500">{a.label}</div>
                 </div>
               ))}

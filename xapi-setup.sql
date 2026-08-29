@@ -75,9 +75,9 @@ CREATE INDEX IF NOT EXISTS idx_xapi_state_activity ON xapi_state(activity_id);
 ALTER TABLE xapi_statements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE xapi_state ENABLE ROW LEVEL SECURITY;
 
--- سياسة: service_role فقط
-CREATE POLICY "Service role full access on xapi_statements" ON xapi_statements
-  FOR ALL USING (true) WITH CHECK (true);
-
-CREATE POLICY "Service role full access on xapi_state" ON xapi_state
-  FOR ALL USING (true) WITH CHECK (true);
+-- service_role bypasses RLS automatically. Do not add a USING (true) policy,
+-- because that would also permit anon/authenticated clients with table grants.
+REVOKE ALL ON TABLE xapi_statements FROM anon, authenticated;
+REVOKE ALL ON TABLE xapi_state FROM anon, authenticated;
+GRANT ALL ON TABLE xapi_statements TO service_role;
+GRANT ALL ON TABLE xapi_state TO service_role;

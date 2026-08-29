@@ -34,7 +34,6 @@ import {
 } from 'lucide-react';
 import { StudentVideoPlayer } from '@/components/student/student-video-player';
 import {
-  getCompletedLessons,
   saveCompletedLessons,
   getLessonNotes,
   saveLessonNote,
@@ -120,7 +119,11 @@ export default function StudentLessonPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   /* ── Completion state ── */
-  const [completedSet, setCompletedSet] = useState<Set<string>>(new Set(['lesson-1']));
+  const [completedSet, setCompletedSet] = useState<Set<string>>(new Set());
+  const [savingLessonId, setSavingLessonId] = useState<string | null>(null);
+  const [completionError, setCompletionError] = useState<string | null>(null);
+  const [serverProgressPercent, setServerProgressPercent] = useState(0);
+  const [completionPendingAssessment, setCompletionPendingAssessment] = useState(false);
 
   /* ── Collapsed chapters & mobile playlist state ── */
   const [collapsedChapters, setCollapsedChapters] = useState<Set<string>>(new Set());
@@ -174,14 +177,21 @@ export default function StudentLessonPage() {
             quizData: it.quizData,
           }));
         } else if (Array.isArray(sec.lessons) && sec.lessons.length > 1) {
-          secLessons = sec.lessons.map((lesName: string, subIdx: number) => ({
-            id: `sub-${sIdx + 1}-${subIdx + 1}`,
-            title: lesName,
-            duration: '15 دقيقة',
-            isCompleted: false,
-            videoUrl: subIdx === 0 ? (sec.videoUrl || '') : '',
-            type: 'video',
-          }));
+          secLessons = (sec.lessons as Array<string | SubLessonItem>).map((lesson, subIdx: number) => {
+            const lessonData = typeof lesson === 'string' ? null : lesson;
+            return {
+              id: lessonData?.id || `sub-${sIdx + 1}-${subIdx + 1}`,
+              title: lessonData?.title || String(lesson),
+              duration: lessonData?.duration || '15 دقيقة',
+              isCompleted: false,
+              videoUrl: lessonData?.videoUrl || (subIdx === 0 ? (sec.videoUrl || '') : ''),
+              type: lessonData?.type || 'video',
+              fileUrl: lessonData?.fileUrl,
+              fileName: lessonData?.fileName,
+              fileSize: lessonData?.fileSize,
+              quizData: lessonData?.quizData,
+            };
+          });
         } else {
           secLessons = [
             {
@@ -243,7 +253,7 @@ export default function StudentLessonPage() {
 
   const totalLessons = Math.max(1, allLessons.length);
   const completedLessons = allLessons.filter(l => completedSet.has(l.id)).length;
-  const progressPercent = Math.min(100, Math.round((completedLessons / totalLessons) * 100));
+  const progressPercent = serverProgressPercent;
 
   const makeLessonUrl = (id: string) => `/dashboard/student/courses/${courseSlug}/lessons/${id}`;
 
@@ -362,69 +372,33 @@ export default function StudentLessonPage() {
   /* ── Persistent State ── */
   useEffect(() => {
     async function initProgress() {
-      const localCompleted = getCompletedLessons(courseSlug);
-      setCompletedSet(localCompleted);
       setNotesList(getLessonNotes(lessonId));
 
       try {
-        const supabase = createClient();
-        const { data: authData } = await supabase.auth.getUser();
-        if (authData?.user) {
-          const userEmail = authData.user.email?.toLowerCase().trim();
+        const response = await fetch(
+          `/api/courses/complete-lesson?courseId=${encodeURIComponent(courseSlug)}`,
+          { cache: 'no-store' },
+        );
+        const result = await response.json();
 
-          // If local storage has progress, sync it to server API route immediately
-          if (localCompleted.size > 0 && totalLessons > 0) {
-            const calculatedProgress = Math.min(100, Math.round((localCompleted.size / totalLessons) * 100));
-            fetch('/api/courses/update-progress', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                email: userEmail,
-                courseSlug,
-                courseTitle: courseData?.title,
-                progress: calculatedProgress,
-              }),
-            }).catch(console.error);
-          } else {
-            // Otherwise fetch from database if available
-            const matchIds = Array.from(new Set([
-              courseSlug,
-              `course-${courseSlug}`,
-              courseData?.slug,
-              courseData?.ghlCourseId,
-              courseData?.ghlCourseId?.replace(/^course-/, ''),
-            ])).filter(Boolean);
-
-            const orQuery = [
-              ...matchIds.map(id => `course_id.eq.${id}`),
-              ...(courseData?.title ? [`course_title.eq.${courseData.title}`] : []),
-            ].join(',');
-
-            const { data: enrollRow } = await supabase
-              .from('enrollments')
-              .select('progress')
-              .eq('email', userEmail)
-              .or(orQuery)
-              .maybeSingle();
-
-            if (enrollRow?.progress && enrollRow.progress > 0) {
-              const calculatedCompletedCount = Math.round((enrollRow.progress / 100) * totalLessons);
-              const loadedSet = new Set<string>();
-              allLessons.slice(0, calculatedCompletedCount).forEach(l => loadedSet.add(l.id));
-              if (loadedSet.size > 0) {
-                setCompletedSet(loadedSet);
-                saveCompletedLessons(courseSlug, loadedSet);
-              }
-            }
-          }
+        if (!response.ok || !result.success || !Array.isArray(result.completedLessonIds)) {
+          throw new Error(result.message || 'تعذر تحميل تقدم الدورة');
         }
+
+        const serverCompleted = new Set<string>(result.completedLessonIds);
+        setCompletedSet(serverCompleted);
+        setServerProgressPercent(Number(result.progress) || 0);
+        setCompletionPendingAssessment(Boolean(result.completionPendingAssessment));
+        saveCompletedLessons(courseSlug, serverCompleted);
+        setCompletionError(null);
       } catch (err) {
         console.error('Error syncing lesson progress on init:', err);
+        setCompletionError(err instanceof Error ? err.message : 'تعذر تحميل تقدم الدورة');
       }
     }
 
     initProgress();
-  }, [courseSlug, lessonId, totalLessons, allLessons, courseData?.title, courseData?.slug, courseData?.ghlCourseId]);
+  }, [courseSlug, lessonId]);
 
   const toggleChapter = (chapId: string) => {
     setCollapsedChapters((prev) => {
@@ -448,57 +422,50 @@ export default function StudentLessonPage() {
       e.stopPropagation();
     }
 
-    setCompletedSet(prev => {
-      const next = new Set(prev);
-      if (next.has(lessonItemId)) {
-        next.delete(lessonItemId);
-      } else {
-        next.add(lessonItemId);
+    if (completedSet.has(lessonItemId) || savingLessonId === lessonItemId) return;
 
-        const allFlat = chapters.flatMap(ch => ch.lessons);
-        const idx = allFlat.findIndex(l => l.id === lessonItemId);
-        if (idx >= 0 && idx < allFlat.length - 1) {
-          const nextUncompleted = allFlat.slice(idx + 1).find(l => !next.has(l.id));
-          if (nextUncompleted) {
-            setTimeout(() => {
-              router.push(makeLessonUrl(nextUncompleted.id));
-            }, 600);
-          }
-        }
+    setSavingLessonId(lessonItemId);
+    setCompletionError(null);
+
+    try {
+      const response = await fetch('/api/courses/complete-lesson', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseId: courseSlug,
+          lessonId: lessonItemId,
+        }),
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'تعذر حفظ إكمال الدرس');
       }
 
+      const next = new Set(completedSet);
+      next.add(lessonItemId);
+      setCompletedSet(next);
+      setServerProgressPercent(Number(result.progress) || 0);
+      setCompletionPendingAssessment(Boolean(result.completionPendingAssessment));
       saveCompletedLessons(courseSlug, next);
 
-      // ── Sync with Supabase Database via API Route ──
       const allFlat = chapters.flatMap(ch => ch.lessons);
-      const newProgress = Math.min(100, Math.round((next.size / Math.max(1, allFlat.length)) * 100));
-
-      (async () => {
-        try {
-          const supabase = createClient();
-          const { data: authData } = await supabase.auth.getUser();
-          if (authData?.user) {
-            const userEmail = authData.user.email?.toLowerCase().trim();
-
-            await fetch('/api/courses/update-progress', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                email: userEmail,
-                courseSlug,
-                courseTitle: courseData?.title,
-                progress: newProgress,
-              }),
-            });
-          }
-        } catch (syncErr) {
-          console.error('Error syncing progress with API route:', syncErr);
+      const idx = allFlat.findIndex(l => l.id === lessonItemId);
+      if (idx >= 0 && idx < allFlat.length - 1) {
+        const nextUncompleted = allFlat.slice(idx + 1).find(l => !next.has(l.id));
+        if (nextUncompleted) {
+          setTimeout(() => {
+            router.push(`/dashboard/student/courses/${courseSlug}/lessons/${nextUncompleted.id}`);
+          }, 600);
         }
-      })();
-
-      return next;
-    });
-  }, [router, courseSlug, chapters, courseData]);
+      }
+    } catch (error) {
+      console.error('Error completing lesson:', error);
+      setCompletionError(error instanceof Error ? error.message : 'تعذر حفظ تقدم الدرس');
+    } finally {
+      setSavingLessonId(null);
+    }
+  }, [chapters, completedSet, courseSlug, router, savingLessonId]);
 
   const handleAddNote = () => {
     if (!userNote.trim()) return;
@@ -711,8 +678,9 @@ export default function StudentLessonPage() {
                             >
                               <button
                                 onClick={(e) => handleToggleComplete(les.id, e)}
-                                className="shrink-0 cursor-pointer"
-                                title={isDone ? 'إلغاء الإكمال' : 'تحديد كمكتمل'}
+                                disabled={isDone || savingLessonId === les.id}
+                                className="shrink-0 cursor-pointer disabled:cursor-default"
+                                title={isDone ? 'الدرس مكتمل' : 'تحديد كمكتمل'}
                               >
                                 {isDone ? (
                                   <CheckCircle2 className={`w-4 h-4 ${isCurrent ? 'text-emerald-300' : 'text-emerald-600'}`} />
@@ -784,7 +752,8 @@ export default function StudentLessonPage() {
                   </a>
                   <button
                     onClick={() => handleToggleComplete(currentLesson.id)}
-                    className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer"
+                    disabled={completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id}
+                    className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer disabled:cursor-default disabled:opacity-80"
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                     <span>{completedSet.has(currentLesson.id) ? 'تمت القراءة' : 'تحديد كمكتمل'}</span>
@@ -793,6 +762,7 @@ export default function StudentLessonPage() {
               </div>
             ) : (
               <StudentVideoPlayer
+                courseSlug={courseSlug}
                 lessonId={currentLesson?.id || lessonId}
                 lessonTitle={currentLesson?.title || courseData?.title || 'الدرس التدريبي'}
                 videoUrl={currentLesson?.videoUrl || 'https://www.youtube.com/watch?v=1BEWMhAuBd4'}
@@ -802,63 +772,76 @@ export default function StudentLessonPage() {
                 onOpenLessonsDrawer={() => setIsMobilePlaylistOpen(true)}
                 onAddNoteAtTimestamp={handleAddTimestampNote}
                 isCompleted={completedSet.has(currentLesson?.id || lessonId)}
+                isSavingCompletion={savingLessonId === (currentLesson?.id || lessonId)}
                 onToggleComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
               />
             )}
           </div>
+
+          {completionError && (
+            <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-bold text-red-700" role="alert">
+              {completionError}
+            </div>
+          )}
+
+          {completionPendingAssessment && !completionError && (
+            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-bold text-amber-800" role="status">
+              اكتملت جميع الدروس. يلزم اجتياز التقييم النهائي لاعتماد نسبة 100% وإصدار الشهادة.
+            </div>
+          )}
 
         </div>
       </div>
 
       {/* Interactive Tabs Workspace */}
       <div className="w-full bg-white/85 backdrop-blur-2xl border border-white/60 rounded-3xl p-4 sm:p-7 shadow-xl space-y-6 text-slate-800">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 border-b border-slate-200 pb-4">
+        <div className="premium-tabs grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 border-b border-slate-200 pb-4">
           <button
             onClick={() => setActiveTab('notes')}
-            className={`w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`premium-tab w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'notes'
                 ? 'bg-[#173A7C] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             <FileText className="w-4 h-4 shrink-0" />
-            <span className="truncate">الملاحظات ({notesList.length})</span>
+            <span className="premium-tab-label truncate">الملاحظات ({notesList.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('attachments')}
-            className={`w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`premium-tab w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'attachments'
                 ? 'bg-[#173A7C] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             <Paperclip className="w-4 h-4 shrink-0" />
-            <span className="truncate">المرفقات ({allAttachments.length})</span>
+            <span className="premium-tab-label truncate">المرفقات ({allAttachments.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('quiz')}
-            className={`w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`premium-tab w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'quiz'
                 ? 'bg-[#173A7C] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             <HelpCircle className="w-4 h-4 shrink-0" />
-            <span className="truncate">الاختبار والتقييم</span>
+            <span className="premium-tab-label truncate">الاختبار والتقييم</span>
           </button>
 
           <button
             onClick={() => setActiveTab('discussion')}
-            className={`w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`premium-tab w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'discussion'
                 ? 'bg-[#173A7C] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             <MessageSquare className="w-4 h-4 shrink-0" />
-            <span className="truncate">المناقشات ({discussionComments.length})</span>
+            <span className="premium-tab-label truncate">المناقشات ({discussionComments.length})</span>
           </button>
         </div>
 

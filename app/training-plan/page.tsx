@@ -29,17 +29,19 @@ export default function TrainingPlanPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm mb-8">
-            <Target className="w-4 h-4 text-[#173A7C]" />
-            <span className="text-xs font-extrabold text-slate-700 tracking-wide uppercase">مسارات التعلم والتطوير</span>
+          <div className="mb-8">
+            <span className="section-badge-glass">
+              <Target className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              مسارات التعلم والتطوير
+            </span>
           </div>
           
-          <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black text-slate-900 mb-6 leading-[1.35] tracking-tight">
+          <h1 className="section-main-title-premium text-3xl sm:text-4xl lg:text-[2.75rem] mb-6 leading-[1.35]">
             الخطة التدريبية <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C] inline-block mt-3">لبرامج التدريب الإلكتروني</span>
+            <span className="gradient-text inline-block mt-3">لبرامج التدريب الإلكتروني</span>
           </h1>
           
-          <p className="text-slate-500 text-base sm:text-lg font-medium leading-[1.8] max-w-3xl mx-auto mb-10">
+          <p className="section-desc-premium text-base sm:text-lg max-w-3xl mx-auto mb-10">
             توفر منصة المعهد الدورات التدريبية والتأهيلية والأدلة الإرشادية الإلكترونية الشاملة للبرامج المستخدمة في بيئات التدريب الإلكتروني للمتدربين، لضمان أعلى درجات الاستفادة والكفاءة.
           </p>
 
@@ -51,8 +53,8 @@ export default function TrainingPlanPage() {
               <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4">
                 <Target className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-800 text-lg mb-2">أهداف الخطة</h3>
-              <p className="text-sm font-medium text-slate-500 leading-relaxed">
+              <h3 className="card-title-royal-blue text-lg mb-2">أهداف الخطة</h3>
+              <p className="card-desc-premium text-sm leading-relaxed">
                 ضمان امتلاك المتدرب الخبرة اللازمة والاستفادة القصوى في التعامل مع نمط التعليم الإلكتروني بشكل فعال.
               </p>
             </div>
@@ -62,8 +64,8 @@ export default function TrainingPlanPage() {
               <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4">
                 <MonitorPlay className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-800 text-lg mb-2">المهارات والأساليب</h3>
-              <ul className="text-sm font-medium text-slate-500 leading-relaxed space-y-1">
+              <h3 className="card-title-royal-blue text-lg mb-2">المهارات والأساليب</h3>
+              <ul className="card-desc-premium text-sm leading-relaxed space-y-1">
                 <li>• استخدام الفصول الافتراضية.</li>
                 <li>• استخدام أنظمة إدارة التعلم.</li>
                 <li>• تدريب متزامن وغير متزامن.</li>
@@ -75,8 +77,8 @@ export default function TrainingPlanPage() {
               <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-4">
                 <Users className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-800 text-lg mb-2">الفئة المستهدفة</h3>
-              <p className="text-sm font-medium text-slate-500 leading-relaxed mt-4 bg-slate-50 p-3 rounded-xl inline-block">
+              <h3 className="card-title-royal-blue text-lg mb-2">الفئة المستهدفة</h3>
+              <p className="card-desc-premium text-sm leading-relaxed mt-4 bg-slate-50 p-3 rounded-xl inline-block font-bold">
                 جميع المتدربين (المتعلمين)
               </p>
             </div>
@@ -90,20 +92,20 @@ export default function TrainingPlanPage() {
         <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] overflow-hidden">
           
           {/* Tabs Header */}
-          <div className="flex border-b border-slate-100 flex-col sm:flex-row">
+          <div className="premium-tabs flex border-b border-slate-100 flex-col sm:flex-row">
             <button 
               onClick={() => setActiveTab("sync")}
-              className={`flex-1 flex items-center justify-center gap-3 py-6 px-4 font-black transition-colors ${activeTab === 'sync' ? 'bg-blue-50/50 text-[#173A7C] border-b-2 border-[#173A7C]' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
+              className={`premium-tab flex-1 flex items-center justify-center gap-3 py-6 px-4 font-black transition-colors ${activeTab === 'sync' ? 'bg-blue-50/50 text-[#173A7C] border-b-2 border-[#173A7C]' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
             >
               <Presentation className="w-5 h-5" />
-              التدريب الإلكتروني (المتزامن)
+              <span className="premium-tab-label">التدريب الإلكتروني (المتزامن)</span>
             </button>
             <button 
               onClick={() => setActiveTab("async")}
-              className={`flex-1 flex items-center justify-center gap-3 py-6 px-4 font-black transition-colors ${activeTab === 'async' ? 'bg-emerald-50/50 text-[#5CB07C] border-b-2 border-[#5CB07C]' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
+              className={`premium-tab flex-1 flex items-center justify-center gap-3 py-6 px-4 font-black transition-colors ${activeTab === 'async' ? 'bg-emerald-50/50 text-[#5CB07C] border-b-2 border-[#5CB07C]' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
             >
               <PlayCircle className="w-5 h-5" />
-              التدريب الإلكتروني (الغير متزامن)
+              <span className="premium-tab-label">التدريب الإلكتروني (الغير متزامن)</span>
             </button>
           </div>
 

@@ -115,7 +115,7 @@ export default function SmartCourseAction({
   const checkoutUrl = courseSlug ? `/checkout?slug=${courseSlug}` : "/checkout";
   return (
     <Button href={checkoutUrl} size="md" className={`w-full text-sm sm:text-base py-3 font-black ${className}`}>
-      سجّل في الدورة الآن
+      سجّل مجاناً وابدأ الآن
     </Button>
   );
 }

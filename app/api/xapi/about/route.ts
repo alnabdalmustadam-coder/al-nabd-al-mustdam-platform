@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { verifyBasicAuth, xapiUnauthorizedResponse } from "@/lib/security/integrations";
 
 /**
  * xAPI About Resource — /api/xapi/about
@@ -21,7 +22,8 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: CORS });
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  if (!verifyBasicAuth(req)) return xapiUnauthorizedResponse();
   return NextResponse.json(
     {
       version: ["1.0.3", "1.0.2", "1.0.1", "1.0.0"],

@@ -11,10 +11,10 @@ import {
   List,
   BookmarkPlus,
   Circle,
-  ShieldAlert
 } from 'lucide-react';
 
 interface StudentVideoPlayerProps {
+  courseSlug: string;
   lessonId: string;
   lessonTitle: string;
   videoUrl?: string;
@@ -24,6 +24,7 @@ interface StudentVideoPlayerProps {
   onOpenLessonsDrawer?: () => void;
   onAddNoteAtTimestamp?: (timestamp: string) => void;
   isCompleted?: boolean;
+  isSavingCompletion?: boolean;
   onToggleComplete?: () => void;
 }
 
@@ -95,6 +96,7 @@ const parseEmbedUrl = (url: string): string => {
 };
 
 export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
+  courseSlug,
   lessonId,
   lessonTitle,
   videoUrl,
@@ -104,6 +106,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
   onOpenLessonsDrawer,
   onAddNoteAtTimestamp,
   isCompleted = false,
+  isSavingCompletion = false,
   onToggleComplete,
 }) => {
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
@@ -137,24 +140,21 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
         const bunnyGuid = extractBunnyGuid(trimmed);
 
         if (bunnyGuid) {
-          try {
-            const res = await fetch('/api/videos/playback-token', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ lessonId, videoId: bunnyGuid }),
-            });
+          const res = await fetch('/api/videos/playback-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lessonId, videoId: bunnyGuid, courseSlug }),
+          });
 
-            const data = await res.json();
+          const data = await res.json();
+          if (!res.ok || !data.success || !data.iframeUrl) {
+            throw new Error(data.error || 'تعذر التحقق من صلاحية مشاهدة الفيديو');
+          }
 
-            if (res.ok && data.success && data.iframeUrl) {
-              if (isMounted) {
-                setIframeUrl(data.iframeUrl);
-                setLoading(false);
-                return;
-              }
-            }
-          } catch (tokenErr) {
-            console.error('Error fetching signed Bunny playback token:', tokenErr);
+          if (isMounted) {
+            setIframeUrl(data.iframeUrl);
+            setLoading(false);
+            return;
           }
         }
 
@@ -167,15 +167,11 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
         } else {
           throw new Error('يرجى اختيار درس يحتوي على محاضرة فيديو.');
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (isMounted) {
-          if (videoUrl) {
-            setIframeUrl(parseEmbedUrl(videoUrl));
-            setLoading(false);
-          } else {
-            setError(err.message || 'حدث خطأ أثناء تحميل مشغل الفيديو');
-            setLoading(false);
-          }
+          setIframeUrl(null);
+          setError(err instanceof Error ? err.message : 'حدث خطأ أثناء تحميل مشغل الفيديو');
+          setLoading(false);
         }
       }
     }
@@ -186,41 +182,22 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
       isMounted = false;
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     };
-  }, [lessonId, videoUrl]);
+  }, [courseSlug, lessonId, videoUrl]);
 
-  // Real-time tracking of watched progress in exact seconds
+  // Keep an approximate local timestamp for note-taking only. Academic lesson
+  // completion is recorded explicitly by the page when the student confirms it.
   useEffect(() => {
     if (!iframeUrl) return;
 
     watchedSecondsRef.current = 0;
     progressTimerRef.current = setInterval(() => {
       watchedSecondsRef.current += 1;
-      // Periodically sync progress with server every 10 seconds
-      if (watchedSecondsRef.current % 10 === 0) {
-        saveProgress(watchedSecondsRef.current, false);
-      }
     }, 1000);
 
     return () => {
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     };
-  }, [iframeUrl, lessonId]);
-
-  const saveProgress = async (watchedSec: number, completedStatus: boolean) => {
-    try {
-      await fetch('/api/courses/complete-lesson', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lessonId,
-          watchedSeconds: watchedSec,
-          isCompleted: completedStatus,
-        }),
-      });
-    } catch (err) {
-      console.error('Error saving progress in seconds:', err);
-    }
-  };
+  }, [iframeUrl]);
 
   const handleTimestampNote = () => {
     const totalSecs = watchedSecondsRef.current;
@@ -336,12 +313,18 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
 
           <button
             onClick={onToggleComplete || onLessonComplete}
-            className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md ${isCompleted
+            disabled={isCompleted || isSavingCompletion}
+            className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md disabled:cursor-default ${isCompleted
                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 border border-emerald-400/40'
                 : 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white hover:opacity-95 border border-white/20 shadow-blue-900/30'
               }`}
           >
-            {isCompleted ? (
+            {isSavingCompletion ? (
+              <>
+                <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                <span>جاري الحفظ...</span>
+              </>
+            ) : isCompleted ? (
               <>
                 <CheckCircle2 className="w-4 h-4 text-white" />
                 <span>مكتمل ✓</span>

@@ -19,7 +19,6 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { CertificateBuilderModal, CertificateData } from '@/components/student/certificate-builder-modal';
-import { createClient } from '@/utils/supabase/client';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -61,11 +60,7 @@ export default function StudentCertificatesPage() {
   const fetchCertificates = async () => {
     try {
       setLoading(true);
-      const supabase = createClient();
-      const { data: authData } = await supabase.auth.getUser();
-      const email = authData?.user?.email?.toLowerCase().trim() || '';
-
-      const res = await fetch(`/api/student/certificates${email ? `?email=${encodeURIComponent(email)}` : ''}`, {
+      const res = await fetch('/api/student/certificates', {
         cache: 'no-store',
       });
       const data = await res.json();

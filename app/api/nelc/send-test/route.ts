@@ -8,6 +8,7 @@ import {
   stmtPassed,
   stmtAttended,
 } from "@/lib/xapi";
+import { requireAdmin } from "@/lib/security/auth";
 
 /**
  * POST /api/nelc/send-test
@@ -25,6 +26,8 @@ import {
  */
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
     const body = await req.json();
 
     const email = body.email || "test@nabdtraining.com";

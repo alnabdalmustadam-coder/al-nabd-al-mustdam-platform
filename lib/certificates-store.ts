@@ -1,53 +1,20 @@
 import fs from 'fs';
 import path from 'path';
+import {
+  CertificateCanvasElement,
+  CertificateTemplate,
+  IssuedCertificate,
+  DEFAULT_CERTIFICATE_ELEMENTS,
+} from '@/types/certificates';
 
-export interface CertificateTemplate {
-  id: string;
-  name: string;
-  courseTitle: string;
-  courseId?: string;
-  bgType: 'image' | 'preset' | 'custom';
-  bgPreset?: 'royal-gold' | 'emerald-official' | 'classic-navy' | 'modern-clean';
-  imageUrl: string;
-  headerTitle: string;
-  subtitle: string;
-  statement: string;
-  bodyText: string;
-  issuerName: string;
-  signatory1Title: string;
-  signatory1Name: string;
-  signatory2Title: string;
-  signatory2Name: string;
-  showQrCode: boolean;
-  showNationalSeal: boolean;
-  showInstituteSeal: boolean;
-  accentColor: string;
-  autoIssue: boolean;
-  issuedCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface IssuedCertificate {
-  id: string;
-  code: string;
-  studentName: string;
-  studentEmail?: string;
-  courseTitle: string;
-  templateId?: string;
-  issueDate: string;
-  grade: string;
-  hours: string;
-  status: 'active' | 'revoked';
-  imageUrl: string;
-  customData?: Record<string, any>;
-  createdAt: string;
-}
+export type { CertificateCanvasElement, CertificateTemplate, IssuedCertificate };
+export { DEFAULT_CERTIFICATE_ELEMENTS };
 
 interface CertificatesDatabase {
   templates: CertificateTemplate[];
   issued: IssuedCertificate[];
 }
+
 
 const DB_FILE_PATH = path.join(process.cwd(), 'data', 'certificates-db.json');
 
@@ -272,6 +239,7 @@ export function saveTemplate(templateData: Partial<CertificateTemplate> & { name
       showInstituteSeal: templateData.showInstituteSeal !== undefined ? templateData.showInstituteSeal : true,
       accentColor: templateData.accentColor || '#173A7C',
       autoIssue: templateData.autoIssue !== undefined ? templateData.autoIssue : true,
+      elementsLayout: templateData.elementsLayout || DEFAULT_CERTIFICATE_ELEMENTS,
       issuedCount: templateData.issuedCount || 0,
       createdAt: now,
       updatedAt: now,

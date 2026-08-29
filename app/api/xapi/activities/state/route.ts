@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { verifyBasicAuth, xapiUnauthorizedResponse } from "@/lib/security/integrations";
 
 /**
  * xAPI Activity State API — /api/xapi/activities/state
@@ -34,6 +35,7 @@ export async function OPTIONS() {
  */
 export async function GET(req: NextRequest) {
   try {
+    if (!verifyBasicAuth(req)) return xapiUnauthorizedResponse();
     const { searchParams } = req.nextUrl;
     const activityId = searchParams.get("activityId");
     const agent = searchParams.get("agent");
@@ -97,6 +99,7 @@ export async function POST(req: NextRequest) {
 
 async function handlePutPost(req: NextRequest) {
   try {
+    if (!verifyBasicAuth(req)) return xapiUnauthorizedResponse();
     const { searchParams } = req.nextUrl;
     const activityId = searchParams.get("activityId");
     const agent = searchParams.get("agent");
@@ -153,6 +156,7 @@ async function handlePutPost(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
+    if (!verifyBasicAuth(req)) return xapiUnauthorizedResponse();
     const { searchParams } = req.nextUrl;
     const activityId = searchParams.get("activityId");
     const agent = searchParams.get("agent");

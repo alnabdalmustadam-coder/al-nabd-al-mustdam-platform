@@ -205,14 +205,16 @@ export default function EnglishEvaluationPage() {
         {/* ═══════════ HEADER ═══════════ */}
         <section className="relative px-4 sm:px-6 mb-12 max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-slate-200 shadow-sm mb-6">
-              <GraduationCap className="w-4 h-4 text-[#173A7C]" />
-              <span className="text-xs font-extrabold text-slate-700 tracking-wide uppercase">Sustain Pulse Institute</span>
+            <div className="mb-6">
+              <span className="section-badge-glass">
+                <GraduationCap className="w-4 h-4 text-[#173A7C] mr-1 inline" />
+                Sustain Pulse Institute
+              </span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 mb-5 tracking-tight leading-tight">
-              English <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">Placement Test</span>
+            <h1 className="section-main-title-premium text-4xl sm:text-5xl lg:text-6xl mb-5 tracking-tight leading-tight">
+              English <span className="gradient-text inline-block">Placement Test</span>
             </h1>
-            <p className="text-slate-500 text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
+            <p className="section-desc-premium text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
               Assess your English proficiency level with our comprehensive Written Test. Choose the best answer for each question — stop when the questions become too difficult.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-5 mt-8 text-sm font-bold text-slate-400">

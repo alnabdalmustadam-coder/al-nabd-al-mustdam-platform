@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { Course } from '@/types';
 import { INITIAL_9_COURSES } from '@/data/courses';
 
@@ -8,22 +8,10 @@ const DB_FILE_PATH = path.join(process.cwd(), 'data', 'courses-db.json');
 const SUPABASE_BUCKET = 'platform-data';
 const SUPABASE_FILE = 'courses.json';
 
-const SUPABASE_URL =
-  process.env.SUPABASE_URL ||
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  'https://twsuffnjnayvcqovojmx.supabase.co';
-
-const SUPABASE_KEY =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.SUPABASE_SERVICE_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3c3VmZm5qbmF5dmNxb3Zvam14Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjExMzEyOCwiZXhwIjoyMDkxNjg5MTI4fQ.I42PxnKpuTnBBEpCNMHPBtBM1bNBPBv_Z4LMu_Y9E_A';
-
 // Initialize Supabase Client with Service Key for full backend access
 function getSupabaseClient() {
   try {
-    return createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: false },
-    });
+    return getSupabaseAdmin();
   } catch (err) {
     console.error('Error creating Supabase client in courses-store:', err);
     return null;

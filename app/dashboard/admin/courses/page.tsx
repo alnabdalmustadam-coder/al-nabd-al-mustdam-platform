@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import * as tus from 'tus-js-client';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import {
@@ -159,6 +160,52 @@ function extractVideoDuration(file: File): Promise<string> {
   });
 }
 
+async function uploadVideoSecurely(
+  file: File,
+  title: string,
+  onProgress: (progress: number) => void,
+): Promise<string> {
+  const credentialResponse = await fetch('/api/videos/upload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title }),
+  });
+  const credentials = await credentialResponse.json();
+
+  if (!credentialResponse.ok || !credentials.success) {
+    throw new Error(credentials.error || 'تعذر إنشاء طلب رفع آمن');
+  }
+
+  return await new Promise<string>((resolve, reject) => {
+    const upload = new tus.Upload(file, {
+      endpoint: credentials.uploadUrl,
+      retryDelays: [0, 3000, 5000, 10000, 20000, 60000],
+      headers: {
+        AuthorizationSignature: credentials.signature,
+        AuthorizationExpire: String(credentials.expirationTime),
+        VideoId: credentials.videoId,
+        LibraryId: credentials.libraryId,
+      },
+      metadata: {
+        filetype: file.type,
+        title,
+      },
+      onProgress(bytesUploaded, bytesTotal) {
+        onProgress(Math.max(1, Math.round((bytesUploaded / bytesTotal) * 100)));
+      },
+      onError(error) {
+        reject(error);
+      },
+      onSuccess() {
+        onProgress(100);
+        resolve(credentials.videoId);
+      },
+    });
+
+    upload.start();
+  });
+}
+
 export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -180,6 +227,29 @@ export default function AdminCoursesPage() {
   const [formHours, setFormHours] = useState('30');
   const [formDescription, setFormDescription] = useState('');
   const [formImage, setFormImage] = useState('/logo.webp');
+
+  // Dynamic Categories & Instructors State
+  const [categoriesList, setCategoriesList] = useState<{ id: string; label: string }[]>([
+    { id: 'tech', label: 'تقنية وبرمجة' },
+    { id: 'admin', label: 'أعمال مكتبية' },
+    { id: 'data', label: 'إدخال بيانات ومعالجة نصوص' },
+    { id: 'languages', label: 'لغات وترجمة' },
+    { id: 'corporate', label: 'إدارة وأعمال وسلامة' },
+    { id: 'cyber', label: 'أمن سيبراني وشبكات' },
+    { id: 'design', label: 'تصميم ومونتاج' },
+  ]);
+  const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+
+  const [instructorsList, setInstructorsList] = useState<string[]>([
+    'د. محمد القحطاني',
+    'أ. د. سارة العتيبي',
+    'د. خالد الدوسري',
+    'م. فهد السبيعي',
+    'أ. ريم الجهني',
+  ]);
+  const [isAddingNewInstructor, setIsAddingNewInstructor] = useState(false);
+  const [newInstructorName, setNewInstructorName] = useState('');
   
   // Hierarchical Sections & Sub-Lessons State
   const [formSections, setFormSections] = useState<FormSectionItem[]>([]);
@@ -228,8 +298,11 @@ export default function AdminCoursesPage() {
   const [courseLessons, setCourseLessons] = useState<any[]>([]);
   const [lessonsLoading, setLessonsLoading] = useState(false);
 
-  // Video Player Preview Modal
+  // Video Player Preview Modal & Token Generation
   const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
+  const [previewSignedIframeUrl, setPreviewSignedIframeUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState<boolean>(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
 
   // Standalone Lesson Upload State
   const [newLessonTitle, setNewLessonTitle] = useState('');
@@ -250,7 +323,25 @@ export default function AdminCoursesPage() {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  // Fetch Courses from Server
+  // Fetch Courses & Instructors from Server
+  const loadInstructors = async () => {
+    try {
+      const res = await fetch('/api/admin/users');
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.users)) {
+        const dbTrainers = data.users
+          .filter((u: any) => u.role === 'مدرب' || u.role === 'INSTRUCTOR' || u.role === 'أدمن')
+          .map((u: any) => u.name)
+          .filter(Boolean);
+        if (dbTrainers.length > 0) {
+          setInstructorsList((prev) => Array.from(new Set([...prev, ...dbTrainers])));
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching instructors for courses:', err);
+    }
+  };
+
   const loadCourses = async () => {
     setLoading(true);
     try {
@@ -264,6 +355,12 @@ export default function AdminCoursesPage() {
       const data = await res.json();
       if (data.success && Array.isArray(data.courses)) {
         setCourses(data.courses);
+
+        // Populate any unique trainers and categories found in loaded courses
+        const existingTrainers = data.courses.map((c: any) => c.trainer).filter(Boolean);
+        if (existingTrainers.length > 0) {
+          setInstructorsList((prev) => Array.from(new Set([...prev, ...existingTrainers])));
+        }
       }
     } catch (err) {
       console.error('Error fetching admin courses:', err);
@@ -275,7 +372,32 @@ export default function AdminCoursesPage() {
 
   useEffect(() => {
     loadCourses();
+    loadInstructors();
   }, []);
+
+  const handleAddNewCategory = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) return;
+    if (!categoriesList.some((c) => c.id === trimmed || c.label === trimmed)) {
+      setCategoriesList((prev) => [...prev, { id: trimmed, label: trimmed }]);
+    }
+    setFormCategory(trimmed);
+    setNewCategoryName('');
+    setIsAddingNewCategory(false);
+  };
+
+  const handleAddNewInstructor = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = newInstructorName.trim();
+    if (!trimmed) return;
+    if (!instructorsList.includes(trimmed)) {
+      setInstructorsList((prev) => [...prev, trimmed]);
+    }
+    setFormTrainer(trimmed);
+    setNewInstructorName('');
+    setIsAddingNewInstructor(false);
+  };
 
   // ═════════════════════════════════════════════════════════════════════════════
   // MODAL INITIALIZATION & ACTIONS
@@ -295,6 +417,10 @@ export default function AdminCoursesPage() {
     setFormImage('/logo.webp');
     setFormAttachments([]);
     setHasFinalExam(false);
+    setIsAddingNewCategory(false);
+    setIsAddingNewInstructor(false);
+    setNewCategoryName('');
+    setNewInstructorName('');
 
     // Initial Section with 1 Sub-video
     setFormSections([
@@ -325,12 +451,26 @@ export default function AdminCoursesPage() {
     setModalActiveTab('basic');
     setFormTitle(course.title);
     setFormSlug(course.slug);
-    setFormCategory(course.rawCategory || 'tech');
-    setFormTrainer(course.trainer);
+    setFormCategory(course.rawCategory || course.category || 'tech');
+    setFormTrainer(course.trainer || 'د. محمد القحطاني');
     setFormPrice(String(course.rawPrice ?? 500));
     setFormHours(String(course.hours ?? 30));
     setFormDescription(course.description || '');
     setFormImage(course.image || '/logo.webp');
+    setIsAddingNewCategory(false);
+    setIsAddingNewInstructor(false);
+    setNewCategoryName('');
+    setNewInstructorName('');
+
+    // Ensure course category is in list
+    const activeCatId = course.rawCategory || course.category;
+    if (activeCatId && !categoriesList.some((c) => c.id === activeCatId || c.label === activeCatId)) {
+      setCategoriesList((prev) => [...prev, { id: activeCatId, label: course.category || activeCatId }]);
+    }
+    // Ensure course trainer is in list
+    if (course.trainer && !instructorsList.includes(course.trainer)) {
+      setInstructorsList((prev) => [...prev, course.trainer]);
+    }
 
     // Attachments
     if (Array.isArray(course.attachments) && course.attachments.length > 0) {
@@ -582,50 +722,11 @@ export default function AdminCoursesPage() {
     setLessonUploadProgress(5);
 
     try {
-      // 2. Create Video on Bunny Stream
-      const createRes = await fetch('/api/bunny/create-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: `${formTitle || 'دورة'} - ${targetTitle}` }),
-      });
-
-      const createData = await createRes.json();
-      if (!createRes.ok || !createData.success) {
-        throw new Error(createData.error || 'فشل إنشاء الفيديو على خادم Bunny');
-      }
-
-      const { videoId } = createData;
-      setLessonUploadProgress(25);
-
-      // 3. Direct Upload to Bunny Stream
-      const libraryId = process.env.NEXT_PUBLIC_BUNNY_LIBRARY_ID || '729792';
-      const apiKey = process.env.NEXT_PUBLIC_BUNNY_API_KEY || '20059e98-ea4c-4e3a-b8ae029fcf95-9bf8-466d';
-
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', `https://video.bunnycdn.com/library/${libraryId}/videos/${videoId}`);
-        xhr.setRequestHeader('AccessKey', apiKey);
-        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 70) + 25;
-            setLessonUploadProgress(percent);
-          }
-        };
-
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            setLessonUploadProgress(100);
-            resolve();
-          } else {
-            reject(new Error(`فشل رفع الفيديو إلى السيرفر (${xhr.status})`));
-          }
-        };
-
-        xhr.onerror = () => reject(new Error('حدث خطأ في شبكة الاتصال أثناء الرفع'));
-        xhr.send(file);
-      });
+      const videoId = await uploadVideoSecurely(
+        file,
+        `${formTitle || 'دورة'} - ${targetTitle}`,
+        setLessonUploadProgress,
+      );
 
       // 4. Update Video ID in State
       if (subIdx !== undefined) {
@@ -937,6 +1038,9 @@ export default function AdminCoursesPage() {
     setUploadSuccess(null);
     setNewLessonTitle('');
     setNewLessonUrl('');
+    setPreviewVideoUrl(null);
+    setPreviewSignedIframeUrl(null);
+    setPreviewError(null);
 
     try {
       const res = await fetch(`/api/admin/courses/${course.slug}/lessons?t=${Date.now()}`, { cache: 'no-store' });
@@ -1033,50 +1137,11 @@ export default function AdminCoursesPage() {
     setUploadSuccess(null);
 
     try {
-      const createRes = await fetch('/api/bunny/create-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: `${selectedCourseForLessons.title} - ${newLessonTitle || file.name}`,
-        }),
-      });
-
-      const createData = await createRes.json();
-      if (!createRes.ok || !createData.success) {
-        throw new Error(createData.error || 'فشل إنشاء الفيديو في Bunny Stream');
-      }
-
-      const { videoId } = createData;
-      setUploadProgress(25);
-
-      const libraryId = process.env.NEXT_PUBLIC_BUNNY_LIBRARY_ID || '729792';
-      const apiKey = process.env.NEXT_PUBLIC_BUNNY_API_KEY || '20059e98-ea4c-4e3a-b8ae029fcf95-9bf8-466d';
-
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', `https://video.bunnycdn.com/library/${libraryId}/videos/${videoId}`);
-        xhr.setRequestHeader('AccessKey', apiKey);
-        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 70) + 25;
-            setUploadProgress(percent);
-          }
-        };
-
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            setUploadProgress(100);
-            resolve();
-          } else {
-            reject(new Error(`فشل رفع الفيديو إلى السيرفر (${xhr.status})`));
-          }
-        };
-
-        xhr.onerror = () => reject(new Error('خطأ في شبكة الاتصال أثناء الرفع'));
-        xhr.send(file);
-      });
+      const videoId = await uploadVideoSecurely(
+        file,
+        `${selectedCourseForLessons.title} - ${newLessonTitle || file.name}`,
+        setUploadProgress,
+      );
 
       setNewLessonUrl(videoId);
       setUploadSuccess(`تم رفع الفيديو وتشفيره بنجاح! كود الفيديو: ${videoId} (المدة: ${calculatedDuration})`);
@@ -1086,6 +1151,70 @@ export default function AdminCoursesPage() {
       setUploadError(err.message || 'حدث خطأ أثناء رفع الفيديو');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  // Safe Preview with DRM Token Authentication
+  const handlePreviewVideo = async (rawUrl: string) => {
+    if (!rawUrl) return;
+    const trimmed = rawUrl.trim();
+    setPreviewVideoUrl(trimmed);
+    setPreviewLoading(true);
+    setPreviewError(null);
+    setPreviewSignedIframeUrl(null);
+
+    try {
+      // 1. YouTube or direct standard URL or raw YouTube video ID
+      const isYt =
+        /^[a-zA-Z0-9_-]{11}$/.test(trimmed) ||
+        trimmed.includes('youtube.com') ||
+        trimmed.includes('youtu.be') ||
+        trimmed.includes('youtube.com/embed');
+
+      if (isYt) {
+        let ytId = trimmed;
+        if (trimmed.includes('youtube.com/watch?v=')) {
+          ytId = trimmed.split('v=')[1]?.split('&')[0] || '';
+        } else if (trimmed.includes('youtu.be/')) {
+          ytId = trimmed.split('youtu.be/')[1]?.split('?')[0] || '';
+        } else if (trimmed.includes('youtube.com/embed/')) {
+          ytId = trimmed.split('youtube.com/embed/')[1]?.split('?')[0] || '';
+        }
+        setPreviewSignedIframeUrl(`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1`);
+        setPreviewLoading(false);
+        return;
+      }
+
+      // 2. Bunny Stream GUID extraction (36-character UUID)
+      const guidMatch = trimmed.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+      const videoGuid = guidMatch ? guidMatch[0] : (trimmed.length === 36 ? trimmed : null);
+
+      if (videoGuid) {
+        const res = await fetch('/api/videos/playback-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            videoId: videoGuid,
+            courseSlug: selectedCourseForLessons?.slug || 'admin-preview',
+          }),
+        });
+        const data = await res.json();
+        if (res.ok && data.success && data.iframeUrl) {
+          setPreviewSignedIframeUrl(data.iframeUrl);
+        } else {
+          // Fallback to direct embed
+          setPreviewSignedIframeUrl(`https://iframe.mediadelivery.net/embed/729792/${videoGuid}?autoplay=true&preload=true`);
+        }
+      } else if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        setPreviewSignedIframeUrl(trimmed);
+      } else {
+        setPreviewSignedIframeUrl(`https://www.youtube-nocookie.com/embed/${trimmed}?autoplay=1`);
+      }
+    } catch (err: any) {
+      console.error('Error fetching preview token:', err);
+      setPreviewError('تعذر تجهيز مشغل الفيديو للمعاينة');
+    } finally {
+      setPreviewLoading(false);
     }
   };
 
@@ -1360,88 +1489,90 @@ export default function AdminCoursesPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[94vh]"
+              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[94vh]"
             >
               {/* Modal Header */}
-              <div className="p-5 sm:p-6 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] text-white flex items-center justify-between shrink-0">
+              <div className="p-4 sm:p-6 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] text-white flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center border border-white/15">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/10 flex items-center justify-center border border-white/15 shrink-0">
                     <BookOpen className="w-5 h-5 text-emerald-300" />
                   </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-black">
+                    <h3 className="text-sm sm:text-lg font-black">
                       {editingCourse ? 'تعديل بيانات ومنهج ومرفقات الدورة' : 'إضافة دورة تدريبية جديدة مع المنهج والمرفقات'}
                     </h3>
-                    <p className="text-xs text-blue-100">
+                    <p className="text-[11px] sm:text-xs text-blue-100">
                       دعم كامل لتقسيم الوحدات لمقاطع فرعية متعددة، ملفات PDF/Word، واختبارات تفاعلية ⚡
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer shrink-0"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
 
-              {/* Modal Navigation Tabs */}
-              <div className="flex items-center border-b border-slate-200 bg-slate-50/90 px-5 sm:px-6 pt-2 shrink-0 gap-2 overflow-x-auto">
-                <button
-                  type="button"
-                  onClick={() => setModalActiveTab('basic')}
-                  className={`py-3 px-4 text-xs font-black border-b-2 flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
-                    modalActiveTab === 'basic'
-                      ? 'border-[#173A7C] text-[#173A7C] bg-white rounded-t-xl shadow-xs'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <Settings className="w-4 h-4" />
-                  <span>1. البيانات الأساسية والغلاف</span>
-                </button>
+              {/* Modal Navigation Tabs - Single Row Grid (No Horizontal Scrollbar) */}
+              <div className="border-b border-slate-200 bg-slate-50/90 px-3 sm:px-6 pt-2 shrink-0">
+                <div className="grid grid-cols-4 gap-1 sm:gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setModalActiveTab('basic')}
+                    className={`py-2 sm:py-2.5 px-1 sm:px-3 text-[10px] sm:text-xs font-black border-b-2 flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer truncate ${
+                      modalActiveTab === 'basic'
+                        ? 'border-[#173A7C] text-[#173A7C] bg-white rounded-t-xl shadow-xs'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    <Settings className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">1. البيانات والغلاف</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => setModalActiveTab('curriculum')}
-                  className={`py-3 px-4 text-xs font-black border-b-2 flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
-                    modalActiveTab === 'curriculum'
-                      ? 'border-[#173A7C] text-[#173A7C] bg-white rounded-t-xl shadow-xs'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <Video className="w-4 h-4 text-blue-600" />
-                  <span>2. الوحدات والمقاطع الفرعية ({formSections.length})</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setModalActiveTab('curriculum')}
+                    className={`py-2 sm:py-2.5 px-1 sm:px-3 text-[10px] sm:text-xs font-black border-b-2 flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer truncate ${
+                      modalActiveTab === 'curriculum'
+                        ? 'border-[#173A7C] text-[#173A7C] bg-white rounded-t-xl shadow-xs'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    <Video className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <span className="truncate">2. المنهج والمقاطع ({formSections.length})</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => setModalActiveTab('attachments')}
-                  className={`py-3 px-4 text-xs font-black border-b-2 flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
-                    modalActiveTab === 'attachments'
-                      ? 'border-[#173A7C] text-[#173A7C] bg-white rounded-t-xl shadow-xs'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <Paperclip className="w-4 h-4 text-emerald-600" />
-                  <span>3. الحقيبة والمرفقات PDF ({formAttachments.length})</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setModalActiveTab('attachments')}
+                    className={`py-2 sm:py-2.5 px-1 sm:px-3 text-[10px] sm:text-xs font-black border-b-2 flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer truncate ${
+                      modalActiveTab === 'attachments'
+                        ? 'border-[#173A7C] text-[#173A7C] bg-white rounded-t-xl shadow-xs'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    <Paperclip className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="truncate">3. المرفقات PDF ({formAttachments.length})</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => setModalActiveTab('exam')}
-                  className={`py-3 px-4 text-xs font-black border-b-2 flex items-center gap-2 transition-all cursor-pointer shrink-0 ${
-                    modalActiveTab === 'exam'
-                      ? 'border-[#173A7C] text-[#173A7C] bg-white rounded-t-xl shadow-xs'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <HelpCircle className="w-4 h-4 text-amber-500" />
-                  <span>4. الاختبار النهائي {hasFinalExam ? '✓' : ''}</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setModalActiveTab('exam')}
+                    className={`py-2 sm:py-2.5 px-1 sm:px-3 text-[10px] sm:text-xs font-black border-b-2 flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer truncate ${
+                      modalActiveTab === 'exam'
+                        ? 'border-[#173A7C] text-[#173A7C] bg-white rounded-t-xl shadow-xs'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    <HelpCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span className="truncate">4. الاختبار {hasFinalExam ? '✓' : ''}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Form Content */}
-              <form onSubmit={handleSaveCourse} className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
+              <form onSubmit={handleSaveCourse} className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1">
                 {/* ═══════════════════════════════════════════════════════════ */}
                 {/* TAB 1: BASIC INFO & COVER */}
                 {/* ═══════════════════════════════════════════════════════════ */}
@@ -1538,30 +1669,144 @@ export default function AdminCoursesPage() {
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* 1. Academic Category */}
                         <div>
-                          <label className="block text-xs font-black text-slate-700 mb-1.5">التصنيف الأكاديمي</label>
-                          <select
-                            value={formCategory}
-                            onChange={(e) => setFormCategory(e.target.value)}
-                            className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                          >
-                            <option value="tech">تقنية وبرمجة</option>
-                            <option value="admin">أعمال مكتبية</option>
-                            <option value="data">إدخال بيانات</option>
-                            <option value="languages">لغات وترجمة</option>
-                            <option value="corporate">إدارة وأعمال وسلامة</option>
-                          </select>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-xs font-black text-slate-700">التصنيف الأكاديمي</label>
+                            <button
+                              type="button"
+                              onClick={() => setIsAddingNewCategory(!isAddingNewCategory)}
+                              className="text-[11px] text-[#173A7C] hover:text-[#1E4D9D] hover:underline font-black cursor-pointer flex items-center gap-1 transition-colors"
+                            >
+                              <Plus className="w-3 h-3" />
+                              <span>{isAddingNewCategory ? 'اختيار من القائمة' : 'إضافة تصنيف جديد'}</span>
+                            </button>
+                          </div>
+
+                          {isAddingNewCategory ? (
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                type="text"
+                                autoFocus
+                                value={newCategoryName}
+                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddNewCategory();
+                                  }
+                                }}
+                                placeholder="اكتب اسم التصنيف الجديد..."
+                                className="flex-1 px-3.5 py-2.5 text-xs font-bold text-slate-800 bg-white rounded-xl border-2 border-[#173A7C] focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleAddNewCategory}
+                                className="px-3.5 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs font-black transition-all cursor-pointer shrink-0 shadow-xs"
+                              >
+                                إضافة
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setIsAddingNewCategory(false)}
+                                className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-all cursor-pointer shrink-0"
+                                title="إلغاء"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <select
+                              value={formCategory}
+                              onChange={(e) => {
+                                if (e.target.value === '__add_new__') {
+                                  setIsAddingNewCategory(true);
+                                } else {
+                                  setFormCategory(e.target.value);
+                                }
+                              }}
+                              className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C] cursor-pointer"
+                            >
+                              {categoriesList.map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                  {cat.label}
+                                </option>
+                              ))}
+                              <option value="__add_new__" className="text-[#173A7C] font-black bg-blue-50">
+                                إضافة تصنيف جديد...
+                              </option>
+                            </select>
+                          )}
                         </div>
 
+                        {/* 2. Certified Instructor */}
                         <div>
-                          <label className="block text-xs font-black text-slate-700 mb-1.5">المحاضر المعتمد</label>
-                          <input
-                            type="text"
-                            value={formTrainer}
-                            onChange={(e) => setFormTrainer(e.target.value)}
-                            placeholder="اسم المدرب"
-                            className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                          />
+                          <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-xs font-black text-slate-700">المحاضر المعتمد</label>
+                            <button
+                              type="button"
+                              onClick={() => setIsAddingNewInstructor(!isAddingNewInstructor)}
+                              className="text-[11px] text-[#173A7C] hover:text-[#1E4D9D] hover:underline font-black cursor-pointer flex items-center gap-1 transition-colors"
+                            >
+                              <Plus className="w-3 h-3" />
+                              <span>{isAddingNewInstructor ? 'اختيار من المسجلين' : 'إضافة مدرب جديد'}</span>
+                            </button>
+                          </div>
+
+                          {isAddingNewInstructor ? (
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                type="text"
+                                autoFocus
+                                value={newInstructorName}
+                                onChange={(e) => setNewInstructorName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddNewInstructor();
+                                  }
+                                }}
+                                placeholder="اكتب اسم المحاضر / المدرب..."
+                                className="flex-1 px-3.5 py-2.5 text-xs font-bold text-slate-800 bg-white rounded-xl border-2 border-[#173A7C] focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleAddNewInstructor}
+                                className="px-3.5 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs font-black transition-all cursor-pointer shrink-0 shadow-xs"
+                              >
+                                إضافة
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setIsAddingNewInstructor(false)}
+                                className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-all cursor-pointer shrink-0"
+                                title="إلغاء"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <select
+                              value={formTrainer}
+                              onChange={(e) => {
+                                if (e.target.value === '__add_new__') {
+                                  setIsAddingNewInstructor(true);
+                                } else {
+                                  setFormTrainer(e.target.value);
+                                }
+                              }}
+                              className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C] cursor-pointer"
+                            >
+                              {instructorsList.map((tName) => (
+                                <option key={tName} value={tName}>
+                                  {tName}
+                                </option>
+                              ))}
+                              <option value="__add_new__" className="text-[#173A7C] font-black bg-blue-50">
+                                إضافة مدرب / محاضر جديد...
+                              </option>
+                            </select>
+                          )}
                         </div>
                       </div>
 
@@ -1900,9 +2145,10 @@ export default function AdminCoursesPage() {
                                               questions: [...currentQuestions, nextQ],
                                             });
                                           }}
-                                          className="text-[11px] font-bold text-[#173A7C] hover:underline cursor-pointer"
+                                          className="text-[11px] font-bold text-[#173A7C] hover:underline cursor-pointer flex items-center gap-1"
                                         >
-                                          + إضافة سؤال للكويز
+                                          <Plus className="w-3 h-3" />
+                                          <span>إضافة سؤال للكويز</span>
                                         </button>
                                       </div>
 
@@ -1956,7 +2202,7 @@ export default function AdminCoursesPage() {
                                 className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#173A7C] font-black text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-blue-200"
                               >
                                 <PlusCircle className="w-3.5 h-3.5 text-blue-600" />
-                                <span>➕ إضافة مقطع / فيديو فرعي داخل هذا الدرس</span>
+                                <span>إضافة مقطع / فيديو فرعي</span>
                               </button>
 
                               <button
@@ -1965,7 +2211,7 @@ export default function AdminCoursesPage() {
                                 className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-emerald-200"
                               >
                                 <FilePlus className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>+ ملف PDF فرعي</span>
+                                <span>ملف PDF فرعي</span>
                               </button>
 
                               <button
@@ -1974,7 +2220,7 @@ export default function AdminCoursesPage() {
                                 className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-amber-200"
                               >
                                 <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
-                                <span>+ كويز للوحدة</span>
+                                <span>كويز للوحدة</span>
                               </button>
                             </div>
                           </div>
@@ -2345,7 +2591,7 @@ export default function AdminCoursesPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]"
+              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]"
             >
               {/* Modal Header */}
               <div className="p-5 sm:p-6 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] text-white flex items-center justify-between shrink-0">
@@ -2367,6 +2613,8 @@ export default function AdminCoursesPage() {
                   onClick={() => {
                     setSelectedCourseForLessons(null);
                     setPreviewVideoUrl(null);
+                    setPreviewSignedIframeUrl(null);
+                    setPreviewError(null);
                   }}
                   className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
                 >
@@ -2488,9 +2736,21 @@ export default function AdminCoursesPage() {
                         )}
 
                         {uploadSuccess && (
-                          <div className="p-2.5 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 text-right flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                            <span>{uploadSuccess}</span>
+                          <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 text-right flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                              <span>{uploadSuccess}</span>
+                            </div>
+                            {newLessonUrl && (
+                              <button
+                                type="button"
+                                onClick={() => handlePreviewVideo(newLessonUrl)}
+                                className="px-3 py-1.5 rounded-lg bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-[11px] font-black transition-all cursor-pointer shrink-0 shadow-xs flex items-center gap-1.5 self-start sm:self-auto"
+                              >
+                                <PlayCircle className="w-3.5 h-3.5 text-emerald-300" />
+                                <span>معاينة الفيديو الآن</span>
+                              </button>
+                            )}
                           </div>
                         )}
 
@@ -2503,9 +2763,21 @@ export default function AdminCoursesPage() {
                       </div>
                     ) : (
                       <div>
-                        <label className="block text-[11px] font-black text-slate-700 mb-1">
-                          معرف الفيديو من Bunny.net (Video ID / GUID) أو كود التضمين
-                        </label>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-[11px] font-black text-slate-700">
+                            معرف الفيديو من Bunny.net (Video ID / GUID) أو كود التضمين
+                          </label>
+                          {newLessonUrl && (
+                            <button
+                              type="button"
+                              onClick={() => handlePreviewVideo(newLessonUrl)}
+                              className="text-[11px] text-[#173A7C] hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                            >
+                              <PlayCircle className="w-3.5 h-3.5 text-blue-600" />
+                              <span>معاينة الرابط المكتوب</span>
+                            </button>
+                          )}
+                        </div>
                         <input
                           type="text"
                           required
@@ -2532,35 +2804,51 @@ export default function AdminCoursesPage() {
 
                 {/* 2. Video Preview Player (If Selected) */}
                 {previewVideoUrl && (
-                  <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-3">
+                  <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-3 shadow-xl border border-slate-800 animate-fade-in-up">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-xs font-black text-emerald-400">
                         <PlayCircle className="w-4 h-4" />
-                        <span>معاينة مشغل الفيديو التفاعلي</span>
+                        <span>معاينة مشغل الفيديو التفاعلي والآمن (Bunny DRM Stream)</span>
                       </div>
                       <button
-                        onClick={() => setPreviewVideoUrl(null)}
-                        className="text-xs text-slate-400 hover:text-white cursor-pointer"
+                        onClick={() => {
+                          setPreviewVideoUrl(null);
+                          setPreviewSignedIframeUrl(null);
+                          setPreviewError(null);
+                        }}
+                        className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
                       >
-                        إغلاق المشغل
+                        ✕ إغلاق المشغل
                       </button>
                     </div>
-                    <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black flex items-center justify-center">
-                      {previewVideoUrl.includes('-') && previewVideoUrl.length > 20 ? (
+
+                    <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black flex items-center justify-center border border-slate-800 shadow-inner">
+                      {previewLoading ? (
+                        <div className="flex flex-col items-center justify-center gap-3 text-slate-300 text-xs font-bold p-8">
+                          <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
+                          <span>جاري إعداد مشغل الفيديو وتوليد تصريح المشاهدة الآمن...</span>
+                        </div>
+                      ) : previewError ? (
+                        <div className="flex flex-col items-center justify-center gap-2 text-rose-400 text-xs font-bold p-8 text-center">
+                          <AlertCircle className="w-7 h-7 text-rose-500" />
+                          <span>{previewError}</span>
+                          <button
+                            onClick={() => handlePreviewVideo(previewVideoUrl)}
+                            className="mt-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-white text-xs font-black transition-colors cursor-pointer"
+                          >
+                            إعادة المحاولة
+                          </button>
+                        </div>
+                      ) : previewSignedIframeUrl ? (
                         <iframe
-                          src={`https://iframe.mediadelivery.net/embed/729792/${previewVideoUrl}?autoplay=true&loop=false&muted=false&preload=true`}
+                          src={previewSignedIframeUrl}
                           loading="lazy"
                           className="border-0 absolute top-0 left-0 h-full w-full"
                           allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
                           allowFullScreen={true}
                         />
                       ) : (
-                        <iframe
-                          src={`https://www.youtube-nocookie.com/embed/${previewVideoUrl}?autoplay=1`}
-                          className="border-0 absolute top-0 left-0 h-full w-full"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
+                        <div className="text-slate-400 text-xs font-bold">لا يوجد رابط فيديو متاح للمعاينة</div>
                       )}
                     </div>
                   </div>
@@ -2631,7 +2919,7 @@ export default function AdminCoursesPage() {
                           <div className="flex items-center gap-2">
                             {lesson.videoUrl && (
                               <button
-                                onClick={() => setPreviewVideoUrl(lesson.videoUrl)}
+                                onClick={() => handlePreviewVideo(lesson.videoUrl)}
                                 className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#173A7C] text-[11px] font-black transition-colors flex items-center gap-1 cursor-pointer"
                               >
                                 <PlayCircle className="w-3.5 h-3.5 text-blue-600" />
@@ -2665,6 +2953,8 @@ export default function AdminCoursesPage() {
                   onClick={() => {
                     setSelectedCourseForLessons(null);
                     setPreviewVideoUrl(null);
+                    setPreviewSignedIframeUrl(null);
+                    setPreviewError(null);
                   }}
                   className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-black cursor-pointer transition-colors"
                 >

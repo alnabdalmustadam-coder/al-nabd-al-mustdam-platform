@@ -65,14 +65,14 @@ export default function WhyUsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20 relative"
         >
-          <span className="inline-flex items-center justify-center gap-2 text-[#173A7C] text-sm font-black tracking-widest uppercase bg-white px-5 py-2 rounded-full mb-6 border border-slate-200 shadow-sm max-w-max mx-auto">
+          <span className="section-badge-glass mb-6">
             <CheckCircle2 className="w-4 h-4 text-[#5CB07C]" />
             لماذا النبض المستدام؟
           </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#173A7C] mt-2 leading-[1.2] tracking-tight">
-            تميّز يصنع <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C]">الفرق</span>
+          <h2 className="section-main-title-premium mt-2 mb-6">
+            تميّز يصنع <span className="gradient-text">الفرق</span>
           </h2>
-          <p className="mt-6 text-slate-500 text-lg sm:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="section-desc-premium max-w-2xl mx-auto">
             نحن لا نقدم مجرد دورات، بل نصنع تجربة تعليمية متكاملة تضعك على طريق النجاح المهني بأحدث الأساليب والمعايير العالمية.
           </p>
         </motion.div>

@@ -6,7 +6,6 @@ import {
   Home,
   User,
   LogOut,
-  Settings,
   PanelLeftClose,
   PanelLeftOpen,
   Menu,
@@ -176,13 +175,6 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
                 >
                   <User className="w-4 h-4 text-[#5CB07C]" />
                   <span>الملف الشخصي</span>
-                </Link>
-                <Link
-                  href="/dashboard/admin"
-                  className="flex items-center gap-2.5 p-2.5 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
-                >
-                  <Settings className="w-4 h-4 text-[#173A7C]" />
-                  <span>التبديل إلى لوحة الأدمن</span>
                 </Link>
                 <div className="pt-1 border-t border-slate-200">
                   <button

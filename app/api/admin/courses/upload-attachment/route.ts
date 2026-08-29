@@ -1,21 +1,13 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { requireInstructorOrAdmin } from '@/lib/security/auth';
+import { ATTACHMENT_UPLOAD_POLICY, getSafeExtension, validateUpload } from '@/lib/security/uploads';
 import fs from 'fs';
 import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
 const SUPABASE_BUCKET = 'platform-data';
-const SUPABASE_URL =
-  process.env.SUPABASE_URL ||
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  'https://twsuffnjnayvcqovojmx.supabase.co';
-
-const SUPABASE_KEY =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.SUPABASE_SERVICE_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3c3VmZm5qbmF5dmNxb3Zvam14Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjExMzEyOCwiZXhwIjoyMDkxNjg5MTI4fQ.I42PxnKpuTnBBEpCNMHPBtBM1bNBPBv_Z4LMu_Y9E_A';
-
 function formatBytes(bytes: number, decimals = 1) {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -27,6 +19,9 @@ function formatBytes(bytes: number, decimals = 1) {
 
 export async function POST(req: Request) {
   try {
+    const auth = await requireInstructorOrAdmin(req);
+    if (!auth.ok) return auth.response;
+
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const customTitle = formData.get('title') as string | null;
@@ -34,11 +29,15 @@ export async function POST(req: Request) {
     if (!file) {
       return NextResponse.json({ success: false, error: 'لم يتم اختيار ملف' }, { status: 400 });
     }
+    const validationError = validateUpload(file, ATTACHMENT_UPLOAD_POLICY);
+    if (validationError) {
+      return NextResponse.json({ success: false, error: validationError }, { status: 400 });
+    }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const originalName = file.name || 'document.pdf';
-    const ext = originalName.split('.').pop()?.toLowerCase() || 'pdf';
+    const ext = getSafeExtension(originalName);
     const cleanBaseName = originalName.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_\u0600-\u06FF-]/g, '_');
     const storagePath = `attachments/${Date.now()}_${cleanBaseName}.${ext}`;
     const formattedSize = formatBytes(file.size);
@@ -51,9 +50,7 @@ export async function POST(req: Request) {
 
     // 1. Upload to Supabase Storage Bucket
     try {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-        auth: { persistSession: false },
-      });
+      const supabase = getSupabaseAdmin();
 
       const { data, error } = await supabase.storage
         .from(SUPABASE_BUCKET)
@@ -84,7 +81,11 @@ export async function POST(req: Request) {
       console.warn('Supabase client upload exception:', supaErr);
     }
 
-    // 2. Local fallback if writable
+    // 2. Local fallback is limited to development. Production must use managed storage.
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ success: false, error: 'تعذر حفظ الملف في التخزين الآمن' }, { status: 500 });
+    }
+
     try {
       const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'attachments');
       if (!fs.existsSync(uploadsDir)) {

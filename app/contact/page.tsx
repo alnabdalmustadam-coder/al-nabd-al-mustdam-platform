@@ -55,13 +55,13 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgwLDAsMCwwLjA0KSIvPjwvc3ZnPg==')] opacity-50" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center py-8 md:py-16 pb-16 md:pb-24">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="text-[#173A7C] text-sm font-bold tracking-wide uppercase bg-[#173A7C]/5 px-4 py-1.5 rounded-full inline-block mb-4">
+            <span className="section-badge-glass mb-4">
               الدعم الفني
             </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 mb-6 leading-tight">
+            <h1 className="section-main-title-premium text-3xl sm:text-4xl lg:text-5xl mb-6">
               تواصل <span className="gradient-text">معنا</span>
             </h1>
-            <p className="text-slate-600 max-w-2xl mx-auto text-lg leading-relaxed font-medium">نسعد بتواصلك معنا. أرسل لنا رسالتك وسنرد عليك في أقرب وقت.</p>
+            <p className="section-desc-premium max-w-2xl mx-auto text-lg">نسعد بتواصلك معنا. أرسل لنا رسالتك وسنرد عليك في أقرب وقت.</p>
           </motion.div>
         </div>
       </section>
@@ -86,7 +86,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <span className="text-sm font-bold text-slate-400 block mb-1">{c.label}</span>
-                    <span className="text-base text-slate-900 font-bold" dir={c.dir}>{c.value}</span>
+                    <span className="card-title-royal-blue text-base" dir={c.dir}>{c.value}</span>
                   </div>
                 </motion.div>
               );
@@ -104,7 +104,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <span className="text-sm font-bold text-slate-400 block mb-1">واتساب</span>
-                <span className="text-base text-slate-900 font-bold group-hover:text-green-600 transition-colors">
+                <span className="card-title-royal-blue text-base group-hover:text-green-600 transition-colors">
                   تحدث معنا مباشرة
                 </span>
               </div>
@@ -114,7 +114,7 @@ export default function ContactPage() {
           {/* Form */}
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="bg-white border border-slate-200 shadow-xl shadow-slate-200/50 rounded-[32px] p-8 sm:p-12 space-y-6">
-              <h2 className="text-2xl font-black text-slate-900 mb-8 w-full border-b border-slate-100 pb-4">أرسل لنا رسالة</h2>
+              <h2 className="card-title-royal-blue text-2xl mb-8 w-full border-b border-slate-100 pb-4">أرسل لنا رسالة</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm font-bold text-slate-700 block mb-2">الاسم الكامل</label>
