@@ -3,15 +3,24 @@ import 'server-only';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import {
+  ADMIN_ROLES,
+  INSTRUCTOR_ROLES,
+  getTrustedRole,
+  type AppRole,
+} from '@/lib/security/roles';
 
-export const ADMIN_ROLES = ['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN'] as const;
-export const INSTRUCTOR_ROLES = ['INSTRUCTOR', 'TRAINER', 'TEACHER'] as const;
-
-export type AppRole =
-  | (typeof ADMIN_ROLES)[number]
-  | (typeof INSTRUCTOR_ROLES)[number]
-  | 'STUDENT'
-  | 'TRAINEE';
+export {
+  ADMIN_ROLES,
+  INSTRUCTOR_ROLES,
+  getDashboardUrlForRole,
+  getRoleDisplayName,
+  getTrustedRole,
+  isAdminRole,
+  isInstructorRole,
+  normalizeRole,
+  type AppRole,
+} from '@/lib/security/roles';
 
 type AuthenticatedRequest = {
   ok: true;
@@ -26,40 +35,6 @@ type RejectedRequest = {
 };
 
 export type AuthorizationResult = AuthenticatedRequest | RejectedRequest;
-
-const KNOWN_ROLES = new Set<AppRole>([
-  ...ADMIN_ROLES,
-  ...INSTRUCTOR_ROLES,
-  'STUDENT',
-  'TRAINEE',
-]);
-
-export function normalizeRole(value: unknown): AppRole {
-  const role = typeof value === 'string' ? value.trim().toUpperCase() : '';
-  return KNOWN_ROLES.has(role as AppRole) ? (role as AppRole) : 'STUDENT';
-}
-
-export function isAdminRole(role: AppRole): boolean {
-  return (ADMIN_ROLES as readonly string[]).includes(role);
-}
-
-export function isInstructorRole(role: AppRole): boolean {
-  return (INSTRUCTOR_ROLES as readonly string[]).includes(role);
-}
-
-export function getDashboardUrlForRole(roleInput: unknown): string {
-  const role = normalizeRole(roleInput);
-  if (isAdminRole(role)) return '/dashboard/admin';
-  if (isInstructorRole(role)) return '/dashboard/instructor';
-  return '/dashboard/student';
-}
-
-export function getRoleDisplayName(roleInput: unknown): string {
-  const role = normalizeRole(roleInput);
-  if (isAdminRole(role)) return 'لوحة الإدارة';
-  if (isInstructorRole(role)) return 'لوحة المدرب';
-  return 'لوحة المتدرب';
-}
 
 function errorResponse(message: string, status: number) {
   return NextResponse.json({ success: false, message }, { status });
@@ -106,26 +81,10 @@ export async function requireUser(request?: Request): Promise<AuthorizationResul
       return { ok: false, response: errorResponse('يرجى تسجيل الدخول أولاً', 401) };
     }
 
-    let roleSource: unknown = user.app_metadata?.role;
-    if (!roleSource || normalizeRole(roleSource) === 'STUDENT') {
-      if (user.user_metadata?.role && normalizeRole(user.user_metadata.role) !== 'STUDENT') {
-        roleSource = user.user_metadata.role;
-      } else {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle();
-        if (profile?.role) {
-          roleSource = profile.role;
-        }
-      }
-    }
-
     return {
       ok: true,
       user,
-      role: normalizeRole(roleSource),
+      role: getTrustedRole(user),
       supabase,
     };
   } catch (error) {

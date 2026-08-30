@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/security/auth';
 import { getSupabaseAdmin } from '@/lib/supabase';
-
-type EnrollmentRow = {
-  id: string;
-  course_id: string;
-};
+import {
+  getStudentEnrollments,
+  isEnrollmentActive,
+  normalizeCourseId,
+} from '@/lib/security/student-access';
 
 type AttemptRow = {
   id: string;
@@ -30,20 +30,15 @@ export async function GET(request: Request) {
 
   try {
     const admin = getSupabaseAdmin();
-    const [byUser, byEmail] = await Promise.all([
-      admin.from('enrollments').select('id, course_id').eq('user_id', auth.user.id),
-      admin.from('enrollments').select('id, course_id').eq('email', email),
-    ]);
-
-    if (byUser.error || byEmail.error) {
-      throw byUser.error || byEmail.error;
-    }
-
-    const enrollments = uniqueById([
-      ...((byUser.data || []) as EnrollmentRow[]),
-      ...((byEmail.data || []) as EnrollmentRow[]),
-    ]);
-    const courseIds = [...new Set(enrollments.map((row) => row.course_id).filter(Boolean))];
+    const enrollments = await getStudentEnrollments(admin, auth.user.id, email);
+    const courseIds = [...new Set(
+      enrollments
+        .filter((row) => isEnrollmentActive(row.status))
+        .flatMap((row) => {
+          const normalized = normalizeCourseId(row.course_id);
+          return normalized ? [row.course_id, normalized, `course-${normalized}`] : [];
+        }),
+    )];
 
     if (courseIds.length === 0) {
       return NextResponse.json({ success: true, quizzes: [] });

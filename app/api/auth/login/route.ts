@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { checkRateLimit } from "@/lib/security/rate-limit";
-import { isAdminRole, isInstructorRole, normalizeRole } from "@/lib/security/auth";
+import { getTrustedRole, isAdminRole, isInstructorRole } from "@/lib/security/auth";
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204 });
@@ -32,15 +32,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Fetch profile and role from profiles table
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("ghl_contact_id, role")
-      .eq("id", authData.user.id)
-      .maybeSingle();
-
-    // 3. Determine redirect URL based on user role
-    const userRole = normalizeRole(authData.user?.app_metadata?.role || profile?.role);
+    // Determine redirect URL from the server-controlled role claim only.
+    const userRole = getTrustedRole(authData.user);
     let redirectUrl = "/dashboard/student";
     if (isAdminRole(userRole)) {
       redirectUrl = "/dashboard/admin";

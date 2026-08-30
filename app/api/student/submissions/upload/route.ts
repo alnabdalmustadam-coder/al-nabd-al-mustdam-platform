@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const file = formData.get('file');
     const kind = formData.get('kind');
     const resourceId = safeSegment(String(formData.get('resourceId') || 'draft'));
-    const courseId = String(formData.get('courseId') || '').trim();
+    const courseId = String(formData.get('courseId') || '').trim().slice(0, 200);
 
     if (!(file instanceof File)) {
       return NextResponse.json({ success: false, message: 'يرجى اختيار ملف صالح' }, { status: 400 });
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     if (kind === 'assignment') {
       const { data: assignment, error } = await admin
         .from('assignments')
-        .select('id, course_id, is_active')
+        .select('id, course_id, due_date, allow_late_submission, is_active')
         .eq('id', resourceId)
         .maybeSingle();
 
@@ -55,6 +55,13 @@ export async function POST(request: Request) {
       }
       if (!(await isStudentEnrolled(admin, auth.user.id, email, assignment.course_id))) {
         return NextResponse.json({ success: false, message: 'هذا الواجب لا يتبع دورة مسجلة لديك' }, { status: 403 });
+      }
+      if (
+        assignment.due_date
+        && !assignment.allow_late_submission
+        && Date.parse(assignment.due_date) < Date.now()
+      ) {
+        return NextResponse.json({ success: false, message: 'انتهى موعد التسليم لهذا الواجب' }, { status: 409 });
       }
     } else if (!(await isStudentEnrolled(admin, auth.user.id, email, courseId))) {
       return NextResponse.json({ success: false, message: 'المشروع يجب أن يرتبط بدورة مسجلة لديك' }, { status: 403 });

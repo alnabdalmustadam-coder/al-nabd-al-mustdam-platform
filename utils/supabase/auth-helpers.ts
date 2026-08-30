@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { ADMIN_ROLES, INSTRUCTOR_ROLES, normalizeRole, getDashboardUrlForRole } from '@/lib/security/auth'
+import { ADMIN_ROLES, INSTRUCTOR_ROLES, getDashboardUrlForRole, getTrustedRole } from '@/lib/security/auth'
 
 export async function updateSession(request: NextRequest) {
   try {
@@ -59,22 +59,9 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    // Resolve effective user role (from app_metadata, user_metadata, or profiles table)
-    let userRole = normalizeRole(user?.app_metadata?.role);
-    if (user && (!user.app_metadata?.role || userRole === 'STUDENT')) {
-      if (user.user_metadata?.role && normalizeRole(user.user_metadata.role) !== 'STUDENT') {
-        userRole = normalizeRole(user.user_metadata.role);
-      } else {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle();
-        if (profile?.role) {
-          userRole = normalizeRole(profile.role);
-        }
-      }
-    }
+    // Proxy is only an optimistic gate. Privileged roles come exclusively
+    // from the server-controlled app_metadata claim in the verified user JWT.
+    const userRole = getTrustedRole(user);
 
     // 1.1 Direct /dashboard route redirection based on role
     if (pathname === '/dashboard') {

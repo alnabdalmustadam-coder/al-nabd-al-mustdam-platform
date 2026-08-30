@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
   Award,
@@ -16,6 +16,11 @@ import {
   Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
+import {
+  QuizAttemptModal,
+  type QuizAttemptResult,
+  type QuizAttemptSession,
+} from '@/components/student/quiz-attempt-modal';
 
 interface QuizItem {
   id: string;
@@ -63,30 +68,95 @@ export default function StudentQuizzesPage() {
   const [activeQuizModal, setActiveQuizModal] = useState<QuizItem | null>(null);
   const [quizzes, setQuizzes] = useState<QuizItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [attemptSession, setAttemptSession] = useState<QuizAttemptSession | null>(null);
+  const [attemptResult, setAttemptResult] = useState<QuizAttemptResult | null>(null);
+  const [quizActionLoading, setQuizActionLoading] = useState(false);
+  const [quizActionError, setQuizActionError] = useState<string | null>(null);
+
+  const loadQuizzes = useCallback(async () => {
+    try {
+      const response = await fetch('/api/quizzes', {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
+      });
+      const payload = await response.json();
+
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.message || 'تعذر تحميل الاختبارات');
+      }
+
+      setQuizzes(payload.quizzes as QuizItem[]);
+    } catch (loadError) {
+      console.error('Error loading quizzes:', loadError);
+      setQuizActionError(loadError instanceof Error ? loadError.message : 'تعذر تحميل الاختبارات');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function loadQuizzes() {
-      try {
-        const response = await fetch('/api/quizzes', {
-          method: 'GET',
-          headers: { Accept: 'application/json' },
-        });
-        const payload = await response.json();
+    void loadQuizzes();
+  }, [loadQuizzes]);
 
-        if (!response.ok || !payload.success) {
-          throw new Error(payload.message || 'تعذر تحميل الاختبارات');
-        }
+  const closeQuiz = () => {
+    setActiveQuizModal(null);
+    setAttemptSession(null);
+    setAttemptResult(null);
+    setQuizActionError(null);
+    setQuizActionLoading(false);
+  };
 
-        setQuizzes(payload.quizzes as QuizItem[]);
-      } catch (err) {
-        console.error('Error loading quizzes:', err);
-      } finally {
-        setLoading(false);
+  const startQuizAttempt = async () => {
+    if (!activeQuizModal) return;
+    setQuizActionLoading(true);
+    setQuizActionError(null);
+    try {
+      const response = await fetch(
+        `/api/quizzes/${encodeURIComponent(activeQuizModal.id)}/attempts`,
+        { method: 'GET', headers: { Accept: 'application/json' }, cache: 'no-store' },
+      );
+      const payload = await response.json();
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.message || 'تعذر بدء الاختبار');
       }
+      setAttemptResult(null);
+      setAttemptSession(payload.attempt as QuizAttemptSession);
+    } catch (startError) {
+      setQuizActionError(startError instanceof Error ? startError.message : 'تعذر بدء الاختبار');
+    } finally {
+      setQuizActionLoading(false);
     }
+  };
 
-    loadQuizzes();
-  }, []);
+  const openLatestReview = async (quiz: QuizItem) => {
+    setActiveQuizModal(quiz);
+    setAttemptSession(null);
+    setAttemptResult(null);
+    setQuizActionLoading(true);
+    setQuizActionError(null);
+    try {
+      const response = await fetch(
+        `/api/quizzes/${encodeURIComponent(quiz.id)}/attempts?review=latest`,
+        { method: 'GET', headers: { Accept: 'application/json' }, cache: 'no-store' },
+      );
+      const payload = await response.json();
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.message || 'تعذر تحميل تفاصيل المحاولة');
+      }
+      setAttemptResult(payload.result as QuizAttemptResult);
+    } catch (reviewError) {
+      setQuizActionError(reviewError instanceof Error ? reviewError.message : 'تعذر تحميل تفاصيل المحاولة');
+    } finally {
+      setQuizActionLoading(false);
+    }
+  };
+
+  const handleAttemptCompleted = (result: QuizAttemptResult) => {
+    setAttemptResult(result);
+    setAttemptSession(null);
+    void loadQuizzes();
+  };
 
   const filteredQuizzes = quizzes.filter((q) => {
     if (filter === 'pending') return q.status === 'pending';
@@ -154,7 +224,7 @@ export default function StudentQuizzesPage() {
           ].map((tab, idx) => (
             <button
               key={tab.key}
-              onClick={() => setFilter(tab.key as any)}
+              onClick={() => setFilter(tab.key as typeof filter)}
               className={`premium-tab px-3 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-200 text-center cursor-pointer flex-1 sm:flex-none ${
                 idx === 2 ? 'col-span-2 sm:col-span-1' : ''
               } ${
@@ -257,7 +327,10 @@ export default function StudentQuizzesPage() {
 
                 {quiz.status === 'pending' && (
                   <button
-                    onClick={() => setActiveQuizModal(quiz)}
+                    onClick={() => {
+                      setActiveQuizModal(quiz);
+                      setQuizActionError(null);
+                    }}
                     className="w-full xs:w-auto px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-[#173A7C]/20 transition-all hover:-translate-y-0.5 cursor-pointer"
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />
@@ -267,7 +340,10 @@ export default function StudentQuizzesPage() {
 
                 {quiz.status === 'failed' && quiz.attemptsUsed < quiz.maxAttempts && (
                   <button
-                    onClick={() => setActiveQuizModal(quiz)}
+                    onClick={() => {
+                      setActiveQuizModal(quiz);
+                      setQuizActionError(null);
+                    }}
                     className="w-full xs:w-auto px-5 py-2.5 sm:py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-amber-500/20 transition-all hover:-translate-y-0.5 cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -278,7 +354,7 @@ export default function StudentQuizzesPage() {
                 {quiz.status === 'passed' && (
                   <div className="flex items-center gap-2 flex-wrap">
                     <button
-                      onClick={() => setActiveQuizModal(quiz)}
+                      onClick={() => void openLatestReview(quiz)}
                       className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-extrabold text-xs border border-slate-300/90 shadow-xs flex items-center justify-center gap-1.5 transition-all hover:-translate-y-0.5 cursor-pointer"
                     >
                       <FileCheck className="w-3.5 h-3.5 text-[#173A7C]" />
@@ -301,7 +377,7 @@ export default function StudentQuizzesPage() {
 
       {/* Quiz Modal */}
       <AnimatePresence>
-        {activeQuizModal && (
+        {activeQuizModal && !attemptSession && !attemptResult && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -325,42 +401,70 @@ export default function StudentQuizzesPage() {
                   </div>
                 </div>
                 <button
-                  onClick={() => setActiveQuizModal(null)}
+                  onClick={closeQuiz}
+                  disabled={quizActionLoading}
                   className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="space-y-3 text-xs text-slate-600 font-bold leading-relaxed p-4 rounded-2xl bg-slate-50 border border-slate-200/60">
-                <h4 className="font-black text-slate-800 text-sm">تعليمات الاختبار المهمة:</h4>
-                <ul className="list-disc list-inside space-y-1.5 text-slate-600">
-                  <li>عدد الأسئلة المتضمنة: <strong className="text-[#173A7C]">{activeQuizModal.questionsCount} سؤال</strong></li>
-                  <li>الزمن المتاح للإجابة: <strong className="text-[#173A7C]">{activeQuizModal.durationMinutes} دقيقة</strong> (سيبدأ العداد فور البدء)</li>
-                  <li>درجة النجاح المطلوبة: <strong className="text-[#5CB07C]">{activeQuizModal.passPercentage}%</strong></li>
-                  <li>محاولات التشغيل المتاحة: <strong>{activeQuizModal.maxAttempts - activeQuizModal.attemptsUsed} من {activeQuizModal.maxAttempts}</strong></li>
-                </ul>
-              </div>
+              {quizActionLoading && activeQuizModal.status === 'passed' ? (
+                <div className="py-10 flex flex-col items-center justify-center gap-3 text-slate-500">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+                  <p className="text-xs font-black">جاري تحميل تفاصيل المحاولة...</p>
+                </div>
+              ) : (
+                <div className="space-y-3 text-xs text-slate-600 font-bold leading-relaxed p-4 rounded-2xl bg-slate-50 border border-slate-200/60">
+                  <h4 className="font-black text-slate-800 text-sm">تعليمات الاختبار المهمة:</h4>
+                  <ul className="list-disc list-inside space-y-1.5 text-slate-600">
+                    <li>عدد الأسئلة المتضمنة: <strong className="text-[#173A7C]">{activeQuizModal.questionsCount} سؤال</strong></li>
+                    <li>الزمن المتاح للإجابة: <strong className="text-[#173A7C]">{activeQuizModal.durationMinutes} دقيقة</strong> (سيبدأ العداد فور البدء)</li>
+                    <li>درجة النجاح المطلوبة: <strong className="text-[#5CB07C]">{activeQuizModal.passPercentage}%</strong></li>
+                    <li>محاولات التشغيل المتاحة: <strong>{activeQuizModal.maxAttempts - activeQuizModal.attemptsUsed} من {activeQuizModal.maxAttempts}</strong></li>
+                  </ul>
+                </div>
+              )}
+
+              {quizActionError && (
+                <div className="px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{quizActionError}</span>
+                </div>
+              )}
 
               <div className="flex items-center justify-end gap-3 pt-2">
                 <button
-                  onClick={() => setActiveQuizModal(null)}
+                  onClick={closeQuiz}
+                  disabled={quizActionLoading}
                   className="px-5 py-2.5 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                 >
                   إلغاء
                 </button>
-                <button
-                  onClick={() => { setActiveQuizModal(null); alert('سيتم تفعيل واجهة الاختبار التفاعلية قريباً'); }}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 hover:opacity-95 cursor-pointer"
-                >
-                  <span>تأكيد والبدء الآن</span>
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
+                {activeQuizModal.status !== 'passed' && (
+                  <button
+                    onClick={() => void startQuizAttempt()}
+                    disabled={quizActionLoading}
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 hover:opacity-95 cursor-pointer disabled:opacity-60"
+                  >
+                    {quizActionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronLeft className="w-4 h-4" />}
+                    <span>{quizActionLoading ? 'جاري تجهيز المحاولة...' : 'تأكيد والبدء الآن'}</span>
+                  </button>
+                )}
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {(attemptSession || attemptResult) && (
+        <QuizAttemptModal
+          session={attemptSession}
+          initialResult={attemptResult}
+          onClose={closeQuiz}
+          onCompleted={handleAttemptCompleted}
+        />
+      )}
     </div>
   );
 }

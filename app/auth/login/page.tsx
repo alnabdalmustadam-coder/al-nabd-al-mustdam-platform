@@ -85,7 +85,7 @@ function LoginForm() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name, role')
+        .select('full_name')
         .eq('id', data.user?.id)
         .single();
 
@@ -100,7 +100,7 @@ function LoginForm() {
 
       window.dispatchEvent(new Event('nabd_user_updated'));
 
-      const role = (data.user?.app_metadata?.role || profile?.role || 'STUDENT').toUpperCase();
+      const role = String(data.user?.app_metadata?.role || 'STUDENT').toUpperCase();
       let targetUrl = '/dashboard/student';
       if (role === 'ADMIN' || role === 'SUPERADMIN' || role === 'SUPER_ADMIN') {
         targetUrl = '/dashboard/admin';

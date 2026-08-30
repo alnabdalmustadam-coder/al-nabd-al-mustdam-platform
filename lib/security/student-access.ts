@@ -14,6 +14,11 @@ export function normalizeCourseId(value: unknown): string {
     : '';
 }
 
+export function isEnrollmentActive(statusValue: unknown): boolean {
+  const status = typeof statusValue === 'string' ? statusValue.trim().toLowerCase() : 'active';
+  return !['revoked', 'cancelled', 'canceled', 'inactive'].includes(status);
+}
+
 export async function getStudentEnrollments(
   admin: SupabaseClient,
   userId: string,
@@ -43,8 +48,7 @@ export async function isStudentEnrolled(
 
   const rows = await getStudentEnrollments(admin, userId, email);
   return rows.some((row) => {
-    const status = (row.status || 'active').toLowerCase();
-    return status !== 'revoked' && normalizeCourseId(row.course_id) === target;
+    return isEnrollmentActive(row.status) && normalizeCourseId(row.course_id) === target;
   });
 }
 

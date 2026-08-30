@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { isAdminRole, isInstructorRole, normalizeRole, getDashboardUrlForRole } from '@/lib/security/auth';
+import { isAdminRole, isInstructorRole, getDashboardUrlForRole, getTrustedRole } from '@/lib/security/auth';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -12,23 +12,7 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data?.user) {
-      let roleSource: unknown = data.user.app_metadata?.role;
-      if (!roleSource || normalizeRole(roleSource) === 'STUDENT') {
-        if (data.user.user_metadata?.role && normalizeRole(data.user.user_metadata.role) !== 'STUDENT') {
-          roleSource = data.user.user_metadata.role;
-        } else {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', data.user.id)
-            .maybeSingle();
-          if (profile?.role) {
-            roleSource = profile.role;
-          }
-        }
-      }
-
-      const userRole = normalizeRole(roleSource);
+      const userRole = getTrustedRole(data.user);
       const defaultRoleDashboard = getDashboardUrlForRole(userRole);
 
       let targetDestination = defaultRoleDashboard;

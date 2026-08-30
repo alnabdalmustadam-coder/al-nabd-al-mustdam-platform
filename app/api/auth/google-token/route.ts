@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { getDashboardUrlForRole, normalizeRole } from "@/lib/security/auth";
+import { getDashboardUrlForRole, getTrustedRole } from "@/lib/security/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const userRole = normalizeRole(user.app_metadata?.role || existing?.role || user.user_metadata?.role);
+    const userRole = getTrustedRole(user);
     const redirectUrl = getDashboardUrlForRole(userRole);
 
     return NextResponse.json({

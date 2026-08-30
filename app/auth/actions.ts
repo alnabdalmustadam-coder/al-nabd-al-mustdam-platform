@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
-import { isAdminRole, isInstructorRole, normalizeRole, getDashboardUrlForRole } from '@/lib/security/auth';
+import { isAdminRole, isInstructorRole, getDashboardUrlForRole, getTrustedRole } from '@/lib/security/auth';
 import { consumeRateLimit } from '@/lib/security/rate-limit';
 
 function isStrongPassword(password: string): boolean {
@@ -44,23 +44,7 @@ export async function login(formData: FormData) {
     return { error: error.message };
   }
 
-  let roleSource: unknown = data.user?.app_metadata?.role;
-  if (!roleSource || normalizeRole(roleSource) === 'STUDENT') {
-    if (data.user?.user_metadata?.role && normalizeRole(data.user.user_metadata.role) !== 'STUDENT') {
-      roleSource = data.user.user_metadata.role;
-    } else if (data.user?.id) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .maybeSingle();
-      if (profile?.role) {
-        roleSource = profile.role;
-      }
-    }
-  }
-
-  const userRole = normalizeRole(roleSource);
+  const userRole = getTrustedRole(data.user);
   const roleHome = getDashboardUrlForRole(userRole);
 
   const safeRequestedRedirect =
