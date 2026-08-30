@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Search,
   Home,
@@ -10,6 +11,13 @@ import {
   PanelLeftOpen,
   Menu,
   X,
+  BookOpen,
+  Award,
+  Radio,
+  FileQuestion,
+  Layers,
+  ArrowLeft,
+  CheckCircle2,
 } from 'lucide-react';
 import { DefaultAvatar } from './default-avatar';
 import Link from 'next/link';
@@ -27,8 +35,12 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
   onToggleSidebar,
   onToggleMobileMenu,
 }) => {
+  const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const [userProfile, setUserProfile] = useState<{
     fullName: string;
     avatarUrl: string | null;
@@ -106,6 +118,63 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
     };
   }, []);
 
+  // Close search suggestions on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setIsSearchFocused(false);
+    setIsMobileSearchOpen(false);
+    router.push(`/dashboard/student/courses?q=${encodeURIComponent(searchQuery.trim())}`);
+  };
+
+  const studentSearchCategories = [
+    {
+      title: 'البحث في الدورات التدريبية والمناهج',
+      url: `/dashboard/student/courses${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: BookOpen,
+      badge: 'الدورات',
+      color: 'text-indigo-600 bg-indigo-50',
+    },
+    {
+      title: 'البحث في الاختبارات والتقييمات',
+      url: `/dashboard/student/quizzes${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: FileQuestion,
+      badge: 'الاختبارات',
+      color: 'text-amber-600 bg-amber-50',
+    },
+    {
+      title: 'البحث في اللقاءات المباشرة والورش',
+      url: `/dashboard/student/live${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: Radio,
+      badge: 'البث المباشر',
+      color: 'text-rose-600 bg-rose-50',
+    },
+    {
+      title: 'البحث في الشهادات المعتمدة والتوثيق',
+      url: `/dashboard/student/certificates${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: Award,
+      badge: 'الشهادات',
+      color: 'text-emerald-600 bg-emerald-50',
+    },
+    {
+      title: 'البحث في المسارات والكتب المهنية',
+      url: `/dashboard/student/pathways${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: Layers,
+      badge: 'المسارات',
+      color: 'text-blue-600 bg-blue-50',
+    },
+  ];
+
   return (
     <header className="sticky top-0 z-[30] w-full font-[family-name:var(--font-cairo)] m-0 p-0">
       {/* Sleek 100% Flush Header with Platform Logo & Glass Backdrop */}
@@ -153,19 +222,65 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
           </Link>
         </div>
 
-        {/* CENTER: Desktop Search Bar (Hidden on Mobile) */}
-        <div className="hidden md:flex flex-1 min-w-0 max-w-md mx-4">
-          <div className="w-full relative flex items-center px-3.5 rounded-xl border border-slate-200/80 overflow-hidden transition-all focus-within:border-[#173A7C] bg-slate-50/80 shadow-xs">
+        {/* CENTER: Real-Time Interactive Search Bar */}
+        <div ref={searchContainerRef} className="hidden md:flex flex-1 min-w-0 max-w-lg mx-4 relative">
+          <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center px-3.5 rounded-2xl border border-slate-200/90 transition-all focus-within:border-[#173A7C] focus-within:bg-white bg-slate-50/90 shadow-2xs">
             <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
             <input
               type="text"
-              placeholder="البحث بالمنصة..."
-              className="w-full py-2 text-xs font-bold text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              placeholder="اكتب للبحث في المقررات، الاختبارات، الشهادات... واضغط Enter"
+              className="w-full py-2.5 text-xs font-bold text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
             />
-            <kbd className="inline-flex items-center gap-1 mr-2 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-400 bg-white rounded border border-slate-200 shrink-0">
-              Ctrl + K
-            </kbd>
-          </div>
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-full mr-1 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </form>
+
+          {/* Search Dropdown Quick Categories */}
+          {isSearchFocused && (
+            <div className="absolute top-full right-0 left-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 z-50 space-y-1 text-right animate-in fade-in zoom-in-95 duration-150 font-[family-name:var(--font-cairo)]">
+              <div className="px-3 py-1.5 text-[11px] font-black text-slate-500 flex items-center justify-between border-b border-slate-100 mb-1">
+                <span>{searchQuery ? `نتائج البحث عن: "${searchQuery}" (اضغط Enter)` : 'البحث السريع في أقسام المنصة'}</span>
+                <Search className="w-3.5 h-3.5 text-[#173A7C]" />
+              </div>
+
+              {studentSearchCategories.map((item, idx) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={idx}
+                    href={item.url}
+                    onClick={() => setIsSearchFocused(false)}
+                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className={`p-2 rounded-xl ${item.color}`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 group-hover:text-[#173A7C]">
+                        {item.title}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600">
+                        {item.badge}
+                      </span>
+                      <ArrowLeft className="w-3 h-3 text-slate-400 group-hover:-translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* LEFT SIDE (RTL): Mobile Search Icon, Home Link, Notifications, Profile Avatar */}
@@ -243,21 +358,24 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
       {/* Expandable Mobile Search Bar (Only visible when toggled on mobile) */}
       {isMobileSearchOpen && (
         <div className="md:hidden w-full px-4 py-3 bg-white/95 border-b border-slate-200/80 backdrop-blur-md shadow-md animate-fade-in-down">
-          <div className="relative flex items-center px-3.5 rounded-xl border border-slate-200/80 overflow-hidden bg-slate-50 shadow-xs">
+          <form onSubmit={handleSearchSubmit} className="relative flex items-center px-3.5 rounded-xl border border-slate-200/80 overflow-hidden bg-slate-50 shadow-xs">
             <Search className="w-4 h-4 text-[#173A7C] shrink-0 ml-2" />
             <input
               type="text"
               autoFocus
-              placeholder="ابحث عن المحتوى والدروس والشهادات..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="اكتب للبحث واضغط Enter..."
               className="w-full py-2.5 text-xs font-bold text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
             />
             <button
+              type="button"
               onClick={() => setIsMobileSearchOpen(false)}
-              className="p-1 text-slate-400 hover:text-slate-600 rounded-lg text-xs font-bold mr-1"
+              className="p-1 text-slate-400 hover:text-slate-600 rounded-lg text-xs font-bold mr-1 cursor-pointer"
             >
               إلغاء
             </button>
-          </div>
+          </form>
         </div>
       )}
     </header>

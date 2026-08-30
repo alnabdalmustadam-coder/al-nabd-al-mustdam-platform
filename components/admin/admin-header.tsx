@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Search,
   Home,
@@ -17,6 +18,13 @@ import {
   ShieldCheck,
   User,
   Crown,
+  Users,
+  BookOpen,
+  UserCheck,
+  Award,
+  FileQuestion,
+  Headphones,
+  ArrowLeft,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -31,9 +39,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   onToggleSidebar,
   onToggleMobileMenu,
 }) => {
+  const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const [adminProfile, setAdminProfile] = useState<{
     fullName: string;
@@ -113,6 +125,70 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     };
   }, []);
 
+  // Close search suggestions on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setIsSearchFocused(false);
+    setIsMobileSearchOpen(false);
+    router.push(`/dashboard/admin/users?q=${encodeURIComponent(searchQuery.trim())}`);
+  };
+
+  const adminSearchCategories = [
+    {
+      title: 'البحث في بيانات الطلاب والمتدربين',
+      url: `/dashboard/admin/users${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: Users,
+      badge: 'الطلاب',
+      color: 'text-blue-600 bg-blue-50',
+    },
+    {
+      title: 'البحث في المقررات والمناهج التدريبية',
+      url: `/dashboard/admin/courses${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: BookOpen,
+      badge: 'الدورات',
+      color: 'text-indigo-600 bg-indigo-50',
+    },
+    {
+      title: 'البحث في هيئة التدريب والمحاضرين',
+      url: `/dashboard/admin/trainers${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: UserCheck,
+      badge: 'المدربين',
+      color: 'text-emerald-600 bg-emerald-50',
+    },
+    {
+      title: 'البحث في السجلات والشهادات المعتمدة',
+      url: `/dashboard/admin/certificates${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: Award,
+      badge: 'الشهادات',
+      color: 'text-amber-600 bg-amber-50',
+    },
+    {
+      title: 'البحث في بنوك الأسئلة والاختبارات',
+      url: `/dashboard/admin/quizzes${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: FileQuestion,
+      badge: 'الاختبارات',
+      color: 'text-purple-600 bg-purple-50',
+    },
+    {
+      title: 'البحث في تذاكر وطلبات الدعم الفني',
+      url: `/dashboard/admin/support${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: Headphones,
+      badge: 'الدعم الفني',
+      color: 'text-rose-600 bg-rose-50',
+    },
+  ];
+
   const notifications = [
     {
       id: '1',
@@ -191,19 +267,65 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           </Link>
         </div>
 
-        {/* CENTER: Desktop Search Bar (Hidden on Mobile) */}
-        <div className="hidden md:flex flex-1 min-w-0 max-w-md mx-4">
-          <div className="w-full relative flex items-center px-3.5 py-0.5 rounded-xl border border-slate-200/80 overflow-hidden transition-all focus-within:border-[#173A7C] bg-slate-50/80 shadow-xs">
+        {/* CENTER: Real-Time Interactive Search Bar */}
+        <div ref={searchContainerRef} className="hidden md:flex flex-1 min-w-0 max-w-lg mx-4 relative">
+          <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center px-3.5 rounded-2xl border border-slate-200/90 transition-all focus-within:border-[#173A7C] focus-within:bg-white bg-slate-50/90 shadow-2xs">
             <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
             <input
               type="text"
-              placeholder="البحث في النظام والإشعارات والطلاب..."
-              className="w-full py-2 text-xs font-bold text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              placeholder="اكتب للبحث في الطلاب، الدورات، المدربين، التذاكر... واضغط Enter"
+              className="w-full py-2.5 text-xs font-bold text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
             />
-            <kbd className="inline-flex items-center gap-1 mr-2 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-400 bg-white rounded border border-slate-200 shrink-0">
-              Ctrl + K
-            </kbd>
-          </div>
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-full mr-1 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </form>
+
+          {/* Search Dropdown Quick Categories */}
+          {isSearchFocused && (
+            <div className="absolute top-full right-0 left-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 z-50 space-y-1 text-right animate-in fade-in zoom-in-95 duration-150 font-[family-name:var(--font-cairo)]">
+              <div className="px-3 py-1.5 text-[11px] font-black text-slate-500 flex items-center justify-between border-b border-slate-100 mb-1">
+                <span>{searchQuery ? `نتائج البحث عن: "${searchQuery}" (اضغط Enter)` : 'البحث السريع في أقسام الإدارة'}</span>
+                <Search className="w-3.5 h-3.5 text-[#173A7C]" />
+              </div>
+
+              {adminSearchCategories.map((item, idx) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={idx}
+                    href={item.url}
+                    onClick={() => setIsSearchFocused(false)}
+                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-colors group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className={`p-2 rounded-xl ${item.color}`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 group-hover:text-[#173A7C]">
+                        {item.title}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600">
+                        {item.badge}
+                      </span>
+                      <ArrowLeft className="w-3 h-3 text-slate-400 group-hover:-translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* LEFT SIDE (RTL): Mobile Search, Home Link, Notifications, Admin Profile */}
@@ -387,16 +509,25 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
       {/* Mobile Search Overlay Bar (Expands beneath Header) */}
       {isMobileSearchOpen && (
-        <div className="md:hidden px-3.5 py-2.5 bg-white/95 border-b border-slate-200/80 shadow-md">
-          <div className="w-full relative flex items-center px-3 rounded-xl border border-slate-200 bg-slate-50">
+        <div className="md:hidden px-3.5 py-2.5 bg-white/95 border-b border-slate-200/80 shadow-md animate-fade-in-down">
+          <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center px-3 rounded-xl border border-slate-200 bg-slate-50">
             <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
             <input
               type="text"
-              placeholder="البحث في النظام..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="اكتب للبحث واضغط Enter..."
               autoFocus
               className="w-full py-2 text-xs font-bold text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none min-w-0"
             />
-          </div>
+            <button
+              type="button"
+              onClick={() => setIsMobileSearchOpen(false)}
+              className="p-1 text-slate-400 hover:text-slate-600 rounded-lg text-xs font-bold mr-1 cursor-pointer"
+            >
+              إلغاء
+            </button>
+          </form>
         </div>
       )}
     </header>

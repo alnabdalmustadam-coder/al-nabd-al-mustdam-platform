@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { motion, Variants } from 'framer-motion';
 import {
   ArrowLeft,
@@ -59,10 +60,30 @@ interface EnrolledCourseItem {
 }
 
 export default function StudentCoursesPage() {
-  const [searchQuery, setSearchQuery] = useState('');
+  return (
+    <Suspense fallback={
+      <div className="p-12 flex justify-center items-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+      </div>
+    }>
+      <StudentCoursesContent />
+    </Suspense>
+  );
+}
+
+function StudentCoursesContent() {
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams?.get('q') || '');
   const [filterTab, setFilterTab] = useState<'all' | 'in_progress' | 'completed'>('all');
   const [myCourses, setMyCourses] = useState<EnrolledCourseItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = searchParams?.get('q');
+    if (q !== null && q !== undefined) {
+      setSearchQuery(q);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function loadCourses() {

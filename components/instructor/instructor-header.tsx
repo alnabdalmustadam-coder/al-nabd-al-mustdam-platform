@@ -213,14 +213,14 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
-              placeholder="بحث في الطلاب، المقررات، المقالات، والخدمات..."
+              placeholder="اكتب للبحث في الطلاب، المقررات، المقالات، الخدمات... واضغط Enter"
               className="w-full pl-9 pr-10 py-2.5 sm:py-3 rounded-2xl border border-slate-200/90 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white bg-slate-50/90 transition-all shadow-2xs"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full"
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -230,9 +230,9 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
           {/* Search Dropdown Quick Links */}
           {isSearchFocused && (
             <div className="absolute top-full right-0 left-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 z-50 space-y-1 text-right animate-in fade-in zoom-in-95 duration-150">
-              <div className="px-3 py-1.5 text-[11px] font-black text-slate-400 flex items-center justify-between border-b border-slate-100 mb-1">
-                <span>{searchQuery ? `نتائج البحث عن: "${searchQuery}"` : 'البحث السريع في المنصة'}</span>
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <div className="px-3 py-1.5 text-[11px] font-black text-slate-500 flex items-center justify-between border-b border-slate-100 mb-1">
+                <span>{searchQuery ? `نتائج البحث عن: "${searchQuery}" (اضغط Enter)` : 'البحث السريع في أقسام المنصة'}</span>
+                <Search className="w-3.5 h-3.5 text-[#173A7C]" />
               </div>
 
               {quickSearchShortcuts.map((item, idx) => {
