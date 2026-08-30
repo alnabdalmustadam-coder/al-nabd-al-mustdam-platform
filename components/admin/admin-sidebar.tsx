@@ -24,6 +24,8 @@ import {
   Store,
   Ticket,
   ClipboardList,
+  Newspaper,
+  Briefcase,
 } from 'lucide-react';
 
 import { createClient } from '@/utils/supabase/client';
@@ -149,13 +151,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { label: 'إدارة الدورات', href: '/dashboard/admin/courses', icon: BookOpen, count: '48' },
     { label: 'إدارة المتدربين', href: '/dashboard/admin/users', icon: Users, count: '14.2k' },
     { label: 'إدارة المدربين', href: '/dashboard/admin/trainers', icon: UserCheck, count: '32' },
+    { label: 'إدارة المقالات', href: '/dashboard/admin/articles', icon: Newspaper, count: 'جديد' },
+    { label: 'إدارة الخدمات', href: '/dashboard/admin/services', icon: Briefcase, count: 'استشارات' },
     { label: 'إدارة الشهادات', href: '/dashboard/admin/certificates', icon: Award, highlight: true },
     { label: 'بنك الاختبارات', href: '/dashboard/admin/quizzes', icon: FileQuestion, count: '12' },
     { label: 'قسائم الخصم', href: '/dashboard/admin/coupons', icon: Ticket, count: 'كوبونات' },
     { label: 'الاستبيانات', href: '/dashboard/admin/surveys', icon: ClipboardList, count: '18' },
     { label: 'البث المباشر', href: '/dashboard/admin/live', icon: Radio, count: '5' },
     { label: 'السجل المالي', href: '/dashboard/admin/finance', icon: CreditCard, count: 'ر.س' },
-    { label: 'متجر الخدمات', href: '/marketplace', icon: Store, badge: 'جديد' },
+    { label: 'متجر الخدمات (معاينة)', href: '/marketplace', icon: Store, badge: 'المتجر' },
     { label: 'تذاكر الدعم', href: '/dashboard/admin/support', icon: Headphones, count: '12' },
     { label: 'الملف الشخصي للمدير', href: '/dashboard/admin/profile', icon: User },
     { label: 'إعدادات المنصة', href: '/dashboard/admin/settings', icon: Settings },

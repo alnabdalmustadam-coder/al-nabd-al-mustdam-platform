@@ -25,6 +25,8 @@ import {
   FileQuestion,
   Headphones,
   ArrowLeft,
+  Newspaper,
+  Briefcase,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -160,24 +162,31 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       color: 'text-indigo-600 bg-indigo-50',
     },
     {
+      title: 'البحث في المقالات والنشر الأكاديمي',
+      url: `/dashboard/admin/articles${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: Newspaper,
+      badge: 'المقالات',
+      color: 'text-emerald-600 bg-emerald-50',
+    },
+    {
+      title: 'البحث في باقات الخدمات والاستشارات',
+      url: `/dashboard/admin/services${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
+      icon: Briefcase,
+      badge: 'الخدمات',
+      color: 'text-amber-600 bg-amber-50',
+    },
+    {
       title: 'البحث في هيئة التدريب والمحاضرين',
       url: `/dashboard/admin/trainers${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
       icon: UserCheck,
       badge: 'المدربين',
-      color: 'text-emerald-600 bg-emerald-50',
+      color: 'text-teal-600 bg-teal-50',
     },
     {
       title: 'البحث في السجلات والشهادات المعتمدة',
       url: `/dashboard/admin/certificates${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
       icon: Award,
       badge: 'الشهادات',
-      color: 'text-amber-600 bg-amber-50',
-    },
-    {
-      title: 'البحث في بنوك الأسئلة والاختبارات',
-      url: `/dashboard/admin/quizzes${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`,
-      icon: FileQuestion,
-      badge: 'الاختبارات',
       color: 'text-purple-600 bg-purple-50',
     },
     {
