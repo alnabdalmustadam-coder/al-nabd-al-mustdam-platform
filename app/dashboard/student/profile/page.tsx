@@ -2,11 +2,61 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
-import { User, Mail, Phone, Key, Shield, Laptop, Smartphone, Trash2, CheckCircle2, UserCheck, RefreshCw, Loader2, Save, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, Key, Shield, Laptop, Smartphone, Trash2, CheckCircle2, UserCheck, RefreshCw, Loader2, Save, AlertCircle, Camera, UploadCloud } from 'lucide-react';
 import { DefaultAvatar } from '@/components/student/default-avatar';
 import type { RegisteredDevice } from '@/components/student/device-limit-modal';
 import { getDeviceInfo } from '@/utils/device';
 import { createClient } from '@/utils/supabase/client';
+
+// Client-side WebP converter to reduce storage footprint and maximize performance
+async function convertImageToWebP(file: File, maxDimension = 600, quality = 0.82): Promise<{ blob: Blob; dataUrl: string }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (readerEvent) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error('WebP blob creation failed'));
+              return;
+            }
+            const dataUrl = canvas.toDataURL('image/webp', quality);
+            resolve({ blob, dataUrl });
+          },
+          'image/webp',
+          quality
+        );
+      };
+      img.onerror = () => reject(new Error('Failed to load source image'));
+      img.src = readerEvent.target?.result as string;
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+}
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -58,10 +108,76 @@ export default function StudentProfilePage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleAvatarFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('يرجى اختيار ملف صورة صالح (JPG, PNG, WebP)');
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+
+      // 1. Convert to optimized WebP
+      const { blob, dataUrl } = await convertImageToWebP(file, 600, 0.82);
+
+      // 2. Prepare FormData
+      const formData = new FormData();
+      const webpFile = new File([blob], `avatar_${Date.now()}.webp`, { type: 'image/webp' });
+      formData.append('file', webpFile);
+
+      // 3. Upload to single-avatar endpoint
+      const res = await fetch('/api/profile/upload-avatar', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+
+      const finalUrl = data.success && data.avatarUrl ? data.avatarUrl : dataUrl;
+
+      // 4. Update local state
+      setStudent((prev) => ({ ...prev, avatarUrl: finalUrl }));
+
+      // 5. Update local cache and dispatch sync events
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('student_avatar', finalUrl);
+        localStorage.setItem('student_name', student.fullName);
+        window.dispatchEvent(
+          new CustomEvent('student-profile-updated', {
+            detail: { avatarUrl: finalUrl, fullName: student.fullName },
+          })
+        );
+        window.dispatchEvent(
+          new CustomEvent('profileUpdated', {
+            detail: { avatarUrl: finalUrl, fullName: student.fullName },
+          })
+        );
+      }
+
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    } catch (err) {
+      console.error('Error uploading avatar:', err);
+      alert('حدث خطأ أثناء معالجة ورفع الصورة');
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   useEffect(() => {
     async function loadStudentProfile() {
       try {
+        const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('student_avatar') : null;
+        const cachedName = typeof window !== 'undefined' ? localStorage.getItem('student_name') : null;
+
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -76,17 +192,22 @@ export default function StudentProfilePage() {
             .maybeSingle();
 
           const activeEmail = profile?.email || userEmail;
+          const finalAvatar = profile?.avatar_url || metaAvatar || cachedAvatar || null;
+          const finalName = profile?.full_name || metaName || cachedName || userEmail.split('@')[0] || 'متدرب';
 
           setStudent({
             id: user.id,
-            fullName: profile?.full_name || metaName || userEmail.split('@')[0] || 'متدرب',
+            fullName: finalName,
             email: activeEmail,
             phone: profile?.phone || user.user_metadata?.phone || '+966 50 000 0000',
             nationalId: profile?.national_id || user.user_metadata?.national_id || '10XXXXXXXX',
             role: profile?.role === 'ADMIN' ? 'مدير المنصة' : profile?.role === 'INSTRUCTOR' ? 'مدرب معتمد' : 'متدرب معتمد بالمنصة',
             joinedDate: user.created_at ? new Date(user.created_at).toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' }) : 'يناير 2026',
-            avatarUrl: profile?.avatar_url || metaAvatar || null,
+            avatarUrl: finalAvatar,
           });
+
+          if (finalAvatar && typeof window !== 'undefined') localStorage.setItem('student_avatar', finalAvatar);
+          if (finalName && typeof window !== 'undefined') localStorage.setItem('student_name', finalName);
 
           loadDevices(activeEmail);
         } else {
@@ -271,19 +392,64 @@ export default function StudentProfilePage() {
       >
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#173A7C]/8 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-5">
-          <div className="flex items-center gap-3">
-            <DefaultAvatar
-              src={student.avatarUrl}
-              name={student.fullName}
-              size="lg"
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
+          <div className="flex items-center gap-4">
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/jpg,image/webp"
+              className="hidden"
+              onChange={handleAvatarFileSelect}
             />
-            <div className="space-y-1 pr-2">
+
+            {/* Interactive Avatar Container with Camera Overlay */}
+            <div className="relative shrink-0 group">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shadow-lg ring-4 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center relative">
+                {student.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={student.avatarUrl}
+                    alt={student.fullName}
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <span className="text-2xl sm:text-3xl font-black text-white">
+                    {student.fullName ? student.fullName.charAt(0) : 'م'}
+                  </span>
+                )}
+
+                {/* Uploading Overlay Spinner */}
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-xs flex flex-col items-center justify-center text-white z-20">
+                    <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
+                    <span className="text-[9px] font-black mt-1">جاري الحفظ...</span>
+                  </div>
+                )}
+
+                {/* Hover Trigger */}
+                <button
+                  type="button"
+                  disabled={isUploadingAvatar}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer z-10"
+                  title="انقر لتغيير الصورة الشخصية"
+                >
+                  <Camera className="w-5 h-5 text-white drop-shadow-sm" />
+                  <span className="text-[10px] font-black mt-0.5">تغيير الصورة</span>
+                </button>
+              </div>
+
+              {/* Status Online indicator */}
+              <span className="absolute -bottom-1 -left-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
+            </div>
+
+            <div className="space-y-1.5 pr-1">
               <motion.div variants={textItemVariants} className="student-tag-badge bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-xs">
                 <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{student.role}</span>
               </motion.div>
-              <motion.h1 variants={textItemVariants} className="student-heading-h1 text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+              <motion.h1 variants={textItemVariants} className="student-heading-h1 text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
                 {student.fullName || (isLoading ? 'جاري التحميل...' : 'المتدرب')}
               </motion.h1>
               <motion.p variants={textItemVariants} className="text-xs sm:text-sm text-slate-500 font-bold">
@@ -291,6 +457,20 @@ export default function StudentProfilePage() {
               </motion.p>
             </div>
           </div>
+
+          <button
+            type="button"
+            disabled={isUploadingAvatar}
+            onClick={() => fileInputRef.current?.click()}
+            className="px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-[#173A7C] font-black text-xs flex items-center gap-2 border border-slate-200 shadow-xs hover:shadow-sm cursor-pointer transition-all shrink-0 self-start md:self-center"
+          >
+            {isUploadingAvatar ? (
+              <Loader2 className="w-4 h-4 animate-spin text-[#173A7C]" />
+            ) : (
+              <Camera className="w-4 h-4 text-[#173A7C]" />
+            )}
+            <span>{isUploadingAvatar ? 'جاري التحويل والرفع...' : 'تغيير الصورة الشخصية'}</span>
+          </button>
         </div>
       </motion.div>
 

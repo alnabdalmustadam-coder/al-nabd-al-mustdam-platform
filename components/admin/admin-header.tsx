@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Search,
@@ -15,7 +15,10 @@ import {
   Bell,
   ChevronDown,
   ShieldCheck,
+  User,
+  Crown,
 } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 interface AdminHeaderProps {
   isSidebarCollapsed?: boolean;
@@ -31,6 +34,84 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
+  const [adminProfile, setAdminProfile] = useState<{
+    fullName: string;
+    avatarUrl: string | null;
+  }>({
+    fullName: 'سعود القحطاني',
+    avatarUrl: null,
+  });
+
+  useEffect(() => {
+    async function loadAdminUser() {
+      try {
+        const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('admin_avatar') : null;
+        const cachedName = typeof window !== 'undefined' ? localStorage.getItem('admin_name') : null;
+        if (cachedAvatar || cachedName) {
+          setAdminProfile((prev) => ({
+            ...prev,
+            avatarUrl: cachedAvatar || prev.avatarUrl,
+            fullName: cachedName || prev.fullName,
+          }));
+        }
+
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
+          const metaAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
+
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          const resolvedAvatar = profile?.avatar_url || metaAvatar || cachedAvatar || null;
+          const resolvedName = profile?.full_name || metaName || cachedName || 'سعود القحطاني';
+
+          setAdminProfile({
+            fullName: resolvedName,
+            avatarUrl: resolvedAvatar,
+          });
+
+          if (resolvedAvatar && typeof window !== 'undefined') localStorage.setItem('admin_avatar', resolvedAvatar);
+          if (resolvedName && typeof window !== 'undefined') localStorage.setItem('admin_name', resolvedName);
+        }
+      } catch (err) {
+        console.error('Error loading admin user in header:', err);
+      }
+    }
+
+    loadAdminUser();
+
+    const handleProfileUpdate = (e: any) => {
+      if (e?.detail) {
+        setAdminProfile((prev) => ({
+          ...prev,
+          avatarUrl: e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : prev.avatarUrl,
+          fullName: e.detail.fullName || prev.fullName,
+        }));
+      } else {
+        loadAdminUser();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleProfileUpdate);
+      window.addEventListener('admin-profile-updated', handleProfileUpdate);
+      window.addEventListener('profileUpdated', handleProfileUpdate);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleProfileUpdate);
+        window.removeEventListener('admin-profile-updated', handleProfileUpdate);
+        window.removeEventListener('profileUpdated', handleProfileUpdate);
+      }
+    };
+  }, []);
 
   const notifications = [
     {
@@ -209,14 +290,27 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 setShowProfileMenu(!showProfileMenu);
                 setShowNotifications(false);
               }}
-              className="h-9 sm:h-10 px-2 sm:px-3 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 flex items-center gap-2 cursor-pointer"
+              className="h-10 px-2 sm:px-3 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 flex items-center gap-2.5 cursor-pointer"
               title="حساب الإدارة"
             >
-              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-[11px] sm:text-xs shadow-xs">
-                A
+              <div className="relative shrink-0">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl overflow-hidden shadow-xs ring-2 ring-[#173A7C]/20 border border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center">
+                  {adminProfile.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={adminProfile.avatarUrl}
+                      alt={adminProfile.fullName}
+                      className="w-full h-full object-cover object-top"
+                    />
+                  ) : (
+                    <Crown className="w-4 h-4 text-amber-300" />
+                  )}
+                </div>
+                <span className="absolute -bottom-0.5 -left-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-white shadow-2xs animate-pulse" />
               </div>
               <div className="hidden sm:block text-right">
-                <span className="font-extrabold text-[11px] text-slate-900 block leading-tight">سعود القحطاني</span>
+                <span className="font-black text-xs text-slate-900 block leading-tight max-w-[120px] truncate">{adminProfile.fullName}</span>
+                <span className="font-extrabold text-[10px] text-amber-700 block">مدير المنصة 👑</span>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
@@ -229,23 +323,41 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   onClick={() => setShowProfileMenu(false)}
                 />
                 <div
-                  className="absolute top-full mt-2 left-0 w-60 rounded-2xl border border-slate-200 p-2 shadow-2xl z-[1000] text-right space-y-1 bg-white text-slate-800"
+                  className="absolute top-full mt-2 left-0 w-64 rounded-2xl border border-slate-200 p-2 shadow-2xl z-[1000] text-right space-y-1 bg-white text-slate-800"
                   style={{ boxShadow: '0 20px 50px rgba(15, 23, 42, 0.15)' }}
                 >
                   <div className="p-2.5 pb-3 border-b border-slate-100">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-xs">
-                        A
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden shadow-xs ring-2 ring-[#173A7C]/20 border border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center shrink-0">
+                        {adminProfile.avatarUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={adminProfile.avatarUrl}
+                            alt={adminProfile.fullName}
+                            className="w-full h-full object-cover object-top"
+                          />
+                        ) : (
+                          <Crown className="w-5 h-5 text-amber-300" />
+                        )}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1">
-                          <h4 className="font-black text-xs text-slate-900 truncate">سعود القحطاني</h4>
+                          <h4 className="font-black text-xs text-slate-900 truncate">{adminProfile.fullName}</h4>
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                         </div>
-                        <p className="text-[10px] text-slate-500 font-bold truncate">مدير المنصة الرئيسي</p>
+                        <p className="text-[10px] text-amber-700 font-bold truncate">مدير المنصة الرئيسي 👑</p>
                       </div>
                     </div>
                   </div>
+
+                  <Link
+                    href="/dashboard/admin/profile"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+                  >
+                    <User className="w-4 h-4 text-[#173A7C]" />
+                    <span>الملف الشخصي للمدير</span>
+                  </Link>
 
                   <Link
                     href="/dashboard/admin/settings"

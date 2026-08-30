@@ -160,15 +160,31 @@ export default function InstructorAssignmentsPage() {
     <div className="space-y-6 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
       {/* Hero Header */}
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-black border border-amber-200">
-            <ClipboardList className="w-3.5 h-3.5" />
+        {/* Top Badges Row */}
+        <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200/90 shadow-xs">
+            <ClipboardList className="w-4 h-4 text-[#173A7C]" />
             <span>تصحيح التكليفات والواجبات الميدانية</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
-            تسليمات المتدربين <span className="student-name-gradient">ورصد الدرجات</span> 📝
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-50 text-amber-900 text-xs font-black border border-amber-300 shadow-xs">
+            <Clock className="w-4 h-4 text-amber-600" />
+            <span>{submissions.filter((s) => s.status !== 'graded').length} مهام بانتظار التقييم</span>
+          </span>
+        </div>
+
+        <div className="space-y-3 max-w-2xl">
+          <div className="flex items-center gap-3.5 sm:gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 text-white flex items-center justify-center shadow-xl shadow-amber-500/25 border border-white/40 shrink-0">
+              <ClipboardList className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                تسليمات المتدربين <span className="student-name-gradient">ورصد الدرجات</span>
+              </h1>
+            </div>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-600 font-bold leading-relaxed pr-1 sm:pr-2">
             مراجعة ملفات الواجبات المسلمة من الطلاب، كتابة الملاحظات التوجيهية، ورصد الدرجات المستحقة.
           </p>
         </div>

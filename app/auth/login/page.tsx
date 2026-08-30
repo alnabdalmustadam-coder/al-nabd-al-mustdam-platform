@@ -17,7 +17,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams();
   const message = searchParams.get('message');
-  const redirectParam = searchParams.get('redirect') || '/dashboard/student';
+  const redirectParam = searchParams.get('redirect') || '';
 
   // OTP screen state for unconfirmed email login attempts
   const [showOtpScreen, setShowOtpScreen] = useState(false);
@@ -52,7 +52,7 @@ function LoginForm() {
       window.location.href = result.redirectUrl;
     } else {
       window.dispatchEvent(new Event('nabd_user_updated'));
-      window.location.href = redirectParam;
+      window.location.href = redirectParam || '/dashboard';
     }
   }
 
@@ -101,13 +101,15 @@ function LoginForm() {
       window.dispatchEvent(new Event('nabd_user_updated'));
 
       const role = (data.user?.app_metadata?.role || profile?.role || 'STUDENT').toUpperCase();
+      let targetUrl = '/dashboard/student';
       if (role === 'ADMIN' || role === 'SUPERADMIN' || role === 'SUPER_ADMIN') {
-        window.location.href = '/dashboard/admin';
+        targetUrl = '/dashboard/admin';
       } else if (role === 'INSTRUCTOR' || role === 'TRAINER' || role === 'TEACHER') {
-        window.location.href = '/dashboard/instructor';
-      } else {
-        window.location.href = redirectParam;
+        targetUrl = '/dashboard/instructor';
+      } else if (redirectParam && redirectParam.startsWith('/')) {
+        targetUrl = redirectParam;
       }
+      window.location.href = targetUrl;
     } catch (err) {
       setError('حدث خطأ غير متوقع أثناء تفعيل الحساب');
       setOtpLoading(false);
@@ -143,7 +145,7 @@ function LoginForm() {
     try {
       const supabase = createClient();
       const callbackUrl = new URL('/auth/callback', window.location.origin);
-      if (redirectParam && redirectParam !== '/dashboard/student') {
+      if (redirectParam && redirectParam.startsWith('/')) {
         callbackUrl.searchParams.set('next', redirectParam);
       }
 

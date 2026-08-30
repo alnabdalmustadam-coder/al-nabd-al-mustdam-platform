@@ -58,6 +58,16 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
   useEffect(() => {
     async function loadUserProfile() {
       try {
+        const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('student_avatar') : null;
+        const cachedName = typeof window !== 'undefined' ? localStorage.getItem('student_name') : null;
+        if (cachedAvatar || cachedName) {
+          setUserProfile((prev) => ({
+            ...prev,
+            avatarUrl: cachedAvatar || prev.avatarUrl,
+            fullName: cachedName || prev.fullName,
+          }));
+        }
+
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -88,8 +98,8 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
             }
           }
 
-          const name = profile?.full_name || metaName || userEmail.split('@')[0] || 'متدرب معتمد';
-          const avatar = profile?.avatar_url || metaAvatar || null;
+          const name = profile?.full_name || metaName || cachedName || userEmail.split('@')[0] || 'متدرب معتمد';
+          const avatar = profile?.avatar_url || metaAvatar || cachedAvatar || null;
 
           setUserProfile({
             fullName: name,
@@ -98,6 +108,9 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
             enrolledCount,
             completedCount,
           });
+
+          if (avatar && typeof window !== 'undefined') localStorage.setItem('student_avatar', avatar);
+          if (name && typeof window !== 'undefined') localStorage.setItem('student_name', name);
         }
       } catch (err) {
         console.error('Error fetching sidebar profile:', err);
@@ -106,19 +119,31 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
 
     loadUserProfile();
 
-    const handleStorage = () => {
-      loadUserProfile();
+    const handleProfileUpdate = (e: any) => {
+      if (e?.detail) {
+        setUserProfile((prev) => ({
+          ...prev,
+          avatarUrl: e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : prev.avatarUrl,
+          fullName: e.detail.fullName || prev.fullName,
+        }));
+      } else {
+        loadUserProfile();
+      }
     };
 
     if (typeof window !== 'undefined') {
-      window.addEventListener('storage', handleStorage);
-      window.addEventListener('nabd_progress_updated', handleStorage);
+      window.addEventListener('storage', handleProfileUpdate);
+      window.addEventListener('student-profile-updated', handleProfileUpdate);
+      window.addEventListener('profileUpdated', handleProfileUpdate);
+      window.addEventListener('nabd_progress_updated', handleProfileUpdate);
     }
 
     return () => {
       if (typeof window !== 'undefined') {
-        window.removeEventListener('storage', handleStorage);
-        window.removeEventListener('nabd_progress_updated', handleStorage);
+        window.removeEventListener('storage', handleProfileUpdate);
+        window.removeEventListener('student-profile-updated', handleProfileUpdate);
+        window.removeEventListener('profileUpdated', handleProfileUpdate);
+        window.removeEventListener('nabd_progress_updated', handleProfileUpdate);
       }
     };
   }, []);
@@ -150,33 +175,47 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
           }`}
       >
         <div
-          className={`relative overflow-hidden rounded-none border-l h-full flex flex-col justify-between transition-all duration-300 ${isCollapsed ? 'p-2 pt-1' : 'px-3.5 py-2.5'
+          className={`relative overflow-hidden rounded-none border-l h-full flex flex-col justify-between transition-all duration-300 ${isCollapsed ? 'p-2 pt-2' : 'px-3.5 py-3'
             }`}
           style={{
-            background: 'rgba(255, 255, 255, 0.94)',
+            background: 'rgba(255, 255, 255, 0.96)',
             backdropFilter: 'blur(28px) saturate(1.8)',
             WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
             boxShadow: '0 0 40px rgba(23, 58, 124, 0.06), 0 4px 20px rgba(0, 0, 0, 0.04)',
             borderLeft: '1px solid rgba(23, 58, 124, 0.08)',
           }}
         >
-          <div className="space-y-3 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="space-y-3.5 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 
-            {/* Student Profile Identity Card */}
+            {/* Student Profile Identity Card with Prominent Avatar */}
             <div
-              className={`rounded-2xl border border-slate-200/90 transition-all duration-300 relative group overflow-hidden ${isCollapsed ? 'p-2 flex items-center justify-center' : 'p-3.5'
+              className={`rounded-2xl border border-slate-200/90 transition-all duration-300 relative group overflow-hidden ${isCollapsed ? 'p-2 flex flex-col items-center justify-center' : 'p-3.5'
                 }`}
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%)',
-                boxShadow: '0 2px 8px rgba(23, 58, 124, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
+                boxShadow: '0 4px 14px rgba(23, 58, 124, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1)',
               }}
             >
-              <div className="flex items-center gap-3">
-                <DefaultAvatar
-                  src={userProfile.avatarUrl}
-                  name={userProfile.fullName}
-                  size="md"
-                />
+              <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3.5'}`}>
+                {/* Prominent Large Avatar Frame */}
+                <div className="relative shrink-0">
+                  <div className={`${isCollapsed ? 'w-12 h-12' : 'w-14 h-14 sm:w-15 sm:h-15'} rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center`}>
+                    {userProfile.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={userProfile.avatarUrl}
+                        alt={userProfile.fullName}
+                        className="w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                      <span className="text-lg sm:text-xl font-black text-white">
+                        {userProfile.fullName.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
+                </div>
+
                 {!isCollapsed && (
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 mb-0.5">
@@ -185,7 +224,7 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                       </h3>
                       <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                     </div>
-                    <p className="text-xs text-emerald-700 font-bold truncate">{userProfile.role}</p>
+                    <p className="text-xs text-emerald-700 font-extrabold truncate">{userProfile.role}</p>
                   </div>
                 )}
               </div>
@@ -349,17 +388,29 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
 
               {/* Student Profile Identity Card in Mobile Drawer */}
               <div
-                className="rounded-2xl border border-slate-200/90 p-3.5 flex items-center gap-3"
+                className="rounded-2xl border border-slate-200/90 p-3.5 flex items-center gap-3.5"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%)',
-                  boxShadow: '0 2px 8px rgba(23, 58, 124, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
+                  boxShadow: '0 4px 12px rgba(23, 58, 124, 0.06)',
                 }}
               >
-                <DefaultAvatar
-                  src={userProfile.avatarUrl}
-                  name={userProfile.fullName}
-                  size="md"
-                />
+                <div className="relative shrink-0">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center">
+                    {userProfile.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={userProfile.avatarUrl}
+                        alt={userProfile.fullName}
+                        className="w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                      <span className="text-lg font-black text-white">
+                        {userProfile.fullName.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
+                </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 mb-0.5">
                     <h3 className="font-black text-sm text-slate-900 truncate leading-tight" title={userProfile.fullName}>
@@ -367,7 +418,7 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                     </h3>
                     <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                   </div>
-                  <p className="text-xs text-emerald-700 font-bold truncate">{userProfile.role}</p>
+                  <p className="text-xs text-emerald-700 font-extrabold truncate">{userProfile.role}</p>
                 </div>
               </div>
 

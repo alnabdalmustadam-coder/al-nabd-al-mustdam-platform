@@ -47,6 +47,20 @@ export function isInstructorRole(role: AppRole): boolean {
   return (INSTRUCTOR_ROLES as readonly string[]).includes(role);
 }
 
+export function getDashboardUrlForRole(roleInput: unknown): string {
+  const role = normalizeRole(roleInput);
+  if (isAdminRole(role)) return '/dashboard/admin';
+  if (isInstructorRole(role)) return '/dashboard/instructor';
+  return '/dashboard/student';
+}
+
+export function getRoleDisplayName(roleInput: unknown): string {
+  const role = normalizeRole(roleInput);
+  if (isAdminRole(role)) return 'لوحة الإدارة';
+  if (isInstructorRole(role)) return 'لوحة المدرب';
+  return 'لوحة المتدرب';
+}
+
 function errorResponse(message: string, status: number) {
   return NextResponse.json({ success: false, message }, { status });
 }

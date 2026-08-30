@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase as supabaseAdmin } from "@/lib/supabase";
-import { requireUser } from "@/lib/security/auth";
+import { requireUser, getDashboardUrlForRole, getRoleDisplayName, normalizeRole } from "@/lib/security/auth";
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,10 +8,10 @@ export async function GET(req: NextRequest) {
     if (!auth.ok) return auth.response;
     const user = auth.user;
 
-    // Fetch full name from profiles using admin client
+    // Fetch full name and role from profiles using admin client
     let { data: profile } = await supabaseAdmin
       .from("profiles")
-      .select("full_name")
+      .select("full_name, avatar_url, role")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -51,11 +51,20 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    const effectiveRole = profile?.role ? normalizeRole(profile.role) : auth.role;
+    const dashboardUrl = getDashboardUrlForRole(effectiveRole);
+    const roleLabel = getRoleDisplayName(effectiveRole);
+
     return NextResponse.json({
       success: true,
       user: {
+        id: user.id,
         email: user.email,
         name: profile?.full_name || user.user_metadata?.full_name || "",
+        avatarUrl: profile?.avatar_url || user.user_metadata?.avatar_url || null,
+        role: effectiveRole,
+        dashboardUrl,
+        roleLabel,
       },
     });
   } catch {

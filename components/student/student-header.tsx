@@ -40,6 +40,16 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
   useEffect(() => {
     async function loadUser() {
       try {
+        const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('student_avatar') : null;
+        const cachedName = typeof window !== 'undefined' ? localStorage.getItem('student_name') : null;
+        if (cachedAvatar || cachedName) {
+          setUserProfile((prev) => ({
+            ...prev,
+            avatarUrl: cachedAvatar || prev.avatarUrl,
+            fullName: cachedName || prev.fullName,
+          }));
+        }
+
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -52,16 +62,48 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
             .eq('id', user.id)
             .maybeSingle();
 
+          const finalAvatar = profile?.avatar_url || metaAvatar || cachedAvatar || null;
+          const finalName = profile?.full_name || metaName || cachedName || '';
+
           setUserProfile({
-            fullName: profile?.full_name || metaName || '',
-            avatarUrl: profile?.avatar_url || metaAvatar || null,
+            fullName: finalName,
+            avatarUrl: finalAvatar,
           });
+
+          if (finalAvatar && typeof window !== 'undefined') localStorage.setItem('student_avatar', finalAvatar);
+          if (finalName && typeof window !== 'undefined') localStorage.setItem('student_name', finalName);
         }
       } catch (e) {
         console.error('Error loading header user:', e);
       }
     }
     loadUser();
+
+    const handleProfileUpdate = (e: any) => {
+      if (e?.detail) {
+        setUserProfile((prev) => ({
+          ...prev,
+          avatarUrl: e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : prev.avatarUrl,
+          fullName: e.detail.fullName || prev.fullName,
+        }));
+      } else {
+        loadUser();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleProfileUpdate);
+      window.addEventListener('student-profile-updated', handleProfileUpdate);
+      window.addEventListener('profileUpdated', handleProfileUpdate);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleProfileUpdate);
+        window.removeEventListener('student-profile-updated', handleProfileUpdate);
+        window.removeEventListener('profileUpdated', handleProfileUpdate);
+      }
+    };
   }, []);
 
   return (

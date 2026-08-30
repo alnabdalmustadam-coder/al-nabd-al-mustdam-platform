@@ -20,6 +20,8 @@ import {
   ChevronLeft,
   X,
   Store,
+  Newspaper,
+  Briefcase,
 } from 'lucide-react';
 import { DefaultAvatar } from '@/components/student/default-avatar';
 import { createClient } from '@/utils/supabase/client';
@@ -50,6 +52,17 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
   useEffect(() => {
     async function loadInstructorProfile() {
       try {
+        // Fast local storage cache check
+        const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('instructor_avatar') : null;
+        const cachedName = typeof window !== 'undefined' ? localStorage.getItem('instructor_name') : null;
+        if (cachedAvatar || cachedName) {
+          setUserProfile((prev) => ({
+            ...prev,
+            avatarUrl: cachedAvatar || prev.avatarUrl,
+            fullName: cachedName || prev.fullName,
+          }));
+        }
+
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -62,11 +75,17 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
             .eq('id', user.id)
             .maybeSingle();
 
+          const finalAvatar = profile?.avatar_url || metaAvatar || cachedAvatar || null;
+          const finalName = profile?.full_name || metaName || cachedName || user.email?.split('@')[0] || 'المدرب المعتمد';
+
           setUserProfile({
-            fullName: profile?.full_name || metaName || user.email?.split('@')[0] || 'المدرب المعتمد',
-            avatarUrl: profile?.avatar_url || metaAvatar || null,
+            fullName: finalName,
+            avatarUrl: finalAvatar,
             specialty: profile?.bio || 'هيئة التدريس والتدريب',
           });
+
+          if (finalAvatar) localStorage.setItem('instructor_avatar', finalAvatar);
+          if (finalName) localStorage.setItem('instructor_name', finalName);
         }
       } catch (err) {
         console.error(err);
@@ -74,16 +93,38 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
     }
 
     loadInstructorProfile();
+
+    // Listen for live instant profile updates from profile page
+    const handleProfileUpdate = (e: any) => {
+      if (e?.detail) {
+        setUserProfile((prev) => ({
+          ...prev,
+          avatarUrl: e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : prev.avatarUrl,
+          fullName: e.detail.fullName || prev.fullName,
+        }));
+      } else {
+        loadInstructorProfile();
+      }
+    };
+
+    window.addEventListener('instructor-profile-updated', handleProfileUpdate);
+    window.addEventListener('storage', handleProfileUpdate);
+
+    return () => {
+      window.removeEventListener('instructor-profile-updated', handleProfileUpdate);
+      window.removeEventListener('storage', handleProfileUpdate);
+    };
   }, []);
 
   const navItems = [
     { label: 'الرئيسية والمؤشرات', href: '/dashboard/instructor', icon: LayoutDashboard },
     { label: 'دوراتي التدريبية', href: '/dashboard/instructor/courses', icon: BookOpen },
     { label: 'المتدربون والطلاب', href: '/dashboard/instructor/students', icon: Users },
-    { label: 'الورش والبث المباشر', href: '/dashboard/instructor/live', icon: Radio, count: 'بث 🔴' },
+    { label: 'الورش والبث المباشر', href: '/dashboard/instructor/live', icon: Radio, count: 'مباشر' },
     { label: 'بنك الأسئلة والاختبارات', href: '/dashboard/instructor/quizzes', icon: Award },
     { label: 'الواجبات والتسليمات', href: '/dashboard/instructor/assignments', icon: ClipboardList },
-    { label: 'متجر الخدمات', href: '/marketplace', icon: Store, badge: 'جديد' },
+    { label: 'المقالات والمنشورات', href: '/dashboard/instructor/articles', icon: Newspaper },
+    { label: 'إدارة خدماتي بالمتجر', href: '/dashboard/instructor/services', icon: Briefcase },
     { label: 'الملف الشخصي والبيانات', href: '/dashboard/instructor/profile', icon: User },
   ];
 
@@ -97,29 +138,47 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
       >
         <div
           className={`relative overflow-hidden rounded-none border-l h-full flex flex-col justify-between transition-all duration-300 ${
-            isCollapsed ? 'p-2 pt-1' : 'px-3.5 py-2.5'
+            isCollapsed ? 'p-2 pt-2' : 'px-3.5 py-3'
           }`}
           style={{
-            background: 'rgba(255, 255, 255, 0.94)',
+            background: 'rgba(255, 255, 255, 0.96)',
             backdropFilter: 'blur(28px) saturate(1.8)',
             WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
             boxShadow: '0 0 40px rgba(23, 58, 124, 0.06), 0 4px 20px rgba(0, 0, 0, 0.04)',
             borderLeft: '1px solid rgba(23, 58, 124, 0.08)',
           }}
         >
-          <div className="space-y-3 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1">
-            {/* Identity Card */}
+          <div className="space-y-3.5 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1">
+            {/* Identity Card with Large Prominent Avatar */}
             <div
               className={`rounded-2xl border border-slate-200/90 transition-all duration-300 relative group overflow-hidden ${
-                isCollapsed ? 'p-2 flex items-center justify-center' : 'p-3.5'
+                isCollapsed ? 'p-2 flex flex-col items-center justify-center' : 'p-3.5'
               }`}
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%)',
-                boxShadow: '0 2px 8px rgba(23, 58, 124, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
+                boxShadow: '0 4px 14px rgba(23, 58, 124, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1)',
               }}
             >
-              <div className="flex items-center gap-3">
-                <DefaultAvatar src={userProfile.avatarUrl} name={userProfile.fullName} size="md" />
+              <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3.5'}`}>
+                {/* Prominent Large Avatar Frame */}
+                <div className="relative shrink-0">
+                  <div className={`${isCollapsed ? 'w-12 h-12' : 'w-14 h-14 sm:w-15 sm:h-15'} rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center`}>
+                    {userProfile.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={userProfile.avatarUrl}
+                        alt={userProfile.fullName}
+                        className="w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                      <span className="text-lg sm:text-xl font-black text-white">
+                        {userProfile.fullName.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
+                </div>
+
                 {!isCollapsed && (
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 mb-0.5">
@@ -128,7 +187,7 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                       </h3>
                       <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                     </div>
-                    <p className="text-xs text-emerald-700 font-bold truncate">مدرب ومحاضر معتمد</p>
+                    <p className="text-xs text-emerald-700 font-extrabold truncate">مدرب ومحاضر معتمد</p>
                   </div>
                 )}
               </div>
@@ -162,8 +221,9 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                     </div>
 
                     {!isCollapsed && item.count && (
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
-                        {item.count}
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 inline-flex items-center gap-1 whitespace-nowrap shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+                        <span>{item.count}</span>
                       </span>
                     )}
                   </Link>
@@ -172,14 +232,32 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
             </nav>
           </div>
 
-          {/* Footer Logo & Back to Home */}
+          {/* ── Brand Logo & Academy Verification Card ── */}
           {!isCollapsed && (
-            <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs font-bold text-slate-500">
-              <Link href="/" className="hover:text-[#173A7C] flex items-center gap-1">
-                <span>الرئيسية</span>
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </Link>
-              <span className="text-[10px]">بوابة المدرب المعتمد</span>
+            <div className="mt-4 pt-4 border-t border-slate-200/70 space-y-3">
+              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-white/90 via-blue-50/60 to-emerald-50/40 border border-slate-200/80 shadow-xs space-y-2.5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white p-1.5 shadow-sm border border-slate-200/80 flex items-center justify-center shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/logo.webp" alt="النبض المستدام" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="min-w-0">
+                    <h5 className="font-black text-xs text-[#173A7C] truncate">منصة النبض المستدام</h5>
+                    <p className="text-[10px] text-slate-500 font-bold">البوابة الأكاديمية المعتمدة</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 text-[10px] font-bold text-slate-500">
+                  <span className="flex items-center gap-1 text-emerald-700">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>نظام متكامل 2026</span>
+                  </span>
+                  <Link href="/" className="hover:text-[#173A7C] flex items-center gap-0.5 text-[#173A7C] font-black">
+                    <span>الموقع</span>
+                    <ChevronLeft className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -202,16 +280,32 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
               </div>
 
               <div
-                className="flex items-center gap-3 p-3.5 rounded-2xl border border-slate-200/90"
+                className="flex items-center gap-3.5 p-3.5 rounded-2xl border border-slate-200/90"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%)',
-                  boxShadow: '0 2px 8px rgba(23, 58, 124, 0.05)',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
+                  boxShadow: '0 4px 12px rgba(23, 58, 124, 0.06)',
                 }}
               >
-                <DefaultAvatar src={userProfile.avatarUrl} name={userProfile.fullName} size="md" />
-                <div>
-                  <h4 className="text-sm font-black text-slate-900 mb-0.5">{userProfile.fullName}</h4>
-                  <p className="text-xs text-emerald-700 font-bold">مدرب ومحاضر معتمد</p>
+                <div className="relative shrink-0">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center">
+                    {userProfile.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={userProfile.avatarUrl}
+                        alt={userProfile.fullName}
+                        className="w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                      <span className="text-lg font-black text-white">
+                        {userProfile.fullName.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-sm font-black text-slate-900 mb-0.5 truncate">{userProfile.fullName}</h4>
+                  <p className="text-xs text-emerald-700 font-extrabold truncate">مدرب ومحاضر معتمد</p>
                 </div>
               </div>
 

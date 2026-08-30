@@ -1,137 +1,188 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Award, Users, Clock, HeadphonesIcon, CheckCircle2 } from "lucide-react";
+import {
+  Award,
+  Users,
+  Clock,
+  HeadphonesIcon,
+  CheckCircle2,
+  ArrowUpLeft,
+} from "lucide-react";
+
+function SustainPulseMark() {
+  return (
+    <svg
+      viewBox="0 0 64 64"
+      aria-hidden="true"
+      className="h-12 w-12 drop-shadow-[0_8px_14px_rgba(23,58,124,0.12)]"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="sustain-pulse-ring" x1="10" y1="8" x2="55" y2="57" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#173A7C" />
+          <stop offset="1" stopColor="#5CB07C" />
+        </linearGradient>
+        <linearGradient id="sustain-pulse-line" x1="12" y1="34" x2="53" y2="34" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#173A7C" />
+          <stop offset="0.55" stopColor="#25589A" />
+          <stop offset="1" stopColor="#5CB07C" />
+        </linearGradient>
+      </defs>
+
+      <circle cx="32" cy="32" r="27" fill="white" stroke="url(#sustain-pulse-ring)" strokeWidth="2.6" />
+      <path
+        d="M12 35h10l4-12 7 24 6-19 5 9h8"
+        stroke="url(#sustain-pulse-line)"
+        strokeWidth="3.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M39 13c7 .3 11.2 3.8 12.5 10.4-7 .8-11.8-1.7-14.4-7.4.2-1.1.7-2.1 1.9-3Z"
+        fill="#F1FAF5"
+        stroke="#5CB07C"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="m38.6 22.2 8-5" stroke="#5CB07C" strokeWidth="2.1" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 const features = [
   {
     icon: Award,
     title: "مدربون معتمدون",
-    description: "نخبة من المدربين المعتمدين دولياً بخبرات تزيد عن 15 عاماً في مجالاتهم لضمان أعلى جودة تعليمية.",
-    color: "emerald",
+    label: "خبرة موثوقة",
+    description:
+      "نخبة من المدربين المعتمدين دولياً بخبرات تزيد عن 15 عاماً في مجالاتهم لضمان أعلى جودة تعليمية.",
+    accent: "from-[#173A7C] to-[#2B5AAD]",
+    iconSurface: "from-[#173A7C] to-[#2757A7]",
   },
   {
     icon: Users,
     title: "شهادات معتمدة",
-    description: "شهادات معترف بها دولياً وإقليمياً تعزز سيرتك الذاتية وتفتح لك آفاقاً مهنية جديدة وواسعة.",
-    color: "blue",
+    label: "اعتماد مهني",
+    description:
+      "شهادات معترف بها دولياً وإقليمياً تعزز سيرتك الذاتية وتفتح لك آفاقاً مهنية جديدة وواسعة.",
+    accent: "from-[#2B5AAD] to-[#5CB07C]",
+    iconSurface: "from-[#245194] to-[#3A8B78]",
   },
   {
     icon: Clock,
     title: "تعلم مرن",
-    description: "دورات وباقات مصممة خصيصاً لتتناسب مع جدولك. تعلم في أي وقت وبالسرعة التي تتوافق معك.",
-    color: "emerald",
+    label: "مرونة كاملة",
+    description:
+      "دورات وباقات مصممة خصيصاً لتتناسب مع جدولك. تعلم في أي وقت وبالسرعة التي تتوافق معك.",
+    accent: "from-[#5CB07C] to-[#2E8B74]",
+    iconSurface: "from-[#55AB78] to-[#287A69]",
   },
   {
     icon: HeadphonesIcon,
     title: "دعم مستمر",
-    description: "فريق دعم متاح لمساعدتك في رحلتك التعليمية من البداية وحتى بعد التخرج والانضمام للعمل.",
-    color: "blue",
+    label: "معك دائماً",
+    description:
+      "فريق دعم متاح لمساعدتك في رحلتك التعليمية من البداية وحتى بعد التخرج والانضمام للعمل.",
+    accent: "from-[#2E8B74] to-[#173A7C]",
+    iconSurface: "from-[#347F71] to-[#173A7C]",
   },
 ];
 
-const colorMap: Record<string, { bg: string; text: string; glow: string; border: string }> = {
-  emerald: { 
-    bg: "bg-gradient-to-br from-white to-[#5CB07C]/10 group-hover:bg-white", 
-    text: "text-[#5CB07C]", 
-    glow: "shadow-sm group-hover:shadow-[0_8px_25px_rgba(92,176,124,0.25)]",
-    border: "border-slate-100 ring-[#5CB07C]/10 group-hover:border-[#5CB07C]/30"
-  },
-  blue: { 
-    bg: "bg-gradient-to-br from-white to-[#173A7C]/10 group-hover:bg-white", 
-    text: "text-[#173A7C]", 
-    glow: "shadow-sm group-hover:shadow-[0_8px_25px_rgba(23,58,124,0.25)]",
-    border: "border-slate-100 ring-[#173A7C]/10 group-hover:border-[#173A7C]/30"
-  },
-};
-
 export default function WhyUsSection() {
   return (
-    <section className="pt-32 pb-44 relative bg-gradient-to-br from-white via-slate-50 to-[#173A7C]/5 overflow-hidden">
-      {/* Background Soft Glows */}
-      <div className="absolute top-0 right-0 -m-32 w-[600px] h-[600px] bg-[#173A7C]/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -m-32 w-[600px] h-[600px] bg-[#5CB07C]/5 rounded-full blur-[120px] pointer-events-none" />
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_45%,#f4faf7_100%)] py-20 sm:py-24 lg:py-28">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#173A7C]/15 to-transparent" />
+      <div className="pointer-events-none absolute -right-48 top-12 h-[520px] w-[520px] rounded-full bg-[#173A7C]/[0.055] blur-[110px]" />
+      <div className="pointer-events-none absolute -left-40 bottom-0 h-[480px] w-[480px] rounded-full bg-[#5CB07C]/[0.08] blur-[110px]" />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, #173A7C 1px, transparent 0)",
+          backgroundSize: "28px 28px",
+        }}
+      />
 
-      {/* Decorative Grid Lines */}
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.015] mix-blend-overlay pointer-events-none" />
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-        
-        {/* Editorial Heading */}
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-20 relative"
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto mb-12 max-w-3xl text-center sm:mb-14"
         >
-          <span className="section-badge-glass mb-6">
-            <CheckCircle2 className="w-4 h-4 text-[#5CB07C]" />
+          <span className="section-badge-glass mb-5">
+            <CheckCircle2 className="h-4 w-4 text-[#5CB07C]" />
             لماذا النبض المستدام؟
           </span>
-          <h2 className="section-main-title-premium mt-2 mb-6">
+
+          <h2 className="section-main-title-premium mb-5 mt-1">
             تميّز يصنع <span className="gradient-text">الفرق</span>
           </h2>
-          <p className="section-desc-premium max-w-2xl mx-auto">
-            نحن لا نقدم مجرد دورات، بل نصنع تجربة تعليمية متكاملة تضعك على طريق النجاح المهني بأحدث الأساليب والمعايير العالمية.
+
+          <p className="section-desc-premium mx-auto max-w-2xl">
+            نحن لا نقدم مجرد دورات، بل نصنع تجربة تعليمية متكاملة تضعك على طريق
+            النجاح المهني بأحدث الأساليب والمعايير العالمية.
           </p>
+
+          <div className="mx-auto mt-6 flex w-52 items-center justify-center gap-3" aria-hidden="true">
+            <span className="h-px flex-1 bg-gradient-to-l from-[#173A7C]/55 to-transparent" />
+            <SustainPulseMark />
+            <span className="h-px flex-1 bg-gradient-to-r from-[#5CB07C]/65 to-transparent" />
+          </div>
         </motion.div>
 
-        {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feat, i) => {
-            const Icon = feat.icon;
-            const colors = colorMap[feat.color];
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="relative group h-full"
-              >
-                {/* Navy Gradient Card */}
-                <div className="h-full bg-gradient-to-br from-[#173A7C] via-[#1a4490] to-[#1e5a6e] rounded-[2rem] p-8 text-start border border-white/15 ring-1 ring-inset ring-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_40px_80px_-15px_rgba(23,58,124,0.35)] hover:-translate-y-2 transition-all duration-500 overflow-hidden flex flex-col relative">
-                  
-                  {/* Top Accent Stripe */}
-                  <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#5CB07C] to-transparent opacity-60" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-6">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
 
-                  {/* Corner Glow */}
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#5CB07C]/10 rounded-full blur-3xl pointer-events-none" />
-                  <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+              return (
+                <motion.article
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 26 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{
+                    duration: 0.65,
+                    delay: index * 0.08,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className="group relative min-h-[285px] overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(248,250,252,0.92))] p-5 text-right shadow-[0_12px_35px_-25px_rgba(15,23,42,0.4)] transition-all duration-500 hover:-translate-y-1.5 hover:border-[#5CB07C]/35 hover:shadow-[0_28px_55px_-28px_rgba(23,58,124,0.36)] sm:p-6"
+                >
+                  <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${feature.accent}`} />
+                  <div className="pointer-events-none absolute -left-16 -top-16 h-40 w-40 rounded-full bg-[#5CB07C]/[0.07] blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
 
-                  {/* Icon Container */}
-                  <div className="w-16 h-16 mb-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:bg-white/20 group-hover:shadow-[0_8px_25px_rgba(92,176,124,0.2)] relative z-10">
-                    <Icon className="w-8 h-8 text-white transition-all duration-500" strokeWidth={1.5} />
+                  <div className="relative z-10 flex h-full flex-col">
+                    <div className="mb-7 flex items-start justify-between gap-4">
+                      <div className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${feature.iconSurface} text-white shadow-[0_12px_24px_-12px_rgba(23,58,124,0.65)] ring-4 ring-white transition-transform duration-500 group-hover:-rotate-3 group-hover:scale-105`}>
+                        <Icon className="h-6 w-6" strokeWidth={1.8} />
+                      </div>
+
+                      <span className="font-mono text-3xl font-black tracking-tighter text-slate-200 transition-colors duration-500 group-hover:text-[#173A7C]/15">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+
+                    <span className="mb-2 text-[11px] font-black tracking-wide text-[#2E8B68]">
+                      {feature.label}
+                    </span>
+                    <h3 className="mb-3 text-lg font-black text-[#173A7C] sm:text-xl">
+                      {feature.title}
+                    </h3>
+                    <p className="text-[13px] font-semibold leading-[1.9] text-slate-600">
+                      {feature.description}
+                    </p>
+
+                    <div className="mt-auto flex items-center justify-end pt-5 text-[#173A7C]/35 transition-colors duration-300 group-hover:text-[#5CB07C]">
+                      <ArrowUpLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </div>
                   </div>
-                  
-                  {/* Header */}
-                  <h3 className="text-xl font-black text-white relative z-10 mb-5 pb-5 border-b border-white/10">
-                    {feat.title}
-                  </h3>
-                  
-                  {/* Body Text */}
-                  <p className="text-[14.5px] text-white/70 leading-[1.8] relative z-10 flex-grow font-medium">
-                    {feat.description}
-                  </p>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Ultra Premium Section Divider */}
-      <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-none flex flex-col items-center justify-end h-32">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-96 h-32 bg-gradient-to-t from-white to-transparent blur-xl" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-24 bg-[#5CB07C]/10 blur-2xl rounded-t-full z-0" />
-        <div className="absolute bottom-0 left-0 w-full h-[100px] bg-gradient-to-b from-transparent to-white/70" />
-
-        <div className="relative w-full z-20">
-          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[85%] md:w-[95%] h-[2px] bg-gradient-to-r from-transparent via-[#5CB07C]/80 to-transparent shadow-[0_0_15px_rgba(92,176,124,0.8)]"></div>
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 md:w-[70%] h-[3px] bg-gradient-to-r from-transparent via-[#173A7C]/90 to-transparent shadow-[0_0_18px_rgba(23,58,124,0.9)]"></div>
+                </motion.article>
+              );
+            })}
         </div>
       </div>
     </section>

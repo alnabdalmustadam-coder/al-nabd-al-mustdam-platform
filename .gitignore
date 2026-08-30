@@ -43,3 +43,7 @@ next-env.d.ts
 
 # local generated notes
 GHL Native Registration Integration.md
+
+# uploads
+/public/uploads
+

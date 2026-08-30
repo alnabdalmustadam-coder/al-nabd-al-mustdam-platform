@@ -18,7 +18,7 @@ function RegisterContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const searchParams = useSearchParams();
-  const redirectParam = searchParams.get('redirect') || '/dashboard/student';
+  const redirectParam = searchParams.get('redirect') || '';
 
   // OTP Verification flow states
   const [showOtpScreen, setShowOtpScreen] = useState(false);
@@ -122,7 +122,16 @@ function RegisterContent() {
       });
 
       window.dispatchEvent(new Event('nabd_user_updated'));
-      window.location.href = redirectParam;
+      const role = (data.user?.app_metadata?.role || 'STUDENT').toUpperCase();
+      let targetUrl = '/dashboard/student';
+      if (role === 'ADMIN' || role === 'SUPERADMIN' || role === 'SUPER_ADMIN') {
+        targetUrl = '/dashboard/admin';
+      } else if (role === 'INSTRUCTOR' || role === 'TRAINER' || role === 'TEACHER') {
+        targetUrl = '/dashboard/instructor';
+      } else if (redirectParam && redirectParam.startsWith('/')) {
+        targetUrl = redirectParam;
+      }
+      window.location.href = targetUrl;
     } catch (err) {
       setError('حدث خطأ غير متوقع أثناء تفعيل الحساب');
       setOtpLoading(false);
@@ -158,7 +167,7 @@ function RegisterContent() {
     try {
       const supabase = createClient();
       const callbackUrl = new URL('/auth/callback', window.location.origin);
-      if (redirectParam && redirectParam !== '/dashboard/student') {
+      if (redirectParam && redirectParam.startsWith('/')) {
         callbackUrl.searchParams.set('next', redirectParam);
       }
 

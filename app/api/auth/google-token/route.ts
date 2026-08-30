@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getDashboardUrlForRole, normalizeRole } from "@/lib/security/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,13 +36,17 @@ export async function POST(req: NextRequest) {
         id: user.id,
         full_name: fullName,
         phone: "",
+        role: "STUDENT",
         nelc_eligible: false,
       });
     }
 
+    const userRole = normalizeRole(user.app_metadata?.role || existing?.role || user.user_metadata?.role);
+    const redirectUrl = getDashboardUrlForRole(userRole);
+
     return NextResponse.json({
       success: true,
-      redirectUrl: "/dashboard/student",
+      redirectUrl,
     });
   } catch (e) {
     console.error(e);

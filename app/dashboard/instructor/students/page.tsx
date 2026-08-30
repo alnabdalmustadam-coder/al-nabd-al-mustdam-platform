@@ -19,6 +19,7 @@ import {
   ExternalLink,
   MessageSquare,
   FileCheck,
+  Sparkles,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -167,42 +168,101 @@ export default function InstructorStudentsPage() {
     <div className="space-y-6 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
       {/* ── 1. HERO HEADER ── */}
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-            <Users className="w-3.5 h-3.5" />
+        {/* Top Badges Row */}
+        <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200/90 shadow-xs">
+            <Users className="w-4 h-4 text-[#173A7C]" />
             <span>المتدربون والطلاب المسجلون في مقرراتي</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
-            إدارة <span className="student-name-gradient">المتدربين ونسب الإنجاز الأكاديمي</span> 👥
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-2xl">
+
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>{students.length} متدرب مسجل</span>
+          </span>
+        </div>
+
+        <div className="space-y-3 max-w-2xl">
+          <div className="flex items-center gap-3.5 sm:gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#173A7C]/25 border border-white/40 shrink-0">
+              <Users className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                إدارة <span className="student-name-gradient">المتدربين ونسب الإنجاز الأكاديمي</span>
+              </h1>
+            </div>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-600 font-bold leading-relaxed pr-1 sm:pr-2">
             متابعة تقدم الطلاب الأكاديمي، نسب مشاهدة الدروس، نتائج التقييمات، والتواصل المباشر مع المتدربين.
           </p>
         </div>
       </div>
 
-      {/* ── 2. METRICS COUNTERS ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-md space-y-1 shadow-xs">
-          <span className="text-[11px] text-slate-500 font-bold block">إجمالي المتدربين</span>
-          <div className="text-xl font-black text-[#173A7C] font-mono">{students.length} متدرب</div>
-        </div>
-        <div className="p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-md space-y-1 shadow-xs">
-          <span className="text-[11px] text-slate-500 font-bold block">المكتملون 100%</span>
-          <div className="text-xl font-black text-emerald-700 font-mono">
-            {students.filter((s) => s.progress >= 100).length} خريج
+      {/* ── 2. METRICS COUNTERS (MATCHED WITH MAIN DASHBOARD STYLE) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md">
+              <Users className="w-5 h-5" />
+            </div>
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-blue-50 text-[#173A7C] border-blue-200">
+              إجمالي الطلاب
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-xs text-slate-500 font-extrabold block">إجمالي المتدربين</span>
+            <h3 className="text-2xl sm:text-3xl font-black text-[#173A7C] tracking-tight">{students.length} متدرب</h3>
           </div>
         </div>
-        <div className="p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-md space-y-1 shadow-xs">
-          <span className="text-[11px] text-slate-500 font-bold block">المتدربون النشطون</span>
-          <div className="text-xl font-black text-blue-700 font-mono">
-            {students.filter((s) => s.progress < 100).length} متدرب
+
+        <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-emerald-50 text-emerald-800 border-emerald-300">
+              أتموا المنهج
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-xs text-slate-500 font-extrabold block">المكتملون 100%</span>
+            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
+              {students.filter((s) => s.progress >= 100).length} خريج
+            </h3>
           </div>
         </div>
-        <div className="p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-md space-y-1 shadow-xs">
-          <span className="text-[11px] text-slate-500 font-bold block">متوسط نسبة الإنجاز</span>
-          <div className="text-xl font-black text-amber-700 font-mono">
-            {Math.round(students.reduce((acc, s) => acc + s.progress, 0) / (students.length || 1))}%
+
+        <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-md">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-blue-50 text-blue-800 border-blue-200">
+              قيد الدراسة
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-xs text-slate-500 font-extrabold block">المتدربون النشطون</span>
+            <h3 className="text-2xl sm:text-3xl font-black text-blue-700 tracking-tight">
+              {students.filter((s) => s.progress < 100).length} متدرب
+            </h3>
+          </div>
+        </div>
+
+        <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md">
+              <Award className="w-5 h-5" />
+            </div>
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-amber-50 text-amber-900 border-amber-300">
+              معدل الإنجاز
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-xs text-slate-500 font-extrabold block">متوسط نسبة الإنجاز</span>
+            <h3 className="text-2xl sm:text-3xl font-black text-amber-700 tracking-tight">
+              {Math.round(students.reduce((acc, s) => acc + s.progress, 0) / (students.length || 1))}%
+            </h3>
           </div>
         </div>
       </div>
@@ -216,14 +276,14 @@ export default function InstructorStudentsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="بحث باسم المتدرب أو البريد أو المقرر..."
-            className="w-full pl-4 pr-10 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-slate-50/80"
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-slate-50/80"
           />
         </div>
 
         <select
           value={selectedCourseFilter}
           onChange={(e) => setSelectedCourseFilter(e.target.value)}
-          className="p-2 rounded-xl border border-slate-200 text-xs font-bold bg-white focus:outline-none focus:border-[#173A7C]"
+          className="p-2.5 rounded-xl border border-slate-200 text-xs font-bold bg-white focus:outline-none focus:border-[#173A7C]"
         >
           <option value="all">كافة المقررات التدريبية</option>
           <option value="التسامح">دبلوم التسامح والسلام</option>
@@ -232,7 +292,7 @@ export default function InstructorStudentsPage() {
         </select>
       </div>
 
-      {/* ── 4. STUDENTS ROSTER ── */}
+      {/* ── 4. STUDENTS DATA TABLE ── */}
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
@@ -244,57 +304,89 @@ export default function InstructorStudentsPage() {
           <h3 className="text-base font-black text-slate-900">لا يوجد متدربون مطابقون للبحث</h3>
         </div>
       ) : (
-        <div className="space-y-3">
-          {filteredStudents.map((st) => (
-            <div
-              key={st.id}
-              className="p-5 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover flex flex-col md:flex-row items-start md:items-center justify-between gap-4 student-card-accent"
-            >
-              <div className="space-y-1.5 min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="text-xs sm:text-sm font-black text-slate-900">{st.name}</h4>
-                  <span className="text-[11px] text-slate-400 font-bold">({st.email})</span>
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                      st.status === 'مكتمل'
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                        : 'bg-blue-50 text-[#173A7C] border-blue-200'
-                    }`}
-                  >
-                    {st.status}
-                  </span>
-                </div>
-                <p className="text-xs text-[#173A7C] font-bold">{st.course}</p>
-                <span className="text-[10px] text-slate-400 font-bold block">
-                  تاريخ التسجيل: {st.enrolledDate}
-                </span>
-              </div>
+        <div className="rounded-3xl liquid-glass-card border border-slate-200/80 overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-right text-xs">
+              <thead className="bg-slate-100/90 text-slate-700 font-black border-b border-slate-200/80">
+                <tr>
+                  <th className="py-3.5 px-4 font-black">المتدرب</th>
+                  <th className="py-3.5 px-4 font-black">المقرر التدريبي</th>
+                  <th className="py-3.5 px-4 font-black">تاريخ التسجيل</th>
+                  <th className="py-3.5 px-4 font-black min-w-[170px]">نسبة الإنجاز والتقدم</th>
+                  <th className="py-3.5 px-4 font-black">الحالة الأكاديمية</th>
+                  <th className="py-3.5 px-4 font-black text-center">الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 bg-white/70">
+                {filteredStudents.map((st) => (
+                  <tr key={st.id} className="hover:bg-blue-50/40 transition-colors">
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-xs shadow-xs shrink-0">
+                          {st.name.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-black text-xs text-slate-900 truncate">{st.name}</h4>
+                          <span className="text-[11px] text-slate-400 font-medium block truncate" dir="ltr">
+                            {st.email}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
 
-              {/* Progress & Quick Actions */}
-              <div className="flex items-center gap-4 w-full md:w-80 shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-slate-200/60">
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between text-[11px] font-black">
-                    <span className="text-slate-500">نسبة الإنجاز</span>
-                    <span className="text-[#173A7C] font-mono">{st.progress}%</span>
-                  </div>
-                  <div className="w-full h-2 rounded-full bg-slate-200/80 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-[#173A7C] to-emerald-500 rounded-full transition-all duration-500"
-                      style={{ width: `${st.progress}%` }}
-                    />
-                  </div>
-                </div>
+                    <td className="py-3.5 px-4">
+                      <span className="inline-block px-2.5 py-1 rounded-xl bg-blue-50 text-[#173A7C] text-[11px] font-black border border-blue-200 max-w-[200px] truncate">
+                        {st.course}
+                      </span>
+                    </td>
 
-                <button
-                  type="button"
-                  onClick={() => setSelectedStudent(st)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-[#173A7C] hover:text-white text-slate-700 text-xs font-black transition-colors cursor-pointer border border-slate-200 shrink-0"
-                >
-                  تفاصيل وتواصل
-                </button>
-              </div>
-            </div>
-          ))}
+                    <td className="py-3.5 px-4 text-slate-600 font-bold whitespace-nowrap">
+                      {st.enrolledDate}
+                    </td>
+
+                    <td className="py-3.5 px-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-[11px] font-black">
+                          <span className="text-slate-500">التقدم</span>
+                          <span className="text-[#173A7C] font-mono">{st.progress}%</span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden border border-slate-200/60">
+                          <div
+                            className="h-full bg-gradient-to-r from-[#173A7C] to-emerald-500 rounded-full transition-all duration-500"
+                            style={{ width: `${st.progress}%` }}
+                          />
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-black border ${
+                          st.status === 'مكتمل'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                            : 'bg-blue-50 text-[#173A7C] border-blue-200'
+                        }`}
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>{st.status}</span>
+                      </span>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedStudent(st)}
+                        className="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-[#173A7C] hover:text-white text-slate-700 text-xs font-black transition-colors cursor-pointer border border-slate-200 inline-flex items-center gap-1.5"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>تفاصيل وتواصل</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

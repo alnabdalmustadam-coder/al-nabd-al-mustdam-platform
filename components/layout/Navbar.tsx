@@ -51,6 +51,9 @@ export default function Navbar() {
 
   const [localUserEmail, setLocalUserEmail] = useState<string | null>(null);
   const [localUserName, setLocalUserName] = useState<string | null>(null);
+  const [userDashboardUrl, setUserDashboardUrl] = useState<string>("/dashboard/student");
+  const [userRoleLabel, setUserRoleLabel] = useState<string>("لوحة التحكم");
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
@@ -65,17 +68,32 @@ export default function Navbar() {
             if (data.user?.name) {
               setLocalUserName(data.user.name);
             }
+            if (data.user?.dashboardUrl) {
+              setUserDashboardUrl(data.user.dashboardUrl);
+            }
+            if (data.user?.roleLabel) {
+              setUserRoleLabel(data.user.roleLabel);
+            }
+            if (data.user?.role) {
+              setUserRole(data.user.role);
+            }
           }
         } else {
           if (isMounted) {
             setLocalUserEmail(null);
             setLocalUserName(null);
+            setUserDashboardUrl("/dashboard/student");
+            setUserRoleLabel("لوحة التحكم");
+            setUserRole(null);
           }
         }
       } catch {
         if (isMounted) {
           setLocalUserEmail(null);
           setLocalUserName(null);
+          setUserDashboardUrl("/dashboard/student");
+          setUserRoleLabel("لوحة التحكم");
+          setUserRole(null);
         }
       } finally {
         if (isMounted) {
@@ -83,9 +101,18 @@ export default function Navbar() {
         }
       }
     };
+
     updateAuth();
+
+    const handleUserUpdated = () => {
+      updateAuth();
+    };
+
+    window.addEventListener("nabd_user_updated", handleUserUpdated);
+
     return () => {
       isMounted = false;
+      window.removeEventListener("nabd_user_updated", handleUserUpdated);
     };
   }, [pathname]);
 
@@ -278,11 +305,15 @@ export default function Navbar() {
             {authLoading ? (
               <div className="w-24 h-9 rounded-xl bg-slate-100/70 border border-slate-200/50 animate-pulse" />
             ) : localUserEmail ? (
-              <Link href="/dashboard/student" className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border border-transparent ${
-                isDarkPage
-                  ? "hover:bg-white/5 hover:border-white/10"
-                  : "hover:bg-slate-50 hover:border-slate-200"
-              }`}>
+              <Link 
+                href={userDashboardUrl} 
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border border-transparent ${
+                  isDarkPage
+                    ? "hover:bg-white/5 hover:border-white/10"
+                    : "hover:bg-slate-50 hover:border-slate-200"
+                }`}
+                title={userRoleLabel}
+              >
                 <div className={`w-8 h-8 rounded-full border flex items-center justify-center ${
                   isDarkPage
                     ? "bg-white/10 border-white/20 text-[#5CB07C]"
@@ -437,8 +468,8 @@ export default function Navbar() {
             {authLoading ? (
               <div className="w-full h-11 rounded-xl bg-slate-200/70 animate-pulse" />
             ) : localUserEmail ? (
-              <Button href="/dashboard/student" className="w-full text-center justify-center">
-                لوحة المتدرب
+              <Button href={userDashboardUrl} className="w-full text-center justify-center">
+                {userRoleLabel}
               </Button>
             ) : (
               <Button href="/auth/login" className="w-full text-center justify-center">

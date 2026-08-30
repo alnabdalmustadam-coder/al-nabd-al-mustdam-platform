@@ -138,23 +138,39 @@ export default function InstructorLivePage() {
     <div className="space-y-6 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
       {/* Hero Header */}
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-black border border-red-200">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-              <span>القاعات الافتراضية واللقاءات الحية</span>
+        {/* Top Badges Row */}
+        <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-700 text-xs font-black border border-red-200/90 shadow-xs">
+            <Radio className="w-4 h-4 text-red-600 animate-pulse" />
+            <span>القاعات الافتراضية واللقاءات الحية</span>
+          </div>
+
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>{sessions.length} ورش مجدولة</span>
+          </span>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="flex items-center gap-3.5 sm:gap-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-red-600 via-rose-600 to-red-700 text-white flex items-center justify-center shadow-xl shadow-red-600/25 border border-white/40 shrink-0">
+                <Radio className="w-6 h-6 sm:w-7 sm:h-7 text-white animate-pulse" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                  جلساتي وورشي <span className="student-name-gradient">المباشرة</span>
+                </h1>
+              </div>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
-              جلساتي وورشي <span className="student-name-gradient">المباشرة</span> 🔴
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+            <p className="text-xs sm:text-sm text-slate-600 font-bold leading-relaxed pr-1 sm:pr-2">
               جدولة الورش الحية مع الطلاب، إطلاق البث المباشر، ومشاركة روابط قاعات التدريب الافتراضية.
             </p>
           </div>
 
           <button
             onClick={() => setShowModal(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-red-600/20 hover:opacity-95 transition-all cursor-pointer whitespace-nowrap"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-red-600/20 hover:opacity-95 transition-all cursor-pointer whitespace-nowrap border border-white/20"
           >
             <Plus className="w-4 h-4" />
             <span>جدولة ورشة جديدة</span>

@@ -16,6 +16,8 @@ import {
   Check,
   Trash2,
   FileQuestion,
+  Sparkles,
+  Layers,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -131,16 +133,32 @@ export default function InstructorQuizzesPage() {
     <div className="space-y-6 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
       {/* ── 1. HERO HEADER ── */}
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-              <Award className="w-3.5 h-3.5" />
-              <span>التقييمات والاختبارات الأكاديمية</span>
+        {/* Top Badges Row */}
+        <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200/90 shadow-xs">
+            <Award className="w-4 h-4 text-[#173A7C]" />
+            <span>التقييمات والاختبارات الأكاديمية</span>
+          </div>
+
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>{quizzes.length} اختبارات متاحة</span>
+          </span>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="flex items-center gap-3.5 sm:gap-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#173A7C]/25 border border-white/40 shrink-0">
+                <Award className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                  بنك الاختبارات <span className="student-name-gradient">والتقييمات الأكاديمية</span>
+                </h1>
+              </div>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
-              بنك الاختبارات <span className="student-name-gradient">والتقييمات الأكاديمية</span> 📝
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+            <p className="text-xs sm:text-sm text-slate-600 font-bold leading-relaxed pr-1 sm:pr-2">
               إنشاء وإدارة الاختبارات التقييمية لمقرراتك، تحديد درجات الاجتياز، ومتابعة درجات المتدربين.
             </p>
           </div>
@@ -148,7 +166,7 @@ export default function InstructorQuizzesPage() {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="px-5 py-3 rounded-2xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 cursor-pointer transition-all border border-white/20"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-[#173A7C]/20 cursor-pointer hover:opacity-95 transition-all border border-white/20"
           >
             <Plus className="w-4 h-4" />
             <span>إنشاء اختبار جديد</span>
@@ -156,25 +174,68 @@ export default function InstructorQuizzesPage() {
         </div>
       </div>
 
-      {/* ── 2. METRICS COUNTERS ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-md space-y-1 shadow-xs">
-          <span className="text-[11px] text-slate-500 font-bold block">إجمالي الاختبارات</span>
-          <div className="text-xl font-black text-[#173A7C] font-mono">{quizzes.length} اختبار</div>
-        </div>
-        <div className="p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-md space-y-1 shadow-xs">
-          <span className="text-[11px] text-slate-500 font-bold block">إجمالي الأسئلة</span>
-          <div className="text-xl font-black text-emerald-700 font-mono">
-            {quizzes.reduce((acc, q) => acc + (q.questions_json?.length || 10), 0)} سؤال
+      {/* ── 2. METRICS COUNTERS (MATCHED WITH MAIN DASHBOARD STYLE) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md">
+              <Award className="w-5 h-5" />
+            </div>
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-blue-50 text-[#173A7C] border-blue-200">
+              بنك الأسئلة
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-xs text-slate-500 font-extrabold block">إجمالي الاختبارات</span>
+            <h3 className="text-2xl sm:text-3xl font-black text-[#173A7C] tracking-tight">{quizzes.length} اختبار</h3>
           </div>
         </div>
-        <div className="p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-md space-y-1 shadow-xs">
-          <span className="text-[11px] text-slate-500 font-bold block">متوسط نسبة الاجتياز</span>
-          <div className="text-xl font-black text-amber-700 font-mono">75%</div>
+
+        <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-emerald-50 text-emerald-800 border-emerald-300">
+              أسئلة معتمدة
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-xs text-slate-500 font-extrabold block">إجمالي الأسئلة</span>
+            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
+              {quizzes.reduce((acc, q) => acc + (q.questions_json?.length || 10), 0)} سؤال
+            </h3>
+          </div>
         </div>
-        <div className="p-4 rounded-2xl bg-white/80 border border-slate-200/80 backdrop-blur-md space-y-1 shadow-xs">
-          <span className="text-[11px] text-slate-500 font-bold block">المحاولات المنجزة</span>
-          <div className="text-xl font-black text-indigo-700 font-mono">180 محاولة</div>
+
+        <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-amber-50 text-amber-900 border-amber-300">
+              معدل النجاح
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-xs text-slate-500 font-extrabold block">متوسط نسبة الاجتياز</span>
+            <h3 className="text-2xl sm:text-3xl font-black text-amber-700 tracking-tight">75%</h3>
+          </div>
+        </div>
+
+        <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
+          <div className="flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-md">
+              <Layers className="w-5 h-5" />
+            </div>
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-indigo-50 text-indigo-900 border-indigo-200">
+              تفاعل الطلاب
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="text-xs text-slate-500 font-extrabold block">المحاولات المنجزة</span>
+            <h3 className="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tight">180 محاولة</h3>
+          </div>
         </div>
       </div>
 

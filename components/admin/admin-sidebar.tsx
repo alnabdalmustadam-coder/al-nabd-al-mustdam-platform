@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, Variants } from 'framer-motion';
@@ -25,6 +25,9 @@ import {
   Ticket,
   ClipboardList,
 } from 'lucide-react';
+
+import { createClient } from '@/utils/supabase/client';
+import { User } from 'lucide-react';
 
 interface AdminSidebarProps {
   isCollapsed?: boolean;
@@ -63,6 +66,83 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onCloseMobile,
 }) => {
   const pathname = usePathname();
+  const [adminProfile, setAdminProfile] = useState<{
+    fullName: string;
+    avatarUrl: string | null;
+  }>({
+    fullName: 'سعود القحطاني',
+    avatarUrl: null,
+  });
+
+  useEffect(() => {
+    async function loadAdminProfile() {
+      try {
+        const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('admin_avatar') : null;
+        const cachedName = typeof window !== 'undefined' ? localStorage.getItem('admin_name') : null;
+        if (cachedAvatar || cachedName) {
+          setAdminProfile((prev) => ({
+            ...prev,
+            avatarUrl: cachedAvatar || prev.avatarUrl,
+            fullName: cachedName || prev.fullName,
+          }));
+        }
+
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
+          const metaAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
+
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          const resolvedAvatar = profile?.avatar_url || metaAvatar || cachedAvatar || null;
+          const resolvedName = profile?.full_name || metaName || cachedName || 'سعود القحطاني';
+
+          setAdminProfile({
+            fullName: resolvedName,
+            avatarUrl: resolvedAvatar,
+          });
+
+          if (resolvedAvatar && typeof window !== 'undefined') localStorage.setItem('admin_avatar', resolvedAvatar);
+          if (resolvedName && typeof window !== 'undefined') localStorage.setItem('admin_name', resolvedName);
+        }
+      } catch (err) {
+        console.error('Error fetching admin sidebar profile:', err);
+      }
+    }
+
+    loadAdminProfile();
+
+    const handleProfileUpdate = (e: any) => {
+      if (e?.detail) {
+        setAdminProfile((prev) => ({
+          ...prev,
+          avatarUrl: e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : prev.avatarUrl,
+          fullName: e.detail.fullName || prev.fullName,
+        }));
+      } else {
+        loadAdminProfile();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleProfileUpdate);
+      window.addEventListener('admin-profile-updated', handleProfileUpdate);
+      window.addEventListener('profileUpdated', handleProfileUpdate);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleProfileUpdate);
+        window.removeEventListener('admin-profile-updated', handleProfileUpdate);
+        window.removeEventListener('profileUpdated', handleProfileUpdate);
+      }
+    };
+  }, []);
 
   const navItems = [
     { label: 'الرئيسية', href: '/dashboard/admin', icon: LayoutDashboard, badge: 'مباشر' },
@@ -77,6 +157,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { label: 'السجل المالي', href: '/dashboard/admin/finance', icon: CreditCard, count: 'ر.س' },
     { label: 'متجر الخدمات', href: '/marketplace', icon: Store, badge: 'جديد' },
     { label: 'تذاكر الدعم', href: '/dashboard/admin/support', icon: Headphones, count: '12' },
+    { label: 'الملف الشخصي للمدير', href: '/dashboard/admin/profile', icon: User },
     { label: 'إعدادات المنصة', href: '/dashboard/admin/settings', icon: Settings },
   ];
 
@@ -95,7 +176,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             isCollapsed ? 'p-2 pt-2' : 'px-3.5 py-3'
           }`}
           style={{
-            background: 'rgba(255, 255, 255, 0.94)',
+            background: 'rgba(255, 255, 255, 0.96)',
             backdropFilter: 'blur(28px) saturate(1.8)',
             WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
             boxShadow: '0 0 40px rgba(23, 58, 124, 0.06), 0 4px 20px rgba(0, 0, 0, 0.04)',
@@ -108,40 +189,58 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
           {/* Top & Scrollable Nav Block */}
           <div
-            className="space-y-3 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1"
+            className="space-y-3.5 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {/* Block 1: Admin Profile Identity Card */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className={`rounded-2xl border border-slate-200/90 transition-all duration-300 relative group overflow-hidden ${
-                isCollapsed ? 'p-2 flex items-center justify-center' : 'p-3.5'
-              }`}
-              style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%)',
-                boxShadow: '0 2px 8px rgba(23, 58, 124, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] text-white flex items-center justify-center font-black shadow-md shrink-0 border border-white/40 group-hover:scale-105 transition-transform">
-                  <Crown className="w-5 h-5 text-amber-300" />
-                </div>
-                {!isCollapsed && (
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <h3 className="font-black text-sm sm:text-[15px] text-slate-900 truncate leading-tight">سعود القحطاني</h3>
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            {/* Block 1: Admin Profile Identity Card with Prominent Large Avatar */}
+            <Link href="/dashboard/admin/profile" className="block">
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className={`rounded-2xl border border-slate-200/90 hover:border-[#173A7C]/40 transition-all duration-300 relative group overflow-hidden ${
+                  isCollapsed ? 'p-2 flex flex-col items-center justify-center' : 'p-3.5'
+                }`}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
+                  boxShadow: '0 4px 14px rgba(23, 58, 124, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                }}
+              >
+                <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3.5'}`}>
+                  {/* Large Prominent Avatar Frame */}
+                  <div className="relative shrink-0">
+                    <div className={`${isCollapsed ? 'w-12 h-12' : 'w-14 h-14 sm:w-15 sm:h-15'} rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center`}>
+                      {adminProfile.avatarUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={adminProfile.avatarUrl}
+                          alt={adminProfile.fullName}
+                          className="w-full h-full object-cover object-top"
+                        />
+                      ) : (
+                        <Crown className="w-7 h-7 text-amber-300 drop-shadow-sm" />
+                      )}
                     </div>
-                    <p className="text-xs text-amber-700 font-bold truncate flex items-center gap-1">
-                      <span>مدير المنصة الرئيسي</span>
-                      <span className="text-xs">👑</span>
-                    </p>
+                    <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
                   </div>
-                )}
-              </div>
-            </motion.div>
+
+                  {!isCollapsed && (
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <h3 className="font-black text-sm sm:text-[15px] text-slate-900 truncate leading-tight group-hover:text-[#173A7C] transition-colors">
+                          {adminProfile.fullName}
+                        </h3>
+                        <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                      </div>
+                      <p className="text-xs text-amber-700 font-extrabold truncate flex items-center gap-1">
+                        <span>مدير المنصة الرئيسي</span>
+                        <span className="text-xs">👑</span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </Link>
 
             {/* Block 2: Desktop Navigation Links with Rich Blocks & Spring Animations */}
             <motion.nav
@@ -326,24 +425,38 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               </div>
 
               {/* Mobile Admin Profile Identity Card */}
-              <div
-                className="rounded-2xl border border-slate-200/90 p-3.5 flex items-center gap-3 shrink-0"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%)',
-                  boxShadow: '0 2px 8px rgba(23, 58, 124, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
-                }}
-              >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] text-white flex items-center justify-center font-black shadow-md shrink-0 border border-white/40">
-                  <Crown className="w-5 h-5 text-amber-300" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <h3 className="font-black text-sm text-slate-900 truncate leading-tight">سعود القحطاني</h3>
-                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <Link href="/dashboard/admin/profile" onClick={onCloseMobile} className="block shrink-0">
+                <div
+                  className="rounded-2xl border border-slate-200/90 p-3.5 flex items-center gap-3.5"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
+                    boxShadow: '0 4px 12px rgba(23, 58, 124, 0.06)',
+                  }}
+                >
+                  <div className="relative shrink-0">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center">
+                      {adminProfile.avatarUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={adminProfile.avatarUrl}
+                          alt={adminProfile.fullName}
+                          className="w-full h-full object-cover object-top"
+                        />
+                      ) : (
+                        <Crown className="w-7 h-7 text-amber-300 drop-shadow-sm" />
+                      )}
+                    </div>
+                    <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
                   </div>
-                  <p className="text-xs text-amber-700 font-bold truncate">مدير المنصة الرئيسي 👑</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <h3 className="font-black text-sm text-slate-900 truncate leading-tight">{adminProfile.fullName}</h3>
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    </div>
+                    <p className="text-xs text-amber-700 font-extrabold truncate">مدير المنصة الرئيسي 👑</p>
+                  </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Mobile Scrollable Nav Links */}
               <nav className="space-y-2 overflow-y-auto flex-1 py-1" style={{ scrollbarWidth: 'none' }}>

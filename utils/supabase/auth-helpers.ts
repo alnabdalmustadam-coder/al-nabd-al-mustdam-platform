@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { ADMIN_ROLES, INSTRUCTOR_ROLES, normalizeRole } from '@/lib/security/auth'
+import { ADMIN_ROLES, INSTRUCTOR_ROLES, normalizeRole, getDashboardUrlForRole } from '@/lib/security/auth'
 
 export async function updateSession(request: NextRequest) {
   try {
@@ -74,6 +74,18 @@ export async function updateSession(request: NextRequest) {
           userRole = normalizeRole(profile.role);
         }
       }
+    }
+
+    // 1.1 Direct /dashboard route redirection based on role
+    if (pathname === '/dashboard') {
+      const url = request.nextUrl.clone()
+      if (!user) {
+        url.pathname = '/auth/login'
+        url.searchParams.set('redirect', '/dashboard')
+        return NextResponse.redirect(url)
+      }
+      url.pathname = getDashboardUrlForRole(userRole)
+      return NextResponse.redirect(url)
     }
 
     // 2. Protect Admin Dashboard Routes (/dashboard/admin/*)

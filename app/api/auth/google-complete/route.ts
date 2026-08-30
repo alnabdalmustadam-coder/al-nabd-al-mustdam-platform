@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { requireUser } from "@/lib/security/auth";
+import { requireUser, getDashboardUrlForRole } from "@/lib/security/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const redirectUrl = "/dashboard/student";
+    const redirectUrl = getDashboardUrlForRole(auth.role);
 
     return NextResponse.json({
       success: true,

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { checkRateLimit } from '@/lib/security/rate-limit';
+import { SITE_CONTACT } from '@/data/siteContact';
 
 const ALLOWED_FORM_TYPES = new Set([
   'placement-test',
@@ -15,6 +16,19 @@ const ALLOWED_FORM_TYPES = new Set([
   'membership',
   'subscription',
 ]);
+
+type PlacementAnswer = {
+  id: string | number;
+  question: string;
+  isCorrect: boolean;
+  student: string;
+  correct: string;
+};
+
+type CourseNominee = {
+  name?: string;
+  phone?: string;
+};
 
 function escapeHtml(value: string): string {
   return value.slice(0, 10_000).replace(/[&<>'"]/g, (character) => ({
@@ -37,6 +51,21 @@ function sanitizeValue<T>(value: T): T {
   return value;
 }
 
+function validateContactPayload(payload: Record<string, unknown>): string | null {
+  const name = typeof payload.name === 'string' ? payload.name.trim() : '';
+  const email = typeof payload.email === 'string' ? payload.email.trim() : '';
+  const phone = typeof payload.phone === 'string' ? payload.phone.replace(/\D/g, '') : '';
+  const subject = typeof payload.subject === 'string' ? payload.subject.trim() : '';
+  const message = typeof payload.message === 'string' ? payload.message.trim() : '';
+
+  if (name.length < 2 || name.length > 100) return 'الاسم غير صالح';
+  if (email.length > 180 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'البريد الإلكتروني غير صالح';
+  if (!/^(?:9665|05|5)\d{8}$/.test(phone)) return 'رقم الجوال السعودي غير صالح';
+  if (subject.length < 3 || subject.length > 180) return 'موضوع الرسالة غير صالح';
+  if (message.length < 10 || message.length > 2000) return 'نص الرسالة يجب أن يكون بين 10 و2000 حرف';
+  return null;
+}
+
 export async function POST(request: Request) {
   try {
     const rateLimited = checkRateLimit(request, 'contact', 8, 15 * 60 * 1000);
@@ -53,6 +82,13 @@ export async function POST(request: Request) {
     }
     const payload = sanitizeValue(rawPayload);
 
+    if (type === 'contact') {
+      const validationError = validateContactPayload(payload);
+      if (validationError) {
+        return NextResponse.json({ success: false, error: validationError }, { status: 400 });
+      }
+    }
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -66,10 +102,8 @@ export async function POST(request: Request) {
 
     if (type === "placement-test") {
       const {
-        student_name, student_email, student_phone, student_id,
-        student_specialization, student_section,
+        student_name, student_phone,
         score, total, percentage, level, levelAr,
-        correct_count, total_questions,
         writing_answer, detailed_answers
       } = payload;
 
@@ -79,7 +113,7 @@ export async function POST(request: Request) {
         percentage >= 55 ? "#6366f1" :
         percentage >= 35 ? "#f59e0b" : "#ef4444";
 
-      const answersHTML = detailed_answers.map((a: any) => `
+      const answersHTML = detailed_answers.map((a: PlacementAnswer) => `
         <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 12px 16px; font-weight: 700; color: #64748b; text-align: center; width: 50px;">${a.id}</td>
           <td style="padding: 12px 16px; color: #334155; font-size: 14px;">${a.question}</td>
@@ -336,7 +370,7 @@ export async function POST(request: Request) {
             <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-right: 4px solid #10b981;">
               <strong style="color: #64748b; display: block; margin-bottom: 5px;">أشخاص مرشحين للدورة:</strong>
               <table style="width: 100%; font-size: 14px;">
-                ${nominees.filter((n: any) => n.name).map((n: any) => `<tr><td style="padding:4px 0">${n.name}</td><td style="padding:4px 0; text-align:left;" dir="ltr">${n.phone}</td></tr>`).join('') || "لا يوجد"}
+                ${nominees.filter((n: CourseNominee) => n.name).map((n: CourseNominee) => `<tr><td style="padding:4px 0">${n.name}</td><td style="padding:4px 0; text-align:left;" dir="ltr">${n.phone}</td></tr>`).join('') || "لا يوجد"}
               </table>
             </div>
 
@@ -701,7 +735,11 @@ export async function POST(request: Request) {
       if (subject && htmlEmail) {
         await transporter.sendMail({
           from: `"Sustain Pulse Platform" <${process.env.GMAIL_USER}>`,
-          to: process.env.GMAIL_USER,
+          to: process.env.CONTACT_RECIPIENT_EMAIL || SITE_CONTACT.primaryEmail,
+          replyTo:
+            type === 'contact' && typeof payload.email === 'string'
+              ? payload.email
+              : undefined,
           subject: subject,
           html: htmlEmail,
         });

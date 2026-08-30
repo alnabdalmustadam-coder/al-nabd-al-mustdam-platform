@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, Phone, MapPin, Clock, MessageCircle, ShieldCheck, ExternalLink, ChevronLeft } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, MessageCircle, ChevronLeft } from "lucide-react";
 import NELCBadge from "@/components/ui/NELCBadge";
+import { SITE_CONTACT } from "@/data/siteContact";
 
 const policiesAndGuides = [
   { label: "سياسة الخصوصية والاستخدام", href: "/privacy" },
@@ -153,7 +154,7 @@ export default function Footer() {
                   },
                   {
                     label: "WhatsApp",
-                    href: "https://wa.me/966559924441",
+                    href: SITE_CONTACT.whatsappUrl,
                     svg: <MessageCircle className="w-4 h-4" />,
                   },
                 ].map((social, idx) => (
@@ -233,7 +234,7 @@ export default function Footer() {
                   <MapPin className="w-3.5 h-3.5 text-emerald-400" />
                 </div>
                 <p className="text-slate-200 font-normal leading-relaxed">
-                  المملكة العربية السعودية - جدة - حي الربوة - شارع السبعين - مركز العلى للأعمال - مقابل اكسترا
+                  {SITE_CONTACT.address}
                 </p>
               </div>
 
@@ -244,16 +245,16 @@ export default function Footer() {
                 </div>
                 <div className="flex flex-col space-y-1 font-medium" dir="ltr">
                   <a
-                    href="mailto:nabdtraining@gmail.com"
+                    href={`mailto:${SITE_CONTACT.primaryEmail}`}
                     className="text-slate-200 hover:text-white transition-colors text-right"
                   >
-                    nabdtraining@gmail.com
+                    {SITE_CONTACT.primaryEmail}
                   </a>
                   <a
-                    href="mailto:support@support.nabdtraining.com"
+                    href={`mailto:${SITE_CONTACT.supportEmail}`}
                     className="text-slate-200 hover:text-white transition-colors text-right"
                   >
-                    support@support.nabdtraining.com
+                    {SITE_CONTACT.supportEmail}
                   </a>
                 </div>
               </div>
@@ -263,9 +264,9 @@ export default function Footer() {
                 <div className="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center shrink-0 text-slate-200">
                   <Phone className="w-3.5 h-3.5 text-emerald-400" />
                 </div>
-                <span className="text-white font-bold" dir="ltr">
-                  0559924441
-                </span>
+                <a href={SITE_CONTACT.phoneHref} className="text-white font-bold hover:text-emerald-300 transition-colors" dir="ltr">
+                  {SITE_CONTACT.phoneDisplay}
+                </a>
               </div>
 
               {/* Working Hours */}
@@ -273,9 +274,7 @@ export default function Footer() {
                 <div className="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center shrink-0 text-slate-200">
                   <Clock className="w-3.5 h-3.5 text-amber-300" />
                 </div>
-                <span className="text-slate-200 font-medium" dir="ltr">
-                  <span className="font-bold text-slate-300 pr-1">Mon-Sat:</span> 05:00 AM - 08:00 PM
-                </span>
+                <span className="text-slate-200 font-medium">{SITE_CONTACT.workingHours}</span>
               </div>
             </div>
           </div>

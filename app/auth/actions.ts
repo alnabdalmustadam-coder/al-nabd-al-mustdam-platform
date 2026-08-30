@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
-import { isAdminRole, isInstructorRole, normalizeRole } from '@/lib/security/auth';
+import { isAdminRole, isInstructorRole, normalizeRole, getDashboardUrlForRole } from '@/lib/security/auth';
 import { consumeRateLimit } from '@/lib/security/rate-limit';
 
 function isStrongPassword(password: string): boolean {
@@ -61,11 +61,7 @@ export async function login(formData: FormData) {
   }
 
   const userRole = normalizeRole(roleSource);
-  const roleHome = isAdminRole(userRole)
-    ? '/dashboard/admin'
-    : isInstructorRole(userRole)
-      ? '/dashboard/instructor'
-      : '/dashboard/student';
+  const roleHome = getDashboardUrlForRole(userRole);
 
   const safeRequestedRedirect =
     requestedRedirect?.startsWith('/') && !requestedRedirect.startsWith('//')
@@ -74,7 +70,8 @@ export async function login(formData: FormData) {
   const canUseRequestedRedirect =
     (isAdminRole(userRole) && safeRequestedRedirect.startsWith('/dashboard/admin')) ||
     (isInstructorRole(userRole) && safeRequestedRedirect.startsWith('/dashboard/instructor')) ||
-    (!isAdminRole(userRole) && !isInstructorRole(userRole) && safeRequestedRedirect.startsWith('/dashboard/student'));
+    (!isAdminRole(userRole) && !isInstructorRole(userRole) && safeRequestedRedirect.startsWith('/dashboard/student')) ||
+    (safeRequestedRedirect !== '' && !safeRequestedRedirect.startsWith('/dashboard'));
 
   const finalDestination = canUseRequestedRedirect ? safeRequestedRedirect : roleHome;
 
