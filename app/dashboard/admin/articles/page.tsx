@@ -56,7 +56,7 @@ export default function AdminArticlesPage() {
       shortTitle: p.shortTitle,
       slug: p.slug,
       category: p.category,
-      authorName: (p as any).author || 'فريق التحرير الأكاديمي',
+      authorName: typeof p.author === 'object' && p.author ? p.author.name : (typeof (p as any).author === 'string' ? (p as any).author : 'فريق التحرير الأكاديمي'),
       excerpt: p.excerpt,
       content: p.sections?.map((s) => `### ${s.title}\n${s.paragraphs.join('\n\n')}`).join('\n\n') || '',
       image: p.image || '/1.png',
