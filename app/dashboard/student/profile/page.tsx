@@ -392,8 +392,8 @@ export default function StudentProfilePage() {
       >
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#173A7C]/8 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
-          <div className="flex items-center gap-4">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
+          <div className="flex items-center gap-5 sm:gap-6">
             {/* Hidden file input */}
             <input
               ref={fileInputRef}
@@ -403,9 +403,9 @@ export default function StudentProfilePage() {
               onChange={handleAvatarFileSelect}
             />
 
-            {/* Interactive Avatar Container with Camera Overlay */}
+            {/* Large Interactive Avatar Container Matching Card Height */}
             <div className="relative shrink-0 group">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shadow-lg ring-4 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center relative">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-3xl overflow-hidden shadow-xl ring-4 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] flex items-center justify-center relative transition-transform duration-300 group-hover:scale-[1.02]">
                 {student.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -414,16 +414,16 @@ export default function StudentProfilePage() {
                     className="w-full h-full object-cover object-top"
                   />
                 ) : (
-                  <span className="text-2xl sm:text-3xl font-black text-white">
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white">
                     {student.fullName ? student.fullName.charAt(0) : 'م'}
                   </span>
                 )}
 
                 {/* Uploading Overlay Spinner */}
                 {isUploadingAvatar && (
-                  <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-xs flex flex-col items-center justify-center text-white z-20">
-                    <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
-                    <span className="text-[9px] font-black mt-1">جاري الحفظ...</span>
+                  <div className="absolute inset-0 bg-slate-900/75 backdrop-blur-xs flex flex-col items-center justify-center text-white z-20">
+                    <Loader2 className="w-7 h-7 animate-spin text-emerald-400" />
+                    <span className="text-[10px] font-black mt-1">جاري الحفظ...</span>
                   </div>
                 )}
 
@@ -432,24 +432,24 @@ export default function StudentProfilePage() {
                   type="button"
                   disabled={isUploadingAvatar}
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer z-10"
+                  className="absolute inset-0 bg-slate-900/65 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer z-10"
                   title="انقر لتغيير الصورة الشخصية"
                 >
-                  <Camera className="w-5 h-5 text-white drop-shadow-sm" />
-                  <span className="text-[10px] font-black mt-0.5">تغيير الصورة</span>
+                  <Camera className="w-6 h-6 text-white drop-shadow-md" />
+                  <span className="text-[11px] font-black mt-1">تغيير الصورة</span>
                 </button>
               </div>
 
               {/* Status Online indicator */}
-              <span className="absolute -bottom-1 -left-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
+              <span className="absolute -bottom-1 -left-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 border-2 sm:border-3 border-white shadow-xs animate-pulse" />
             </div>
 
-            <div className="space-y-1.5 pr-1">
-              <motion.div variants={textItemVariants} className="student-tag-badge bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-xs">
+            <div className="space-y-2 pr-1 flex flex-col justify-center">
+              <motion.div variants={textItemVariants} className="student-tag-badge bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-xs self-start">
                 <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{student.role}</span>
               </motion.div>
-              <motion.h1 variants={textItemVariants} className="student-heading-h1 text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
+              <motion.h1 variants={textItemVariants} className="student-heading-h1 text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                 {student.fullName || (isLoading ? 'جاري التحميل...' : 'المتدرب')}
               </motion.h1>
               <motion.p variants={textItemVariants} className="text-xs sm:text-sm text-slate-500 font-bold">
@@ -462,7 +462,7 @@ export default function StudentProfilePage() {
             type="button"
             disabled={isUploadingAvatar}
             onClick={() => fileInputRef.current?.click()}
-            className="px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-[#173A7C] font-black text-xs flex items-center gap-2 border border-slate-200 shadow-xs hover:shadow-sm cursor-pointer transition-all shrink-0 self-start md:self-center"
+            className="px-5 py-3 rounded-2xl bg-white hover:bg-slate-50 text-[#173A7C] font-black text-xs flex items-center gap-2 border border-slate-200 shadow-sm hover:shadow-md cursor-pointer transition-all shrink-0 self-start md:self-center"
           >
             {isUploadingAvatar ? (
               <Loader2 className="w-4 h-4 animate-spin text-[#173A7C]" />

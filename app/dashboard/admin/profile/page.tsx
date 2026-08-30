@@ -342,7 +342,7 @@ export default function AdminProfilePage() {
           <div className="flex items-center gap-4 sm:gap-6">
             {/* Prominent Admin Avatar Container with Camera Overlay */}
             <div className="relative shrink-0 group">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl overflow-hidden shadow-xl ring-4 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center relative">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-3xl overflow-hidden shadow-xl ring-4 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center relative transition-transform duration-300 group-hover:scale-[1.02]">
                 {adminData.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -351,7 +351,7 @@ export default function AdminProfilePage() {
                     className="w-full h-full object-cover object-top"
                   />
                 ) : (
-                  <Crown className="w-10 h-10 text-amber-300 drop-shadow-md" />
+                  <Crown className="w-12 h-12 text-amber-300 drop-shadow-md" />
                 )}
 
                 {/* Uploading Spinner */}
