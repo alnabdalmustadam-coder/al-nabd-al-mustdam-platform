@@ -51,6 +51,7 @@ import {
 } from 'lucide-react';
 import { QuizData, QuizQuestion, CourseAttachment, SubLessonItem, Course } from '@/types';
 import { createClient } from '@/utils/supabase/client';
+import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 
 interface CourseItem {
   id: string;
@@ -241,6 +242,7 @@ export default function InstructorCoursesPage() {
 
   const [formAttachments, setFormAttachments] = useState<FormAttachmentItem[]>([]);
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
+  const [attachmentUploadProgress, setAttachmentUploadProgress] = useState(0);
   const attachmentFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [hasFinalExam, setHasFinalExam] = useState(false);
@@ -657,6 +659,12 @@ export default function InstructorCoursesPage() {
     if (!file) return;
 
     setIsUploadingAttachment(true);
+    setAttachmentUploadProgress(15);
+
+    const progressTimer = setInterval(() => {
+      setAttachmentUploadProgress((prev) => (prev < 90 ? prev + 12 : prev));
+    }, 140);
+
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -666,6 +674,9 @@ export default function InstructorCoursesPage() {
         method: 'POST',
         body: formData,
       });
+
+      clearInterval(progressTimer);
+      setAttachmentUploadProgress(100);
 
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -683,13 +694,17 @@ export default function InstructorCoursesPage() {
       setFormAttachments((prev) => [...prev, newAtt]);
       showToast(`تمت إضافة الملف المرفق (${data.fileName}) لحقيبة الدورة بنجاح!`);
     } catch (err: any) {
+      clearInterval(progressTimer);
       console.error('Attachment bag upload failed:', err);
       showToast(err.message || 'فشل رفع الملف', 'error');
     } finally {
-      setIsUploadingAttachment(false);
-      if (attachmentFileInputRef.current) {
-        attachmentFileInputRef.current.value = '';
-      }
+      setTimeout(() => {
+        setIsUploadingAttachment(false);
+        setAttachmentUploadProgress(0);
+        if (attachmentFileInputRef.current) {
+          attachmentFileInputRef.current.value = '';
+        }
+      }, 500);
     }
   };
 
@@ -1351,44 +1366,15 @@ export default function InstructorCoursesPage() {
                       </div>
                     </div>
 
-                    <div className="space-y-2 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                      <label className="text-slate-700 block font-black">صورة غلاف الدورة (رفع مباشر أو مسار)</label>
-                      <div className="flex flex-col sm:flex-row items-center gap-4">
-                        <div className="relative w-28 h-20 rounded-xl overflow-hidden bg-slate-200 border border-slate-300 shrink-0">
-                          <img
-                            src={formImage || '/1.png'}
-                            alt="Cover Preview"
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/1.png';
-                            }}
-                          />
-                        </div>
-
-                        <div className="flex-1 space-y-2 w-full">
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => courseImageInputRef.current?.click()}
-                              disabled={isUploadingImage}
-                              className="px-4 py-2 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs font-black flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                            >
-                              {isUploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
-                              <span>{isUploadingImage ? 'جاري الرفع...' : 'رفع صورة من الجهاز'}</span>
-                            </button>
-                            <span className="text-[11px] text-slate-400 font-bold">أو كتابة مسار الصورة:</span>
-                          </div>
-
-                          <input
-                            type="text"
-                            value={formImage}
-                            onChange={(e) => setFormImage(e.target.value)}
-                            placeholder="/1.png"
-                            className="w-full p-2 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    <DeviceImageUploader
+                      value={formImage}
+                      onChange={(url) => setFormImage(url)}
+                      folder="courses"
+                      slug={formSlug || 'course'}
+                      label="صورة وغلاف الدورة التدريبية (رفع مباشر من جهازك مع ضغط WebP)"
+                      recommendedSize="المقاس المثالي: 1280 × 720 بكسل (WebP / JPG / PNG)"
+                      aspectRatio="video"
+                    />
 
                     <div className="space-y-1">
                       <label className="text-slate-700 block">وصف البرنامج التدريبي ومخرجات التعلم *</label>
@@ -1596,10 +1582,38 @@ export default function InstructorCoursesPage() {
                         disabled={isUploadingAttachment}
                         className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center gap-2 cursor-pointer disabled:opacity-50"
                       >
-                        {isUploadingAttachment ? <Loader2 className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
-                        <span>رفع ملف جديد للحقيبة</span>
+                        {isUploadingAttachment ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>جاري الرفع {attachmentUploadProgress}%</span>
+                          </>
+                        ) : (
+                          <>
+                            <Paperclip className="w-4 h-4" />
+                            <span>رفع ملف جديد للحقيبة</span>
+                          </>
+                        )}
                       </button>
                     </div>
+
+                    {/* Visual Progress Bar for Attachment Bag */}
+                    {isUploadingAttachment && (
+                      <div className="w-full space-y-1.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                        <div className="flex items-center justify-between text-xs font-black text-emerald-900">
+                          <span className="flex items-center gap-1.5">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
+                            <span>جاري رفع ومعالجة المستند (PDF / Word)...</span>
+                          </span>
+                          <span className="font-mono text-emerald-700">{attachmentUploadProgress}%</span>
+                        </div>
+                        <div className="w-full h-2 bg-emerald-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-emerald-500 to-teal-600 transition-all duration-300 rounded-full"
+                            style={{ width: `${attachmentUploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
 
                     {formAttachments.length === 0 ? (
                       <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2 text-xs font-bold text-slate-500">

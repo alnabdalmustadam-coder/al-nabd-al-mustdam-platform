@@ -29,6 +29,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 
 interface AdminServiceItem {
   id: string;
@@ -797,8 +798,8 @@ export default function AdminServicesPage() {
                   </div>
                 </div>
 
-                {/* Price, Duration, Image */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Price, Duration */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-slate-700 font-black">السعر (ر.س) *</label>
                     <input
@@ -822,18 +823,18 @@ export default function AdminServicesPage() {
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                     />
                   </div>
-
-                  <div className="space-y-1">
-                    <label className="text-slate-700 font-black">رابط الصورة التعبيرية</label>
-                    <input
-                      type="text"
-                      value={editingService.image || ''}
-                      onChange={(e) => setEditingService({ ...editingService, image: e.target.value })}
-                      placeholder="/1.png أو رابط صورة"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
-                    />
-                  </div>
                 </div>
+
+                {/* Device-Based WebP Service Image Uploader */}
+                <DeviceImageUploader
+                  value={editingService.image || ''}
+                  onChange={(url) => setEditingService({ ...editingService, image: url })}
+                  folder="services"
+                  slug={editingService.id || 'service'}
+                  label="صورة وبنر الخدمة التوضيحي (رفع مباشر من الجهاز مع ضغط WebP)"
+                  recommendedSize="المقاس المثالي: 1200 × 750 بكسل (WebP / JPG / PNG)"
+                  aspectRatio="video"
+                />
 
                 {/* Description */}
                 <div className="space-y-1">

@@ -52,6 +52,7 @@ import {
   FolderOpen,
 } from 'lucide-react';
 import { QuizData, QuizQuestion, CourseAttachment, SubLessonItem } from '@/types';
+import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 
 interface CourseItem {
   id: string;
@@ -257,6 +258,7 @@ export default function AdminCoursesPage() {
   // Attachments Bag (PDF / Word / Study Guides)
   const [formAttachments, setFormAttachments] = useState<FormAttachmentItem[]>([]);
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
+  const [attachmentUploadProgress, setAttachmentUploadProgress] = useState(0);
   const attachmentFileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Final Course Exam State
@@ -763,6 +765,11 @@ export default function AdminCoursesPage() {
 
     const { secIdx, subIdx } = uploadingAttachmentTarget;
     setIsUploadingAttachment(true);
+    setAttachmentUploadProgress(15);
+
+    const progressTimer = setInterval(() => {
+      setAttachmentUploadProgress((prev) => (prev < 90 ? prev + 12 : prev));
+    }, 140);
 
     try {
       const formData = new FormData();
@@ -773,6 +780,9 @@ export default function AdminCoursesPage() {
         method: 'POST',
         body: formData,
       });
+
+      clearInterval(progressTimer);
+      setAttachmentUploadProgress(100);
 
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -791,11 +801,15 @@ export default function AdminCoursesPage() {
 
       showToast(`تم رفع الملف المرفق (${data.fileName}) بنجاح!`);
     } catch (err: any) {
+      clearInterval(progressTimer);
       console.error('Attachment upload failed:', err);
       showToast(err.message || 'فشل رفع الملف', 'error');
     } finally {
-      setIsUploadingAttachment(false);
-      setUploadingAttachmentTarget(null);
+      setTimeout(() => {
+        setIsUploadingAttachment(false);
+        setUploadingAttachmentTarget(null);
+        setAttachmentUploadProgress(0);
+      }, 500);
     }
   };
 
@@ -805,6 +819,12 @@ export default function AdminCoursesPage() {
     if (!file) return;
 
     setIsUploadingAttachment(true);
+    setAttachmentUploadProgress(15);
+
+    const progressTimer = setInterval(() => {
+      setAttachmentUploadProgress((prev) => (prev < 90 ? prev + 12 : prev));
+    }, 140);
+
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -814,6 +834,9 @@ export default function AdminCoursesPage() {
         method: 'POST',
         body: formData,
       });
+
+      clearInterval(progressTimer);
+      setAttachmentUploadProgress(100);
 
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -831,13 +854,17 @@ export default function AdminCoursesPage() {
       setFormAttachments((prev) => [...prev, newAtt]);
       showToast(`تمت إضافة الملف المرفق (${data.fileName}) لحقيبة الدورة بنجاح!`);
     } catch (err: any) {
+      clearInterval(progressTimer);
       console.error('Attachment bag upload failed:', err);
       showToast(err.message || 'فشل رفع الملف', 'error');
     } finally {
-      setIsUploadingAttachment(false);
-      if (attachmentFileInputRef.current) {
-        attachmentFileInputRef.current.value = '';
-      }
+      setTimeout(() => {
+        setIsUploadingAttachment(false);
+        setAttachmentUploadProgress(0);
+        if (attachmentFileInputRef.current) {
+          attachmentFileInputRef.current.value = '';
+        }
+      }, 500);
     }
   };
 
@@ -1575,69 +1602,33 @@ export default function AdminCoursesPage() {
                         <span className="text-[10px] text-slate-500 font-medium">يتم الحفظ في Supabase والموقع فوراً</span>
                       </label>
 
-                      <div className="flex flex-col sm:flex-row items-center gap-4">
-                        {/* Live Preview Box */}
-                        <div className="w-32 h-24 rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 p-2 flex items-center justify-center shrink-0 border border-slate-200 shadow-xs relative overflow-hidden">
-                          <img
-                            src={formImage || '/logo.webp'}
-                            alt="Preview"
-                            className="max-h-20 max-w-full object-contain drop-shadow-md"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/logo.webp';
-                            }}
-                          />
-                        </div>
+                      <DeviceImageUploader
+                        value={formImage}
+                        onChange={(url) => setFormImage(url)}
+                        folder="courses"
+                        slug={formSlug || 'course'}
+                        label="صورة وغلاف الدورة التدريبية (رفع مباشر من جهازك مع ضغط WebP)"
+                        recommendedSize="المقاس المثالي: 1280 × 720 بكسل (WebP / JPG / PNG)"
+                        aspectRatio="video"
+                      />
 
-                        <div className="flex-1 w-full space-y-2">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={formImage}
-                              onChange={(e) => setFormImage(e.target.value)}
-                              placeholder="رابط الصورة (URL) أو اختر ملف من جهازك..."
-                              className="flex-1 px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => courseImageInputRef.current?.click()}
-                              disabled={isUploadingImage}
-                              className="px-4 py-2 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
-                            >
-                              {isUploadingImage ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <UploadCloud className="w-4 h-4" />
-                              )}
-                              <span>رفع صورة</span>
-                            </button>
-                            <input
-                              ref={courseImageInputRef}
-                              type="file"
-                              accept="image/*"
-                              onChange={handleCourseImageUpload}
-                              className="hidden"
-                            />
-                          </div>
-
-                          {/* Presets */}
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-bold">
-                            <span>أغلفة جاهزة:</span>
-                            {['/logo.webp', '/1.png', '/2.png'].map((preset) => (
-                              <button
-                                key={preset}
-                                type="button"
-                                onClick={() => setFormImage(preset)}
-                                className={`px-2 py-0.5 rounded-lg border text-[10px] transition-colors cursor-pointer ${
-                                  formImage === preset
-                                    ? 'bg-blue-50 border-blue-300 text-[#173A7C] font-black'
-                                    : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-600'
-                                }`}
-                              >
-                                {preset === '/logo.webp' ? 'شعار المعهد' : preset === '/1.png' ? 'نموذج 1' : 'نموذج 2'}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                      {/* Presets */}
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-bold pt-1">
+                        <span>أو اختر من النماذج الجاهزة:</span>
+                        {['/logo.webp', '/1.png', '/2.png'].map((preset) => (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => setFormImage(preset)}
+                            className={`px-2 py-0.5 rounded-lg border text-[10px] transition-colors cursor-pointer ${
+                              formImage === preset
+                                ? 'bg-blue-50 border-blue-300 text-[#173A7C] font-black'
+                                : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-600'
+                            }`}
+                          >
+                            {preset === '/logo.webp' ? 'شعار المعهد' : preset === '/1.png' ? 'نموذج 1' : 'نموذج 2'}
+                          </button>
+                        ))}
                       </div>
                     </div>
 
@@ -1947,10 +1938,19 @@ export default function AdminCoursesPage() {
                                 type="button"
                                 onClick={() => triggerAttachmentUploadForTarget(secIdx)}
                                 disabled={isUploadingAttachment}
-                                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-[#173A7C] font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-[#173A7C] font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
                               >
-                                <UploadCloud className="w-3.5 h-3.5" />
-                                <span>{sec.fileName ? 'تغيير الملف' : 'إرفاق ملف PDF للوحدة'}</span>
+                                {uploadingAttachmentTarget?.secIdx === secIdx && uploadingAttachmentTarget?.subIdx === undefined ? (
+                                  <>
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#173A7C]" />
+                                    <span>جاري الرفع {attachmentUploadProgress}%</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <UploadCloud className="w-3.5 h-3.5" />
+                                    <span>{sec.fileName ? 'تغيير الملف' : 'إرفاق ملف PDF للوحدة'}</span>
+                                  </>
+                                )}
                               </button>
 
                               {sec.fileName && (
@@ -1967,6 +1967,22 @@ export default function AdminCoursesPage() {
                               )}
                             </div>
                           </div>
+
+                          {/* Progress bar for module attachment */}
+                          {uploadingAttachmentTarget?.secIdx === secIdx && uploadingAttachmentTarget?.subIdx === undefined && (
+                            <div className="w-full space-y-1 p-2 bg-blue-50 rounded-xl border border-blue-200">
+                              <div className="flex items-center justify-between text-[11px] font-bold text-[#173A7C]">
+                                <span>جاري رفع ومعالجة ملحق الوحدة (PDF / Word)...</span>
+                                <span className="font-mono">{attachmentUploadProgress}%</span>
+                              </div>
+                              <div className="w-full bg-blue-100 rounded-full h-1.5 overflow-hidden">
+                                <div
+                                  className="bg-gradient-to-r from-[#173A7C] to-emerald-500 h-full rounded-full transition-all duration-300"
+                                  style={{ width: `${attachmentUploadProgress}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
 
                           {/* ── SUB-ITEMS / SUB-LESSONS LIST ── */}
                           <div className="space-y-3 bg-white p-4 rounded-xl border border-blue-100 shadow-2xs">
@@ -2083,28 +2099,55 @@ export default function AdminCoursesPage() {
                                   )}
 
                                   {sub.type === 'pdf' && (
-                                    <div className="flex items-center justify-between gap-2 p-2 bg-white rounded-lg border border-slate-200 text-xs">
-                                      <div className="flex items-center gap-2 min-w-0">
-                                        <FileText className="w-4 h-4 text-blue-600 shrink-0" />
-                                        <div className="min-w-0">
-                                          <span className="font-bold text-slate-800 truncate block">
-                                            {sub.fileName || 'ملف PDF / Word غير مرفوع'}
-                                          </span>
-                                          <span className="text-[10px] text-slate-400 font-mono">
-                                            {sub.fileSize || 'ملف مستند'}
-                                          </span>
+                                    <div className="flex flex-col gap-2 p-2.5 bg-white rounded-lg border border-slate-200 text-xs">
+                                      <div className="flex items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <FileText className="w-4 h-4 text-blue-600 shrink-0" />
+                                          <div className="min-w-0">
+                                            <span className="font-bold text-slate-800 truncate block">
+                                              {sub.fileName || 'ملف PDF / Word غير مرفوع'}
+                                            </span>
+                                            <span className="text-[10px] text-slate-400 font-mono">
+                                              {sub.fileSize || 'ملف مستند'}
+                                            </span>
+                                          </div>
                                         </div>
+
+                                        <button
+                                          type="button"
+                                          onClick={() => triggerAttachmentUploadForTarget(secIdx, subIdx)}
+                                          disabled={isUploadingAttachment}
+                                          className="px-3 py-1.5 rounded-lg bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-all disabled:opacity-50 shrink-0 shadow-xs"
+                                        >
+                                          {uploadingAttachmentTarget?.secIdx === secIdx && uploadingAttachmentTarget?.subIdx === subIdx ? (
+                                            <>
+                                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                              <span>جاري الرفع {attachmentUploadProgress}%</span>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <UploadCloud className="w-3.5 h-3.5" />
+                                              <span>{sub.fileUrl ? 'تغيير الملف' : 'رفع ملف PDF/Word'}</span>
+                                            </>
+                                          )}
+                                        </button>
                                       </div>
 
-                                      <button
-                                        type="button"
-                                        onClick={() => triggerAttachmentUploadForTarget(secIdx, subIdx)}
-                                        disabled={isUploadingAttachment}
-                                        className="px-3 py-1 rounded-lg bg-[#173A7C] text-white font-bold text-xs flex items-center gap-1 cursor-pointer"
-                                      >
-                                        <UploadCloud className="w-3.5 h-3.5" />
-                                        <span>{sub.fileUrl ? 'تغيير الملف' : 'رفع ملف PDF/Word'}</span>
-                                      </button>
+                                      {/* Animated Progress Bar for Sub-Item Document */}
+                                      {uploadingAttachmentTarget?.secIdx === secIdx && uploadingAttachmentTarget?.subIdx === subIdx && (
+                                        <div className="w-full space-y-1 pt-1">
+                                          <div className="flex items-center justify-between text-[11px] font-bold text-blue-700">
+                                            <span>جاري رفع ومعالجة المستند...</span>
+                                            <span className="font-mono">{attachmentUploadProgress}%</span>
+                                          </div>
+                                          <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden border border-slate-200">
+                                            <div
+                                              className="bg-gradient-to-r from-blue-600 to-emerald-500 h-full rounded-full transition-all duration-300"
+                                              style={{ width: `${attachmentUploadProgress}%` }}
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
                                   )}
 

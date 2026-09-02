@@ -29,6 +29,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { blogPosts } from '@/data/blogPosts';
+import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 
 interface AdminArticleItem {
   id: string | number;
@@ -724,8 +725,8 @@ export default function AdminArticlesPage() {
                   </div>
                 </div>
 
-                {/* Slug, Read Time, Image */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Slug & Read Time */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-slate-700 font-black">الرابط المخصص (Slug)</label>
                     <input
@@ -747,18 +748,18 @@ export default function AdminArticlesPage() {
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
                     />
                   </div>
-
-                  <div className="space-y-1">
-                    <label className="text-slate-700 font-black">رابط صورة الغلاف</label>
-                    <input
-                      type="text"
-                      value={editingArticle.image || ''}
-                      onChange={(e) => setEditingArticle({ ...editingArticle, image: e.target.value })}
-                      placeholder="/1.png أو رابط صورة"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
-                    />
-                  </div>
                 </div>
+
+                {/* Device-Based WebP Cover Image Uploader with Progress Bar */}
+                <DeviceImageUploader
+                  value={editingArticle.image || ''}
+                  onChange={(url) => setEditingArticle({ ...editingArticle, image: url })}
+                  folder="articles"
+                  slug={editingArticle.slug || 'article'}
+                  label="صورة غلاف المقال (رفع مباشر من الجهاز مع ضغط WebP)"
+                  recommendedSize="المقاس المثالي: 1200 × 630 بكسل (WebP / JPG / PNG)"
+                  aspectRatio="video"
+                />
 
                 {/* Excerpt */}
                 <div className="space-y-1">

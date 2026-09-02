@@ -23,6 +23,7 @@ import {
   Layers,
   Power,
 } from 'lucide-react';
+import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 
 interface ServiceItem {
   id: string;
@@ -621,15 +622,16 @@ export default function InstructorServicesPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-slate-700 block">صورة الغلاف (مسار الصورة)</label>
-                    <input
-                      type="text"
-                      value={editingService.image || '/1.png'}
-                      onChange={(e) => setEditingService({ ...editingService, image: e.target.value })}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs"
-                    />
-                  </div>
+                  {/* Device-Based WebP Service Image Uploader */}
+                  <DeviceImageUploader
+                    value={editingService.image || ''}
+                    onChange={(url) => setEditingService({ ...editingService, image: url })}
+                    folder="services"
+                    slug={editingService.id || 'service'}
+                    label="صورة وبنر الخدمة (رفع مباشر من جهازك مع ضغط WebP)"
+                    recommendedSize="المقاس المثالي: 1200 × 750 بكسل (WebP / JPG / PNG)"
+                    aspectRatio="video"
+                  />
 
                   <div className="space-y-1">
                     <label className="text-slate-700 block">وصف الخدمة وتفاصيلها *</label>

@@ -26,6 +26,7 @@ import {
 import { createClient } from '@/utils/supabase/client';
 
 import { blogPosts } from '@/data/blogPosts';
+import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 
 interface ArticleItem {
   id: string | number;
@@ -591,6 +592,17 @@ export default function InstructorArticlesPage() {
                       </select>
                     </div>
                   </div>
+
+                  {/* Device-Based WebP Cover Image Uploader with Progress Bar */}
+                  <DeviceImageUploader
+                    value={editingArticle.image || ''}
+                    onChange={(url) => setEditingArticle({ ...editingArticle, image: url })}
+                    folder="articles"
+                    slug={editingArticle.slug || 'article'}
+                    label="صورة غلاف المقال (رفع مباشر من جهازك مع ضغط WebP)"
+                    recommendedSize="المقاس المثالي: 1200 × 630 بكسل (WebP / JPG / PNG)"
+                    aspectRatio="video"
+                  />
 
                   <div className="space-y-1">
                     <label className="text-slate-700 block">المقدمة والملخص التنفيذي (Excerpt) *</label>
