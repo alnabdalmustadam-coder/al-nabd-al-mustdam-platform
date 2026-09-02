@@ -581,10 +581,8 @@ function AdminUsersPageContent() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl bg-white/95 backdrop-blur-xl text-slate-900 rounded-2xl sm:rounded-3xl border border-white/80 p-5 sm:p-7 shadow-2xl relative max-h-[92vh] flex flex-col my-auto"
+              className="w-full max-w-xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl bg-white/95 backdrop-blur-xl text-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/90 p-5 sm:p-7 shadow-2xl relative max-h-[92vh] flex flex-col my-auto overflow-hidden"
             >
-              <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#5CB07C] via-[#173A7C] to-emerald-400" />
-
               {/* Modal Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-200/70 shrink-0">
                 <div className="flex items-center gap-3">
