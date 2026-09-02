@@ -311,8 +311,8 @@ function CheckoutContent() {
                     type="email"
                     disabled
                     value={email}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-100/80 text-slate-500 text-xs font-bold cursor-not-allowed text-left font-mono"
-                    dir="ltr"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-100/80 text-slate-500 text-xs font-bold cursor-not-allowed text-right"
+                    dir="rtl"
                   />
                 </div>
 
@@ -333,9 +333,9 @@ function CheckoutContent() {
                       required
                       value={phoneInput}
                       onChange={(e) => setPhoneInput(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all text-left font-mono"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all text-right"
                       placeholder="05XXXXXXXX"
-                      dir="ltr"
+                      dir="rtl"
                     />
                     <Smartphone className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
                   </div>
@@ -358,9 +358,9 @@ function CheckoutContent() {
                       required
                       value={nationalIdInput}
                       onChange={(e) => setNationalIdInput(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all text-left font-mono"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all text-right"
                       placeholder="10XXXXXXXX"
-                      dir="ltr"
+                      dir="rtl"
                     />
                     <Shield className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
                   </div>

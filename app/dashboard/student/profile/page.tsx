@@ -695,8 +695,8 @@ export default function StudentProfilePage() {
                 type="email"
                 disabled
                 value={student.email}
-                className="w-full p-3.5 rounded-xl border border-slate-300/80 text-slate-500 font-bold bg-slate-100/80 cursor-not-allowed text-left font-mono"
-                dir="ltr"
+                className="w-full p-3.5 rounded-xl border border-slate-300/80 text-slate-500 font-bold bg-slate-100/80 cursor-not-allowed text-right"
+                dir="rtl"
               />
             </div>
 
@@ -717,8 +717,8 @@ export default function StudentProfilePage() {
                 value={student.phone}
                 onChange={(e) => setStudent({ ...student, phone: e.target.value })}
                 placeholder="05XXXXXXXX"
-                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all text-left font-mono"
-                dir="ltr"
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all text-right"
+                dir="rtl"
                 style={glassInput}
               />
             </div>
@@ -739,8 +739,8 @@ export default function StudentProfilePage() {
                 value={student.nationalId}
                 onChange={(e) => setStudent({ ...student, nationalId: e.target.value })}
                 placeholder="أدخل رقم الهوية أو الإقامة (10 أرقام تبدأ بـ 1 أو 2)..."
-                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all text-left font-mono"
-                dir="ltr"
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all text-right"
+                dir="rtl"
                 style={glassInput}
               />
             </div>
@@ -813,7 +813,8 @@ export default function StudentProfilePage() {
                 required
                 value={passwords.current}
                 onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-                className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400"
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400 text-right"
+                dir="rtl"
                 style={glassInput}
               />
             </div>
@@ -829,7 +830,8 @@ export default function StudentProfilePage() {
               required
               value={passwords.newPass}
               onChange={(e) => setPasswords({ ...passwords, newPass: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400"
+              className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400 text-right"
+              dir="rtl"
               style={glassInput}
             />
           </div>
@@ -844,7 +846,8 @@ export default function StudentProfilePage() {
               required
               value={passwords.confirmPass}
               onChange={(e) => setPasswords({ ...passwords, confirmPass: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400"
+              className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400 text-right"
+              dir="rtl"
               style={glassInput}
             />
           </div>
