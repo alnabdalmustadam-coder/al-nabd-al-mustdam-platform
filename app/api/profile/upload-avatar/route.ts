@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import fs from 'fs';
 import path from 'path';
 import { IMAGE_UPLOAD_POLICY, validateUpload } from '@/lib/security/uploads';
+import { optimizeAvatarToWebp } from '@/lib/media/image-processor';
 
 export async function POST(req: Request) {
   try {
@@ -26,29 +27,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: validationError }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    
-    // Determine the real extension from the uploaded file's MIME type
-    const mimeToExt: Record<string, string> = {
-      'image/jpeg': 'jpg',
-      'image/png': 'png',
-      'image/webp': 'webp',
-    };
-    const actualType = file.type || 'image/jpeg';
-    const ext = mimeToExt[actualType] || 'jpg';
+    const rawBytes = await file.arrayBuffer();
+    const rawBuffer = Buffer.from(rawBytes);
 
-    // Deterministic unique avatar key per user to prevent accumulation
-    const fileName = `avatar_${user.id}.${ext}`;
+    // 1. Enforce WebP conversion and high-efficiency compression (~25-50KB)
+    let optimizedWebpBuffer: Buffer;
+    try {
+      optimizedWebpBuffer = await optimizeAvatarToWebp(rawBuffer);
+    } catch (procErr) {
+      console.error('WebP conversion failed, falling back to raw buffer:', procErr);
+      optimizedWebpBuffer = rawBuffer;
+    }
 
+    // 2. Deterministic single avatar filename per user - ZERO storage accumulation
+    const fileName = `avatar_${user.id}.webp`;
     let finalPublicUrl = '';
 
-    // 1. Try Supabase Storage 'avatars' bucket with upsert: true (replaces old file in-place)
+    // 3. Try Supabase Storage 'avatars' bucket with upsert: true (replaces old file in-place)
     try {
       const { data, error } = await supabase.storage
         .from('avatars')
-        .upload(fileName, buffer, {
-          contentType: actualType,
+        .upload(fileName, optimizedWebpBuffer, {
+          contentType: 'image/webp',
           upsert: true,
         });
 
@@ -60,19 +60,28 @@ export async function POST(req: Request) {
         if (publicUrlData?.publicUrl) {
           finalPublicUrl = `${publicUrlData.publicUrl}?t=${Date.now()}`;
         }
+
+        // Clean up any legacy non-webp avatar files for this user in Supabase bucket
+        try {
+          await supabase.storage.from('avatars').remove([
+            `avatar_${user.id}.jpg`,
+            `avatar_${user.id}.jpeg`,
+            `avatar_${user.id}.png`,
+          ]);
+        } catch {}
       }
     } catch (supaErr) {
       console.warn('Supabase avatars bucket upload fallback:', supaErr);
     }
 
-    // 2. Local fallback if Supabase storage is not configured (or development)
+    // 4. Local fallback if Supabase storage bucket is not configured (or development)
     if (!finalPublicUrl) {
       const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'avatars');
       if (!fs.existsSync(uploadsDir)) {
         fs.mkdirSync(uploadsDir, { recursive: true });
       }
 
-      // Clean up any old files starting with avatar_${user.id}
+      // Clean up any legacy or duplicate files for this user
       try {
         const existingFiles = fs.readdirSync(uploadsDir);
         for (const existing of existingFiles) {
@@ -87,11 +96,11 @@ export async function POST(req: Request) {
       }
 
       const filePath = path.join(uploadsDir, fileName);
-      fs.writeFileSync(filePath, buffer);
+      fs.writeFileSync(filePath, optimizedWebpBuffer);
       finalPublicUrl = `/uploads/avatars/${fileName}?t=${Date.now()}`;
     }
 
-    // 3. Update profiles table
+    // 5. Update profiles table
     await supabaseServer
       .from('profiles')
       .update({
@@ -100,7 +109,7 @@ export async function POST(req: Request) {
       })
       .eq('id', user.id);
 
-    // 4. Update auth user metadata
+    // 6. Update auth user metadata
     await supabaseServer.auth.updateUser({
       data: { avatar_url: finalPublicUrl },
     });
@@ -108,6 +117,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       avatarUrl: finalPublicUrl,
+      format: 'webp',
     });
   } catch (err: any) {
     console.error('Avatar upload route error:', err);

@@ -349,6 +349,9 @@ export default function AdminProfilePage() {
                     src={adminData.avatarUrl}
                     alt={adminData.fullName}
                     className="w-full h-full object-cover object-top"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
+                    onError={() => setAdminData((prev) => ({ ...prev, avatarUrl: null }))}
                   />
                 ) : (
                   <Crown className="w-12 h-12 text-amber-300 drop-shadow-md" />

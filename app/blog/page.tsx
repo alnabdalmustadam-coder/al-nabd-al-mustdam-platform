@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { ShimmerImage } from "@/components/ui/ShimmerImage";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -106,7 +106,7 @@ export default function BlogIndexPage() {
             <div className="rounded-[2.4rem] bg-white p-6 sm:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               {/* Image side */}
               <div className="lg:col-span-6 relative h-[260px] sm:h-[340px] rounded-3xl overflow-hidden bg-slate-900 shadow-md">
-                <Image
+                <ShimmerImage
                   src={featuredPost.image}
                   alt={featuredPost.title}
                   fill
@@ -193,7 +193,7 @@ export default function BlogIndexPage() {
                   <div className="relative rounded-[2rem] overflow-hidden border border-slate-200/90 bg-white shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col">
                     {/* Image */}
                     <div className="relative h-52 overflow-hidden bg-slate-100">
-                      <Image
+                      <ShimmerImage
                         src={post.image}
                         alt={post.title}
                         fill

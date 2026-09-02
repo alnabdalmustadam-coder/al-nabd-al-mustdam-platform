@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ShimmerImage } from '@/components/ui/ShimmerImage';
+import { ServiceCardSkeleton } from '@/components/ui/CardSkeleton';
 import { motion } from 'framer-motion';
 import {
   Search,
@@ -501,6 +503,7 @@ export default function MarketplacePage() {
   useEffect(() => {
     async function loadData() {
       try {
+        setLoading(true);
         const res = await fetch(`/api/services?t=${Date.now()}`, { cache: 'no-store' });
         const data = await res.json();
         if (data.success && Array.isArray(data.services) && data.services.length > 0) {
@@ -508,6 +511,8 @@ export default function MarketplacePage() {
         }
       } catch (err) {
         console.error('Marketplace fetch services error:', err);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -726,8 +731,14 @@ export default function MarketplacePage() {
           </div>
         </div>
 
-        {/* Empty State */}
-        {filteredServices.length === 0 ? (
+        {/* Skeleton Loading State */}
+        {loading && services.length === 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ServiceCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : filteredServices.length === 0 ? (
           <div className="bg-white rounded-[2rem] border border-slate-200/80 p-12 text-center space-y-4 shadow-xs max-w-lg mx-auto">
             <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
               <Package className="w-8 h-8" />
@@ -762,13 +773,13 @@ export default function MarketplacePage() {
                     {/* Top Accent Gradient Bar */}
                     <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] z-30 opacity-80 group-hover:opacity-100 transition-opacity" />
 
-                    {/* Real Image Thumbnail with Hover Zoom */}
+                    {/* Real Image Thumbnail with Skeleton Shimmer & Hover Zoom */}
                     <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100">
-                      <img
+                      <ShimmerImage
                         src={service.image_url}
                         alt={service.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        loading="lazy"
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-700"
                       />
 
                       {/* Image Overlay Gradient */}

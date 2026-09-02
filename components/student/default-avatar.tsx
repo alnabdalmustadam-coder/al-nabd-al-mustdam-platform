@@ -17,6 +17,10 @@ export function DefaultAvatar({
 }: DefaultAvatarProps) {
   const [imageError, setImageError] = useState(false);
 
+  React.useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
   const sizeClasses = {
     sm: 'w-7 h-7 rounded-lg text-[10px]',
     md: 'w-10 h-10 rounded-xl text-xs',
@@ -63,6 +67,7 @@ export function DefaultAvatar({
             className="w-full h-full object-cover relative z-0"
             onError={() => setImageError(true)}
             referrerPolicy="no-referrer"
+            crossOrigin="anonymous"
           />
         ) : initials ? (
           <span className="font-black text-white tracking-wider relative z-10 drop-shadow-sm font-[family-name:var(--font-cairo)]">

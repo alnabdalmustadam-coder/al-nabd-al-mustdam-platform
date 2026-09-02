@@ -206,6 +206,9 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                         src={userProfile.avatarUrl}
                         alt={userProfile.fullName}
                         className="w-full h-full object-cover object-top"
+                        referrerPolicy="no-referrer"
+                        crossOrigin="anonymous"
+                        onError={() => setUserProfile((p) => ({ ...p, avatarUrl: null }))}
                       />
                     ) : (
                       <span className="text-lg sm:text-xl font-black text-white">
@@ -402,6 +405,9 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                         src={userProfile.avatarUrl}
                         alt={userProfile.fullName}
                         className="w-full h-full object-cover object-top"
+                        referrerPolicy="no-referrer"
+                        crossOrigin="anonymous"
+                        onError={() => setUserProfile((p) => ({ ...p, avatarUrl: null }))}
                       />
                     ) : (
                       <span className="text-lg font-black text-white">

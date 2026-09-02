@@ -12,6 +12,32 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data?.user) {
+      // Sync Google avatar & name to public.profiles table if missing
+      try {
+        const metaAvatar = data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture;
+        const metaName = data.user.user_metadata?.full_name || data.user.user_metadata?.name;
+        if (metaAvatar || metaName) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('avatar_url, full_name')
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+          const updates: Record<string, any> = {};
+          if (!profile?.avatar_url && metaAvatar) updates.avatar_url = metaAvatar;
+          if (!profile?.full_name && metaName) updates.full_name = metaName;
+
+          if (Object.keys(updates).length > 0) {
+            await supabase
+              .from('profiles')
+              .update({ ...updates, updated_at: new Date().toISOString() })
+              .eq('id', data.user.id);
+          }
+        }
+      } catch (syncErr) {
+        console.warn('OAuth profile sync notice:', syncErr);
+      }
+
       const userRole = getTrustedRole(data.user);
       const defaultRoleDashboard = getDashboardUrlForRole(userRole);
 

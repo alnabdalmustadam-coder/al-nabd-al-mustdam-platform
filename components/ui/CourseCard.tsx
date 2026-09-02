@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Badge from "@/components/ui/Badge";
 import { Course } from "@/types";
 import { Users, Clock, Play, ShoppingCart, ArrowRight, Heart, Check } from "lucide-react";
-import Image from "next/image";
+import { ShimmerImage } from "@/components/ui/ShimmerImage";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 
@@ -24,9 +24,8 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="h-full"
     >
@@ -40,7 +39,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent z-10 opacity-80"></div>
 
           <div className="relative w-full h-full z-0">
-            <Image
+            <ShimmerImage
               src={imageUrl}
               alt={course.title}
               fill

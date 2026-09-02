@@ -705,6 +705,8 @@ export default function InstructorCoursesPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      if (formSlug) formData.append('courseSlug', formSlug);
+      if (formImage) formData.append('existingImageUrl', formImage);
 
       const res = await fetch('/api/admin/courses/upload-image', {
         method: 'POST',

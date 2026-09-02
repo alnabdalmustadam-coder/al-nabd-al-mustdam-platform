@@ -412,6 +412,9 @@ export default function StudentProfilePage() {
                     src={student.avatarUrl}
                     alt={student.fullName}
                     className="w-full h-full object-cover object-top"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
+                    onError={() => setStudent((prev) => ({ ...prev, avatarUrl: null }))}
                   />
                 ) : (
                   <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white">

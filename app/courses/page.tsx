@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CourseCard from "@/components/ui/CourseCard";
+import { CourseCardSkeleton } from "@/components/ui/CardSkeleton";
 import { courses, courseCategories } from "@/data/courses";
 import { Search, SlidersHorizontal, Grid3X3, List, X, Headphones, ArrowLeft } from "lucide-react";
 
@@ -22,6 +23,7 @@ const sortOptions = [
 
 export default function CoursesPage() {
   const [courseList, setCourseList] = useState(courses);
+  const [coursesLoading, setCoursesLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [level, setLevel] = useState("all");
@@ -30,6 +32,7 @@ export default function CoursesPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const fetchLiveCourses = () => {
+    setCoursesLoading(true);
     fetch(`/api/courses?t=${Date.now()}`)
       .then((res) => res.json())
       .then((data) => {
@@ -37,7 +40,8 @@ export default function CoursesPage() {
           setCourseList(data.courses);
         }
       })
-      .catch((err) => console.error('Error fetching live courses:', err));
+      .catch((err) => console.error('Error fetching live courses:', err))
+      .finally(() => setCoursesLoading(false));
   };
 
   useEffect(() => {
@@ -347,7 +351,13 @@ export default function CoursesPage() {
 
           {/* Course Grid */}
           <div className="flex-1">
-            {filtered.length === 0 ? (
+            {coursesLoading && courseList.length === 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-8 xl:gap-10">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <CourseCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-24 bg-white rounded-3xl border border-slate-200 shadow-sm">
                 <p className="section-desc-premium text-lg">لا توجد دورات مطابقة للبحث أو الفلتر المختار.</p>
                 <button 
