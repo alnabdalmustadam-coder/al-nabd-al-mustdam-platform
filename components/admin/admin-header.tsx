@@ -324,16 +324,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             {isMobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
           </button>
 
-          {/* Go to Home Link (Uniform size matching student portal) */}
-          <Link
-            href="/"
-            className="w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-[#173A7C] hover:text-[#1E4D9D] transition-all cursor-pointer border border-slate-200/60 flex items-center justify-center gap-1.5 shrink-0 text-xs font-black"
-            title="الذهاب للرئيسية"
-          >
-            <Home className="w-4 h-4 text-[#173A7C] shrink-0" />
-            <span className="hidden sm:inline">الرئيسية</span>
-          </Link>
-
           {/* Notifications Button & Panels */}
           <div className="relative shrink-0">
             <button
@@ -350,7 +340,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               )}
             </button>
 
-            {/* 1. DESKTOP NOTIFICATIONS DROPDOWN (Directly centered under the bell icon) */}
+            {/* 1. DESKTOP NOTIFICATIONS DROPDOWN (Anchored left-0 so it opens inward away from screen boundary) */}
             {showNotifications && (
               <div className="hidden sm:block">
                 <div
@@ -358,7 +348,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   onClick={() => setShowNotifications(false)}
                 />
                 <div
-                  className="absolute top-full mt-2.5 left-1/2 -translate-x-1/2 w-96 rounded-2xl border border-slate-200/90 p-4 shadow-2xl z-[1000] text-right space-y-3 bg-white text-slate-800"
+                  className="absolute top-full mt-2.5 left-0 w-80 sm:w-96 max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200/90 p-4 shadow-2xl z-[1000] text-right space-y-3 bg-white text-slate-800 animate-in fade-in zoom-in-95 duration-150"
                   style={{ boxShadow: '0 20px 50px rgba(15, 23, 42, 0.18)' }}
                 >
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -594,6 +584,16 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 )
               : null}
           </div>
+
+          {/* Go to Home Link (Positioned on the outermost left corner) */}
+          <Link
+            href="/"
+            className="w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-[#173A7C] hover:text-[#1E4D9D] transition-all cursor-pointer border border-slate-200/60 flex items-center justify-center gap-1.5 shrink-0 text-xs font-black"
+            title="الذهاب للرئيسية"
+          >
+            <Home className="w-4 h-4 text-[#173A7C] shrink-0" />
+            <span className="hidden sm:inline">الرئيسية</span>
+          </Link>
         </div>
       </div>
 
