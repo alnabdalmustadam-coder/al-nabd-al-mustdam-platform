@@ -34,43 +34,11 @@ const extractBunnyGuid = (str: string): string | null => {
   return match ? match[0] : null;
 };
 
-const isYouTubeId = (str: string): boolean => {
-  return /^[a-zA-Z0-9_-]{11}$/.test(str.trim());
-};
-
 const parseEmbedUrl = (url: string): string => {
   if (!url) return '';
   const trimmed = url.trim();
 
-  // 1. Raw YouTube 11-character video ID (e.g., MmHWTPJMzbQ)
-  if (isYouTubeId(trimmed)) {
-    return `https://www.youtube-nocookie.com/embed/${trimmed}?autoplay=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1`;
-  }
-
-  // 2. Full YouTube Links (watch, embed, short)
-  if (trimmed.includes('youtube.com/watch?v=') || trimmed.includes('youtu.be/') || trimmed.includes('youtube.com/embed/')) {
-    let vId = '';
-    if (trimmed.includes('youtube.com/watch?v=')) {
-      vId = trimmed.split('v=')[1]?.split('&')[0] || '';
-    } else if (trimmed.includes('youtu.be/')) {
-      vId = trimmed.split('youtu.be/')[1]?.split('?')[0] || '';
-    } else if (trimmed.includes('youtube.com/embed/')) {
-      vId = trimmed.split('youtube.com/embed/')[1]?.split('?')[0] || '';
-    }
-    if (vId && isYouTubeId(vId)) {
-      return `https://www.youtube-nocookie.com/embed/${vId}?autoplay=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1`;
-    }
-  }
-
-  // 3. Vimeo Links
-  if (trimmed.includes('vimeo.com/')) {
-    const vimeoMatch = trimmed.match(/vimeo\.com\/(?:video\/)?([0-9]+)/);
-    if (vimeoMatch && vimeoMatch[1]) {
-      return `https://player.vimeo.com/video/${vimeoMatch[1]}?title=0&byline=0&portrait=0`;
-    }
-  }
-
-  // 4. Bunny Player to Embed URL conversion
+  // 1. Bunny Player to Embed URL conversion
   if (trimmed.includes('player.mediadelivery.net/play/')) {
     return trimmed.replace('player.mediadelivery.net/play/', 'iframe.mediadelivery.net/embed/');
   }
@@ -91,8 +59,8 @@ const parseEmbedUrl = (url: string): string => {
     return trimmed;
   }
 
-  // Safety fallback for empty or unrecognized strings: fallback to platform default video
-  return 'https://www.youtube-nocookie.com/embed/1BEWMhAuBd4?autoplay=0&rel=0&modestbranding=1&enablejsapi=1&playsinline=1';
+  // No mock or YouTube fallback - only authentic videos from database
+  return '';
 };
 
 export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
@@ -127,16 +95,16 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
       try {
         const trimmed = (videoUrl || '').trim();
 
-        // 1. YouTube or direct standard URL or raw YouTube video ID
-        if (trimmed && (trimmed.includes('youtube.com') || trimmed.includes('youtu.be') || trimmed.includes('youtube.com/embed') || isYouTubeId(trimmed))) {
+        if (!trimmed) {
           if (isMounted) {
-            setIframeUrl(parseEmbedUrl(trimmed));
+            setIframeUrl(null);
+            setError(null);
             setLoading(false);
           }
           return;
         }
 
-        // 2. Bunny Stream GUID Extraction (from GUID or URL)
+        // 1. Bunny Stream GUID Extraction (from GUID or URL)
         const bunnyGuid = extractBunnyGuid(trimmed);
 
         if (bunnyGuid) {
@@ -158,14 +126,19 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
           }
         }
 
-        // 3. Fallback to parseEmbedUrl
-        if (trimmed) {
+        // 2. Direct embedded or stream URL
+        const parsed = parseEmbedUrl(trimmed);
+        if (parsed) {
           if (isMounted) {
-            setIframeUrl(parseEmbedUrl(trimmed));
+            setIframeUrl(parsed);
             setLoading(false);
           }
         } else {
-          throw new Error('يرجى اختيار درس يحتوي على محاضرة فيديو.');
+          if (isMounted) {
+            setIframeUrl(null);
+            setError(null);
+            setLoading(false);
+          }
         }
       } catch (err: unknown) {
         if (isMounted) {
@@ -270,6 +243,18 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
             allowFullScreen
           />
+        )}
+
+        {!loading && !error && !iframeUrl && (
+          <div className="p-8 text-center max-w-md rounded-2xl bg-[#173056]/90 border border-white/10 text-slate-200 space-y-3 mx-4">
+            <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mx-auto text-emerald-400">
+              <Video className="w-7 h-7" />
+            </div>
+            <h4 className="text-sm sm:text-base font-black text-white">المحتوى المرئي قيد التجهيز</h4>
+            <p className="text-xs text-slate-300 leading-relaxed font-bold">
+              لم يتم إرفاق فيديو لهذا الدرس بعد. يمكنك متابعة محتوى الدرس المكتوب والملفات المرفقة.
+            </p>
+          </div>
         )}
       </div>
 

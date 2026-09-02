@@ -560,7 +560,7 @@ export default function AdminCoursesPage() {
           id: `sec-${Date.now()}-1`,
           title: 'الوحدة الأولى: مدخل ومفاهيم أساسية',
           duration: '30 دقيقة',
-          videoUrl: 'MmHWTPJMzbQ',
+          videoUrl: '',
           type: 'video',
           isLocked: false,
           subItems: [
@@ -568,7 +568,7 @@ export default function AdminCoursesPage() {
               id: `sub-${Date.now()}-1-1`,
               title: 'الدرس الأول: مقدمة تمهيدية وأهداف البرنامج',
               duration: '20 دقيقة',
-              videoUrl: 'MmHWTPJMzbQ',
+              videoUrl: '',
               type: 'video',
               isLocked: false,
             },
@@ -1164,28 +1164,13 @@ export default function AdminCoursesPage() {
     setPreviewSignedIframeUrl(null);
 
     try {
-      // 1. YouTube or direct standard URL or raw YouTube video ID
-      const isYt =
-        /^[a-zA-Z0-9_-]{11}$/.test(trimmed) ||
-        trimmed.includes('youtube.com') ||
-        trimmed.includes('youtu.be') ||
-        trimmed.includes('youtube.com/embed');
-
-      if (isYt) {
-        let ytId = trimmed;
-        if (trimmed.includes('youtube.com/watch?v=')) {
-          ytId = trimmed.split('v=')[1]?.split('&')[0] || '';
-        } else if (trimmed.includes('youtu.be/')) {
-          ytId = trimmed.split('youtu.be/')[1]?.split('?')[0] || '';
-        } else if (trimmed.includes('youtube.com/embed/')) {
-          ytId = trimmed.split('youtube.com/embed/')[1]?.split('?')[0] || '';
-        }
-        setPreviewSignedIframeUrl(`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1`);
+      if (!trimmed) {
+        setPreviewError('لا يوجد فيديو مرفق لهذا الدرس بعد.');
         setPreviewLoading(false);
         return;
       }
 
-      // 2. Bunny Stream GUID extraction (36-character UUID)
+      // 1. Bunny Stream GUID extraction (36-character UUID)
       const guidMatch = trimmed.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
       const videoGuid = guidMatch ? guidMatch[0] : (trimmed.length === 36 ? trimmed : null);
 
@@ -1208,7 +1193,7 @@ export default function AdminCoursesPage() {
       } else if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
         setPreviewSignedIframeUrl(trimmed);
       } else {
-        setPreviewSignedIframeUrl(`https://www.youtube-nocookie.com/embed/${trimmed}?autoplay=1`);
+        setPreviewError('معرّف الفيديو غير صالح. يرجى إدخال معرّف Bunny Stream GUID أو رابط فيديو مباشر.');
       }
     } catch (err: any) {
       console.error('Error fetching preview token:', err);
@@ -2059,7 +2044,7 @@ export default function AdminCoursesPage() {
                                           type="text"
                                           value={sub.videoUrl}
                                           onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'videoUrl', e.target.value)}
-                                          placeholder="معرف فيديو Bunny Stream (GUID) أو رابط YouTube..."
+                                          placeholder="معرف فيديو Bunny Stream (GUID) أو رابط الفيديو المعتمد..."
                                           className="flex-1 px-3 py-1.5 text-xs font-mono text-slate-800 bg-white rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C]"
                                         />
 
@@ -2897,13 +2882,13 @@ export default function AdminCoursesPage() {
                                   <span>{lesson.duration}</span>
                                 </span>
                                 <span>•</span>
-                                <span className="text-blue-600 font-mono">
-                                  {lesson.videoUrl
-                                    ? lesson.videoUrl.includes('-') && lesson.videoUrl.length > 20
-                                      ? `Bunny: ${lesson.videoUrl.substring(0, 10)}...`
-                                      : `YouTube: ${lesson.videoUrl}`
-                                    : 'بدون فيديو'}
-                                </span>
+                                  <span className="text-blue-600 font-mono">
+                                    {lesson.videoUrl
+                                      ? lesson.videoUrl.includes('-') && lesson.videoUrl.length > 20
+                                        ? `Bunny: ${lesson.videoUrl.substring(0, 10)}...`
+                                        : `فيديو: ${lesson.videoUrl.substring(0, 15)}...`
+                                      : 'بدون فيديو'}
+                                  </span>
                                 {lesson.items && lesson.items.length > 0 && (
                                   <>
                                     <span>•</span>

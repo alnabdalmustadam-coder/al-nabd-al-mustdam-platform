@@ -765,7 +765,7 @@ export default function StudentLessonPage() {
                 courseSlug={courseSlug}
                 lessonId={currentLesson?.id || lessonId}
                 lessonTitle={currentLesson?.title || courseData?.title || 'الدرس التدريبي'}
-                videoUrl={currentLesson?.videoUrl || 'https://www.youtube.com/watch?v=1BEWMhAuBd4'}
+                videoUrl={currentLesson?.videoUrl || ''}
                 onLessonComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
                 nextLessonUrl={nextLesson ? makeLessonUrl(nextLesson.id) : undefined}
                 prevLessonUrl={prevLesson ? makeLessonUrl(prevLesson.id) : undefined}
