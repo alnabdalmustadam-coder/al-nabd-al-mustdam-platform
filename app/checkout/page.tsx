@@ -2,14 +2,12 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { getCourseBySlug, courses } from "@/data/courses";
-import Button from "@/components/ui/Button";
 import {
   Shield, 
   CheckCircle, 
   ArrowLeft, 
-  BookOpen, 
   Loader2, 
   User, 
   Sparkles,
@@ -27,7 +25,7 @@ function CheckoutContent() {
   const isCartCheckout = searchParams.get("cart") === "true";
   const slug = searchParams.get("slug") || "computer-basics-office";
   
-  const { cart, clearCart, totalPrice } = useCart();
+  const { cart, clearCart } = useCart();
   const singleCourse = getCourseBySlug(slug) || courses[0];
 
   const checkoutItems = isCartCheckout && cart.length > 0
@@ -50,9 +48,11 @@ function CheckoutContent() {
   const [userName, setUserName] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneInput, setPhoneInput] = useState("");
+  const [nationalId, setNationalId] = useState("");
+  const [nationalIdInput, setNationalIdInput] = useState("");
   const [authLoading, setAuthLoading] = useState(true);
 
-  // Authenticate user and prefill or redirect
+  // Authenticate user and prefill phone & national_id from profile
   useEffect(() => {
     async function checkAuth() {
       try {
@@ -68,19 +68,29 @@ function CheckoutContent() {
         }
         
         setEmail(data.user.email || "");
-        setUserName(data.user.name || "");
         
         const supabase = createClient();
         const { data: profileData } = await supabase
           .from("profiles")
-          .select("phone")
+          .select("full_name, phone, national_id")
           .eq("id", data.user.id || "")
           .maybeSingle();
 
-        const userPhone = profileData?.phone || data.user.phone || "";
-        setPhone(userPhone);
-        if (userPhone) {
-          setPhoneInput(userPhone);
+        const userFullName = profileData?.full_name || data.user.name || "";
+        setUserName(userFullName);
+
+        const rawPhone = profileData?.phone || data.user.phone || "";
+        const cleanPhone = (rawPhone && rawPhone !== '+966 50 000 0000' && rawPhone !== '0500000000') ? rawPhone : "";
+        setPhone(cleanPhone);
+        if (cleanPhone) {
+          setPhoneInput(cleanPhone);
+        }
+
+        const rawNationalId = profileData?.national_id || data.user.national_id || "";
+        const cleanNationalId = (rawNationalId && rawNationalId !== '10XXXXXXXX') ? rawNationalId : "";
+        setNationalId(cleanNationalId);
+        if (cleanNationalId) {
+          setNationalIdInput(cleanNationalId);
         }
         
         setAuthLoading(false);
@@ -99,9 +109,15 @@ function CheckoutContent() {
       return;
     }
 
-    const finalPhone = phone || phoneInput;
-    if (!finalPhone.trim()) {
-      setErrorMessage("رقم الجوال مطلوب لإكمال عملية التسجيل واعتماد الشهادة");
+    const finalPhone = (phoneInput || phone || '').trim();
+    if (!finalPhone) {
+      setErrorMessage("رقم الجوال مطلوب لإكمال عملية التسجيل وتوثيق الحساب");
+      return;
+    }
+
+    const finalNationalId = (nationalIdInput || nationalId || '').trim();
+    if (!finalNationalId) {
+      setErrorMessage("رقم الهوية الوطنية أو الإقامة مطلوب لاعتماد شهادتك الرسمية");
       return;
     }
 
@@ -111,14 +127,19 @@ function CheckoutContent() {
     try {
       const supabase = createClient();
 
-      if (!phone && phoneInput) {
-        const { data: userData } = await supabase.auth.getUser();
-        if (userData?.user?.id) {
-          await supabase
-            .from("profiles")
-            .update({ phone: phoneInput })
-            .eq("id", userData.user.id);
-        }
+      // Automatically sync and persist phone & nationalId to profile so student never needs to re-enter
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData?.user?.id) {
+        await supabase
+          .from("profiles")
+          .update({
+            full_name: userName || undefined,
+            phone: finalPhone,
+            national_id: finalNationalId,
+            nelc_eligible: true,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userData.user.id);
       }
 
       // Enroll in each item
@@ -265,12 +286,12 @@ function CheckoutContent() {
             <form onSubmit={handleCheckout} className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xl shadow-slate-900/5 space-y-6">
               <div className="border-b border-slate-100 pb-4">
                 <h2 className="text-lg font-black text-slate-900">بيانات المتدرب والتسجيل</h2>
-                <p className="text-xs text-slate-500 font-bold mt-0.5">تأكد من صحة الاسم ورقم الجوال لطباعة الشهادة</p>
+                <p className="text-xs text-slate-500 font-bold mt-0.5">تأكد من صحة الاسم ورقم الجوال ورقم الهوية لطباعة واعتماد الشهادة</p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black text-slate-700 mb-1.5">الاسم الكامل (كما سيظهر بالشهادة)</label>
+                  <label className="block text-xs font-black text-slate-700 mb-1.5">الاسم الكامل (كما سيظهر بالشهادة) *</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -290,23 +311,58 @@ function CheckoutContent() {
                     type="email"
                     disabled
                     value={email}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-100/80 text-slate-500 text-xs font-bold cursor-not-allowed"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-100/80 text-slate-500 text-xs font-bold cursor-not-allowed text-left font-mono"
+                    dir="ltr"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black text-slate-700 mb-1.5">رقم الجوال للتواصل وتوثيق الشهادة</label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-black text-slate-700">
+                      رقم الجوال للتواصل وتوثيق الحساب *
+                    </label>
+                    {phone && (
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        ✓ محفوظ بملفك الشخصي
+                      </span>
+                    )}
+                  </div>
                   <div className="relative">
                     <input
                       type="tel"
                       required
                       value={phoneInput}
                       onChange={(e) => setPhoneInput(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all text-left"
-                      placeholder="05xxxxxxxx"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all text-left font-mono"
+                      placeholder="05XXXXXXXX"
                       dir="ltr"
                     />
-                    <Smartphone className="absolute right-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                    <Smartphone className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-black text-slate-700">
+                      رقم الهوية الوطنية / الإقامة (لإصدار الشهادة الرسمية) *
+                    </label>
+                    {nationalId && (
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        ✓ محفوظ بملفك الشخصي
+                      </span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={nationalIdInput}
+                      onChange={(e) => setNationalIdInput(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all text-left font-mono"
+                      placeholder="10XXXXXXXX"
+                      dir="ltr"
+                    />
+                    <Shield className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
                   </div>
                 </div>
               </div>

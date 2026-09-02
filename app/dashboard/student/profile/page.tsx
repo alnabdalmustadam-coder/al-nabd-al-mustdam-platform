@@ -103,13 +103,26 @@ export default function StudentProfilePage() {
     confirmPass: '',
   });
 
+  const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const [isOnboarding, setIsOnboarding] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [passSuccess, setPassSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('onboarding') === 'required') {
+        setIsOnboarding(true);
+      }
+    }
+  }, []);
 
   const handleAvatarFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -181,6 +194,12 @@ export default function StudentProfilePage() {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
+          const isGoogle =
+            user.app_metadata?.provider === 'google' ||
+            (Array.isArray(user.app_metadata?.providers) && user.app_metadata.providers.includes('google')) ||
+            (Array.isArray(user.identities) && user.identities.some((id: any) => id.provider === 'google'));
+          setIsGoogleUser(Boolean(isGoogle));
+
           const metaName = user.user_metadata?.full_name || user.user_metadata?.name || '';
           const metaAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
           const userEmail = user.email || '';
@@ -195,16 +214,28 @@ export default function StudentProfilePage() {
           const finalAvatar = profile?.avatar_url || metaAvatar || cachedAvatar || null;
           const finalName = profile?.full_name || metaName || cachedName || userEmail.split('@')[0] || 'متدرب';
 
+          // Sanitize phone: avoid placeholder strings like '+966 50 000 0000'
+          const rawPhone = profile?.phone || user.user_metadata?.phone || '';
+          const cleanPhone = (rawPhone && rawPhone !== '+966 50 000 0000' && rawPhone !== '0500000000') ? rawPhone : '';
+
+          // Sanitize national ID: avoid placeholder strings like '10XXXXXXXX'
+          const rawNationalId = profile?.national_id || user.user_metadata?.national_id || '';
+          const cleanNationalId = (rawNationalId && rawNationalId !== '10XXXXXXXX') ? rawNationalId : '';
+
           setStudent({
             id: user.id,
             fullName: finalName,
             email: activeEmail,
-            phone: profile?.phone || user.user_metadata?.phone || '+966 50 000 0000',
-            nationalId: profile?.national_id || user.user_metadata?.national_id || '10XXXXXXXX',
+            phone: cleanPhone,
+            nationalId: cleanNationalId,
             role: profile?.role === 'ADMIN' ? 'مدير المنصة' : profile?.role === 'INSTRUCTOR' ? 'مدرب معتمد' : 'متدرب معتمد بالمنصة',
             joinedDate: user.created_at ? new Date(user.created_at).toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' }) : 'يناير 2026',
             avatarUrl: finalAvatar,
           });
+
+          if (!cleanPhone || !cleanNationalId) {
+            setIsOnboarding(true);
+          }
 
           if (finalAvatar && typeof window !== 'undefined') localStorage.setItem('student_avatar', finalAvatar);
           if (finalName && typeof window !== 'undefined') localStorage.setItem('student_name', finalName);
@@ -267,22 +298,82 @@ export default function StudentProfilePage() {
     }
   };
 
-  const handleSaveProfile = async () => {
+  const handleSaveProfile = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setProfileError(null);
+    setSavedSuccess(false);
+
+    const trimmedPhone = (student.phone || '').trim();
+    const trimmedNationalId = (student.nationalId || '').trim();
+
+    if (!trimmedPhone) {
+      setProfileError('يرجى إدخال رقم الجوال (مطلوب للتواصل وتوثيق حسابك).');
+      return;
+    }
+
+    if (!trimmedNationalId) {
+      setProfileError('يرجى إدخال رقم الهوية الوطنية أو الإقامة (مطلوب لإصدار الشهادات والاعتماد).');
+      return;
+    }
+
+    if (trimmedNationalId && !/^[124]\d{9}$/.test(trimmedNationalId)) {
+      setProfileError('رقم الهوية الوطنية أو الإقامة غير صحيح (يجب أن يتكون من 10 أرقام تبدأ بـ 1 أو 2).');
+      return;
+    }
+
     try {
+      setIsSavingProfile(true);
       const supabase = createClient();
       if (student.id) {
-        await supabase
+        const { error: dbError } = await supabase
           .from('profiles')
           .update({
             full_name: student.fullName,
-            phone: student.phone,
+            phone: trimmedPhone,
+            national_id: trimmedNationalId,
+            nelc_eligible: true,
+            updated_at: new Date().toISOString(),
           })
           .eq('id', student.id);
+
+        if (dbError) {
+          console.warn('Direct profile update note:', dbError);
+        }
+
+        // Call update-profile API to sync with GHL and auth user metadata
+        try {
+          await fetch('/api/auth/update-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fullName: student.fullName,
+              phone: trimmedPhone,
+              nationalId: trimmedNationalId,
+            }),
+          });
+        } catch (apiErr) {
+          console.warn('Update profile API sync note:', apiErr);
+        }
       }
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('student_phone', trimmedPhone);
+        localStorage.setItem('student_national_id', trimmedNationalId);
+        window.dispatchEvent(
+          new CustomEvent('student-profile-updated', {
+            detail: { phone: trimmedPhone, nationalId: trimmedNationalId, fullName: student.fullName },
+          })
+        );
+      }
+
       setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 3000);
-    } catch (err) {
+      setIsOnboarding(false);
+      setTimeout(() => setSavedSuccess(false), 4000);
+    } catch (err: any) {
       console.error('Error saving profile:', err);
+      setProfileError(err?.message || 'حدث خطأ أثناء حفظ البيانات.');
+    } finally {
+      setIsSavingProfile(false);
     }
   };
 
@@ -291,6 +382,44 @@ export default function StudentProfilePage() {
     setPassSuccess(false);
     setPasswordError(null);
 
+    // If user signed in with Google (OAuth): they have no current password. Direct update!
+    if (isGoogleUser) {
+      if (!passwords.newPass || !passwords.confirmPass) {
+        setPasswordError('يرجى إدخال كلمة المرور الجديدة وتأكيدها.');
+        return;
+      }
+      if (passwords.newPass.length < 8) {
+        setPasswordError('كلمة المرور الجديدة يجب ألا تقل عن 8 أحرف.');
+        return;
+      }
+      if (passwords.newPass !== passwords.confirmPass) {
+        setPasswordError('كلمة المرور الجديدة وتأكيدها غير متطابقين.');
+        return;
+      }
+
+      try {
+        setIsSavingPassword(true);
+        const supabase = createClient();
+        const { error: updateError } = await supabase.auth.updateUser({
+          password: passwords.newPass,
+        });
+        if (updateError) {
+          throw new Error(updateError.message || 'تعذر تعيين كلمة المرور.');
+        }
+
+        setPassSuccess(true);
+        setPasswords({ current: '', newPass: '', confirmPass: '' });
+        setTimeout(() => setPassSuccess(false), 4000);
+      } catch (error: any) {
+        console.error('Error setting password for Google user:', error);
+        setPasswordError(error?.message || 'تعذر تعيين كلمة المرور.');
+      } finally {
+        setIsSavingPassword(false);
+      }
+      return;
+    }
+
+    // Standard email/password user
     if (!passwords.current || !passwords.newPass || !passwords.confirmPass) {
       setPasswordError('يرجى إدخال كلمة المرور الحالية والجديدة وتأكيدها.');
       return;
@@ -322,7 +451,7 @@ export default function StudentProfilePage() {
         password: passwords.current,
       });
       if (reauthError) {
-        throw new Error('كلمة المرور الحالية غير صحيحة، أو أن الحساب مسجل عبر مزود دخول خارجي.');
+        throw new Error('كلمة المرور الحالية غير صحيحة.');
       }
 
       const { error: updateError } = await supabase.auth.updateUser({
@@ -334,7 +463,7 @@ export default function StudentProfilePage() {
 
       setPassSuccess(true);
       setPasswords({ current: '', newPass: '', confirmPass: '' });
-      setTimeout(() => setPassSuccess(false), 3000);
+      setTimeout(() => setPassSuccess(false), 4000);
     } catch (error) {
       console.error('Error updating password:', error);
       setPasswordError(error instanceof Error ? error.message : 'تعذر تحديث كلمة المرور.');
@@ -375,6 +504,39 @@ export default function StudentProfilePage() {
 
   return (
     <div className="space-y-6" dir="rtl">
+      {/* ── 0. ONBOARDING MANDATORY NOTICE BANNER (GOOGLE / INCOMPLETE PROFILES) ── */}
+      {(!student.phone || !student.nationalId || isOnboarding) && !isLoading && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/5 border-2 border-amber-300 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Shield className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-black text-amber-950">
+                مطلوب استكمال بياناتك الأساسية (رقم الجوال ورقم الهوية الوطنية / الإقامة)
+              </h4>
+              <p className="text-xs text-amber-800 leading-relaxed font-bold">
+                يرجى إدخال رقم الجوال ورقم الهوية الوطنية أو الإقامة ثم الضغط على "حفظ البيانات" لاعتماد حسابك رسمياً، وتسهيل التسجيل في الدورات وإصدار الشهادات المعتمدة باسمك.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById('student-phone-input');
+              el?.focus();
+            }}
+            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-black shrink-0 transition-colors cursor-pointer shadow-xs"
+          >
+            إكمال البيانات الآن
+          </button>
+        </motion.div>
+      )}
+
       {/* Profile Banner Ultra Premium - Light Glassmorphism matching Student Theme */}
       <motion.div
         variants={sectionFadeVariants}
@@ -499,73 +661,102 @@ export default function StudentProfilePage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
-          <div className="space-y-2.5">
-            <label className="text-slate-700 font-extrabold flex items-center gap-2 mb-1">
-              <User className="w-3.5 h-3.5 text-[#173A7C]" />
-              <span>الاسم الكامل باللغة العربية</span>
-            </label>
-            <input
-              type="text"
-              value={student.fullName}
-              onChange={(e) => setStudent({ ...student, fullName: e.target.value })}
-              className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all"
-              style={glassInput}
-            />
+        <form onSubmit={handleSaveProfile} className="space-y-5">
+          {profileError && (
+            <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-bold text-red-700" role="alert">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{profileError}</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
+            <div className="space-y-2.5">
+              <label className="text-slate-700 font-extrabold flex items-center gap-2 mb-1">
+                <User className="w-3.5 h-3.5 text-[#173A7C]" />
+                <span>الاسم الكامل باللغة العربية *</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={student.fullName}
+                onChange={(e) => setStudent({ ...student, fullName: e.target.value })}
+                placeholder="الاسم الثلاثي أو الرباعي..."
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all"
+                style={glassInput}
+              />
+            </div>
+
+            <div className="space-y-2.5">
+              <label className="text-slate-700 font-extrabold flex items-center gap-2 mb-1">
+                <Mail className="w-3.5 h-3.5 text-[#173A7C]" />
+                <span>البريد الإلكتروني المعتمد</span>
+              </label>
+              <input
+                type="email"
+                disabled
+                value={student.email}
+                className="w-full p-3.5 rounded-xl border border-slate-300/80 text-slate-500 font-bold bg-slate-100/80 cursor-not-allowed text-left font-mono"
+                dir="ltr"
+              />
+            </div>
+
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="text-slate-700 font-extrabold flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-[#173A7C]" />
+                  <span>رقم الجوال (المملكة العربية السعودية) *</span>
+                </label>
+                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                  إجباري
+                </span>
+              </div>
+              <input
+                id="student-phone-input"
+                type="tel"
+                required
+                value={student.phone}
+                onChange={(e) => setStudent({ ...student, phone: e.target.value })}
+                placeholder="05XXXXXXXX"
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all text-left font-mono"
+                dir="ltr"
+                style={glassInput}
+              />
+            </div>
+
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="text-slate-700 font-extrabold flex items-center gap-2">
+                  <Shield className="w-3.5 h-3.5 text-[#173A7C]" />
+                  <span>رقم الهوية الوطنية / الإقامة *</span>
+                </label>
+                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                  إجباري للشهادات
+                </span>
+              </div>
+              <input
+                type="text"
+                required
+                value={student.nationalId}
+                onChange={(e) => setStudent({ ...student, nationalId: e.target.value })}
+                placeholder="أدخل رقم الهوية أو الإقامة (10 أرقام تبدأ بـ 1 أو 2)..."
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all text-left font-mono"
+                dir="ltr"
+                style={glassInput}
+              />
+            </div>
           </div>
 
-          <div className="space-y-2.5">
-            <label className="text-slate-700 font-extrabold flex items-center gap-2 mb-1">
-              <Mail className="w-3.5 h-3.5 text-[#173A7C]" />
-              <span>البريد الإلكتروني المعتمد</span>
-            </label>
-            <input
-              type="email"
-              value={student.email}
-              onChange={(e) => setStudent({ ...student, email: e.target.value })}
-              className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all"
-              style={glassInput}
-            />
+          <div className="pt-2 flex justify-end">
+            <button
+              type="submit"
+              disabled={isSavingProfile}
+              className="px-7 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 transition-all duration-300 shadow-lg shadow-[#173A7C]/20 hover:-translate-y-0.5 cursor-pointer disabled:opacity-60"
+            >
+              {isSavingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              <span>{isSavingProfile ? 'جاري الحفظ...' : 'حفظ البيانات'}</span>
+            </button>
           </div>
-
-          <div className="space-y-2.5">
-            <label className="text-slate-700 font-extrabold flex items-center gap-2 mb-1">
-              <Phone className="w-3.5 h-3.5 text-[#173A7C]" />
-              <span>رقم الجوال (المملكة العربية السعودية)</span>
-            </label>
-            <input
-              type="text"
-              value={student.phone}
-              onChange={(e) => setStudent({ ...student, phone: e.target.value })}
-              className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all"
-              style={glassInput}
-            />
-          </div>
-
-          <div className="space-y-2.5">
-            <label className="text-slate-700 font-extrabold flex items-center gap-2 mb-1">
-              <Shield className="w-3.5 h-3.5 text-[#173A7C]" />
-              <span>رقم الهوية الوطنية / الإقامة</span>
-            </label>
-            <input
-              type="text"
-              value={student.nationalId}
-              disabled
-              className="w-full p-3.5 rounded-xl border border-slate-300/90 text-slate-700 font-extrabold cursor-not-allowed"
-              style={{ background: '#F1F5F9', boxShadow: 'inset 0 2px 4px rgba(15,23,42,0.06)' }}
-            />
-          </div>
-        </div>
-
-        <div className="pt-2 flex justify-end">
-          <button
-            onClick={handleSaveProfile}
-            className="px-7 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 transition-all duration-300 shadow-lg shadow-[#173A7C]/20 hover:-translate-y-0.5"
-          >
-            <Save className="w-4 h-4" />
-            <span>حفظ البيانات</span>
-          </button>
-        </div>
+        </form>
       </motion.div>
 
       {/* Security & Password Section */}
@@ -580,39 +771,56 @@ export default function StudentProfilePage() {
         <div className="flex items-center justify-between border-b border-slate-200/30 pb-4">
           <h3 className="student-heading-h3 flex items-center gap-2">
             <Key className="w-4 h-4 text-[#173A7C]" />
-            <span>تغيير كلمة المرور والأمان</span>
+            <span>{isGoogleUser ? 'تعيين كلمة المرور والأمان' : 'تغيير كلمة المرور والأمان'}</span>
           </h3>
           {passSuccess && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200/60">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200/60 animate-fade-in">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              تم تحديث كلمة المرور بنجاح
+              {isGoogleUser ? 'تم تعيين كلمة المرور بنجاح لحسابك' : 'تم تحديث كلمة المرور بنجاح'}
             </span>
           )}
         </div>
 
-        <form onSubmit={handleSavePassword} className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <form onSubmit={handleSavePassword} className={`grid grid-cols-1 ${isGoogleUser ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-4 text-xs`}>
+          {isGoogleUser && (
+            <div className="sm:col-span-2 p-3.5 rounded-2xl bg-blue-50/90 border border-blue-200 text-[#173A7C] text-xs font-bold flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-white border border-blue-200 flex items-center justify-center font-black text-[#173A7C] shadow-xs shrink-0">
+                G
+              </div>
+              <div>
+                <h4 className="font-black text-slate-900">حسابك مسجل عبر Google</h4>
+                <p className="text-[11px] text-slate-600 font-medium mt-0.5">
+                  لا تحتاج إلى إدخال كلمة مرور حالية. يمكنك إنشاء وتعيين كلمة مرور جديدة لحسابك مباشرة لتسجيل الدخول مستقبلاً بكلمة المرور أو عبر Google.
+                </p>
+              </div>
+            </div>
+          )}
+
           {passwordError && (
-            <div className="sm:col-span-3 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-bold text-red-700" role="alert">
+            <div className={`${isGoogleUser ? 'sm:col-span-2' : 'sm:col-span-3'} flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-bold text-red-700`} role="alert">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{passwordError}</span>
             </div>
           )}
 
+          {!isGoogleUser && (
+            <div className="space-y-2">
+              <label className="text-slate-700 font-bold block mb-1">كلمة المرور الحالية *</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                required
+                value={passwords.current}
+                onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+                className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400"
+                style={glassInput}
+              />
+            </div>
+          )}
+
           <div className="space-y-2">
-            <label className="text-slate-700 font-bold block mb-1">كلمة المرور الحالية</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              required
-              value={passwords.current}
-              onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400"
-              style={glassInput}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-slate-700 font-bold block mb-1">كلمة المرور الجديدة</label>
+            <label className="text-slate-700 font-bold block mb-1">كلمة المرور الجديدة *</label>
             <input
               type="password"
               placeholder="••••••••"
@@ -625,8 +833,9 @@ export default function StudentProfilePage() {
               style={glassInput}
             />
           </div>
+
           <div className="space-y-2">
-            <label className="text-slate-700 font-bold block mb-1">تأكيد كلمة المرور</label>
+            <label className="text-slate-700 font-bold block mb-1">تأكيد كلمة المرور الجديدة *</label>
             <input
               type="password"
               placeholder="••••••••"
@@ -640,14 +849,14 @@ export default function StudentProfilePage() {
             />
           </div>
 
-          <div className="sm:col-span-3 flex justify-end pt-2">
+          <div className={`${isGoogleUser ? 'sm:col-span-2' : 'sm:col-span-3'} flex justify-end pt-2`}>
             <button
               type="submit"
               disabled={isSavingPassword}
-              className="px-6 py-2.5 rounded-xl bg-[#173A7C] text-white font-black text-xs hover:bg-[#1E4D9D] transition-colors disabled:cursor-wait disabled:opacity-70 inline-flex items-center gap-2"
+              className="px-6 py-2.5 rounded-xl bg-[#173A7C] text-white font-black text-xs hover:bg-[#1E4D9D] transition-colors disabled:cursor-wait disabled:opacity-70 inline-flex items-center gap-2 cursor-pointer shadow-md"
             >
               {isSavingPassword && <Loader2 className="h-4 w-4 animate-spin" />}
-              <span>{isSavingPassword ? 'جاري التحقق والتحديث...' : 'تحديث كلمة المرور'}</span>
+              <span>{isSavingPassword ? 'جاري الحفظ...' : isGoogleUser ? 'تعيين كلمة المرور لحسابك' : 'تحديث كلمة المرور'}</span>
             </button>
           </div>
         </form>

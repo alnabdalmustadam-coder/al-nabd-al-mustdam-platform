@@ -55,6 +55,26 @@ export async function GET(request: Request) {
         }
       }
 
+      // Check if student profile is missing phone or national_id for mandatory onboarding
+      if (!isAdminRole(userRole) && !isInstructorRole(userRole)) {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('phone, national_id')
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+          const hasValidPhone = Boolean(profile?.phone && profile.phone.trim() && profile.phone !== '+966 50 000 0000');
+          const hasValidNationalId = Boolean(profile?.national_id && profile.national_id.trim() && profile.national_id !== '10XXXXXXXX');
+
+          if (!hasValidPhone || !hasValidNationalId) {
+            targetDestination = '/dashboard/student/profile?onboarding=required';
+          }
+        } catch (checkErr) {
+          console.warn('Profile onboarding check notice:', checkErr);
+        }
+      }
+
       const forwardedHost = request.headers.get('x-forwarded-host');
       const isLocalEnv = process.env.NODE_ENV === 'development';
 
