@@ -60,8 +60,8 @@ export async function GET(req: NextRequest) {
       user: {
         id: user.id,
         email: user.email,
-        name: profile?.full_name || user.user_metadata?.full_name || "",
-        avatarUrl: profile?.avatar_url || user.user_metadata?.avatar_url || null,
+        name: profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",
+        avatarUrl: profile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
         role: effectiveRole,
         dashboardUrl,
         roleLabel,

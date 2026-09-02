@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Menu, X, Home, Info, BookOpen, Briefcase,
   Users, UserCheck, Phone, ChevronDown, FileText, ChevronLeft, User,
-  ShoppingCart, Heart
+  ShoppingCart, Heart, LayoutDashboard, LogOut, Settings
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { createClient } from "@/utils/supabase/client";
 
 const megaMenuItems = [
   { label: "تقييم مستوى اللغة الانجليزية", href: "/english-evaluation", icon: FileText },
@@ -48,18 +49,29 @@ export default function Navbar() {
 
   const { cartCount, openCart } = useCart();
   const { wishlistCount } = useWishlist();
+  const router = useRouter();
 
   const [localUserEmail, setLocalUserEmail] = useState<string | null>(null);
   const [localUserName, setLocalUserName] = useState<string | null>(null);
+  const [localUserAvatar, setLocalUserAvatar] = useState<string | null>(null);
   const [userDashboardUrl, setUserDashboardUrl] = useState<string>("/dashboard/student");
   const [userRoleLabel, setUserRoleLabel] = useState<string>("لوحة التحكم");
   const [userRole, setUserRole] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let isMounted = true;
     const updateAuth = async () => {
       try {
+        if (typeof window !== 'undefined') {
+          const cachedAvatar = localStorage.getItem('student_avatar');
+          const cachedName = localStorage.getItem('student_name');
+          if (cachedAvatar && isMounted) setLocalUserAvatar(cachedAvatar);
+          if (cachedName && isMounted) setLocalUserName(cachedName);
+        }
+
         const res = await fetch("/api/auth/me");
         if (res.ok) {
           const data = await res.json();
@@ -67,6 +79,12 @@ export default function Navbar() {
             setLocalUserEmail(data.user?.email || null);
             if (data.user?.name) {
               setLocalUserName(data.user.name);
+            }
+            if (data.user?.avatarUrl) {
+              setLocalUserAvatar(data.user.avatarUrl);
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('student_avatar', data.user.avatarUrl);
+              }
             }
             if (data.user?.dashboardUrl) {
               setUserDashboardUrl(data.user.dashboardUrl);
@@ -82,6 +100,7 @@ export default function Navbar() {
           if (isMounted) {
             setLocalUserEmail(null);
             setLocalUserName(null);
+            setLocalUserAvatar(null);
             setUserDashboardUrl("/dashboard/student");
             setUserRoleLabel("لوحة التحكم");
             setUserRole(null);
@@ -91,6 +110,7 @@ export default function Navbar() {
         if (isMounted) {
           setLocalUserEmail(null);
           setLocalUserName(null);
+          setLocalUserAvatar(null);
           setUserDashboardUrl("/dashboard/student");
           setUserRoleLabel("لوحة التحكم");
           setUserRole(null);
@@ -104,17 +124,59 @@ export default function Navbar() {
 
     updateAuth();
 
-    const handleUserUpdated = () => {
+    const handleProfileUpdate = (e: any) => {
+      if (e?.detail) {
+        if (e.detail.avatarUrl !== undefined) setLocalUserAvatar(e.detail.avatarUrl);
+        if (e.detail.fullName) setLocalUserName(e.detail.fullName);
+      }
       updateAuth();
     };
 
-    window.addEventListener("nabd_user_updated", handleUserUpdated);
+    window.addEventListener("nabd_user_updated", handleProfileUpdate);
+    window.addEventListener("student-profile-updated", handleProfileUpdate);
+    window.addEventListener("profileUpdated", handleProfileUpdate);
 
     return () => {
       isMounted = false;
-      window.removeEventListener("nabd_user_updated", handleUserUpdated);
+      window.removeEventListener("nabd_user_updated", handleProfileUpdate);
+      window.removeEventListener("student-profile-updated", handleProfileUpdate);
+      window.removeEventListener("profileUpdated", handleProfileUpdate);
     };
   }, [pathname]);
+
+  // Click outside to close user dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      setUserMenuOpen(false);
+      await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+      const supabase = createClient();
+      await supabase.auth.signOut().catch(() => {});
+    } catch (err) {
+      console.error('Navbar logout error:', err);
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('student_avatar');
+        localStorage.removeItem('student_name');
+        localStorage.removeItem('student_phone');
+        localStorage.removeItem('student_national_id');
+        window.dispatchEvent(new Event('nabd_user_updated'));
+      }
+      setLocalUserEmail(null);
+      setLocalUserName(null);
+      setLocalUserAvatar(null);
+      router.push('/auth/login');
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -303,28 +365,107 @@ export default function Navbar() {
 
             {/* User Auth CTA */}
             {authLoading ? (
-              <div className="w-24 h-9 rounded-xl bg-slate-100/70 border border-slate-200/50 animate-pulse" />
+              <div className="w-10 h-10 rounded-full bg-slate-100/80 border border-slate-200/60 animate-pulse shrink-0" />
             ) : localUserEmail ? (
-              <Link 
-                href={userDashboardUrl} 
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border border-transparent ${
-                  isDarkPage
-                    ? "hover:bg-white/5 hover:border-white/10"
-                    : "hover:bg-slate-50 hover:border-slate-200"
-                }`}
-                title={userRoleLabel}
-              >
-                <div className={`w-8 h-8 rounded-full border flex items-center justify-center ${
-                  isDarkPage
-                    ? "bg-white/10 border-white/20 text-[#5CB07C]"
-                    : "bg-[#173A7C]/10 border-[#173A7C]/20 text-[#173A7C]"
-                }`}>
-                  <User className="w-4 h-4" />
-                </div>
-                <span className={`text-sm font-bold ${isDarkPage ? "text-slate-200" : "text-[#173A7C] engraved-nav-text"}`}>
-                  {localUserName?.split(' ')[0] || localUserEmail.split('@')[0]}
-                </span>
-              </Link>
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="relative group p-0.5 rounded-full transition-transform hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#173A7C]/30"
+                  aria-label="حساب المتدرب"
+                  aria-expanded={userMenuOpen}
+                >
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden ring-2 ring-[#173A7C]/25 group-hover:ring-[#173A7C]/50 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
+                    {localUserAvatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={localUserAvatar}
+                        alt={localUserName || "المستخدم"}
+                        className="w-full h-full object-cover object-top"
+                        referrerPolicy="no-referrer"
+                        crossOrigin="anonymous"
+                        onError={() => setLocalUserAvatar(null)}
+                      />
+                    ) : (
+                      <span className="text-white text-base font-black">
+                        {localUserName ? localUserName.charAt(0) : <User className="w-5 h-5 text-white" />}
+                      </span>
+                    )}
+                  </div>
+                  {/* Online indicator */}
+                  <span className="absolute bottom-0 left-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs" />
+                </button>
+
+                {/* Modern Dropdown Menu */}
+                {userMenuOpen && (
+                  <div 
+                    className="absolute left-0 mt-3 w-64 rounded-2xl border border-slate-200/90 bg-white/98 backdrop-blur-2xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                    dir="rtl"
+                  >
+                    {/* User Identity Card */}
+                    <div className="p-3 bg-slate-50/90 rounded-xl border border-slate-100 mb-1 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden ring-1 ring-slate-200 shrink-0 bg-[#173A7C]/10 flex items-center justify-center">
+                        {localUserAvatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={localUserAvatar}
+                            alt=""
+                            className="w-full h-full object-cover object-top"
+                            referrerPolicy="no-referrer"
+                            crossOrigin="anonymous"
+                          />
+                        ) : (
+                          <User className="w-5 h-5 text-[#173A7C]" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-black text-slate-900 truncate">
+                          {localUserName || "متدرب معتمد"}
+                        </div>
+                        <div className="text-[10px] text-slate-500 font-bold truncate">
+                          {localUserEmail}
+                        </div>
+                        <span className="inline-block mt-1 text-[9px] font-black px-2 py-0.5 rounded-full bg-blue-50 text-[#173A7C] border border-blue-200/60">
+                          {userRoleLabel}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Navigation Links */}
+                    <div className="space-y-0.5 text-xs font-bold text-slate-700">
+                      <Link
+                        href={userDashboardUrl}
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-[#173A7C]/8 hover:text-[#173A7C] transition-colors"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-[#173A7C]" />
+                        <span>لوحة التحكم</span>
+                      </Link>
+
+                      <Link
+                        href="/dashboard/student/profile"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-[#173A7C]/8 hover:text-[#173A7C] transition-colors"
+                      >
+                        <Settings className="w-4 h-4 text-[#173A7C]" />
+                        <span>الملف الشخصي والإعدادات</span>
+                      </Link>
+                    </div>
+
+                    <div className="h-px bg-slate-100 my-1.5" />
+
+                    {/* Logout */}
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50/80 transition-colors cursor-pointer text-right"
+                    >
+                      <LogOut className="w-4 h-4 text-rose-600" />
+                      <span>تسجيل الخروج</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Button href="/auth/login" size="sm" className="text-xs xl:text-sm px-4 py-1.5 whitespace-nowrap">
                 تسجيل دخول
@@ -464,13 +605,49 @@ export default function Navbar() {
             })}
           </div>
 
-          <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex flex-col gap-3">
+          <div className="p-5 border-t border-slate-100 bg-slate-50/70 flex flex-col gap-3">
             {authLoading ? (
               <div className="w-full h-11 rounded-xl bg-slate-200/70 animate-pulse" />
             ) : localUserEmail ? (
-              <Button href={userDashboardUrl} className="w-full text-center justify-center">
-                {userRoleLabel}
-              </Button>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+                  <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-[#173A7C]/20 shrink-0 bg-[#173A7C]/10 flex items-center justify-center">
+                    {localUserAvatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={localUserAvatar}
+                        alt=""
+                        className="w-full h-full object-cover object-top"
+                        referrerPolicy="no-referrer"
+                        crossOrigin="anonymous"
+                      />
+                    ) : (
+                      <User className="w-5 h-5 text-[#173A7C]" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-xs font-black text-slate-900 truncate">{localUserName || 'متدرب معتمد'}</h4>
+                    <p className="text-[10px] text-slate-500 font-bold truncate">{localUserEmail}</p>
+                    <span className="inline-block mt-0.5 text-[9px] font-black px-2 py-0.5 rounded-full bg-blue-50 text-[#173A7C] border border-blue-200/60">
+                      {userRoleLabel}
+                    </span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button href={userDashboardUrl} size="sm" className="w-full justify-center text-xs font-black">
+                    <LayoutDashboard className="w-3.5 h-3.5 ml-1.5" />
+                    لوحة التحكم
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full py-2.5 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs font-black hover:bg-rose-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    تسجيل الخروج
+                  </button>
+                </div>
+              </div>
             ) : (
               <Button href="/auth/login" className="w-full text-center justify-center">
                 تسجيل الدخول
