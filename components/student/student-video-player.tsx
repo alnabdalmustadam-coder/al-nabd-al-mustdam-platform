@@ -38,23 +38,33 @@ const parseEmbedUrl = (url: string): string => {
   if (!url) return '';
   const trimmed = url.trim();
 
+  // Explicitly disallow YouTube or external video links - only authentic database videos allowed
+  if (
+    trimmed.includes('youtube.com') ||
+    trimmed.includes('youtu.be') ||
+    trimmed.includes('youtube-nocookie.com') ||
+    trimmed.includes('vimeo.com')
+  ) {
+    return '';
+  }
+
   // 1. Bunny Player to Embed URL conversion
   if (trimmed.includes('player.mediadelivery.net/play/')) {
     return trimmed.replace('player.mediadelivery.net/play/', 'iframe.mediadelivery.net/embed/');
   }
 
-  // 5. Already Signed Bunny Stream URL
+  // 2. Already Signed Bunny Stream URL
   if (trimmed.includes('iframe.mediadelivery.net')) {
     return trimmed;
   }
 
-  // 6. Raw Bunny GUID string (36-char uuid)
+  // 3. Raw Bunny GUID string (36-char uuid)
   const rawGuid = extractBunnyGuid(trimmed);
   if (rawGuid && !trimmed.startsWith('http')) {
     return `https://iframe.mediadelivery.net/embed/729792/${rawGuid}?autoplay=false&preload=true`;
   }
 
-  // 7. Any other full HTTPS URL
+  // 4. Authentic direct HTTPS storage/CDN stream
   if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
     return trimmed;
   }
@@ -95,7 +105,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
       try {
         const trimmed = (videoUrl || '').trim();
 
-        if (!trimmed) {
+        if (!trimmed || trimmed.includes('youtube.com') || trimmed.includes('youtu.be') || trimmed.includes('vimeo.com')) {
           if (isMounted) {
             setIframeUrl(null);
             setError(null);

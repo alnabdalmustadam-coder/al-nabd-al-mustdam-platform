@@ -156,16 +156,16 @@ export function DeviceImageUploader({
   };
 
   const aspectClasses = {
-    video: 'aspect-16/9',
-    square: 'aspect-square',
-    banner: 'aspect-21/9',
-    auto: 'min-h-[160px]',
+    video: 'aspect-16/10 max-h-[195px]',
+    square: 'aspect-square max-h-[190px]',
+    banner: 'aspect-21/9 max-h-[150px]',
+    auto: 'min-h-[130px] max-h-[195px]',
   }[aspectRatio];
 
   return (
-    <div className={`space-y-2 text-right ${className}`}>
+    <div className={`space-y-1.5 text-right ${className}`}>
       <div className="flex items-center justify-between">
-        <label className="text-slate-800 text-xs font-black flex items-center gap-1.5">
+        <label className="text-slate-700 text-xs font-black flex items-center gap-1.5">
           <ImageIcon className="w-3.5 h-3.5 text-[#173A7C]" />
           <span>{label}</span>
         </label>
@@ -202,7 +202,7 @@ export function DeviceImageUploader({
       >
         {/* Preview of Current Image */}
         {value && !isUploading && (
-          <div className="relative w-full h-full group">
+          <div className="relative w-full h-full flex flex-col justify-between group">
             <img
               src={value}
               alt="معاينة الصورة"
@@ -211,26 +211,27 @@ export function DeviceImageUploader({
                 (e.target as HTMLImageElement).src = '/logo.webp';
               }}
             />
-            <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 p-3 text-white backdrop-blur-xs">
-              <span className="text-xs font-bold bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/30">
-                صورة معتمدة (WebP)
+            {/* Bottom Floating Action Bar */}
+            <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-slate-950/85 via-slate-900/60 to-transparent flex items-center justify-between gap-2 text-white">
+              <span className="text-[10px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 px-2 py-0.5 rounded-md backdrop-blur-md">
+                ✓ WebP معتمد
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3.5 py-1.5 rounded-xl bg-white text-[#173A7C] text-xs font-black shadow-md hover:bg-blue-50 transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg bg-white text-[#173A7C] text-[11px] font-black shadow-xs hover:bg-blue-50 transition-all flex items-center gap-1 cursor-pointer"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>تغيير الصورة من الجهاز</span>
+                  <RefreshCw className="w-3 h-3" />
+                  <span>تغيير</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => onChange('')}
-                  className="p-1.5 rounded-xl bg-rose-500/80 hover:bg-rose-600 text-white transition-all cursor-pointer"
+                  className="p-1 rounded-lg bg-rose-500/80 hover:bg-rose-600 text-white transition-all cursor-pointer"
                   title="حذف الصورة"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -241,22 +242,22 @@ export function DeviceImageUploader({
         {(!value || isUploading) && (
           <div
             onClick={() => !isUploading && fileInputRef.current?.click()}
-            className={`w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer ${
+            className={`w-full h-full flex flex-col items-center justify-center p-4 text-center cursor-pointer ${
               isUploading ? 'cursor-wait' : ''
             }`}
           >
             {isUploading ? (
-              <div className="w-full max-w-xs space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-blue-100 text-[#173A7C] flex items-center justify-center mx-auto shadow-xs">
-                  <Loader2 className="w-6 h-6 animate-spin text-[#173A7C]" />
+              <div className="w-full max-w-xs space-y-2.5 px-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-100 text-[#173A7C] flex items-center justify-center mx-auto shadow-xs">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#173A7C]" />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between text-xs font-black text-slate-700 mb-1">
+                  <div className="flex items-center justify-between text-[11px] font-black text-slate-700 mb-1">
                     <span>{statusText}</span>
                     <span className="font-mono text-[#173A7C]">{progress}%</span>
                   </div>
                   {/* Progress Bar */}
-                  <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
+                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden shadow-inner">
                     <div
                       className="h-full bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] transition-all duration-300 rounded-full"
                       style={{ width: `${progress}%` }}
@@ -264,20 +265,20 @@ export function DeviceImageUploader({
                   </div>
                 </div>
                 <span className="text-[10px] text-slate-400 block font-medium">
-                  يتم التحويل التلقائي لصيغة WebP المضغوطة لتسريع الموقع
+                  يتم التحويل التلقائي لصيغة WebP لتسريع التحميل
                 </span>
               </div>
             ) : (
-              <div className="space-y-2 group">
-                <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 text-[#173A7C] flex items-center justify-center mx-auto shadow-sm group-hover:scale-110 group-hover:border-[#173A7C]/40 transition-all">
-                  <UploadCloud className="w-7 h-7 text-[#173A7C]" />
+              <div className="space-y-1.5 group">
+                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-[#173A7C] flex items-center justify-center mx-auto shadow-xs group-hover:scale-105 group-hover:border-[#173A7C]/40 transition-all">
+                  <UploadCloud className="w-5 h-5 text-[#173A7C]" />
                 </div>
                 <div>
                   <p className="text-xs font-black text-slate-800">
-                    اضغط لاختيار صورة من جهازك <span className="text-[#173A7C]">أو اسحبها وأفلتها هنا</span>
+                    اضغط لرفع صورة من جهازك <span className="text-[#173A7C]">أو اسحبها هنا</span>
                   </p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    يدعم PNG, JPG, JPEG, WebP (تُضغط وتُحوّل لـ WebP تلقائياً)
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    تُضغط وتُحوّل تلقائياً إلى صيغة WebP
                   </p>
                 </div>
               </div>

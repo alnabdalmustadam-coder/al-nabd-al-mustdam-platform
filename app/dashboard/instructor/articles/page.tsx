@@ -484,24 +484,26 @@ export default function InstructorArticlesPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+            className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-white/80 overflow-hidden my-auto"
+              exit={{ scale: 0.96, opacity: 0 }}
+              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden my-auto max-h-[92vh] flex flex-col text-right"
             >
-              <form onSubmit={handleSaveArticle} className="space-y-4">
+              <form onSubmit={handleSaveArticle} className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="p-5 bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Newspaper className="w-5 h-5 text-amber-300" />
+                <div className="px-6 py-4 bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs text-amber-300">
+                      <Newspaper className="w-5 h-5" />
+                    </div>
                     <div>
-                      <h3 className="font-black text-sm sm:text-base">
+                      <h3 className="font-black text-sm sm:text-base leading-tight">
                         {editingArticle.id ? 'تعديل المقال الأكاديمي' : 'كتابة مقال أكاديمي جديد'}
                       </h3>
-                      <p className="text-xs text-blue-100">النشر في المدونة الرسمية للمنصة</p>
+                      <p className="text-[11px] text-blue-100/90 mt-0.5">النشر والمشاركة في المدونة الرسمية للمنصة</p>
                     </div>
                   </div>
                   <button
@@ -510,200 +512,229 @@ export default function InstructorArticlesPage() {
                       setIsModalOpen(false);
                       setEditingArticle(null);
                     }}
-                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                    className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Form Fields */}
-                <div className="p-5 sm:p-6 space-y-4 max-h-[70vh] overflow-y-auto text-xs font-bold">
-                  <div className="space-y-1">
-                    <label className="text-slate-700 block">عنوان المقال الأكاديمي *</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingArticle.title || ''}
-                      onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
-                      placeholder="مثال: أسس القيادة الأخلاقية في المنظمات الحديثة..."
-                      className="w-full p-3 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs font-bold"
-                    />
-                  </div>
+                {/* Scrollable 2-Column Grid */}
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <label className="text-slate-700 block">التصنيف الأكاديمي *</label>
-                        <button
-                          type="button"
-                          onClick={() => setIsAddingNewCat(!isAddingNewCat)}
-                          className="text-[#173A7C] text-[11px] hover:underline font-black cursor-pointer"
-                        >
-                          {isAddingNewCat ? 'إلغاء' : '+ إضافة تصنيف جديد'}
-                        </button>
+                    {/* ── RIGHT COLUMN (7 COLS): Info, Excerpt & Content ── */}
+                    <div className="lg:col-span-7 space-y-4 text-xs font-bold">
+                      <div className="space-y-1">
+                        <label className="text-slate-700 text-xs font-black block">عنوان المقال الأكاديمي *</label>
+                        <input
+                          type="text"
+                          required
+                          value={editingArticle.title || ''}
+                          onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
+                          placeholder="مثال: أسس القيادة الأخلاقية في المنظمات الحديثة..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-bold text-slate-900"
+                        />
                       </div>
 
-                      {isAddingNewCat ? (
-                        <div className="flex items-center gap-1.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <label className="text-slate-700 text-xs font-black block">التصنيف الأكاديمي *</label>
+                            <button
+                              type="button"
+                              onClick={() => setIsAddingNewCat(!isAddingNewCat)}
+                              className="text-[#173A7C] text-[10px] hover:underline font-black cursor-pointer"
+                            >
+                              {isAddingNewCat ? 'إلغاء' : '+ تصنيف جديد'}
+                            </button>
+                          </div>
+
+                          {isAddingNewCat ? (
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="text"
+                                value={newCatInput}
+                                onChange={(e) => setNewCatInput(e.target.value)}
+                                placeholder="تصنيف..."
+                                className="w-full px-2.5 py-2 rounded-xl border border-blue-300 outline-none text-xs"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleAddNewCategory}
+                                className="px-3 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black cursor-pointer"
+                              >
+                                +
+                              </button>
+                            </div>
+                          ) : (
+                            <select
+                              value={editingArticle.category || categoriesList[0]}
+                              onChange={(e) => setEditingArticle({ ...editingArticle, category: e.target.value })}
+                              className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none bg-white text-xs font-bold text-slate-800"
+                            >
+                              {categoriesList.map((cat) => (
+                                <option key={cat} value={cat}>
+                                  {cat}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-slate-700 text-xs font-black block">وقت القراءة المقدر</label>
                           <input
                             type="text"
-                            value={newCatInput}
-                            onChange={(e) => setNewCatInput(e.target.value)}
-                            placeholder="اسم التصنيف الجديد..."
-                            className="flex-1 p-2 rounded-xl border border-blue-300 focus:border-[#173A7C] outline-none text-xs font-bold bg-blue-50/50"
+                            value={editingArticle.read_time || '6 دقائق'}
+                            onChange={(e) => setEditingArticle({ ...editingArticle, read_time: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-bold text-slate-800"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-slate-700 text-xs font-black block">المقدمة والملخص التنفيذي *</label>
+                        <textarea
+                          rows={2}
+                          required
+                          value={editingArticle.excerpt || ''}
+                          onChange={(e) => setEditingArticle({ ...editingArticle, excerpt: e.target.value })}
+                          placeholder="نبذة موجزة تشرح الفكرة الرئيسية للمقال وتجذب القارئ..."
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none resize-none text-xs font-medium text-slate-800 leading-relaxed"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-slate-700 text-xs font-black block">نص المحتوى والمقال بالكامل *</label>
+                        <textarea
+                          rows={6}
+                          required
+                          value={editingArticle.content || ''}
+                          onChange={(e) => setEditingArticle({ ...editingArticle, content: e.target.value })}
+                          placeholder="اكتب المحتوى الأكاديمي، المحاور، النتائج والتوصيات بالتفصيل..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-medium leading-relaxed text-slate-800"
+                        />
+                      </div>
+
+                      {/* Tags Manager */}
+                      <div className="space-y-1.5">
+                        <label className="text-slate-700 text-xs font-black block">الوسوم والكلمات المفتاحية</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAddTag();
+                              }
+                            }}
+                            placeholder="أدخل وسماً ثم اضغط إضافة..."
+                            className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs"
                           />
                           <button
                             type="button"
-                            onClick={handleAddNewCategory}
-                            className="px-3 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black cursor-pointer"
+                            onClick={handleAddTag}
+                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black cursor-pointer transition-colors"
                           >
-                            إضافة
+                            + إضافة
                           </button>
                         </div>
-                      ) : (
-                        <select
-                          value={editingArticle.category || categoriesList[0]}
-                          onChange={(e) => setEditingArticle({ ...editingArticle, category: e.target.value })}
-                          className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none bg-white text-xs font-bold"
-                        >
-                          {categoriesList.map((cat) => (
-                            <option key={cat} value={cat}>
-                              {cat}
-                            </option>
+
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {(editingArticle.tags || []).map((t, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-[11px] font-bold text-slate-800"
+                            >
+                              <span>#{t}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveTag(t)}
+                                className="text-slate-400 hover:text-rose-600 font-black cursor-pointer mr-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
                           ))}
-                        </select>
-                      )}
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-slate-700 block">حالة النشر *</label>
-                      <select
-                        value={editingArticle.status || 'published'}
-                        onChange={(e) =>
-                          setEditingArticle({
-                            ...editingArticle,
-                            status: e.target.value as 'published' | 'draft',
-                          })
-                        }
-                        className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none bg-white text-xs font-bold"
-                      >
-                        <option value="published">منشور ومتاح للجميع</option>
-                        <option value="draft">مسودة خاصة</option>
-                      </select>
-                    </div>
-                  </div>
+                    {/* ── LEFT COLUMN (5 COLS): Image, Status & Live Preview ── */}
+                    <div className="lg:col-span-5 space-y-4">
+                      {/* Device Image Uploader */}
+                      <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
+                        <DeviceImageUploader
+                          value={editingArticle.image || ''}
+                          onChange={(url) => setEditingArticle({ ...editingArticle, image: url })}
+                          folder="articles"
+                          slug={editingArticle.slug || 'article'}
+                          label="صورة غلاف المقال (WebP معتمد)"
+                          recommendedSize="المقاس: 1200 × 630 بكسل"
+                          aspectRatio="video"
+                        />
+                      </div>
 
-                  {/* Device-Based WebP Cover Image Uploader with Progress Bar */}
-                  <DeviceImageUploader
-                    value={editingArticle.image || ''}
-                    onChange={(url) => setEditingArticle({ ...editingArticle, image: url })}
-                    folder="articles"
-                    slug={editingArticle.slug || 'article'}
-                    label="صورة غلاف المقال (رفع مباشر من جهازك مع ضغط WebP)"
-                    recommendedSize="المقاس المثالي: 1200 × 630 بكسل (WebP / JPG / PNG)"
-                    aspectRatio="video"
-                  />
-
-                  <div className="space-y-1">
-                    <label className="text-slate-700 block">المقدمة والملخص التنفيذي (Excerpt) *</label>
-                    <textarea
-                      rows={2}
-                      required
-                      value={editingArticle.excerpt || ''}
-                      onChange={(e) => setEditingArticle({ ...editingArticle, excerpt: e.target.value })}
-                      placeholder="نبذة موجزة تشرح الفكرة الرئيسية للمقال وتجذب القارئ..."
-                      className="w-full p-3 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none resize-none text-xs font-medium"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-slate-700 block">نص المحتوى والمقال بالكامل *</label>
-                    <textarea
-                      rows={8}
-                      value={editingArticle.content || ''}
-                      onChange={(e) => setEditingArticle({ ...editingArticle, content: e.target.value })}
-                      placeholder="اكتب المحتوى الأكاديمي، المحاور، النتائج والتوصيات بالتفصيل..."
-                      className="w-full p-3 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs font-medium leading-relaxed"
-                    />
-                  </div>
-
-                  {/* Tags Manager */}
-                  <div className="space-y-1.5">
-                    <label className="text-slate-700 block">الوسوم والكلمات المفتاحية</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleAddTag();
+                      {/* Status Card */}
+                      <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
+                        <label className="text-slate-700 text-xs font-black block">حالة النشر والظهور</label>
+                        <select
+                          value={editingArticle.status || 'published'}
+                          onChange={(e) =>
+                            setEditingArticle({
+                              ...editingArticle,
+                              status: e.target.value as 'published' | 'draft',
+                            })
                           }
-                        }}
-                        placeholder="أدخل وسماً ثم اضغط إضافة (مثال: حوكمة، إدارة)..."
-                        className="flex-1 p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddTag}
-                        className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-[#173A7C] hover:text-white text-slate-700 text-xs font-black cursor-pointer transition-colors"
-                      >
-                        + إضافة وسم
-                      </button>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {(editingArticle.tags || []).map((t, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2.5 py-1 rounded-lg bg-blue-50 text-[#173A7C] text-xs font-bold flex items-center gap-1 border border-blue-200"
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none bg-white text-xs font-bold text-slate-800"
                         >
-                          <span>#{t}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveTag(t)}
-                            className="text-red-500 hover:text-red-700 font-black cursor-pointer"
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                          <option value="published">🟢 منشور ومتاح للجميع بالمدونة</option>
+                          <option value="draft">🟡 مسودة خاصة غير منشورة</option>
+                        </select>
+                      </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-slate-700 block">صورة الغلاف (مسار الصورة)</label>
-                      <input
-                        type="text"
-                        value={editingArticle.image || '/1.png'}
-                        onChange={(e) => setEditingArticle({ ...editingArticle, image: e.target.value })}
-                        className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs"
-                      />
+                      {/* Live Store Card Preview */}
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-50/50 to-slate-50 border border-blue-100 space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px] font-black text-[#173A7C]">
+                          <span>معاينة فورية لكارت المقال:</span>
+                          <span className="text-[10px] font-mono text-slate-400">Live Preview</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-xs flex items-center gap-3">
+                          <div className="w-16 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200 relative">
+                            <img
+                              src={editingArticle.image || '/1.png'}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                              onError={(e) => { (e.target as HTMLImageElement).src = '/logo.webp'; }}
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-xs font-black text-slate-800 truncate">
+                              {editingArticle.title || 'عنوان المقال الأكاديمي'}
+                            </h4>
+                            <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold mt-1">
+                              <span>{editingArticle.category || 'عام'}</span>
+                              <span className="text-[#173A7C] font-mono">{editingArticle.read_time || '6 دقائق'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-slate-700 block">وقت القراءة المقدر</label>
-                      <input
-                        type="text"
-                        value={editingArticle.read_time || '6 دقائق'}
-                        onChange={(e) => setEditingArticle({ ...editingArticle, read_time: e.target.value })}
-                        className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs"
-                      />
-                    </div>
                   </div>
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
                   <button
                     type="button"
                     onClick={() => {
                       setIsModalOpen(false);
                       setEditingArticle(null);
                     }}
-                    className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-200/60 font-bold text-xs cursor-pointer transition-colors"
                   >
                     إلغاء
                   </button>
@@ -711,16 +742,16 @@ export default function InstructorArticlesPage() {
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-emerald-600 text-white font-black text-xs shadow-md hover:opacity-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-emerald-600 text-white font-black text-xs shadow-md hover:opacity-95 flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-all"
                   >
                     {isSaving ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         <span>جاري الحفظ...</span>
                       </>
                     ) : (
                       <>
-                        <Check className="w-4 h-4" />
+                        <Check className="w-3.5 h-3.5" />
                         <span>حفظ ونشر المقال</span>
                       </>
                     )}

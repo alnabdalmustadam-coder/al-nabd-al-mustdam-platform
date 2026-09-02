@@ -104,8 +104,14 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
 
   const categoryLabel = CATEGORY_MAP[course.category] || course.category;
 
-  const previewVideoUrl =
+  const rawPreviewUrl =
     course.curriculum?.find((l) => Boolean(l.videoUrl))?.videoUrl || "";
+  const isAuthenticVideo =
+    Boolean(rawPreviewUrl) &&
+    !rawPreviewUrl.includes("youtube.com") &&
+    !rawPreviewUrl.includes("youtu.be") &&
+    !rawPreviewUrl.includes("vimeo.com");
+  const previewVideoUrl = isAuthenticVideo ? rawPreviewUrl : "";
 
   const handleShare = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {

@@ -1177,7 +1177,7 @@ export default function InstructorCoursesPage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-white/80 overflow-hidden my-auto flex flex-col max-h-[90vh]"
+              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden my-auto flex flex-col max-h-[92vh]"
             >
               <div className="p-5 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] text-white flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">

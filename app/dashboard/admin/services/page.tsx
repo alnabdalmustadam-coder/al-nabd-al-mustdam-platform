@@ -696,247 +696,306 @@ export default function AdminServicesPage() {
       {/* ── 5. CREATE / EDIT MODAL ── */}
       <AnimatePresence>
         {isModalOpen && editingService && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-md overflow-y-auto">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 my-8"
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="bg-white rounded-3xl max-w-5xl w-full shadow-2xl border border-slate-200/80 my-auto max-h-[92vh] flex flex-col overflow-hidden text-right"
             >
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2.5 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md">
+              {/* Fixed Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/70">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center shadow-md shrink-0">
                     <Briefcase className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900">
+                    <h3 className="text-base font-black text-slate-900 leading-tight">
                       {editingService.id ? 'تعديل بيانات الخدمة' : 'إضافة خدمة أو استشارة جديدة'}
                     </h3>
-                    <p className="text-xs font-bold text-slate-500">
-                      حدد كافة التفاصيل والشروط والمخرجات المعتمدة للظهور في المتجر
+                    <p className="text-[11px] font-bold text-slate-500 mt-0.5">
+                      حدد كافة التفاصيل والشروط والمخرجات المعتمدة للظهور في المتجر العام
                     </p>
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer"
+                  className="p-2 rounded-xl hover:bg-slate-200/60 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <form onSubmit={handleSaveService} className="space-y-4 text-xs font-bold">
-                {/* Title */}
-                <div className="space-y-1">
-                  <label className="text-slate-700 font-black">عنوان الخدمة أو الاستشارة *</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingService.title || ''}
-                    onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
-                    placeholder="مثال: جلسة استشارية فردية في التخطيط الأكاديمي..."
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
-                  />
-                </div>
-
-                {/* Category & Provider */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <label className="text-slate-700 font-black">التصنيف *</label>
-                      <button
-                        type="button"
-                        onClick={() => setIsAddingNewCat(!isAddingNewCat)}
-                        className="text-[10px] font-black text-blue-600 hover:underline cursor-pointer"
-                      >
-                        {isAddingNewCat ? 'إلغاء' : '+ تصنيف جديد'}
-                      </button>
-                    </div>
-
-                    {isAddingNewCat ? (
-                      <div className="flex gap-2">
+              {/* Form Body & Footer */}
+              <form onSubmit={handleSaveService} className="flex-1 flex flex-col overflow-hidden">
+                {/* Scrollable 2-Column Grid */}
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    
+                    {/* ── RIGHT COLUMN (7 COLS): Info, Pricing & Deliverables ── */}
+                    <div className="lg:col-span-7 space-y-4">
+                      {/* Title */}
+                      <div className="space-y-1">
+                        <label className="text-slate-700 text-xs font-black block">عنوان الخدمة أو الاستشارة *</label>
                         <input
                           type="text"
-                          value={newCatInput}
-                          onChange={(e) => setNewCatInput(e.target.value)}
-                          placeholder="اسم التصنيف الجديد..."
-                          className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                          required
+                          value={editingService.title || ''}
+                          onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
+                          placeholder="مثال: جلسة استشارية فردية في التخطيط الأكاديمي..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#173A7C] transition-colors"
                         />
-                        <button
-                          type="button"
-                          onClick={handleAddNewCategory}
-                          className="px-3 py-2 bg-[#173A7C] text-white rounded-xl font-bold cursor-pointer"
-                        >
-                          إضافة
-                        </button>
                       </div>
-                    ) : (
-                      <select
-                        value={editingService.category || categoriesList[0]}
-                        onChange={(e) => setEditingService({ ...editingService, category: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white"
-                      >
-                        {categoriesList.map((c, i) => (
-                          <option key={i} value={c}>
-                            {c}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
 
-                  <div className="space-y-1">
-                    <label className="text-slate-700 font-black">مقدم الخدمة / المشرف *</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingService.providerName || ''}
-                      onChange={(e) => setEditingService({ ...editingService, providerName: e.target.value })}
-                      placeholder="اسم الدكتور / المدرب / الفريق الأكاديمي..."
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
-                    />
-                  </div>
-                </div>
+                      {/* Category & Provider */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <label className="text-slate-700 text-xs font-black block">التصنيف *</label>
+                            <button
+                              type="button"
+                              onClick={() => setIsAddingNewCat(!isAddingNewCat)}
+                              className="text-[10px] font-black text-[#173A7C] hover:underline cursor-pointer"
+                            >
+                              {isAddingNewCat ? 'إلغاء' : '+ تصنيف جديد'}
+                            </button>
+                          </div>
 
-                {/* Price, Duration */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-slate-700 font-black">السعر (ر.س) *</label>
-                    <input
-                      type="number"
-                      required
-                      min="0"
-                      value={editingService.price || ''}
-                      onChange={(e) => setEditingService({ ...editingService, price: Number(e.target.value) })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
-                    />
-                  </div>
+                          {isAddingNewCat ? (
+                            <div className="flex gap-1.5">
+                              <input
+                                type="text"
+                                value={newCatInput}
+                                onChange={(e) => setNewCatInput(e.target.value)}
+                                placeholder="اسم التصنيف..."
+                                className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleAddNewCategory}
+                                className="px-3 py-2 bg-[#173A7C] text-white rounded-xl text-xs font-black cursor-pointer"
+                              >
+                                إضافة
+                              </button>
+                            </div>
+                          ) : (
+                            <select
+                              value={editingService.category || categoriesList[0]}
+                              onChange={(e) => setEditingService({ ...editingService, category: e.target.value })}
+                              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white text-slate-800"
+                            >
+                              {categoriesList.map((c, i) => (
+                                <option key={i} value={c}>
+                                  {c}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
 
-                  <div className="space-y-1">
-                    <label className="text-slate-700 font-black">مدة التنفيذ / الجلسة *</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingService.duration || ''}
-                      onChange={(e) => setEditingService({ ...editingService, duration: e.target.value })}
-                      placeholder="مثال: 3 أيام عمل أو 60 دقيقة"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
-                    />
-                  </div>
-                </div>
+                        <div className="space-y-1">
+                          <label className="text-slate-700 text-xs font-black block">مقدم الخدمة / المشرف *</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingService.providerName || ''}
+                            onChange={(e) => setEditingService({ ...editingService, providerName: e.target.value })}
+                            placeholder="اسم الدكتور أو المشرف الأكاديمي..."
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C]"
+                          />
+                        </div>
+                      </div>
 
-                {/* Device-Based WebP Service Image Uploader */}
-                <DeviceImageUploader
-                  value={editingService.image || ''}
-                  onChange={(url) => setEditingService({ ...editingService, image: url })}
-                  folder="services"
-                  slug={editingService.id || 'service'}
-                  label="صورة وبنر الخدمة التوضيحي (رفع مباشر من الجهاز مع ضغط WebP)"
-                  recommendedSize="المقاس المثالي: 1200 × 750 بكسل (WebP / JPG / PNG)"
-                  aspectRatio="video"
-                />
+                      {/* Price & Duration */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div className="space-y-1">
+                          <label className="text-slate-700 text-xs font-black block">السعر (ر.س) *</label>
+                          <input
+                            type="number"
+                            required
+                            min="0"
+                            value={editingService.price || ''}
+                            onChange={(e) => setEditingService({ ...editingService, price: Number(e.target.value) })}
+                            placeholder="750"
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-black text-[#173A7C] focus:outline-none focus:border-[#173A7C]"
+                          />
+                        </div>
 
-                {/* Description */}
-                <div className="space-y-1">
-                  <label className="text-slate-700 font-black">الوصف التعريفي للخدمة *</label>
-                  <textarea
-                    rows={3}
-                    required
-                    value={editingService.description || ''}
-                    onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
-                    placeholder="اشرح بالتفصيل ما تتضمنه الخدمة ومن الفئة المستهدفة..."
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] resize-none"
-                  />
-                </div>
+                        <div className="space-y-1">
+                          <label className="text-slate-700 text-xs font-black block">مدة التنفيذ / الجلسة *</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingService.duration || ''}
+                            onChange={(e) => setEditingService({ ...editingService, duration: e.target.value })}
+                            placeholder="مثال: 5 أيام عمل أو 60 دقيقة"
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C]"
+                          />
+                        </div>
+                      </div>
 
-                {/* Deliverables Checklist */}
-                <div className="space-y-2">
-                  <label className="text-slate-700 font-black">المخرجات والضمانات المستلمة</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newDeliverableInput}
-                      onChange={(e) => setNewDeliverableInput(e.target.value)}
-                      placeholder="أضف مخرجاً مثل: تقرير فحص، ملف إكسيل، تسجيل..."
-                      className="flex-1 px-4 py-2 rounded-xl border border-slate-200 text-xs"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddDeliverable();
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddDeliverable}
-                      className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs cursor-pointer"
-                    >
-                      إضافة
-                    </button>
-                  </div>
+                      {/* Description */}
+                      <div className="space-y-1">
+                        <label className="text-slate-700 text-xs font-black block">الوصف التعريفي للخدمة *</label>
+                        <textarea
+                          rows={3}
+                          required
+                          value={editingService.description || ''}
+                          onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
+                          placeholder="اشرح بالتفصيل ما تتضمنه الخدمة ومن الفئة المستهدفة..."
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:border-[#173A7C] resize-none leading-relaxed text-slate-800"
+                        />
+                      </div>
 
-                  {editingService.deliverables && editingService.deliverables.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {editingService.deliverables.map((deliv, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200"
-                        >
-                          <Check className="w-3 h-3 text-emerald-600" />
-                          <span>{deliv}</span>
+                      {/* Deliverables Checklist */}
+                      <div className="space-y-2">
+                        <label className="text-slate-700 text-xs font-black block">المخرجات والضمانات المستلمة</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newDeliverableInput}
+                            onChange={(e) => setNewDeliverableInput(e.target.value)}
+                            placeholder="أضف مخرجاً مثل: تقرير فحص، ملف إكسيل، تسجيل..."
+                            className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAddDeliverable();
+                              }
+                            }}
+                          />
                           <button
                             type="button"
-                            onClick={() => handleRemoveDeliverable(index)}
-                            className="text-slate-400 hover:text-rose-600 ml-1 cursor-pointer"
+                            onClick={handleAddDeliverable}
+                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs cursor-pointer transition-colors"
                           >
-                            <X className="w-3 h-3" />
+                            إضافة
                           </button>
-                        </span>
-                      ))}
+                        </div>
+
+                        {editingService.deliverables && editingService.deliverables.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            {editingService.deliverables.map((deliv, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-bold border border-slate-200"
+                              >
+                                <Check className="w-3 h-3 text-emerald-600" />
+                                <span>{deliv}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveDeliverable(index)}
+                                  className="text-slate-400 hover:text-rose-600 cursor-pointer mr-0.5"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+
+                    {/* ── LEFT COLUMN (5 COLS): Image, Visibility & Live Preview ── */}
+                    <div className="lg:col-span-5 space-y-4">
+                      {/* Device Image Uploader */}
+                      <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
+                        <DeviceImageUploader
+                          value={editingService.image || ''}
+                          onChange={(url) => setEditingService({ ...editingService, image: url })}
+                          folder="services"
+                          slug={editingService.id || 'service'}
+                          label="صورة وبنر الخدمة (WebP معتمد)"
+                          recommendedSize="المقاس: 1200 × 750 بكسل"
+                          aspectRatio="video"
+                        />
+                      </div>
+
+                      {/* Publishing & Visibility Settings */}
+                      <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2.5">
+                        <span className="text-xs font-black text-slate-800 block">حالة النشر والظهور في المنصة</span>
+                        
+                        <label className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-slate-300 transition-colors">
+                          <div className="flex items-center gap-2.5">
+                            <div className={`w-2.5 h-2.5 rounded-full ${editingService.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+                            <span className="text-xs font-bold text-slate-800">نشر وعرض الخدمة بالمتجر</span>
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={editingService.isActive || false}
+                            onChange={(e) => setEditingService({ ...editingService, isActive: e.target.checked })}
+                            className="w-4 h-4 rounded text-[#173A7C] focus:ring-0 cursor-pointer"
+                          />
+                        </label>
+
+                        <label className="flex items-center justify-between p-2.5 rounded-xl bg-amber-50/60 border border-amber-200/80 cursor-pointer hover:border-amber-300 transition-colors">
+                          <div className="flex items-center gap-2.5">
+                            <Star className={`w-4 h-4 ${editingService.isFeatured ? 'text-amber-500 fill-amber-500' : 'text-slate-400'}`} />
+                            <span className="text-xs font-bold text-amber-900">تمييز الخدمة في الصفحة الرئيسية</span>
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={editingService.isFeatured || false}
+                            onChange={(e) => setEditingService({ ...editingService, isFeatured: e.target.checked })}
+                            className="w-4 h-4 rounded text-amber-500 focus:ring-0 cursor-pointer"
+                          />
+                        </label>
+                      </div>
+
+                      {/* Live Preview Card */}
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-50/50 to-slate-50 border border-blue-100 space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px] font-black text-[#173A7C]">
+                          <span>معاينة فورية لبطاقة المتجر:</span>
+                          <span className="text-[10px] font-mono text-slate-400">Live Card</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-xs flex items-center gap-3">
+                          <div className="w-16 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200 relative">
+                            <img
+                              src={editingService.image || '/1.png'}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                              onError={(e) => { (e.target as HTMLImageElement).src = '/logo.webp'; }}
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-xs font-black text-slate-800 truncate">
+                              {editingService.title || 'عنوان الخدمة'}
+                            </h4>
+                            <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold mt-1">
+                              <span className="truncate max-w-[120px]">{editingService.providerName || 'مقدم الخدمة'}</span>
+                              <span className="text-[#173A7C] font-black shrink-0">{editingService.price ? `${editingService.price} ر.س` : 'مجاناً'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
 
-                {/* Flags: Active & Featured */}
-                <div className="flex flex-wrap items-center gap-6 pt-2 pb-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={editingService.isActive || false}
-                      onChange={(e) => setEditingService({ ...editingService, isActive: e.target.checked })}
-                      className="w-4 h-4 rounded text-[#173A7C] focus:ring-0"
-                    />
-                    <span className="text-xs font-black text-slate-800">تفعيل ونشر الخدمة في المتجر مباشرة</span>
-                  </label>
-
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={editingService.isFeatured || false}
-                      onChange={(e) => setEditingService({ ...editingService, isFeatured: e.target.checked })}
-                      className="w-4 h-4 rounded text-amber-500 focus:ring-0"
-                    />
-                    <span className="text-xs font-black text-amber-800">تمييز الخدمة في الصفحة الأولى للمتجر ⭐</span>
-                  </label>
-                </div>
-
-                {/* Submit & Cancel */}
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-black cursor-pointer"
-                  >
-                    إلغاء
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSaving}
-                    className="px-6 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-black flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
-                  >
-                    {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                    <span>{editingService.id ? 'حفظ التعديلات' : 'إنشاء ونشر الخدمة'}</span>
-                  </button>
+                {/* Fixed Bottom Footer */}
+                <div className="px-6 py-3.5 border-t border-slate-100 flex items-center justify-between bg-slate-50/80 shrink-0">
+                  <span className="text-[11px] font-medium text-slate-400 hidden sm:inline">
+                    سيتم تطبيق التعديلات فوراً على متجر الخدمات العام وقاعدة البيانات
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-200/60 font-black text-xs cursor-pointer transition-colors"
+                    >
+                      إلغاء
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSaving}
+                      className="px-6 py-2 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-black text-xs flex items-center gap-2 cursor-pointer shadow-md transition-all disabled:opacity-50"
+                    >
+                      {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                      <span>{editingService.id ? 'حفظ التعديلات' : 'إنشاء ونشر الخدمة'}</span>
+                    </button>
+                  </div>
                 </div>
               </form>
             </motion.div>

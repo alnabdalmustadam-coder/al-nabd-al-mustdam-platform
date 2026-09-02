@@ -507,24 +507,26 @@ export default function InstructorServicesPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+            className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-white/80 overflow-hidden my-auto"
+              exit={{ scale: 0.96, opacity: 0 }}
+              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden my-auto max-h-[92vh] flex flex-col text-right"
             >
-              <form onSubmit={handleSaveService} className="space-y-4">
+              <form onSubmit={handleSaveService} className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="p-5 bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 text-amber-300" />
+                <div className="px-6 py-4 bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs text-amber-300">
+                      <Briefcase className="w-5 h-5" />
+                    </div>
                     <div>
-                      <h3 className="font-black text-sm sm:text-base">
+                      <h3 className="font-black text-sm sm:text-base leading-tight">
                         {editingService.id ? 'تعديل الخدمة الأكاديمية' : 'إضافة خدمة واستشارة جديدة'}
                       </h3>
-                      <p className="text-xs text-blue-100">عرض الخدمة في متجر خدمات المنصة</p>
+                      <p className="text-[11px] text-blue-100/90 mt-0.5">عرض وتخصيص تفاصيل الخدمة في متجر خدمات المنصة</p>
                     </div>
                   </div>
                   <button
@@ -533,176 +535,213 @@ export default function InstructorServicesPage() {
                       setIsModalOpen(false);
                       setEditingService(null);
                     }}
-                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                    className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Form Fields */}
-                <div className="p-5 sm:p-6 space-y-4 max-h-[70vh] overflow-y-auto text-xs font-bold">
-                  <div className="space-y-1">
-                    <label className="text-slate-700 block">عنوان الخدمة أو الاستشارة *</label>
-                    <input
-                      type="text"
-                      required
-                      value={editingService.title || ''}
-                      onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
-                      placeholder="مثال: جلسة استشارية فردية في التخطيط الأكاديمي..."
-                      className="w-full p-3 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs font-bold"
-                    />
-                  </div>
+                {/* Scrollable 2-Column Grid */}
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <label className="text-slate-700 block">التصنيف *</label>
-                        <button
-                          type="button"
-                          onClick={() => setIsAddingNewCat(!isAddingNewCat)}
-                          className="text-[#173A7C] text-[10px] hover:underline font-black cursor-pointer"
-                        >
-                          {isAddingNewCat ? 'إلغاء' : '+ جديد'}
-                        </button>
+                    {/* ── RIGHT COLUMN (7 COLS): Info, Pricing & Deliverables ── */}
+                    <div className="lg:col-span-7 space-y-4 text-xs font-bold">
+                      <div className="space-y-1">
+                        <label className="text-slate-700 text-xs font-black block">عنوان الخدمة أو الاستشارة *</label>
+                        <input
+                          type="text"
+                          required
+                          value={editingService.title || ''}
+                          onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
+                          placeholder="مثال: جلسة استشارية فردية في التخطيط الأكاديمي..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-bold text-slate-900"
+                        />
                       </div>
 
-                      {isAddingNewCat ? (
-                        <div className="flex items-center gap-1">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <label className="text-slate-700 text-xs font-black block">التصنيف *</label>
+                            <button
+                              type="button"
+                              onClick={() => setIsAddingNewCat(!isAddingNewCat)}
+                              className="text-[#173A7C] text-[10px] hover:underline font-black cursor-pointer"
+                            >
+                              {isAddingNewCat ? 'إلغاء' : '+ جديد'}
+                            </button>
+                          </div>
+
+                          {isAddingNewCat ? (
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="text"
+                                value={newCatInput}
+                                onChange={(e) => setNewCatInput(e.target.value)}
+                                placeholder="تصنيف..."
+                                className="w-full px-2.5 py-2 rounded-xl border border-blue-300 outline-none text-xs"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleAddNewCategory}
+                                className="px-3 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black cursor-pointer"
+                              >
+                                +
+                              </button>
+                            </div>
+                          ) : (
+                            <select
+                              value={editingService.category || categoriesList[0]}
+                              onChange={(e) => setEditingService({ ...editingService, category: e.target.value })}
+                              className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none bg-white text-xs font-bold text-slate-800"
+                            >
+                              {categoriesList.map((cat) => (
+                                <option key={cat} value={cat}>
+                                  {cat}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-slate-700 text-xs font-black block">السعر (ر.س) *</label>
+                          <input
+                            type="number"
+                            required
+                            min="0"
+                            value={editingService.price || 150}
+                            onChange={(e) => setEditingService({ ...editingService, price: Number(e.target.value) })}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-black text-[#173A7C]"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-slate-700 text-xs font-black block">مدة التنفيذ *</label>
                           <input
                             type="text"
-                            value={newCatInput}
-                            onChange={(e) => setNewCatInput(e.target.value)}
-                            placeholder="تصنيف جديد..."
-                            className="w-full p-2 rounded-xl border border-blue-300 outline-none text-xs"
+                            required
+                            value={editingService.duration || 'جلسة 60 دقيقة'}
+                            onChange={(e) => setEditingService({ ...editingService, duration: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-bold text-slate-800"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-slate-700 text-xs font-black block">وصف الخدمة وتفاصيلها *</label>
+                        <textarea
+                          rows={3}
+                          required
+                          value={editingService.description || ''}
+                          onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
+                          placeholder="اشرح القيمة المضافة وما سيحصل عليه العميل من هذه الخدمة..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none resize-none text-xs font-medium text-slate-800 leading-relaxed"
+                        />
+                      </div>
+
+                      {/* Deliverables Checklist Manager */}
+                      <div className="space-y-2">
+                        <label className="text-slate-700 text-xs font-black block">مخرجات وبنود الخدمة</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={newDeliverableInput}
+                            onChange={(e) => setNewDeliverableInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAddDeliverable();
+                              }
+                            }}
+                            placeholder="أدخل مخرجاً للخدمة ثم اضغط إضافة..."
+                            className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs"
                           />
                           <button
                             type="button"
-                            onClick={handleAddNewCategory}
-                            className="px-2.5 py-2 rounded-xl bg-[#173A7C] text-white text-xs"
+                            onClick={handleAddDeliverable}
+                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black cursor-pointer transition-colors"
                           >
-                            +
+                            + إضافة
                           </button>
                         </div>
-                      ) : (
-                        <select
-                          value={editingService.category || categoriesList[0]}
-                          onChange={(e) => setEditingService({ ...editingService, category: e.target.value })}
-                          className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none bg-white text-xs font-bold"
-                        >
-                          {categoriesList.map((cat) => (
-                            <option key={cat} value={cat}>
-                              {cat}
-                            </option>
+
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {(editingService.deliverables || []).map((del, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-[11px] font-bold text-slate-800"
+                            >
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              <span>{del}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveDeliverable(idx)}
+                                className="text-slate-400 hover:text-rose-600 font-bold mr-0.5 cursor-pointer"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
                           ))}
-                        </select>
-                      )}
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-slate-700 block">السعر (ر.س) *</label>
-                      <input
-                        type="number"
-                        required
-                        min="0"
-                        value={editingService.price || 150}
-                        onChange={(e) => setEditingService({ ...editingService, price: Number(e.target.value) })}
-                        className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs font-black text-[#173A7C]"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-slate-700 block">مدة التنفيذ *</label>
-                      <input
-                        type="text"
-                        required
-                        value={editingService.duration || 'جلسة 60 دقيقة'}
-                        onChange={(e) => setEditingService({ ...editingService, duration: e.target.value })}
-                        className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Device-Based WebP Service Image Uploader */}
-                  <DeviceImageUploader
-                    value={editingService.image || ''}
-                    onChange={(url) => setEditingService({ ...editingService, image: url })}
-                    folder="services"
-                    slug={editingService.id || 'service'}
-                    label="صورة وبنر الخدمة (رفع مباشر من جهازك مع ضغط WebP)"
-                    recommendedSize="المقاس المثالي: 1200 × 750 بكسل (WebP / JPG / PNG)"
-                    aspectRatio="video"
-                  />
-
-                  <div className="space-y-1">
-                    <label className="text-slate-700 block">وصف الخدمة وتفاصيلها *</label>
-                    <textarea
-                      rows={3}
-                      required
-                      value={editingService.description || ''}
-                      onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
-                      placeholder="اشرح القيمة المضافة وما سيحصل عليه العميل من هذه الخدمة..."
-                      className="w-full p-3 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none resize-none text-xs font-medium"
-                    />
-                  </div>
-
-                  {/* Deliverables Checklist Manager */}
-                  <div className="space-y-2">
-                    <label className="text-slate-700 block">مخرجات وبنود الخدمة</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={newDeliverableInput}
-                        onChange={(e) => setNewDeliverableInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleAddDeliverable();
-                          }
-                        }}
-                        placeholder="أدخل مخرجاً للخدمة ثم اضغط إضافة..."
-                        className="flex-1 p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddDeliverable}
-                        className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-[#173A7C] hover:text-white text-slate-700 text-xs font-black transition-colors"
-                      >
-                        + إضافة
-                      </button>
-                    </div>
-
-                    <div className="space-y-1.5 pt-1">
-                      {(editingService.deliverables || []).map((del, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800"
-                        >
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>{del}</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveDeliverable(idx)}
-                            className="text-red-500 hover:text-red-700 font-bold px-2"
-                          >
-                            حذف
-                          </button>
                         </div>
-                      ))}
+                      </div>
                     </div>
+
+                    {/* ── LEFT COLUMN (5 COLS): Image & Live Preview ── */}
+                    <div className="lg:col-span-5 space-y-4">
+                      {/* Device Image Uploader */}
+                      <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
+                        <DeviceImageUploader
+                          value={editingService.image || ''}
+                          onChange={(url) => setEditingService({ ...editingService, image: url })}
+                          folder="services"
+                          slug={editingService.id || 'service'}
+                          label="صورة وبنر الخدمة (WebP معتمد)"
+                          recommendedSize="المقاس: 1200 × 750 بكسل"
+                          aspectRatio="video"
+                        />
+                      </div>
+
+                      {/* Live Store Card Preview */}
+                      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-blue-50/50 to-slate-50 border border-blue-100 space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-black text-[#173A7C]">
+                          <span>معاينة فورية لكارت الخدمة:</span>
+                          <span className="text-[10px] font-mono text-slate-400">Live Preview</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-xs flex items-center gap-3">
+                          <div className="w-16 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200 relative">
+                            <img
+                              src={editingService.image || '/1.png'}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                              onError={(e) => { (e.target as HTMLImageElement).src = '/logo.webp'; }}
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-xs font-black text-slate-800 truncate">
+                              {editingService.title || 'عنوان الخدمة'}
+                            </h4>
+                            <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold mt-1">
+                              <span>{editingService.duration || 'المدة'}</span>
+                              <span className="text-[#173A7C] font-black">{editingService.price ? `${editingService.price} ر.س` : 'مجاناً'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
                   <button
                     type="button"
                     onClick={() => {
                       setIsModalOpen(false);
                       setEditingService(null);
                     }}
-                    className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-200/60 font-bold text-xs cursor-pointer transition-colors"
                   >
                     إلغاء
                   </button>
@@ -710,16 +749,16 @@ export default function InstructorServicesPage() {
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-emerald-600 text-white font-black text-xs shadow-md hover:opacity-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-emerald-600 text-white font-black text-xs shadow-md hover:opacity-95 flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-all"
                   >
                     {isSaving ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         <span>جاري الحفظ...</span>
                       </>
                     ) : (
                       <>
-                        <Check className="w-4 h-4" />
+                        <Check className="w-3.5 h-3.5" />
                         <span>حفظ الخدمة بالمتجر</span>
                       </>
                     )}
