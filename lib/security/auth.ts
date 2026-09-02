@@ -3,6 +3,7 @@ import 'server-only';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { consumeRateLimit } from '@/lib/security/rate-limit';
 import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
@@ -27,6 +28,7 @@ type AuthenticatedRequest = {
   user: User;
   role: AppRole;
   supabase: SupabaseClient;
+  assuranceLevel: 'aal1' | 'aal2' | null;
 };
 
 type RejectedRequest = {
@@ -81,11 +83,21 @@ export async function requireUser(request?: Request): Promise<AuthorizationResul
       return { ok: false, response: errorResponse('يرجى تسجيل الدخول أولاً', 401) };
     }
 
+    let assuranceLevel: 'aal1' | 'aal2' | null = null;
+    try {
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      assuranceLevel = aal?.currentLevel === 'aal2' ? 'aal2' : aal?.currentLevel === 'aal1' ? 'aal1' : null;
+    } catch {
+      // AAL remains unknown. Sensitive admin mutations fail closed below when
+      // MFA enforcement is enabled.
+    }
+
     return {
       ok: true,
       user,
       role: getTrustedRole(user),
       supabase,
+      assuranceLevel,
     };
   } catch (error) {
     console.error('Authentication service error:', error);
@@ -108,7 +120,46 @@ export async function requireRoles(
 }
 
 export async function requireAdmin(request?: Request): Promise<AuthorizationResult> {
-  return requireRoles(request, ADMIN_ROLES);
+  const auth = await requireRoles(request, ADMIN_ROLES);
+  if (!auth.ok) return auth;
+
+  const method = request?.method.toUpperCase() || 'GET';
+  const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
+  const mfaConfigured = process.env.REQUIRE_ADMIN_MFA;
+  const requireMfa = mfaConfigured === 'true' || (
+    process.env.NODE_ENV === 'production' && mfaConfigured !== 'false'
+  );
+
+  if (isMutation && requireMfa && auth.assuranceLevel !== 'aal2') {
+    return {
+      ok: false,
+      response: errorResponse('يلزم التحقق بخطوتين قبل تنفيذ هذا الإجراء', 403),
+    };
+  }
+
+  if (isMutation) {
+    const rate = consumeRateLimit(`admin:${auth.user.id}`, 120, 60_000);
+    if (!rate.allowed) {
+      return {
+        ok: false,
+        response: NextResponse.json(
+          { success: false, message: 'طلبات إدارية كثيرة، حاول مرة أخرى بعد قليل' },
+          { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } },
+        ),
+      };
+    }
+  }
+
+  return auth;
+}
+
+export async function requireSuperAdmin(request?: Request): Promise<AuthorizationResult> {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth;
+  if (!['SUPERADMIN', 'SUPER_ADMIN'].includes(auth.role)) {
+    return { ok: false, response: errorResponse('هذا الإجراء متاح للمدير الأعلى فقط', 403) };
+  }
+  return auth;
 }
 
 export async function requireInstructorOrAdmin(request?: Request): Promise<AuthorizationResult> {

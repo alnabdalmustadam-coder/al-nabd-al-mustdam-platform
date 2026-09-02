@@ -146,6 +146,21 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     router.push(`/dashboard/admin/users?q=${encodeURIComponent(searchQuery.trim())}`);
   };
 
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Error signing out:', err);
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('admin_avatar');
+        localStorage.removeItem('admin_name');
+      }
+      router.push('/auth/login');
+    }
+  };
+
   const adminSearchCategories = [
     {
       title: 'البحث في بيانات الطلاب والمتدربين',
@@ -198,36 +213,35 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     },
   ];
 
-  const notifications = [
-    {
-      id: '1',
-      title: 'إصدار شهادة معتمدة بنجاح ⚡',
-      desc: 'تم إصدار وتوثيق شهادة (استخدام الحاسب الآلي) للمتدرب عبدالله الشمري بنسبة 98%',
-      time: 'منذ 4 دقائق',
-      unread: true,
-    },
-    {
-      id: '2',
-      title: 'عملية دفع جديدة مؤكدة',
-      desc: 'سداد القسط الأول 433 ر.س لدورة إدخال البيانات ومعالجة النصوص عبر (تمارا)',
-      time: 'منذ 14 دقيقة',
-      unread: true,
-    },
-    {
-      id: '3',
-      title: 'تسجيل متدرب جديد',
-      desc: 'انضم المتدرب د. خالد العتيبي إلى مساق دورة الذكاء الاصطناعي',
-      time: 'منذ 35 دقيقة',
-      unread: false,
-    },
-    {
-      id: '4',
-      title: 'تذكرة دعم فني جديدة',
-      desc: 'استفسار بشأن الاسترداد المالي من المتدربة ريم الجهني',
-      time: 'منذ ساعة',
-      unread: false,
-    },
-  ];
+  const [notifications, setNotifications] = useState<{ id: string; title: string; desc: string; time: string; unread: boolean }[]>([]);
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('admin_notifications')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (data && data.length > 0) {
+          setNotifications(
+            data.map((n: any) => ({
+              id: n.id,
+              title: n.title || 'إشعار',
+              desc: n.message || n.description || '',
+              time: n.created_at ? new Date(n.created_at).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' }) : '',
+              unread: !n.read_at,
+            }))
+          );
+        }
+      } catch {
+        // Table may not exist yet — show empty state
+      }
+    };
+    loadNotifications();
+  }, []);
 
   return (
     <header className="sticky top-0 z-[30] w-full font-[family-name:var(--font-cairo)] m-0 p-0" dir="rtl">
@@ -500,14 +514,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   </Link>
 
                   <div className="border-t border-slate-100 my-1 pt-1">
-                    <Link
-                      href="/auth/login"
-                      onClick={() => setShowProfileMenu(false)}
-                      className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-colors"
+                    <button
+                      onClick={() => { setShowProfileMenu(false); handleLogout(); }}
+                      className="w-full flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                     >
                       <LogOut className="w-4 h-4 text-red-500" />
                       <span>تسجيل الخروج</span>
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </>

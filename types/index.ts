@@ -81,6 +81,7 @@ export interface Course {
   enrollees?: number;
   ghlCourseId?: string;
   ghlCheckoutUrl?: string;
+  status?: 'draft' | 'published' | 'archived';
 }
 
 export type CourseCategory = 'tech' | 'languages' | 'security' | 'corporate' | 'management' | 'design' | 'admin' | 'data';

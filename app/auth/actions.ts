@@ -44,7 +44,24 @@ export async function login(formData: FormData) {
     return { error: error.message };
   }
 
-  const userRole = getTrustedRole(data.user);
+  let userRole = getTrustedRole(data.user);
+
+  // Fallback: if app_metadata has no role, check profiles table
+  if (!isAdminRole(userRole) && !isInstructorRole(userRole)) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profile?.role) {
+      const dbRole = String(profile.role).toUpperCase().trim();
+      if (['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(dbRole)) {
+        userRole = dbRole as any;
+      }
+    }
+  }
+
   const roleHome = getDashboardUrlForRole(userRole);
 
   const safeRequestedRedirect =

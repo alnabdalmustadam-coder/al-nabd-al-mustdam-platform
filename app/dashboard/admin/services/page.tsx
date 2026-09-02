@@ -46,96 +46,29 @@ interface AdminServiceItem {
   created_at?: string;
 }
 
-const initialServices: AdminServiceItem[] = [
-  {
-    id: 'srv-1',
-    title: 'جلسة استشارية فردية: التخطيط الأكاديمي وإعداد الحقائب التدريبية',
-    category: 'استشارات وتوجيه',
-    price: 250,
-    duration: 'جلسة 60 دقيقة',
-    ordersCount: 38,
-    isActive: true,
-    isFeatured: true,
-    providerName: 'د. خالد العتيبي',
-    image: '/1.png',
-    description: 'جلسة توجيهية خاصة لمراجعة خطط التدريب وتصميم الحقائب التدريبية المتوافقة مع معايير الجودة والاعتماد.',
-    deliverables: ['خطة عمل تدريبية مخصصة', 'تقرير تقييمي بالنقاط التطويرية', 'تسجيل الجلسة وملحقاتها'],
-    created_at: '2026-06-10',
-  },
-  {
-    id: 'srv-2',
-    title: 'مراجعة وتدقيق البحوث والرسائل الأكاديمية وتدقيق المنهجية',
-    category: 'خدمات أكاديمية',
-    price: 450,
-    duration: '3 أيام عمل',
-    ordersCount: 54,
-    isActive: true,
-    isFeatured: true,
-    providerName: 'أ. د. سارة الشمري',
-    image: '/2.png',
-    description: 'فحص أكاديمي شامل للمنهجية، المراجع، التوثيق، والتأكد من خلو العمل من الانتحال العلمي.',
-    deliverables: ['تقرير فحص الانتحال المعتمد', 'ملاحظات المنهجية والتوثيق', 'ملف مصحح ومراجع'],
-    created_at: '2026-06-15',
-  },
-  {
-    id: 'srv-3',
-    title: 'تصميم وبناء نماذج تقييم الأداء والمؤشرات المؤسسية (KPIs)',
-    category: 'تطوير إداري',
-    price: 600,
-    duration: '5 أيام عمل',
-    ordersCount: 29,
-    isActive: true,
-    isFeatured: false,
-    providerName: 'فريق معهد النبض المستدام',
-    image: '/3.webp',
-    description: 'إعداد لوحة مؤشرات قياس أداء متقدمة ونماذج تقييم عملية للمنشآت والمؤسسات التعليمية.',
-    deliverables: ['لوحة تحكم إكسيل تفاعلية', 'دليل استخدام وتفسير المؤشرات', 'دعم فني وتعديلات لمدة أسبوع'],
-    created_at: '2026-07-01',
-  },
-  {
-    id: 'srv-4',
-    title: 'إعداد ومراجعة لوائح الحوكمة والامتثال للمنشآت والمراكز التدريبية',
-    category: 'تدقيق وحوكمة',
-    price: 850,
-    duration: '7 أيام عمل',
-    ordersCount: 16,
-    isActive: true,
-    isFeatured: false,
-    providerName: 'المستشار القانوني د. عبدالعزيز السالم',
-    image: '/1.png',
-    description: 'صياغة ومراجعة سياسات العمل الداخلية واللوائح التنظيمية المتوافقة مع متطلبات الجهات الإشرافية.',
-    deliverables: ['مسودة اللائحة التنظيمية المعتمدة', 'مصفوفة الصلاحيات والحوكمة', 'جلسة شرح ومواءمة'],
-    created_at: '2026-07-12',
-  },
-  {
-    id: 'srv-5',
-    title: 'جلسات كوتشينغ وتوجيه تنفيذي للقادة والمشرفين التربويين',
-    category: 'تدريب وتوجيه تنفيذي',
-    price: 350,
-    duration: 'جلسة 90 دقيقة',
-    ordersCount: 42,
-    isActive: false,
-    isFeatured: false,
-    providerName: 'كوتش معتمد / فهد الدوسري',
-    image: '/2.png',
-    description: 'برنامج توجيه قيادي فردي يركز على مهارات إدارة فرق العمل واتخاذ القرارات الاستراتيجية وحل المشكلات.',
-    deliverables: ['خطة تطوير قيادية شخصية', 'نموذج تقييم المهارات القيادية', 'متابعة وتغذية راجعة بعد الجلسة'],
-    created_at: '2026-07-20',
-  },
-];
-
 export default function AdminServicesPage() {
-  const [services, setServices] = useState<AdminServiceItem[]>(initialServices);
+  const [services, setServices] = useState<AdminServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'featured'>('all');
 
+  const [stats, setStats] = useState({
+    totalServices: 0,
+    activeServices: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+  });
+
   const [categoriesList, setCategoriesList] = useState<string[]>([
-    'استشارات وتوجيه',
-    'خدمات أكاديمية',
-    'تطوير إداري',
-    'تدقيق وحوكمة',
-    'تدريب وتوجيه تنفيذي',
+    'تصميم وهويات بصرية',
+    'برمجة وتطوير ويب',
+    'تصميم واجهات UI/UX',
+    'كتابة محتوى وسيو',
+    'تسويق وإعلانات ممولة',
+    'استشارات واعتماد NELC',
+    'مونتاج وفيديو موشن',
+    'تحليل بيانات وإكسل',
   ]);
   const [isAddingNewCat, setIsAddingNewCat] = useState(false);
   const [newCatInput, setNewCatInput] = useState('');
@@ -148,6 +81,62 @@ export default function AdminServicesPage() {
 
   // Delete Confirmation Modal
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  const loadServices = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/admin/services?t=${Date.now()}`, { cache: 'no-store' });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.services)) {
+        const mapped: AdminServiceItem[] = data.services.map((s: any) => ({
+          id: s.id,
+          title: s.title,
+          category: s.category_name || s.category || 'خدمات واستشارات',
+          price: Number(s.price || 0),
+          duration: s.delivery_days ? `${s.delivery_days} أيام عمل` : '3 أيام عمل',
+          ordersCount: Number(s.orders_count || 0),
+          isActive: s.status === 'active',
+          isFeatured: Boolean(s.is_featured),
+          providerName: s.provider_name || 'إدارة المنصة المعتمدة',
+          image: s.image_url || '/services/branding.jpg',
+          description: s.description || '',
+          deliverables: Array.isArray(s.deliverables)
+            ? s.deliverables.map((d: any) => (typeof d === 'string' ? d : d.title))
+            : ['تسليم كامل للخدمة'],
+          created_at: s.created_at ? s.created_at.split('T')[0] : '2026-05-15',
+        }));
+        setServices(mapped);
+
+        // Collect all categories dynamically
+        const allCats = Array.from(
+          new Set([
+            'تصميم وهويات بصرية',
+            'برمجة وتطوير ويب',
+            'تصميم واجهات UI/UX',
+            'كتابة محتوى وسيو',
+            'تسويق وإعلانات ممولة',
+            'استشارات واعتماد NELC',
+            'مونتاج وفيديو موشن',
+            'تحليل بيانات وإكسل',
+            ...mapped.map((m) => m.category).filter(Boolean),
+          ])
+        );
+        setCategoriesList(allCats);
+
+        if (data.stats) {
+          setStats(data.stats);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading services:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadServices();
+  }, []);
 
   const handleAddNewCategory = () => {
     if (!newCatInput.trim()) return;
@@ -166,16 +155,16 @@ export default function AdminServicesPage() {
     setEditingService({
       id: '',
       title: '',
-      category: categoriesList[0] || 'استشارات وتوجيه',
+      category: categoriesList[0] || 'تصميم وهويات بصرية',
       price: 150,
-      duration: 'جلسة 60 دقيقة',
+      duration: '3 أيام عمل',
       ordersCount: 0,
       isActive: true,
       isFeatured: false,
       providerName: 'إدارة المنصة المعتمدة',
-      image: '/1.png',
+      image: '/services/branding.jpg',
       description: '',
-      deliverables: ['مخرجات مخصصة للعميل', 'تقرير توثيق معتمد'],
+      deliverables: ['تسليم مخرجات الخدمة كاملة وفق المتطلبات', 'دعم ومراجعات مجانية'],
     });
     setIsModalOpen(true);
   };
@@ -201,23 +190,65 @@ export default function AdminServicesPage() {
     setEditingService({ ...editingService, deliverables: updated });
   };
 
-  const handleToggleActive = (id: string, e: React.MouseEvent) => {
+  const handleToggleActive = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    const target = services.find((s) => s.id === id);
+    if (!target) return;
+    const newActive = !target.isActive;
+
     setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, isActive: !s.isActive } : s))
+      prev.map((s) => (s.id === id ? { ...s, isActive: newActive } : s))
     );
+
+    try {
+      await fetch('/api/admin/services', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, isActive: newActive }),
+      });
+    } catch (err) {
+      console.error('Error toggling active:', err);
+    }
   };
 
-  const handleToggleFeatured = (id: string, e: React.MouseEvent) => {
+  const handleToggleFeatured = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    const target = services.find((s) => s.id === id);
+    if (!target) return;
+    const newFeatured = !target.isFeatured;
+
     setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, isFeatured: !s.isFeatured } : s))
+      prev.map((s) => (s.id === id ? { ...s, isFeatured: newFeatured } : s))
     );
+
+    try {
+      await fetch('/api/admin/services', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, isFeatured: newFeatured }),
+      });
+    } catch (err) {
+      console.error('Error toggling featured:', err);
+    }
   };
 
-  const handleDeleteService = (id: string) => {
-    setServices((prev) => prev.filter((s) => s.id !== id));
-    setDeleteConfirmId(null);
+  const handleDeleteService = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/services?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        setServices((prev) => prev.filter((s) => s.id !== id));
+      } else {
+        alert('تعذر حذف الخدمة');
+      }
+    } catch (err) {
+      console.error('Error deleting service:', err);
+      alert('تعذر حذف الخدمة');
+    } finally {
+      setDeleteConfirmId(null);
+    }
   };
 
   const handleSaveService = async (e: React.FormEvent) => {
@@ -226,28 +257,33 @@ export default function AdminServicesPage() {
 
     setIsSaving(true);
     try {
-      await new Promise((r) => setTimeout(r, 400)); // simulated instant feedback
-
-      if (editingService.id) {
-        // Edit existing
-        setServices((prev) =>
-          prev.map((s) => (s.id === editingService.id ? (editingService as AdminServiceItem) : s))
-        );
+      const durationDays = parseInt(editingService.duration || '3') || 3;
+      const res = await fetch('/api/admin/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...editingService,
+          status: editingService.isActive ? 'active' : 'paused',
+          image_url: editingService.image || '/services/branding.jpg',
+          category_name: editingService.category,
+          delivery_days: durationDays,
+          deliverables: (editingService.deliverables || []).map((d) => ({
+            title: d,
+            desc: 'تنفيذ احترافي ومطابق للمعايير',
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.service) {
+        await loadServices();
+        setIsModalOpen(false);
+        setEditingService(null);
       } else {
-        // Create new
-        const newServ: AdminServiceItem = {
-          ...(editingService as AdminServiceItem),
-          id: `srv-${Date.now()}`,
-          ordersCount: 0,
-          created_at: new Date().toISOString().split('T')[0],
-        };
-        setServices((prev) => [newServ, ...prev]);
+        alert(data.error || 'تعذر حفظ الخدمة');
       }
-
-      setIsModalOpen(false);
-      setEditingService(null);
     } catch (err) {
       console.error('Error saving service:', err);
+      alert('حدث خطأ أثناء حفظ الخدمة');
     } finally {
       setIsSaving(false);
     }
@@ -272,8 +308,8 @@ export default function AdminServicesPage() {
     return matchesSearch && matchesCat && matchesStatus;
   });
 
-  const totalRevenue = services.reduce((acc, s) => acc + s.price * s.ordersCount, 0);
-  const totalOrders = services.reduce((acc, s) => acc + s.ordersCount, 0);
+  const totalRevenue = stats.totalRevenue || 0;
+  const totalOrders = stats.totalOrders || 0;
   const activeCount = services.filter((s) => s.isActive).length;
 
   return (
@@ -286,8 +322,8 @@ export default function AdminServicesPage() {
       >
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+              <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
               <span>لوحة الإدارة العليا • متجر الخدمات والاستشارات</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
@@ -487,7 +523,12 @@ export default function AdminServicesPage() {
       </div>
 
       {/* ── 4. SERVICES GRID ── */}
-      {filteredServices.length === 0 ? (
+      {loading ? (
+        <div className="p-16 text-center rounded-3xl liquid-glass-card border border-slate-200 space-y-3">
+          <Loader2 className="w-8 h-8 text-[#173A7C] animate-spin mx-auto" />
+          <p className="text-xs font-black text-slate-600">جارٍ مزامنة وتحميل خدمات المتجر من قاعدة البيانات...</p>
+        </div>
+      ) : filteredServices.length === 0 ? (
         <div className="p-12 text-center rounded-3xl liquid-glass-card border border-slate-200 space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#173A7C] flex items-center justify-center mx-auto border border-blue-100">
             <Briefcase className="w-8 h-8" />

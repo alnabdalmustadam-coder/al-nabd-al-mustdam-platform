@@ -61,23 +61,29 @@ export default function InstructorLivePage() {
       if (data && data.length > 0) {
         setSessions(data);
       } else {
-        setSessions([
-          {
-            id: 'ls-inst-1',
-            title: 'ورشة عمل تفاعلية: تطبيقات الحوار الإيجابي وتجنب النزاعات المؤسسية',
-            course_id: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-            meeting_url: 'https://zoom.us',
-            platform: 'Zoom',
-            scheduled_at: new Date().toISOString(),
-            duration_minutes: 90,
-            status: 'scheduled',
-          },
-        ]);
+        setSessions([]);
       }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteSession = async (id: string) => {
+    if (!window.confirm('هل أنت متأكد من إلغاء وحذف هذه الجلسة المباشرة؟')) return;
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from('live_sessions').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting live session:', error);
+        alert(`فشل حذف الجلسة: ${error.message}`);
+        return;
+      }
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('حدث خطأ أثناء حذف الجلسة من الخادم');
     }
   };
 
@@ -256,6 +262,13 @@ export default function InstructorLivePage() {
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>فتح القاعة ({s.platform || 'Zoom'})</span>
                       </a>
+                      <button
+                        onClick={() => handleDeleteSession(s.id)}
+                        className="p-2 rounded-xl border border-red-200 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white transition-colors cursor-pointer"
+                        title="إلغاء وحذف الجلسة"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   )}
                 </div>

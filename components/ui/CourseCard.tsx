@@ -101,7 +101,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
           <div className="flex items-center gap-2 text-xs text-slate-600 mb-5 font-bold">
             <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
               <Users className="w-3.5 h-3.5 text-[#173A7C]" />
-              {course.enrollees || course.studentsCount} متدرب
+              {(course.enrollees || course.studentsCount || 0) > 0 ? `${course.enrollees || course.studentsCount} متدرب` : 'متاح للتسجيل'}
             </span>
             <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
               <Clock className="w-3.5 h-3.5 text-[#5CB07C]" />

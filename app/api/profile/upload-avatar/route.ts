@@ -29,8 +29,17 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     
+    // Determine the real extension from the uploaded file's MIME type
+    const mimeToExt: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+    };
+    const actualType = file.type || 'image/jpeg';
+    const ext = mimeToExt[actualType] || 'jpg';
+
     // Deterministic unique avatar key per user to prevent accumulation
-    const fileName = `avatar_${user.id}.webp`;
+    const fileName = `avatar_${user.id}.${ext}`;
 
     let finalPublicUrl = '';
 
@@ -39,7 +48,7 @@ export async function POST(req: Request) {
       const { data, error } = await supabase.storage
         .from('avatars')
         .upload(fileName, buffer, {
-          contentType: 'image/webp',
+          contentType: actualType,
           upsert: true,
         });
 

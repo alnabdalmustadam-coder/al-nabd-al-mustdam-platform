@@ -62,9 +62,9 @@ const allServicesMap: Record<string, any> = {
     currency: 'SAR',
     delivery_days: 5,
     revision_count: 3,
-    orders_count: 128,
+    orders_count: 0,
     rating_avg: 4.9,
-    rating_count: 47,
+    rating_count: 0,
     is_featured: true,
     requirements: 'يرجى تزويدنا بـ: 1. اسم المنشأة باللغتين العربية والإنجليزية. 2. نبذة مختصرة عن نشاطك والجمهور المستهدف. 3. الألوان المفضلة أو أي أمثلة ملهمة ترغب بالاسترشاد بها.',
     provider: {
@@ -98,9 +98,9 @@ const allServicesMap: Record<string, any> = {
     currency: 'SAR',
     delivery_days: 14,
     revision_count: 2,
-    orders_count: 56,
+    orders_count: 0,
     rating_avg: 5.0,
-    rating_count: 23,
+    rating_count: 0,
     is_featured: true,
     requirements: 'يرجى توفير: 1. تفاصيل الصفحات المطلوبة ومحتواها. 2. الشعار والألوان المعتمدة. 3. أي روابط لمواقع تود محاكاة أسلوبها.',
     provider: {
@@ -133,9 +133,9 @@ const allServicesMap: Record<string, any> = {
     currency: 'SAR',
     delivery_days: 10,
     revision_count: 3,
-    orders_count: 94,
+    orders_count: 0,
     rating_avg: 4.9,
-    rating_count: 38,
+    rating_count: 0,
     is_featured: true,
     requirements: 'يرجى تزويدنا بـ: 1. فكرة التطبيق والوظائف الرئيسية. 2. الجمهور المستهدف. 3. أي تطبيقات منافسة تعجبك.',
     provider: {
@@ -168,9 +168,9 @@ const allServicesMap: Record<string, any> = {
     currency: 'SAR',
     delivery_days: 3,
     revision_count: 2,
-    orders_count: 312,
+    orders_count: 0,
     rating_avg: 4.8,
-    rating_count: 89,
+    rating_count: 0,
     is_featured: false,
     requirements: 'يرجى إرسال: 1. الموضوع المطلوب أو الكلمات المفتاحية. 2. الجمهور المستهدف ونبرة الخطاب المطلوبة. 3. عدد الكلمات المستهدف.',
     provider: {
@@ -203,9 +203,9 @@ const allServicesMap: Record<string, any> = {
     currency: 'SAR',
     delivery_days: 30,
     revision_count: 5,
-    orders_count: 78,
+    orders_count: 0,
     rating_avg: 4.7,
-    rating_count: 34,
+    rating_count: 0,
     is_featured: true,
     requirements: 'يرجى تزويدنا بـ: 1. رابط الموقع أو المتجر. 2. الميزانية الإعلانية المقترحة. 3. المناطق والمدن المستهدفة.',
     provider: {
@@ -238,9 +238,9 @@ const allServicesMap: Record<string, any> = {
     currency: 'SAR',
     delivery_days: 7,
     revision_count: 2,
-    orders_count: 45,
+    orders_count: 0,
     rating_avg: 5.0,
-    rating_count: 19,
+    rating_count: 0,
     is_featured: true,
     requirements: 'يرجى تقديم: 1. نوع المنشأة والبرامج المراد ترخيصها. 2. النظام التعليمي LMS المستخدم حالياً إن وجد.',
     provider: {
@@ -273,9 +273,9 @@ const allServicesMap: Record<string, any> = {
     currency: 'SAR',
     delivery_days: 4,
     revision_count: 3,
-    orders_count: 160,
+    orders_count: 0,
     rating_avg: 4.9,
-    rating_count: 52,
+    rating_count: 0,
     is_featured: false,
     requirements: 'يرجى تزويدنا بـ: 1. اللقطات المصورة أو المواد الخام. 2. النصوص أو السكريبت المطلوب. 3. المقاس المفضل (طولي 9:16 أو عرضي 16:9).',
     provider: {
@@ -308,9 +308,9 @@ const allServicesMap: Record<string, any> = {
     currency: 'SAR',
     delivery_days: 3,
     revision_count: 2,
-    orders_count: 210,
+    orders_count: 0,
     rating_avg: 4.8,
-    rating_count: 67,
+    rating_count: 0,
     is_featured: false,
     requirements: 'يرجى إرسال: 1. ملف الإكسل أو عينة البيانات الحالية. 2. المؤشرات والنتائج الأهم التي ترغب بمتابعتها.',
     provider: {
@@ -340,9 +340,9 @@ const allServicesMap: Record<string, any> = {
     currency: 'SAR',
     delivery_days: 3,
     revision_count: 3,
-    orders_count: 135,
+    orders_count: 0,
     rating_avg: 4.9,
-    rating_count: 41,
+    rating_count: 0,
     is_featured: false,
     requirements: 'يرجى تقديم محتوى العرض التقديمي أو النقاط الأساسية والشعار إن وجد.',
     provider: {
@@ -416,8 +416,8 @@ export default function ServiceDetailPage() {
             provider: {
               name: profile?.full_name || 'مقدم خدمة معتمد',
               role: profile?.bio || 'خبير معتمد في المنصة',
-              rating: svc.rating_avg || 4.9,
-              completed_orders: svc.orders_count || 50,
+              rating: svc.rating_avg || 5.0,
+              completed_orders: svc.orders_count || 0,
               response_time: 'خلال ساعة',
               member_since: '2024',
               bio: profile?.bio || 'مقدم خدمة معتمد وموثق في منصة النبض المستدام.',
@@ -451,8 +451,10 @@ export default function ServiceDetailPage() {
         return;
       }
 
+      const uniqueOrderNumber = `ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
       const { data: createdOrder, error } = await supabase.from('service_orders').insert({
-        order_number: 'SERVER-GENERATED',
+        order_number: uniqueOrderNumber,
         service_id: service.id,
         buyer_id: user.id,
         provider_id: service.provider_id || user.id,
@@ -580,15 +582,22 @@ export default function ServiceDetailPage() {
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">مقدم خدمة معتمد</span>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-slate-500 font-medium mt-0.5">
-                    <span className="flex items-center gap-1">
-                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                      <strong className="text-slate-800 font-bold">{service.rating_avg}</strong>
-                      <span>({service.rating_count} تقييم)</span>
-                    </span>
+                    {service.rating_count > 0 ? (
+                      <span className="flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                        <strong className="text-slate-800 font-bold">{service.rating_avg}</strong>
+                        <span>({service.rating_count} تقييم)</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-200">
+                        <Star className="w-3 h-3 text-emerald-600 fill-emerald-600" />
+                        <span>خدمة جديدة ومتاحة</span>
+                      </span>
+                    )}
                     <span>•</span>
                     <span className="flex items-center gap-1">
                       <ShoppingCart className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{service.orders_count} طلب مكتمل</span>
+                      <span>{service.orders_count > 0 ? `${service.orders_count} طلب مكتمل` : 'جاهزة للتنفيذ الفوري'}</span>
                     </span>
                   </div>
                 </div>
@@ -962,15 +971,17 @@ export default function ServiceDetailPage() {
               <div className="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-50 text-center">
                 <div>
                   <span className="text-xs text-slate-500 font-medium block">التقييم العام</span>
-                  <span className="text-lg font-black text-amber-600 font-mono">★ {service.provider?.rating}</span>
+                  <span className="text-lg font-black text-amber-600 font-mono">★ {service.provider?.rating || 5.0}</span>
                 </div>
                 <div>
                   <span className="text-xs text-slate-500 font-medium block">الطلبات المكتملة</span>
-                  <span className="text-lg font-black text-[#173A7C] font-mono">{service.provider?.completed_orders}+</span>
+                  <span className="text-base sm:text-lg font-black text-[#173A7C] font-mono">
+                    {(service.provider?.completed_orders || 0) > 0 ? `${service.provider.completed_orders}` : 'متاح للطلب'}
+                  </span>
                 </div>
                 <div>
                   <span className="text-xs text-slate-500 font-medium block">متوسط الرد</span>
-                  <span className="text-lg font-black text-emerald-600">{service.provider?.response_time}</span>
+                  <span className="text-lg font-black text-emerald-600">{service.provider?.response_time || 'خلال ساعة'}</span>
                 </div>
               </div>
 

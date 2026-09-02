@@ -60,28 +60,6 @@ export default function AdminQuizzesPage() {
 
       if (data && data.length > 0) {
         setQuizzes(data);
-      } else {
-        // Fallback sample quizzes
-        setQuizzes([
-          {
-            id: 'qz-1',
-            course_id: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
-            title: 'اختبار الوحدة الأولى: المفاهيم الأساسية لنظام التشغيل وWord',
-            questions_json: Array(10).fill({}),
-            duration_minutes: 20,
-            pass_percentage: 70,
-            is_active: true,
-          },
-          {
-            id: 'qz-2',
-            course_id: 'دورات ادخال بيانات ومعالجة نصوص',
-            title: 'الاختبار النهائي: دقة وسرعة إدخال البيانات',
-            questions_json: Array(20).fill({}),
-            duration_minutes: 30,
-            pass_percentage: 75,
-            is_active: true,
-          },
-        ]);
       }
     } catch (err) {
       console.error(err);
@@ -139,10 +117,16 @@ export default function AdminQuizzesPage() {
     if (!confirm('هل أنت متأكد من حذف هذا الاختبار؟')) return;
     try {
       const supabase = createClient();
-      await supabase.from('quizzes').delete().eq('id', id);
+      const { error } = await supabase.from('quizzes').delete().eq('id', id);
+      if (error) {
+        console.error('Delete quiz error:', error);
+        alert(`فشل حذف الاختبار: ${error.message}`);
+        return;
+      }
       setQuizzes((prev) => prev.filter((q) => q.id !== id));
     } catch (err) {
       console.error(err);
+      alert('حدث خطأ في الاتصال بالخادم');
     }
   };
 
@@ -158,8 +142,8 @@ export default function AdminQuizzesPage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-              <FileQuestion className="w-3.5 h-3.5" />
+            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+              <FileQuestion className="w-4 h-4 text-blue-600 shrink-0" />
               <span>بنك الأسئلة والتقييمات الأكاديمية</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">

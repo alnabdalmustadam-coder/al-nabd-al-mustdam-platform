@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, Variants } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -68,6 +68,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onCloseMobile,
 }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const [adminProfile, setAdminProfile] = useState<{
     fullName: string;
     avatarUrl: string | null;
@@ -145,6 +146,21 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       }
     };
   }, []);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Error signing out:', err);
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('admin_avatar');
+        localStorage.removeItem('admin_name');
+      }
+      router.push('/auth/login');
+    }
+  }, [router]);
 
   const navItems = [
     { label: 'الرئيسية', href: '/dashboard/admin', icon: LayoutDashboard, badge: 'مباشر' },
@@ -348,9 +364,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           {/* Block 3: Desktop Sidebar Footer Action Blocks */}
           <div className="pt-2.5 border-t border-slate-200/80 space-y-1.5 relative z-10">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link
-                href="/auth/login"
-                className={`flex items-center rounded-xl font-bold text-xs transition-all border border-red-200/70 bg-red-50/80 hover:bg-red-100/90 text-red-600 shadow-2xs ${
+              <button
+                onClick={handleLogout}
+                className={`w-full flex items-center rounded-xl font-bold text-xs transition-all border border-red-200/70 bg-red-50/80 hover:bg-red-100/90 text-red-600 shadow-2xs cursor-pointer ${
                   isCollapsed ? 'p-2.5 justify-center' : 'p-2.5 gap-2.5'
                 }`}
                 title={isCollapsed ? 'تسجيل الخروج' : undefined}
@@ -359,7 +375,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   <LogOut className="w-4 h-4" />
                 </div>
                 {!isCollapsed && <span className="truncate font-extrabold text-xs">تسجيل الخروج</span>}
-              </Link>
+              </button>
             </motion.div>
 
             {!isCollapsed && (
@@ -527,16 +543,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
             {/* Mobile Footer Action Blocks */}
             <div className="pt-3 border-t border-slate-200/80 space-y-1.5 shrink-0">
-              <Link
-                href="/auth/login"
-                onClick={onCloseMobile}
-                className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-bold text-red-600 bg-red-50/80 hover:bg-red-100/90 border border-red-200/70 transition-all"
+              <button
+                onClick={() => { onCloseMobile?.(); handleLogout(); }}
+                className="w-full flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-bold text-red-600 bg-red-50/80 hover:bg-red-100/90 border border-red-200/70 transition-all cursor-pointer"
               >
                 <div className="p-1.5 rounded-lg bg-red-500/15 text-red-600 shrink-0">
                   <LogOut className="w-4 h-4" />
                 </div>
                 <span>تسجيل الخروج</span>
-              </Link>
+              </button>
 
               <div className="pt-1 text-center">
                 <p className="text-[10px] text-slate-500 font-bold">

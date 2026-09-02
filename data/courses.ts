@@ -20,7 +20,7 @@ export const INITIAL_9_COURSES: Course[] = [
     "level": "all",
     "price": 900,
     "rating": 4.9,
-    "enrollees": 1250,
+    "enrollees": 0,
     "duration": "1 ساعة",
     "lessonsCount": 4,
     "featured": true,
@@ -33,7 +33,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "duration": "20 دقيقة",
         "isLocked": false,
         "type": "video",
-        "videoUrl": "https://player.mediadelivery.net/play/729792/efdbb993-f2f4-4ddb-9553-00629191a155",
+        "videoUrl": "",
         "lessons": [
           "1"
         ]
@@ -44,7 +44,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "duration": "20 دقيقة",
         "isLocked": false,
         "type": "video",
-        "videoUrl": "https://player.mediadelivery.net/play/729792/952ec222-1a76-4909-ad47-ddbb30cd2239",
+        "videoUrl": "",
         "lessons": [
           "2"
         ]
@@ -55,7 +55,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "duration": "20 دقيقة",
         "isLocked": false,
         "type": "video",
-        "videoUrl": "https://player.mediadelivery.net/play/729792/edc0bc68-2d67-4bd9-ab87-7b4c6d16532b",
+        "videoUrl": "",
         "lessons": [
           "3"
         ]
@@ -66,7 +66,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "duration": "20 دقيقة",
         "isLocked": false,
         "type": "video",
-        "videoUrl": "https://player.mediadelivery.net/play/729792/25d7c975-a287-4786-b553-427514a454c3",
+        "videoUrl": "",
         "lessons": [
           "4"
         ]
@@ -93,7 +93,7 @@ export const INITIAL_9_COURSES: Course[] = [
     "level": "intermediate",
     "price": 1300,
     "rating": 4.8,
-    "enrollees": 980,
+    "enrollees": 0,
     "duration": "30 ساعة",
     "lessonsCount": 15,
     "featured": true,
@@ -106,7 +106,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": false,
         "duration": "3 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "تقنيات وضعية الأصابع الصحيحة للكتابة دون النظر",
           "تمارين مكثفة لزيادة سرعة الكتابة باللغتين العربية والإنجليزية"
@@ -118,7 +118,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "10 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "إعداد الخطابات الإدارية والمعاملات الحكومية الرسمية",
           "استخدام الأنماط الجاهزة والتحكم المتقدم في الفقرات والهوامش"
@@ -130,7 +130,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "12 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "آليات إدخال السجلات وقواعد البيانات بطرق علمية دقيقة",
           "فحص وتدقيق البيانات وتجنب الأخطاء الشائعة أثناء الرصد السريع"
@@ -142,7 +142,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "5 ساعات",
         "type": "quiz",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "تنفيذ مشروع إدخال سجلات متكامل تحت ضغط الوقت",
           "تقييم دقة وسرعة المتدرب وإعطائه تقرير فني بالأداء"
@@ -169,7 +169,7 @@ export const INITIAL_9_COURSES: Course[] = [
     "level": "all",
     "price": 0,
     "rating": 5,
-    "enrollees": 3400,
+    "enrollees": 0,
     "duration": "60 ساعة",
     "lessonsCount": 40,
     "featured": true,
@@ -182,7 +182,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": false,
         "duration": "ساعتان",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "اختبار تحديد مستوى شامل لقياس المهارات اللغوية الأربعة",
           "بناء خطة الدراسة المخصصة بناءً على نقاط القوة والضعف"
@@ -194,7 +194,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "15 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "التعرف على المفردات والجمل الشائعة في التعارف والمطاعم والتسوق",
           "ممارسة النطق الصحيح وتجنب الأخطاء الصوتية الشائعة"
@@ -206,7 +206,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "15 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "شرح مبسط للأزمنة الأساسية (المضارع، الماضي، المستقبل)",
           "تطبيق القواعد في صياغة جمل صحيحة وتجنب الأخطاء النحوية"
@@ -218,7 +218,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "15 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "هيكلة البريد الإلكتروني والرسائل الإدارية باللغة الإنجليزية",
           "اختيار الأسلوب المناسب للمراسلات الرسمية والمهنية"
@@ -230,7 +230,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "13 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "الاستماع لمقاطع صوتية بلهجات مختلفة (بريطانية، أمريكية)",
           "تطوير تقنيات الاستخلاص والتلخيص وفهم سياق الحوار السريع"
@@ -257,7 +257,7 @@ export const INITIAL_9_COURSES: Course[] = [
     "level": "all",
     "price": 450,
     "rating": 4.9,
-    "enrollees": 1120,
+    "enrollees": 0,
     "duration": "45 ساعة",
     "lessonsCount": 30,
     "featured": true,
@@ -270,7 +270,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": false,
         "duration": "4 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "التعرف على المفاهيم التأسيسية للذكاء الاصطناعي وتطورها التاريخي",
           "فهم خوارزميات التعلم الآلي والشبكات العصبية والفرق بينها"
@@ -282,7 +282,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "20 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "كيفية توظيف أدوات الذكاء الاصطناعي لرفع الإنتاجية وصناعة المحتوى",
           "استكشاف نماذج لغة التوليد التلقائي (Generative AI) وكتابة الأوامر الهندسية"
@@ -294,7 +294,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "21 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "دراسة قضايا التحيز والأمان الرقمي وحماية الملكية الفكرية",
           "استعراض الفرص المستقبلية لوظائف الذكاء الاصطناعي وطرق التأهيل لها"
@@ -320,7 +320,7 @@ export const INITIAL_9_COURSES: Course[] = [
     "level": "intermediate",
     "price": 349,
     "rating": 4.8,
-    "enrollees": 850,
+    "enrollees": 0,
     "duration": "40 ساعة",
     "lessonsCount": 25,
     "featured": true,
@@ -333,7 +333,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": false,
         "duration": "5 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "فهم ركائز الأمان الثلاثة (السرية، السلامة، التوافرية)",
           "التعرف على أساليب الهندسة الاجتماعية والبرمجيات الخبيثة وطرق التصدي لها"
@@ -345,7 +345,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "20 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "إعداد وضبط جدران الحماية وأنظمة الكشف عن التسلل (IDS/IPS)",
           "مبادئ التشفير المتماثل وغير المتماثل وتأمين قنوات الاتصال"
@@ -357,7 +357,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "15 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "خطوات احتواء الهجمات الإلكترونية وتقليل الأضرار بعد الاختراق",
           "أدوات جمع الأدلة الرقمية وكتابة تقارير الحوادث الفنية للإدارة"
@@ -382,7 +382,7 @@ export const INITIAL_9_COURSES: Course[] = [
     "level": "all",
     "price": 750,
     "rating": 5,
-    "enrollees": 2100,
+    "enrollees": 0,
     "duration": "60 ساعة",
     "lessonsCount": 40,
     "featured": true,
@@ -395,7 +395,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": false,
         "duration": "6 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "التعرف على المكونات الداخلية للهاتف وأدوات الفحص والقياس",
           "طرق تفكيك وتركيب الأجهزة الذكية وتحديد القطع التالفة بأمان"
@@ -407,7 +407,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "24 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "مبادئ وتقنيات اللحام الدقيق (Micro-soldering) وإصلاح الدوائر",
           "استبدال الشاشات، البطاريات، منافذ الشحن، والكاميرات التالفة"
@@ -419,7 +419,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "20 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "تثبيت وتحديث أنظمة التشغيل iOS و Android وحل تعليق النظام",
           "طرق استرجاع البيانات المفقودة، وعمل النسخ الاحتياطي، وفك الأقفال البرمجية"
@@ -431,7 +431,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "10 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "مصادر شراء قطع الغيار الأصلية وأدوات الصيانة بأسعار اقتصادية",
           "خطوات الترخيص وتجهيز المحل وجذب العملاء وتسعير الخدمات"
@@ -456,7 +456,7 @@ export const INITIAL_9_COURSES: Course[] = [
     "level": "all",
     "price": 249,
     "rating": 4.7,
-    "enrollees": 620,
+    "enrollees": 0,
     "duration": "30 ساعة",
     "lessonsCount": 15,
     "featured": true,
@@ -469,7 +469,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": false,
         "duration": "5 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "تاريخ الأوشا وأهميتها والتعرف على الحقوق والمسؤوليات القانونية",
           "تصنيف المخاطر المهنية في مكان العمل (فيزيائية، كيميائية، بيولوجية)"
@@ -481,7 +481,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "15 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "معايير الحماية من السقوط والعمل بأمان في المرتفعات والسحالات",
           "مبادئ السلامة الكهربائية، وسلامة الآلات، وخطوات العزل الميكانيكي والكهربائي"
@@ -493,7 +493,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "10 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "أنواع الحرائق واستخدام مطافئ الحريق المختلفة بمهارة",
           "تصميم وتطبيق خطة طوارئ وإخلاء متكاملة للمنشأة"
@@ -518,7 +518,7 @@ export const INITIAL_9_COURSES: Course[] = [
     "level": "advanced",
     "price": 255,
     "rating": 4.8,
-    "enrollees": 780,
+    "enrollees": 0,
     "duration": "40 ساعة",
     "lessonsCount": 20,
     "featured": true,
@@ -531,7 +531,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": false,
         "duration": "4 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "هيكل وتصنيف شهادة النيبوش وأهميتها في الأسواق الدولية",
           "كيفية بناء نظام إدارة أمان وصحة مهنية متكامل (OHSMS)"
@@ -543,7 +543,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "20 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "خطوات وإعداد دراسات تقييم المخاطر (Risk Assessment)",
           "تطبيق هرم إجراءات التحكم والسيطرة للحد من حوادث العمل"
@@ -555,7 +555,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "16 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "أدوات التفتيش والتدقيق الداخلي على إجراءات السلامة",
           "التحقيق في الحوادث واستخلاص الدروس وتحسين الخطط الوقائية"
@@ -580,7 +580,7 @@ export const INITIAL_9_COURSES: Course[] = [
     "level": "all",
     "price": 550,
     "rating": 4.9,
-    "enrollees": 3400,
+    "enrollees": 0,
     "duration": "50 ساعة",
     "lessonsCount": 35,
     "featured": true,
@@ -593,7 +593,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": false,
         "duration": "5 ساعات",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "قوانين الجذور، الأسس، والنسب المئوية وطرق الحل السريع بدون استخدام حاسبة",
           "مهارات الهندسة والإحصاء وحل المسائل الحسابية والمنطقية المعقدة"
@@ -605,7 +605,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "25 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "تقنيات حل التناظر اللفظي، إكمال الجمل، والخطأ السياقي",
           "فهم وتحليل النصوص الطويلة واستنتاج المعاني والعلاقات الضمنية"
@@ -617,7 +617,7 @@ export const INITIAL_9_COURSES: Course[] = [
         "isLocked": true,
         "duration": "20 ساعة",
         "type": "video",
-        "videoUrl": "MmHWTPJMzbQ",
+        "videoUrl": "",
         "lessons": [
           "محاكاة اختبار القدرات الفعلي تحت قيود زمنية محددة",
           "مراجعة إجابات المتدرب وتحليل الأخطاء وتوفير شروحات مسجلة لها"

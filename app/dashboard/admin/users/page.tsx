@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
@@ -45,8 +46,9 @@ interface UserRecord {
   attendanceRate: string;
 }
 
-export default function AdminUsersPage() {
-  const [searchQuery, setSearchQuery] = useState('');
+function AdminUsersPageContent() {
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [roleFilter, setRoleFilter] = useState<'all' | 'طالب' | 'مدرب' | 'أدمن'>('all');
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [selectedUserForLogs, setSelectedUserForLogs] = useState<UserRecord | null>(null);
@@ -56,11 +58,16 @@ export default function AdminUsersPage() {
   const [saving, setSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$';
+    return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  };
+
   // New User Form State
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPhone, setNewPhone] = useState('');
-  const [newPassword, setNewPassword] = useState('12345678');
+  const [newPassword, setNewPassword] = useState(() => generatePassword());
   const [newNationalId, setNewNationalId] = useState('');
   const [newRole, setNewRole] = useState<'STUDENT' | 'INSTRUCTOR' | 'ADMIN'>('STUDENT');
 
@@ -136,7 +143,7 @@ export default function AdminUsersPage() {
       setNewEmail('');
       setNewPhone('');
       setNewNationalId('');
-      setNewPassword('12345678');
+      setNewPassword(generatePassword());
       setNewRole('STUDENT');
       loadUsers();
     } catch (err) {
@@ -178,10 +185,37 @@ export default function AdminUsersPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const toggleUserStatus = (id: string) => {
+  const toggleUserStatus = async (id: string) => {
+    const user = users.find((u) => u.id === id);
+    if (!user) return;
+    const newStatus = user.status === 'active' ? 'suspended' : 'active';
+
+    // Optimistic update
     setUsers((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, status: u.status === 'active' ? 'suspended' : 'active' } : u))
+      prev.map((u) => (u.id === id ? { ...u, status: newStatus } : u))
     );
+
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: id, status: newStatus }),
+      });
+      if (!res.ok) {
+        // Revert on failure
+        setUsers((prev) =>
+          prev.map((u) => (u.id === id ? { ...u, status: user.status } : u))
+        );
+        const data = await res.json().catch(() => ({}));
+        alert(data.message || 'فشل تغيير حالة المستخدم');
+      }
+    } catch {
+      // Revert on error
+      setUsers((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, status: user.status } : u))
+      );
+      alert('حدث خطأ في الاتصال بالخادم');
+    }
   };
 
   const filteredUsers = users.filter((u) => {
@@ -231,7 +265,19 @@ export default function AdminUsersPage() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => alert('تم تصدير سجل المتدربين بصيغة Excel بنجاح!')}
+              onClick={() => {
+                const csvHeader = 'الاسم,البريد الإلكتروني,الهاتف,الدور,الحالة,آخر نشاط\n';
+                const csvBody = filteredUsers.map(u =>
+                  `"${u.name}","${u.email}","${u.phone}","${u.role}","${u.status === 'active' ? 'نشط' : 'معلّق'}","${u.lastActive}"`
+                ).join('\n');
+                const blob = new Blob(['\uFEFF' + csvHeader + csvBody], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `trainees_${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
               className="flex-1 sm:flex-none px-3.5 sm:px-4.5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 shadow-2xs cursor-pointer transition-all shrink-0 whitespace-nowrap"
             >
               <Download className="w-4 h-4 text-[#173A7C] shrink-0" />
@@ -857,5 +903,13 @@ export default function AdminUsersPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function AdminUsersPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-4 border-slate-200 border-t-[#173A7C] rounded-full animate-spin" /></div>}>
+      <AdminUsersPageContent />
+    </Suspense>
   );
 }

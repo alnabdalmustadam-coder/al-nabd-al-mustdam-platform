@@ -77,33 +77,7 @@ export default function InstructorAssignmentsPage() {
         }));
         setSubmissions(mapped);
       } else {
-        // Fallback sample submissions
-        setSubmissions([
-          {
-            id: 'sub-1',
-            assignment_id: 'asg-1',
-            studentName: 'عبدالله الشمري',
-            email: 'a.shammari@example.com',
-            assignmentTitle: 'إعداد دراسة حالة: تطبيق قيم الحوار التسامحي',
-            notes: 'مرفق لكم ملف التقرير الميداني بصيغة PDF',
-            file_url: 'مبادرة_السلام_المجتمعي_عبدالله.pdf',
-            status: 'submitted',
-            submitted_at: new Date().toISOString(),
-          },
-          {
-            id: 'sub-2',
-            assignment_id: 'asg-2',
-            studentName: 'سارة العتيبي',
-            email: 's.otaibi@example.com',
-            assignmentTitle: 'واجب الوحدة الثانية: صياغة مبادرة مجتمعية',
-            notes: 'تم استيفاء كافة معايير المبادرة والمؤشرات المقترحة.',
-            file_url: 'مبادرة_سارة_العتيبي.pdf',
-            grade: 98,
-            feedback: 'عمل متقن ومتميز جداً!',
-            status: 'graded',
-            submitted_at: new Date().toISOString(),
-          },
-        ]);
+        setSubmissions([]);
       }
     } catch (err) {
       console.error(err);

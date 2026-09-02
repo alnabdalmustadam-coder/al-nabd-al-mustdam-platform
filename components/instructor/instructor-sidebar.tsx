@@ -49,6 +49,22 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
     specialty: 'هيئة التدريس والتدريب',
   });
 
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('instructor_avatar');
+        localStorage.removeItem('instructor_name');
+      }
+      await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      window.location.href = '/auth/login';
+    }
+  };
+
   useEffect(() => {
     async function loadInstructorProfile() {
       try {
@@ -260,6 +276,20 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
               </div>
             </div>
           )}
+
+          {/* Logout Button */}
+          <div className="mt-3 pt-3 border-t border-slate-200/70">
+            <button
+              onClick={handleLogout}
+              className={`w-full flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-all cursor-pointer border border-transparent hover:border-red-200 ${
+                isCollapsed ? 'justify-center' : ''
+              }`}
+              title="تسجيل الخروج"
+            >
+              <LogOut className="w-4 h-4 text-red-600 shrink-0" />
+              {!isCollapsed && <span>تسجيل الخروج</span>}
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -337,6 +367,17 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                   );
                 })}
               </nav>
+
+              {/* Mobile Logout Button */}
+              <div className="pt-3 border-t border-slate-200/80">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-all cursor-pointer border border-red-200"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>تسجيل الخروج</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

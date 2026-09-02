@@ -302,7 +302,7 @@ export default function InstructorCoursesPage() {
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.courses)) {
-        setCourses(data.courses.slice(0, 3));
+        setCourses(data.courses);
       }
     } catch (err) {
       console.error('Error fetching instructor courses:', err);

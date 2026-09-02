@@ -105,8 +105,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
   const categoryLabel = CATEGORY_MAP[course.category] || course.category;
 
   const previewVideoUrl =
-    course.curriculum?.[0]?.videoUrl ||
-    "https://player.mediadelivery.net/play/729792/efdbb993-f2f4-4ddb-9553-00629191a155";
+    course.curriculum?.find((l) => Boolean(l.videoUrl))?.videoUrl || "";
 
   const handleShare = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -212,8 +211,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
                     <Users className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="text-xs font-black text-[#173A7C] block leading-tight">{course.studentsCount || course.enrollees || 1250}+</span>
-                    <span className="text-[10px] text-slate-500 font-bold block">متدرب مسجل</span>
+                    <span className="text-xs font-black text-[#173A7C] block leading-tight">
+                      {(course.studentsCount || course.enrollees || 0) > 0 ? `${course.studentsCount || course.enrollees}` : 'متاح للتسجيل'}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-bold block">
+                      {(course.studentsCount || course.enrollees || 0) > 0 ? 'متدرب مسجل' : 'دفعة جديدة'}
+                    </span>
                   </div>
                 </div>
 
@@ -345,18 +348,27 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
 
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors pointer-events-none" />
 
-                  <button
-                    onClick={() => setIsVideoModalOpen(true)}
-                    className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 cursor-pointer"
-                    aria-label="معاينة فيديو الدورة"
-                  >
-                    <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-[#5CB07C]/95 hover:bg-[#4EA06E] text-white flex items-center justify-center shadow-lg shadow-[#5CB07C]/30 group-hover:scale-110 transition-all backdrop-blur-xs">
-                      <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-white translate-x-[-1px]" />
+                  {previewVideoUrl ? (
+                    <button
+                      onClick={() => setIsVideoModalOpen(true)}
+                      className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 cursor-pointer"
+                      aria-label="معاينة فيديو الدورة"
+                    >
+                      <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-[#5CB07C]/95 hover:bg-[#4EA06E] text-white flex items-center justify-center shadow-lg shadow-[#5CB07C]/30 group-hover:scale-110 transition-all backdrop-blur-xs">
+                        <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-white translate-x-[-1px]" />
+                      </div>
+                      <span className="px-3.5 py-1 rounded-full bg-slate-900/75 backdrop-blur-md text-white text-xs font-black border border-white/20 shadow-md">
+                        مشاهدة مقدمة الدورة
+                      </span>
+                    </button>
+                  ) : (
+                    <div className="absolute bottom-4 inset-x-4 flex justify-center pointer-events-none">
+                      <span className="px-3.5 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold border border-white/20 shadow-md flex items-center gap-1.5">
+                        <Play className="w-3 h-3 text-emerald-400" />
+                        <span>منهج تدريبي معتمد ومتكامل</span>
+                      </span>
                     </div>
-                    <span className="px-3.5 py-1 rounded-full bg-slate-900/75 backdrop-blur-md text-white text-xs font-black border border-white/20 shadow-md">
-                      مشاهدة مقدمة الدورة
-                    </span>
-                  </button>
+                  )}
                 </div>
 
                 <div className="mt-3 flex items-center justify-between text-xs text-slate-600 px-3 py-2 bg-slate-50/90 rounded-xl border border-slate-100 font-bold shrink-0">

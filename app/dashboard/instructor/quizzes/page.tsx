@@ -60,32 +60,7 @@ export default function InstructorQuizzesPage() {
       if (data && data.length > 0) {
         setQuizzes(data);
       } else {
-        setQuizzes([
-          {
-            id: 'qz-1',
-            course_id: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-            title: 'اختبار المفاهيم الأساسية للتسامح والسلام المجتمعي',
-            duration_minutes: 20,
-            pass_percentage: 70,
-            questions_json: Array(15).fill({}),
-          },
-          {
-            id: 'qz-2',
-            course_id: 'المهارات الأكاديمية والتفكير الناقد',
-            title: 'التقييم الشامل لمهارات التفكير الناقد وحل المشكلات',
-            duration_minutes: 30,
-            pass_percentage: 75,
-            questions_json: Array(20).fill({}),
-          },
-          {
-            id: 'qz-3',
-            course_id: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
-            title: 'الاختبار التطبيقي العملي: جداول البيانات والنماذج الإدارية',
-            duration_minutes: 25,
-            pass_percentage: 80,
-            questions_json: Array(12).fill({}),
-          },
-        ]);
+        setQuizzes([]);
       }
     } catch (err) {
       console.error(err);
@@ -102,25 +77,66 @@ export default function InstructorQuizzesPage() {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
-    setIsSavingQuiz(true);
-    const newQuiz: QuizItem = {
-      id: `qz-${Date.now()}`,
-      title: newTitle.trim(),
-      course_id: newCourse,
-      duration_minutes: Number(newDuration) || 25,
-      pass_percentage: Number(newPassScore) || 70,
-      questions_json: Array(Number(newQuestionsCount) || 10).fill({}),
-    };
+    try {
+      setIsSavingQuiz(true);
+      const supabase = createClient();
 
-    setQuizzes((prev) => [newQuiz, ...prev]);
-    setIsSavingQuiz(false);
-    setShowCreateModal(false);
-    setNewTitle('');
+      const questions = Array.from({ length: Number(newQuestionsCount) || 5 }, (_, idx) => ({
+        id: `q-${idx + 1}`,
+        question: `سؤال تقييمي ${idx + 1}`,
+        options: ['الخيار الأول', 'الخيار الثاني', 'الخيار الثالث', 'الخيار الرابع'],
+        correctIndex: 0,
+      }));
+
+      const { data: inserted, error } = await supabase
+        .from('quizzes')
+        .insert({
+          title: newTitle.trim(),
+          course_id: newCourse,
+          duration_minutes: Number(newDuration) || 25,
+          pass_percentage: Number(newPassScore) || 70,
+          questions_json: questions,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating quiz:', error);
+        alert(`فشل إنشاء الاختبار: ${error.message}`);
+        return;
+      }
+
+      if (inserted) {
+        setQuizzes((prev) => [inserted, ...prev]);
+      } else {
+        await loadQuizzes();
+      }
+
+      setShowCreateModal(false);
+      setNewTitle('');
+    } catch (err: any) {
+      console.error(err);
+      alert('حدث خطأ أثناء حفظ الاختبار');
+    } finally {
+      setIsSavingQuiz(false);
+    }
   };
 
-  const handleDeleteQuiz = (id: string) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا الاختبار؟')) return;
-    setQuizzes((prev) => prev.filter((q) => q.id !== id));
+  const handleDeleteQuiz = async (id: string) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الاختبار نهائياً؟')) return;
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from('quizzes').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting quiz:', error);
+        alert(`فشل حذف الاختبار: ${error.message}`);
+        return;
+      }
+      setQuizzes((prev) => prev.filter((q) => q.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('حدث خطأ أثناء حذف الاختبار من الخادم');
+    }
   };
 
   const filteredQuizzes = quizzes.filter(

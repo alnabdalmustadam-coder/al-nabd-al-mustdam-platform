@@ -52,8 +52,13 @@ export async function POST(req: NextRequest) {
     if (!webhook.ok) return webhook.response;
     const payload: any = webhook.payload;
 
-    // ── Full payload logging for debugging ──────────────────────────
-    console.log("📊 GHL Progress Webhook — FULL PAYLOAD:", JSON.stringify(payload, null, 2));
+    // ── Safe summary logging (no PII) ──────────────────────────────
+    console.log("📊 GHL Progress Webhook received:", {
+      hasCourseId: !!payload.courseId,
+      hasProgress: payload.progress !== undefined,
+      hasEmail: !!payload.email,
+      timestamp: new Date().toISOString(),
+    });
 
     // ── Extract email ──────────────────────────────────────────────
     const email = (

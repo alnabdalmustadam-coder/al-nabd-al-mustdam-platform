@@ -64,68 +64,40 @@ export default function InstructorStudentsPage() {
         }
 
         if (data && data.length > 0) {
-          const mapped: StudentItem[] = data.map((e: any) => ({
-            id: e.id,
-            name: e.email ? e.email.split('@')[0] : 'متدرب معتمد',
-            email: e.email,
-            course: e.course_id || 'دبلوم التسامح والسلام والمواطنة الصالحة',
-            progress: Number(e.progress || 45),
-            enrolledDate: e.enrolled_at
-              ? new Date(e.enrolled_at).toLocaleDateString('ar-SA')
-              : 'مؤخراً',
-            status: Number(e.progress) >= 100 ? 'مكتمل' : 'مستمر',
-            quizzesTaken: 2,
-            assignmentsSubmitted: 3,
-          }));
+          const emails = Array.from(new Set(data.map((e: any) => e.email).filter(Boolean)));
+          const profileMap = new Map<string, string>();
+          if (emails.length > 0) {
+            const { data: profs } = await supabase
+              .from('profiles')
+              .select('email, full_name')
+              .in('email', emails);
+            if (profs) {
+              profs.forEach((p: any) => {
+                if (p.email) profileMap.set(p.email.toLowerCase().trim(), p.full_name);
+              });
+            }
+          }
+
+          const mapped: StudentItem[] = data.map((e: any) => {
+            const cleanEm = (e.email || '').toLowerCase().trim();
+            const resolvedName = profileMap.get(cleanEm) || (e.email ? e.email.split('@')[0] : 'متدرب معتمد');
+            return {
+              id: e.id,
+              name: resolvedName,
+              email: e.email || 'غير مسجل',
+              course: e.course_id || 'دبلوم التسامح والسلام والمواطنة الصالحة',
+              progress: Number(e.progress || 0),
+              enrolledDate: e.enrolled_at
+                ? new Date(e.enrolled_at).toLocaleDateString('ar-SA')
+                : 'مؤخراً',
+              status: Number(e.progress) >= 100 ? 'مكتمل' : 'مستمر',
+              quizzesTaken: Number(e.progress) > 50 ? 2 : 1,
+              assignmentsSubmitted: Number(e.progress) > 75 ? 3 : 1,
+            };
+          });
           setStudents(mapped);
         } else {
-          // Fallback sample students
-          setStudents([
-            {
-              id: 'st-1',
-              name: 'عبدالله بن محمد الشمري',
-              email: 'a.shammari@example.com',
-              course: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-              progress: 95,
-              enrolledDate: '15 مايو 2026',
-              status: 'مستمر',
-              quizzesTaken: 2,
-              assignmentsSubmitted: 4,
-            },
-            {
-              id: 'st-2',
-              name: 'سارة بنت خالد العتيبي',
-              email: 's.otaibi@example.com',
-              course: 'المهارات الأكاديمية والتفكير الناقد',
-              progress: 100,
-              enrolledDate: '10 مايو 2026',
-              status: 'مكتمل',
-              quizzesTaken: 1,
-              assignmentsSubmitted: 2,
-            },
-            {
-              id: 'st-3',
-              name: 'م. خالد بن فهد الدوسري',
-              email: 'k.dosari@example.com',
-              course: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
-              progress: 60,
-              enrolledDate: '05 مايو 2026',
-              status: 'مستمر',
-              quizzesTaken: 3,
-              assignmentsSubmitted: 2,
-            },
-            {
-              id: 'st-4',
-              name: 'نورة بنت عبدالعزيز القحطاني',
-              email: 'n.qahtani@example.com',
-              course: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-              progress: 80,
-              enrolledDate: '01 مايو 2026',
-              status: 'مستمر',
-              quizzesTaken: 2,
-              assignmentsSubmitted: 3,
-            },
-          ]);
+          setStudents([]);
         }
       } catch (err) {
         console.error(err);
@@ -139,17 +111,23 @@ export default function InstructorStudentsPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageText.trim()) return;
+    if (!messageText.trim() || !selectedStudent) return;
 
     setIsSendingMessage(true);
-    setTimeout(() => {
-      setIsSendingMessage(false);
+    try {
+      const subject = encodeURIComponent(`رسالة أكاديمية من المحاضر - منصة النبض المستدام`);
+      const body = encodeURIComponent(messageText.trim());
+      window.open(`mailto:${selectedStudent.email}?subject=${subject}&body=${body}`, '_blank');
       setMessageSentSuccess(true);
       setTimeout(() => {
         setMessageSentSuccess(false);
         setMessageText('');
-      }, 2000);
-    }, 600);
+      }, 3000);
+    } catch {
+      alert('تعذر فتح برنامج البريد الإلكتروني');
+    } finally {
+      setIsSendingMessage(false);
+    }
   };
 
   const filteredStudents = students.filter((s) => {

@@ -1,422 +1,279 @@
+import 'server-only';
+
 import fs from 'fs';
 import path from 'path';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { Course } from '@/types';
-import { INITIAL_9_COURSES } from '@/data/courses';
+import { logger } from '@/lib/observability/logger';
+import type { Course, CourseCategory, CourseLevel, CurriculumSection } from '@/types';
 
-const DB_FILE_PATH = path.join(process.cwd(), 'data', 'courses-db.json');
-const SUPABASE_BUCKET = 'platform-data';
-const SUPABASE_FILE = 'courses.json';
+type CourseStatus = 'draft' | 'published' | 'archived';
+type CourseInput = Partial<Course> & { title: string; status?: CourseStatus };
+type CourseRow = {
+  id: number;
+  slug: string;
+  title: string;
+  price: number | string;
+  status: CourseStatus;
+  payload: unknown;
+};
 
-// Initialize Supabase Client with Service Key for full backend access
-function getSupabaseClient() {
-  try {
-    return getSupabaseAdmin();
-  } catch (err) {
-    console.error('Error creating Supabase client in courses-store:', err);
-    return null;
-  }
+type LessonInput = {
+  id?: string;
+  title: string;
+  duration?: string;
+  videoUrl?: string;
+  type?: string;
+  isLocked?: boolean;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: string;
+  quizData?: CurriculumSection['quizData'];
+  items?: CurriculumSection['items'];
+  subLessons?: string[];
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
-// In-memory cache
-let memoryCache: Course[] | null = null;
-let lastCloudFetchTime = 0;
-const CACHE_TTL_MS = 15000; // 15 seconds cache
+function normalizeSlug(title: string, input?: string): string {
+  const candidate = (input || title)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\u0600-\u06ff\s_-]/gu, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  return candidate || `course-${crypto.randomUUID().slice(0, 8)}`;
+}
 
-// Helper to ensure database file exists and load initial data
-function loadInitialCourses(): Course[] {
-  if (memoryCache && memoryCache.length > 0) {
-    return memoryCache;
-  }
+function toCourse(row: CourseRow): Course {
+  const payload = isRecord(row.payload) ? row.payload : {};
+  return {
+    id: Number(row.id),
+    slug: row.slug,
+    title: row.title,
+    description: typeof payload.description === 'string' ? payload.description : '',
+    longDescription: typeof payload.longDescription === 'string' ? payload.longDescription : undefined,
+    price: Number(row.price || 0),
+    oldPrice: typeof payload.oldPrice === 'number' ? payload.oldPrice : undefined,
+    currency: typeof payload.currency === 'string' ? payload.currency : 'SAR',
+    category: (typeof payload.category === 'string' ? payload.category : 'tech') as CourseCategory,
+    level: (typeof payload.level === 'string' ? payload.level : 'all') as CourseLevel,
+    rating: typeof payload.rating === 'number' ? payload.rating : 5.0,
+    reviewsCount: typeof payload.reviewsCount === 'number' ? payload.reviewsCount : 0,
+    studentsCount: typeof payload.studentsCount === 'number' ? payload.studentsCount : 0,
+    duration: typeof payload.duration === 'string' ? payload.duration : '0 ساعة',
+    lessonsCount: typeof payload.lessonsCount === 'number' ? payload.lessonsCount : 0,
+    image: typeof payload.image === 'string' ? payload.image : '/logo.webp',
+    instructor: typeof payload.instructor === 'string' ? payload.instructor : undefined,
+    instructorImage: typeof payload.instructorImage === 'string' ? payload.instructorImage : undefined,
+    instructorBio: typeof payload.instructorBio === 'string' ? payload.instructorBio : undefined,
+    featured: payload.featured === true,
+    outcomes: Array.isArray(payload.outcomes) ? payload.outcomes.filter((item): item is string => typeof item === 'string') : [],
+    curriculum: Array.isArray(payload.curriculum) ? payload.curriculum as CurriculumSection[] : [],
+    attachments: Array.isArray(payload.attachments) ? payload.attachments as Course['attachments'] : [],
+    finalExam: isRecord(payload.finalExam) ? payload.finalExam as unknown as Course['finalExam'] : undefined,
+    whyThisCourse: Array.isArray(payload.whyThisCourse) ? payload.whyThisCourse.filter((item): item is string => typeof item === 'string') : [],
+    requirements: typeof payload.requirements === 'string' ? payload.requirements : undefined,
+    trainerId: typeof payload.trainerId === 'string' ? payload.trainerId : undefined,
+    enrollees: typeof payload.enrollees === 'number' ? payload.enrollees : 0,
+    ghlCourseId: typeof payload.ghlCourseId === 'string' ? payload.ghlCourseId : undefined,
+    ghlCheckoutUrl: typeof payload.ghlCheckoutUrl === 'string' ? payload.ghlCheckoutUrl : undefined,
+    status: row.status,
+  };
+}
 
+const DB_PATH = path.join(process.cwd(), 'data', 'courses-db.json');
+
+function readLocalCourses(): Course[] {
   try {
-    if (fs.existsSync(DB_FILE_PATH)) {
-      const content = fs.readFileSync(DB_FILE_PATH, 'utf-8');
-      const parsed = JSON.parse(content);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        memoryCache = parsed;
-        return parsed;
-      }
+    if (fs.existsSync(DB_PATH)) {
+      const raw = fs.readFileSync(DB_PATH, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (err) {
-    console.warn('Could not read local courses-db.json, using INITIAL_9_COURSES:', err);
+    logger.warn('courses.read_local_failed', { err });
   }
-
-  memoryCache = INITIAL_9_COURSES;
-  return INITIAL_9_COURSES;
+  return [];
 }
 
-// Helper to safely write to local disk (won't throw on Vercel read-only system)
-function writeLocalDbFile(courses: Course[]): boolean {
+function writeLocalCourses(list: Course[]) {
   try {
-    if (!fs.existsSync(path.dirname(DB_FILE_PATH))) {
-      fs.mkdirSync(path.dirname(DB_FILE_PATH), { recursive: true });
-    }
-    fs.writeFileSync(DB_FILE_PATH, JSON.stringify(courses, null, 2), 'utf-8');
-    return true;
+    fs.writeFileSync(DB_PATH, JSON.stringify(list, null, 2), 'utf8');
   } catch (err) {
-    // Vercel serverless filesystem is read-only, which is completely normal
-    return false;
+    logger.warn('courses.write_local_failed', { err });
   }
 }
 
-// Asynchronously fetch courses from Supabase Cloud Storage
-export async function fetchCoursesFromCloud(): Promise<Course[]> {
+async function fetchRows(includeUnpublished: boolean): Promise<CourseRow[]> {
   try {
-    const supabase = getSupabaseClient();
-    if (!supabase) return loadInitialCourses();
-
-    const { data, error } = await supabase.storage
-      .from(SUPABASE_BUCKET)
-      .download(SUPABASE_FILE);
-
-    if (error || !data) {
-      // If file doesn't exist yet in bucket, upload current initial courses
-      const initial = loadInitialCourses();
-      await uploadCoursesToCloud(initial).catch(() => {});
-      return initial;
-    }
-
-    const text = await data.text();
-    const parsed = JSON.parse(text);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      memoryCache = parsed;
-      lastCloudFetchTime = Date.now();
-      writeLocalDbFile(parsed);
-      return parsed;
+    let query = getSupabaseAdmin()
+      .from('course_catalog')
+      .select('id, slug, title, price, status, payload')
+      .order('created_at', { ascending: false });
+    if (!includeUnpublished) query = query.eq('status', 'published');
+    const { data, error } = await query;
+    if (!error && data && data.length > 0) {
+      return data as CourseRow[];
     }
   } catch (err) {
-    console.error('Error fetching courses from Supabase Storage:', err);
+    logger.warn('courses.read_supabase_fallback_to_local', { err });
   }
 
-  return loadInitialCourses();
+  // Fallback to resilient local JSON database
+  const local = readLocalCourses();
+  const filtered = includeUnpublished ? local : local.filter(c => c.status !== 'draft');
+  return filtered.map(c => ({
+    id: c.id,
+    slug: c.slug,
+    title: c.title,
+    price: c.price,
+    status: (c.status || 'published') as CourseStatus,
+    payload: c,
+  }));
 }
 
-// Asynchronously upload courses to Supabase Cloud Storage
-export async function uploadCoursesToCloud(courses: Course[]): Promise<boolean> {
-  memoryCache = courses;
-  writeLocalDbFile(courses);
-
-  try {
-    const supabase = getSupabaseClient();
-    if (!supabase) return false;
-
-    const payload = JSON.stringify(courses, null, 2);
-    const { error } = await supabase.storage
-      .from(SUPABASE_BUCKET)
-      .upload(SUPABASE_FILE, Buffer.from(payload, 'utf-8'), {
-        contentType: 'application/json',
-        upsert: true,
-      });
-
-    if (error) {
-      console.error('Failed to upload courses to Supabase Storage:', error);
-      return false;
-    }
-
-    lastCloudFetchTime = Date.now();
-    return true;
-  } catch (err) {
-    console.error('Error uploading courses to cloud storage:', err);
-    return false;
-  }
+export async function getAllCoursesAsync(options: { includeUnpublished?: boolean } = {}): Promise<Course[]> {
+  return (await fetchRows(options.includeUnpublished === true)).map(toCourse);
 }
 
-// Synchronous GetAll (uses cache / local file)
-export function getAllCourses(): Course[] {
-  return memoryCache && memoryCache.length > 0 ? memoryCache : loadInitialCourses();
-}
-
-// Asynchronous GetAll (fetches latest from Supabase Cloud Storage)
-export async function getAllCoursesAsync(): Promise<Course[]> {
-  const now = Date.now();
-  if (memoryCache && memoryCache.length > 0 && now - lastCloudFetchTime < CACHE_TTL_MS) {
-    return memoryCache;
-  }
-  return await fetchCoursesFromCloud();
-}
-
-// Find course by Slug or ID (Sync)
-export function getCourseBySlug(slugOrId?: string): Course | undefined {
+export async function getCourseBySlugAsync(
+  slugOrId?: string,
+  options: { includeUnpublished?: boolean } = {},
+): Promise<Course | undefined> {
   if (!slugOrId) return undefined;
   const clean = slugOrId.replace(/^course-/, '').toLowerCase().trim();
-  const all = getAllCourses();
-
-  return all.find((c) => {
-    const cSlug = (c.slug || '').toLowerCase().trim();
-    const cGhl = (c.ghlCourseId || '').replace(/^course-/, '').toLowerCase().trim();
-    return (
-      cSlug === clean ||
-      cSlug === slugOrId.toLowerCase().trim() ||
-      cGhl === clean ||
-      (c.ghlCourseId && c.ghlCourseId.toLowerCase() === slugOrId.toLowerCase()) ||
-      String(c.id) === clean ||
-      (c.title && (c.title === slugOrId || slugOrId.includes(c.title) || c.title.includes(slugOrId)))
-    );
+  const courses = await getAllCoursesAsync(options);
+  return courses.find((course) => {
+    const ghlId = course.ghlCourseId?.replace(/^course-/, '').toLowerCase().trim();
+    return course.slug.toLowerCase() === clean || String(course.id) === clean || ghlId === clean;
   });
 }
 
-// Find course by Slug or ID (Async)
-export async function getCourseBySlugAsync(slugOrId?: string): Promise<Course | undefined> {
-  if (!slugOrId) return undefined;
-  const all = await getAllCoursesAsync();
-  const clean = slugOrId.replace(/^course-/, '').toLowerCase().trim();
-
-  return all.find((c) => {
-    const cSlug = (c.slug || '').toLowerCase().trim();
-    const cGhl = (c.ghlCourseId || '').replace(/^course-/, '').toLowerCase().trim();
-    return (
-      cSlug === clean ||
-      cSlug === slugOrId.toLowerCase().trim() ||
-      cGhl === clean ||
-      (c.ghlCourseId && c.ghlCourseId.toLowerCase() === slugOrId.toLowerCase()) ||
-      String(c.id) === clean ||
-      (c.title && (c.title === slugOrId || slugOrId.includes(c.title) || c.title.includes(slugOrId)))
-    );
-  });
+function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 'id'> {
+  const curriculum = input.curriculum ?? current?.curriculum ?? [];
+  return {
+    slug: normalizeSlug(input.title, input.slug || current?.slug),
+    title: input.title.trim(),
+    description: input.description ?? current?.description ?? '',
+    longDescription: input.longDescription ?? current?.longDescription,
+    price: input.price ?? current?.price ?? 0,
+    oldPrice: input.oldPrice ?? current?.oldPrice,
+    currency: input.currency ?? current?.currency ?? 'SAR',
+    category: input.category ?? current?.category ?? 'tech',
+    level: input.level ?? current?.level ?? 'all',
+    rating: input.rating ?? current?.rating ?? 0,
+    reviewsCount: input.reviewsCount ?? current?.reviewsCount ?? 0,
+    studentsCount: input.studentsCount ?? current?.studentsCount ?? 0,
+    duration: input.duration ?? current?.duration ?? '0 ساعة',
+    lessonsCount: curriculum.length,
+    image: input.image ?? current?.image ?? '/logo.webp',
+    instructor: input.instructor ?? current?.instructor,
+    instructorImage: input.instructorImage ?? current?.instructorImage,
+    instructorBio: input.instructorBio ?? current?.instructorBio,
+    featured: input.featured ?? current?.featured ?? false,
+    outcomes: input.outcomes ?? current?.outcomes ?? [],
+    curriculum,
+    attachments: input.attachments ?? current?.attachments ?? [],
+    finalExam: input.finalExam ?? current?.finalExam,
+    whyThisCourse: input.whyThisCourse ?? current?.whyThisCourse ?? [],
+    requirements: input.requirements ?? current?.requirements,
+    trainerId: input.trainerId ?? current?.trainerId,
+    enrollees: input.enrollees ?? current?.enrollees ?? 0,
+    ghlCourseId: input.ghlCourseId ?? current?.ghlCourseId,
+    ghlCheckoutUrl: input.ghlCheckoutUrl ?? current?.ghlCheckoutUrl,
+    status: input.status ?? current?.status ?? 'published',
+  };
 }
 
-// Save or Update a Course (Async)
-export async function saveCourseAsync(courseData: Partial<Course> & { title: string }): Promise<Course> {
-  const all = await getAllCoursesAsync();
+export async function saveCourseAsync(courseData: CourseInput, actorId?: string): Promise<Course> {
+  const existing = courseData.id
+    ? (await getAllCoursesAsync({ includeUnpublished: true })).find((course) => String(course.id) === String(courseData.id))
+    : courseData.slug
+      ? await getCourseBySlugAsync(courseData.slug, { includeUnpublished: true })
+      : undefined;
+  const payload = buildCoursePayload(courseData, existing);
+  const status = courseData.status || 'published';
+  const values = {
+    slug: payload.slug,
+    title: payload.title,
+    price: payload.price,
+    status,
+    payload,
+    updated_by: actorId || null,
+    ...(existing ? {} : { created_by: actorId || null }),
+    updated_at: new Date().toISOString(),
+  };
 
-  // Generate slug if not present
-  let baseSlug = courseData.slug ? courseData.slug.trim().toLowerCase().replace(/[\s_]+/g, '-') : '';
-  if (!baseSlug) {
-    const safeTitle = courseData.title
-      .replace(/[^\w\s\u0600-\u06FF-]/g, '')
-      .trim()
-      .replace(/[\s_]+/g, '-');
-    baseSlug = safeTitle ? `${safeTitle}-${Date.now().toString().slice(-4)}` : `course-${Date.now()}`;
+  let savedCourse: Course | undefined;
+
+  try {
+    const query = existing
+      ? getSupabaseAdmin().from('course_catalog').update(values).eq('id', existing.id)
+      : getSupabaseAdmin().from('course_catalog').insert(values);
+    const { data, error } = await query.select('id, slug, title, price, status, payload').single();
+    if (!error && data) {
+      savedCourse = toCourse(data as CourseRow);
+    }
+  } catch (err) {
+    logger.warn('courses.supabase_write_fallback', { err });
   }
 
-  const existingIndex = all.findIndex(
-    (c) =>
-      (courseData.id && (c.id === Number(courseData.id) || String(c.id) === String(courseData.id))) ||
-      (courseData.slug && (c.slug === courseData.slug || c.slug.toLowerCase().trim() === courseData.slug.toLowerCase().trim())) ||
-      (c.slug === baseSlug)
-  );
+  // Sync to local JSON database for guaranteed availability
+  const resultCourse: Course = savedCourse || {
+    id: existing?.id || Date.now(),
+    ...payload,
+  };
 
-  let updatedCourse: Course;
-
-  const curriculum = Array.isArray(courseData.curriculum) && courseData.curriculum.length > 0
-    ? courseData.curriculum
-    : [
-      {
-        id: `sec-1`,
-        title: 'الوحدة الأولى: مدخل ومقدمة عامة',
-        duration: '30 دقيقة',
-        isLocked: false,
-        type: 'video',
-        videoUrl: 'MmHWTPJMzbQ',
-        lessons: ['مقدمة تمهيدية وأهداف البرنامج'],
-      },
-    ];
-
-  if (existingIndex >= 0) {
-    // Update existing course
-    const existing = all[existingIndex];
-    updatedCourse = {
-      ...existing,
-      ...courseData,
-      id: existing.id,
-      slug: courseData.slug || existing.slug || baseSlug,
-      title: courseData.title || existing.title,
-      image: courseData.image || existing.image || '/logo.webp',
-      instructor: courseData.instructor || existing.instructor || 'مدرب معتمد',
-      category: courseData.category || existing.category || 'tech',
-      level: courseData.level || existing.level || 'all',
-      price: typeof courseData.price === 'number' ? courseData.price : (existing.price || 0),
-      duration: courseData.duration || existing.duration || '20 ساعة',
-      description: courseData.description || existing.description || '',
-      curriculum: courseData.curriculum !== undefined ? courseData.curriculum : (existing.curriculum || curriculum),
-      lessonsCount: courseData.curriculum !== undefined ? courseData.curriculum.length : (existing.curriculum ? existing.curriculum.length : (existing.lessonsCount || curriculum.length)),
-      outcomes: courseData.outcomes || existing.outcomes || [],
-    };
-    all[existingIndex] = updatedCourse;
-  } else {
-    // Create new course
-    const nextId = all.length > 0 ? Math.max(...all.map((c) => Number(c.id) || 0)) + 1 : 1;
-    updatedCourse = {
-      id: nextId,
-      slug: baseSlug,
-      title: courseData.title,
-      description: courseData.description || 'برنامج تدريبي معتمد وشامل.',
-      category: courseData.category || 'tech',
-      level: courseData.level || 'all',
-      price: typeof courseData.price === 'number' ? courseData.price : 0,
-      rating: courseData.rating || 5.0,
-      enrollees: courseData.enrollees || 0,
-      duration: courseData.duration || '20 ساعة',
-      lessonsCount: curriculum.length,
-      featured: courseData.featured ?? true,
-      image: courseData.image || '/logo.webp',
-      instructor: courseData.instructor || 'مدرب معتمد',
-      trainerId: courseData.trainerId || 'tr-1',
-      curriculum: curriculum,
-      outcomes: courseData.outcomes || ['اكتساب المعارف والمهارات الأساسية للمسار.'],
-      requirements: courseData.requirements || 'لا توجد متطلبات مسبقة.',
-      ghlCheckoutUrl: courseData.ghlCheckoutUrl || `/checkout?slug=${baseSlug}`,
-      ghlCourseId: courseData.ghlCourseId || `course-${baseSlug}`,
-    };
-    all.unshift(updatedCourse);
+  try {
+    const list = readLocalCourses();
+    const idx = list.findIndex((c) => String(c.id) === String(resultCourse.id) || c.slug === resultCourse.slug);
+    if (idx >= 0) list[idx] = resultCourse;
+    else list.unshift(resultCourse);
+    writeLocalCourses(list);
+  } catch (err) {
+    logger.error('courses.local_sync_failed', { err });
   }
 
-  await uploadCoursesToCloud(all);
-  return updatedCourse;
+  return resultCourse;
 }
 
-// Synchronous wrapper for saveCourse
-export function saveCourse(courseData: Partial<Course> & { title: string }): Course {
-  const all = getAllCourses();
-  let baseSlug = courseData.slug ? courseData.slug.trim().toLowerCase().replace(/[\s_]+/g, '-') : '';
-  if (!baseSlug) {
-    const safeTitle = courseData.title
-      .replace(/[^\w\s\u0600-\u06FF-]/g, '')
-      .trim()
-      .replace(/[\s_]+/g, '-');
-    baseSlug = safeTitle ? `${safeTitle}-${Date.now().toString().slice(-4)}` : `course-${Date.now()}`;
-  }
-
-  const existingIndex = all.findIndex(
-    (c) =>
-      (courseData.id && (c.id === Number(courseData.id) || String(c.id) === String(courseData.id))) ||
-      (courseData.slug && (c.slug === courseData.slug || c.slug.toLowerCase().trim() === courseData.slug.toLowerCase().trim())) ||
-      (c.slug === baseSlug)
-  );
-
-  let updatedCourse: Course;
-  const curriculum = Array.isArray(courseData.curriculum) && courseData.curriculum.length > 0
-    ? courseData.curriculum
-    : [
-      {
-        id: `sec-1`,
-        title: 'الوحدة الأولى: مدخل ومقدمة عامة',
-        duration: '30 دقيقة',
-        isLocked: false,
-        type: 'video',
-        videoUrl: 'MmHWTPJMzbQ',
-        lessons: ['مقدمة تمهيدية وأهداف البرنامج'],
-      },
-    ];
-
-  if (existingIndex >= 0) {
-    const existing = all[existingIndex];
-    updatedCourse = {
-      ...existing,
-      ...courseData,
-      id: existing.id,
-      slug: courseData.slug || existing.slug || baseSlug,
-      title: courseData.title || existing.title,
-      image: courseData.image || existing.image || '/logo.webp',
-      instructor: courseData.instructor || existing.instructor || 'مدرب معتمد',
-      category: courseData.category || existing.category || 'tech',
-      level: courseData.level || existing.level || 'all',
-      price: typeof courseData.price === 'number' ? courseData.price : (existing.price || 0),
-      duration: courseData.duration || existing.duration || '20 ساعة',
-      description: courseData.description || existing.description || '',
-      curriculum: courseData.curriculum !== undefined ? courseData.curriculum : (existing.curriculum || curriculum),
-      lessonsCount: courseData.curriculum !== undefined ? courseData.curriculum.length : (existing.curriculum ? existing.curriculum.length : (existing.lessonsCount || curriculum.length)),
-      outcomes: courseData.outcomes || existing.outcomes || [],
-    };
-    all[existingIndex] = updatedCourse;
-  } else {
-    const nextId = all.length > 0 ? Math.max(...all.map((c) => Number(c.id) || 0)) + 1 : 1;
-    updatedCourse = {
-      id: nextId,
-      slug: baseSlug,
-      title: courseData.title,
-      description: courseData.description || 'برنامج تدريبي معتمد وشامل.',
-      category: courseData.category || 'tech',
-      level: courseData.level || 'all',
-      price: typeof courseData.price === 'number' ? courseData.price : 0,
-      rating: courseData.rating || 5.0,
-      enrollees: courseData.enrollees || 0,
-      duration: courseData.duration || '20 ساعة',
-      lessonsCount: curriculum.length,
-      featured: courseData.featured ?? true,
-      image: courseData.image || '/logo.webp',
-      instructor: courseData.instructor || 'مدرب معتمد',
-      trainerId: courseData.trainerId || 'tr-1',
-      curriculum: curriculum,
-      outcomes: courseData.outcomes || ['اكتساب المعارف والمهارات الأساسية للمسار.'],
-      requirements: courseData.requirements || 'لا توجد متطلبات مسبقة.',
-      ghlCheckoutUrl: courseData.ghlCheckoutUrl || `/checkout?slug=${baseSlug}`,
-      ghlCourseId: courseData.ghlCourseId || `course-${baseSlug}`,
-    };
-    all.unshift(updatedCourse);
-  }
-
-  // Trigger cloud upload in background
-  uploadCoursesToCloud(all).catch(console.error);
-  return updatedCourse;
-}
-
-// Delete Course (Async)
 export async function deleteCourseAsync(slugOrId: string | number): Promise<boolean> {
-  const all = await getAllCoursesAsync();
-  const clean = String(slugOrId).replace(/^course-/, '').toLowerCase().trim();
-
-  const filtered = all.filter(
-    (c) => String(c.id) !== clean && c.slug.toLowerCase().trim() !== clean
-  );
-
-  if (filtered.length !== all.length) {
-    await uploadCoursesToCloud(filtered);
-    return true;
+  const value = String(slugOrId).trim();
+  try {
+    let query = getSupabaseAdmin().from('course_catalog').delete();
+    query = /^\d+$/.test(value) ? query.eq('id', Number(value)) : query.eq('slug', value.replace(/^course-/, ''));
+    await query;
+  } catch (err) {
+    logger.warn('courses.supabase_delete_fallback', { err });
   }
-  return false;
+
+  try {
+    const list = readLocalCourses();
+    const filtered = list.filter((c) => String(c.id) !== value && c.slug !== value.replace(/^course-/, ''));
+    writeLocalCourses(filtered);
+  } catch (err) {
+    logger.error('courses.local_delete_failed', { err });
+  }
+
+  return true;
 }
 
-// Delete Course (Sync wrapper)
-export function deleteCourse(slugOrId: string | number): boolean {
-  const all = getAllCourses();
-  const clean = String(slugOrId).replace(/^course-/, '').toLowerCase().trim();
-
-  const filtered = all.filter(
-    (c) => String(c.id) !== clean && c.slug.toLowerCase().trim() !== clean
-  );
-
-  if (filtered.length !== all.length) {
-    uploadCoursesToCloud(filtered).catch(console.error);
-    return true;
-  }
-  return false;
-}
-
-// Add or Update Lesson (Async)
 export async function addOrUpdateLessonAsync(
   courseSlug: string,
-  lessonData: {
-    id?: string;
-    title: string;
-    duration?: string;
-    videoUrl?: string;
-    type?: string;
-    isLocked?: boolean;
-    fileUrl?: string;
-    fileName?: string;
-    fileSize?: string;
-    quizData?: any;
-    items?: any[];
-    subLessons?: string[];
-  }
+  lessonData: LessonInput,
+  actorId?: string,
 ): Promise<Course | null> {
-  const all = await getAllCoursesAsync();
-  const course = await getCourseBySlugAsync(courseSlug);
+  const course = await getCourseBySlugAsync(courseSlug, { includeUnpublished: true });
   if (!course) return null;
-
-  const courseIndex = all.findIndex((c) => c.slug === course.slug);
-  if (courseIndex === -1) return null;
-
-  const curr = [...(course.curriculum || [])];
-  const lessonId = lessonData.id || `les-${Date.now()}`;
-  const existingLessonIndex = curr.findIndex((l) => l.id === lessonId);
-
-  const newSection: any = {
+  const lessonId = lessonData.id || crypto.randomUUID();
+  const curriculum = [...course.curriculum];
+  const lesson: CurriculumSection = {
     id: lessonId,
-    title: lessonData.title,
-    duration: lessonData.duration || '20 دقيقة',
+    title: lessonData.title.trim(),
+    duration: lessonData.duration || '0 دقيقة',
     isLocked: lessonData.isLocked ?? false,
     type: lessonData.type || 'video',
     videoUrl: lessonData.videoUrl || '',
@@ -425,113 +282,22 @@ export async function addOrUpdateLessonAsync(
     fileSize: lessonData.fileSize,
     quizData: lessonData.quizData,
     items: lessonData.items,
-    lessons: lessonData.subLessons && lessonData.subLessons.length > 0 ? lessonData.subLessons : [lessonData.title],
+    lessons: lessonData.subLessons?.length ? lessonData.subLessons : [lessonData.title.trim()],
   };
-
-  if (existingLessonIndex >= 0) {
-    curr[existingLessonIndex] = { ...curr[existingLessonIndex], ...newSection };
-  } else {
-    curr.push(newSection);
-  }
-
-  course.curriculum = curr;
-  course.lessonsCount = curr.length;
-  all[courseIndex] = course;
-
-  await uploadCoursesToCloud(all);
-  return course;
+  const index = curriculum.findIndex((item) => item.id === lessonId);
+  if (index >= 0) curriculum[index] = { ...curriculum[index], ...lesson };
+  else curriculum.push(lesson);
+  return saveCourseAsync({ ...course, curriculum, title: course.title }, actorId);
 }
 
-// Add or Update Lesson (Sync wrapper)
-export function addOrUpdateLesson(
+export async function deleteLessonAsync(
   courseSlug: string,
-  lessonData: {
-    id?: string;
-    title: string;
-    duration?: string;
-    videoUrl?: string;
-    type?: string;
-    isLocked?: boolean;
-    fileUrl?: string;
-    fileName?: string;
-    fileSize?: string;
-    quizData?: any;
-    items?: any[];
-    subLessons?: string[];
-  }
-): Course | null {
-  const all = getAllCourses();
-  const course = getCourseBySlug(courseSlug);
+  lessonId: string,
+  actorId?: string,
+): Promise<Course | null> {
+  const course = await getCourseBySlugAsync(courseSlug, { includeUnpublished: true });
   if (!course) return null;
-
-  const courseIndex = all.findIndex((c) => c.slug === course.slug);
-  if (courseIndex === -1) return null;
-
-  const curr = [...(course.curriculum || [])];
-  const lessonId = lessonData.id || `les-${Date.now()}`;
-  const existingLessonIndex = curr.findIndex((l) => l.id === lessonId);
-
-  const newSection: any = {
-    id: lessonId,
-    title: lessonData.title,
-    duration: lessonData.duration || '20 دقيقة',
-    isLocked: lessonData.isLocked ?? false,
-    type: lessonData.type || 'video',
-    videoUrl: lessonData.videoUrl || '',
-    fileUrl: lessonData.fileUrl,
-    fileName: lessonData.fileName,
-    fileSize: lessonData.fileSize,
-    quizData: lessonData.quizData,
-    items: lessonData.items,
-    lessons: lessonData.subLessons && lessonData.subLessons.length > 0 ? lessonData.subLessons : [lessonData.title],
-  };
-
-  if (existingLessonIndex >= 0) {
-    curr[existingLessonIndex] = { ...curr[existingLessonIndex], ...newSection };
-  } else {
-    curr.push(newSection);
-  }
-
-  course.curriculum = curr;
-  course.lessonsCount = curr.length;
-  all[courseIndex] = course;
-
-  uploadCoursesToCloud(all).catch(console.error);
-  return course;
-}
-
-// Delete Lesson (Async)
-export async function deleteLessonAsync(courseSlug: string, lessonId: string): Promise<Course | null> {
-  const all = await getAllCoursesAsync();
-  const course = await getCourseBySlugAsync(courseSlug);
-  if (!course) return null;
-
-  const courseIndex = all.findIndex((c) => c.slug === course.slug);
-  if (courseIndex === -1) return null;
-
-  const curr = (course.curriculum || []).filter((l) => l.id !== lessonId);
-  course.curriculum = curr;
-  course.lessonsCount = curr.length;
-  all[courseIndex] = course;
-
-  await uploadCoursesToCloud(all);
-  return course;
-}
-
-// Delete Lesson (Sync wrapper)
-export function deleteLesson(courseSlug: string, lessonId: string): Course | null {
-  const all = getAllCourses();
-  const course = getCourseBySlug(courseSlug);
-  if (!course) return null;
-
-  const courseIndex = all.findIndex((c) => c.slug === course.slug);
-  if (courseIndex === -1) return null;
-
-  const curr = (course.curriculum || []).filter((l) => l.id !== lessonId);
-  course.curriculum = curr;
-  course.lessonsCount = curr.length;
-  all[courseIndex] = course;
-
-  uploadCoursesToCloud(all).catch(console.error);
-  return course;
+  const curriculum = course.curriculum.filter((lesson) => lesson.id !== lessonId);
+  if (curriculum.length === course.curriculum.length) return null;
+  return saveCourseAsync({ ...course, curriculum, title: course.title }, actorId);
 }

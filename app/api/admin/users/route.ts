@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
     const { data: profiles, error: profilesError } = await supabaseAdmin
       .from("profiles")
-      .select("id, email, full_name, phone, role, created_at, updated_at")
+      .select("id, email, full_name, phone, role, status, created_at, updated_at")
       .order("created_at", { ascending: false });
 
     if (profilesError) {
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
         role: mappedRole,
         enrolledCourses: enrollmentMap.get(emailClean) || 0,
         certificatesCount: completedMap.get(emailClean) || 0,
-        status: "active" as const,
+        status: (p.status === "suspended" ? "suspended" : "active") as "active" | "suspended",
         lastActive: "نشط",
         attendanceRate: "100%",
       };
@@ -127,6 +127,53 @@ export async function DELETE(req: NextRequest) {
     console.error("Delete user error:", err);
     return NextResponse.json(
       { message: err.message || "حدث خطأ أثناء حذف الحساب" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const auth = await requireAdmin(req);
+    if (!auth.ok) return auth.response;
+    const supabaseAdmin = getSupabaseAdmin();
+
+    const body = await req.json();
+    const { userId, status } = body;
+
+    if (!userId || !['active', 'suspended'].includes(status)) {
+      return NextResponse.json(
+        { message: 'معرف المستخدم وحالة صالحة مطلوبان' },
+        { status: 400 }
+      );
+    }
+
+    // Prevent self-suspension
+    if (userId === auth.user.id) {
+      return NextResponse.json(
+        { message: 'لا يمكنك تعليق حسابك الحالي' },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabaseAdmin
+      .from('profiles')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', userId);
+
+    if (error) {
+      console.error('Status update error:', error);
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: status === 'suspended' ? 'تم تعليق الحساب بنجاح' : 'تم تفعيل الحساب بنجاح',
+    });
+  } catch (err: any) {
+    console.error('Patch user error:', err);
+    return NextResponse.json(
+      { message: err.message || 'حدث خطأ في الخادم' },
       { status: 500 }
     );
   }

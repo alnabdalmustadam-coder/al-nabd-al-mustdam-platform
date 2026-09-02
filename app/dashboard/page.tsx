@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
-import { getDashboardUrlForRole, getTrustedRole } from '@/lib/security/auth';
+import { getDashboardUrlForRole, getTrustedRole, isAdminRole, isInstructorRole } from '@/lib/security/auth';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -12,8 +12,25 @@ export default async function DashboardPage() {
     redirect('/auth/login?redirect=/dashboard');
   }
 
-  const effectiveRole = getTrustedRole(user);
-  const targetDashboard = getDashboardUrlForRole(effectiveRole);
+  let effectiveRole = getTrustedRole(user);
 
+  // Fallback: if app_metadata has no role (defaults to STUDENT),
+  // check profiles table for the actual role
+  if (!isAdminRole(effectiveRole) && !isInstructorRole(effectiveRole)) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.role) {
+      const dbRole = String(profile.role).toUpperCase().trim();
+      if (['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(dbRole)) {
+        effectiveRole = dbRole as any;
+      }
+    }
+  }
+
+  const targetDashboard = getDashboardUrlForRole(effectiveRole);
   redirect(targetDashboard);
 }

@@ -59,9 +59,29 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    // Proxy is only an optimistic gate. Privileged roles come exclusively
+    // Proxy is only an optimistic gate. Privileged roles come primarily
     // from the server-controlled app_metadata claim in the verified user JWT.
-    const userRole = getTrustedRole(user);
+    let userRole = getTrustedRole(user);
+
+    // Fallback: if app_metadata has no privileged role, check profiles table
+    if (user && !(ADMIN_ROLES as readonly string[]).includes(userRole) && !(INSTRUCTOR_ROLES as readonly string[]).includes(userRole)) {
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profile?.role) {
+          const dbRole = String(profile.role).toUpperCase().trim();
+          if ([...ADMIN_ROLES, ...INSTRUCTOR_ROLES].includes(dbRole as any)) {
+            userRole = dbRole as any;
+          }
+        }
+      } catch {
+        // Continue with trusted role
+      }
+    }
 
     // 1.1 Direct /dashboard route redirection based on role
     if (pathname === '/dashboard') {

@@ -65,42 +65,15 @@ export default function InstructorDashboardPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loadingCourses, setLoadingCourses] = useState(true);
 
-  // Submissions State
-  const [submissions, setSubmissions] = useState<SubmissionItem[]>([
-    {
-      id: 'sub-1',
-      studentName: 'عبدالله بن محمد الشمري',
-      email: 'a.shammari@example.com',
-      courseTitle: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-      assignmentTitle: 'إعداد دراسة حالة: تطبيق قيم الحوار والتعايش المجتمعي',
-      notes: 'مرفق لكم ملف التقرير الميداني والتوصيات العملية.',
-      file_url: 'مبادرة_السلام_المجتمعي.pdf',
-      status: 'submitted',
-      submitted_at: 'منذ ساعتين',
-    },
-    {
-      id: 'sub-2',
-      studentName: 'سارة بنت خالد العتيبي',
-      email: 's.otaibi@example.com',
-      courseTitle: 'المهارات الأكاديمية والتفكير الناقد',
-      assignmentTitle: 'واجب الوحدة الثانية: تحليل المغالطات المنطقية',
-      notes: 'تم استيفاء كافة المعايير المنهجية المطلوبة في التكليف.',
-      file_url: 'تحليل_المغالطات_المنطقية.docx',
-      status: 'submitted',
-      submitted_at: 'اليوم 11:30 ص',
-    },
-    {
-      id: 'sub-3',
-      studentName: 'م. خالد بن فهد الدوسري',
-      email: 'k.dosari@example.com',
-      courseTitle: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
-      assignmentTitle: 'المشروع التطبيقي: إعداد تقرير مالي متقدم بالإكسيل',
-      notes: 'تم إعداد الجداول المحورية والدوال المالية المطلوبة.',
-      file_url: 'مشروع_الاكسيل_المتقدم.xlsx',
-      status: 'submitted',
-      submitted_at: 'أمس 04:15 م',
-    },
-  ]);
+  // Submissions State (loaded dynamically from database)
+  const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
+  const [recentStudents, setRecentStudents] = useState<{
+    name: string;
+    course: string;
+    progress: number;
+    date: string;
+    status: string;
+  }[]>([]);
 
   // Quick Grading Modal State
   const [selectedSubForGrading, setSelectedSubForGrading] = useState<SubmissionItem | null>(null);
@@ -110,15 +83,15 @@ export default function InstructorDashboardPage() {
 
   // Stats State
   const [stats, setStats] = useState({
-    coursesCount: 3,
-    studentsCount: 245,
-    pendingSubmissions: 3,
-    upcomingLiveCount: 1,
-    averageRating: 4.95,
-    totalHours: 120,
+    coursesCount: 0,
+    studentsCount: 0,
+    pendingSubmissions: 0,
+    upcomingLiveCount: 0,
+    averageRating: 4.9,
+    totalHours: 0,
   });
 
-  // Load instructor data & courses
+  // Load instructor data, courses, and dynamic metrics from database
   useEffect(() => {
     async function loadData() {
       try {
@@ -137,16 +110,134 @@ export default function InstructorDashboardPage() {
           }
         }
 
-        // Fetch courses
-        const res = await fetch('/api/courses');
-        const data = await res.json();
-        if (data.success && Array.isArray(data.courses)) {
-          setCourses(data.courses);
-          setStats((prev) => ({
-            ...prev,
-            coursesCount: data.courses.length,
-          }));
+        // 1. Fetch courses
+        let coursesList: Course[] = [];
+        try {
+          const res = await fetch('/api/courses');
+          const data = await res.json();
+          if (data.success && Array.isArray(data.courses)) {
+            coursesList = data.courses;
+            setCourses(coursesList);
+          }
+        } catch (cErr) {
+          console.error('Fetch courses error:', cErr);
         }
+
+        // 2. Fetch real enrollments count and recent students
+        let enrolledCount = 0;
+        try {
+          const { data: enrollments, count } = await supabase
+            .from('enrollments')
+            .select('*', { count: 'exact' })
+            .order('enrolled_at', { ascending: false })
+            .limit(6);
+
+          enrolledCount = count || (enrollments ? enrollments.length : 0);
+
+          if (enrollments && enrollments.length > 0) {
+            const emails = Array.from(new Set(enrollments.map((e: any) => e.email).filter(Boolean)));
+            const profileMap = new Map<string, string>();
+            if (emails.length > 0) {
+              const { data: profs } = await supabase
+                .from('profiles')
+                .select('email, full_name')
+                .in('email', emails);
+              if (profs) {
+                profs.forEach((p: any) => {
+                  if (p.email) profileMap.set(p.email.toLowerCase().trim(), p.full_name);
+                });
+              }
+            }
+
+            const mappedStudents = enrollments.map((e: any) => {
+              const cleanEm = (e.email || '').toLowerCase().trim();
+              const name = profileMap.get(cleanEm) || (e.email ? e.email.split('@')[0] : 'متدرب معتمد');
+              const prog = Number(e.progress || 0);
+              return {
+                name,
+                course: e.course_id || 'دبلوم التسامح والسلام والمواطنة الصالحة',
+                progress: prog,
+                date: e.enrolled_at ? new Date(e.enrolled_at).toLocaleDateString('ar-SA') : 'مؤخراً',
+                status: prog >= 100 ? 'مكتمل' : 'مستمر',
+              };
+            });
+            setRecentStudents(mappedStudents);
+          } else {
+            setRecentStudents([]);
+          }
+        } catch (enrErr) {
+          console.error('Fetch enrollments error:', enrErr);
+        }
+
+        // 3. Fetch real submissions
+        let subsList: SubmissionItem[] = [];
+        try {
+          const { data: subsData } = await supabase
+            .from('assignment_submissions')
+            .select(`
+              id,
+              email,
+              file_url,
+              notes,
+              grade,
+              feedback,
+              status,
+              submitted_at,
+              assignments (
+                title,
+                course_id
+              )
+            `)
+            .order('submitted_at', { ascending: false })
+            .limit(6);
+
+          if (subsData && subsData.length > 0) {
+            subsList = subsData.map((s: any) => ({
+              id: s.id,
+              studentName: s.email ? s.email.split('@')[0] : 'متدرب',
+              email: s.email || '',
+              courseTitle: (s.assignments as any)?.course_id || 'برنامج تدريبي',
+              assignmentTitle: (s.assignments as any)?.title || 'واجب دراسي',
+              notes: s.notes || undefined,
+              file_url: s.file_url || undefined,
+              grade: s.grade,
+              feedback: s.feedback,
+              status: s.status || 'submitted',
+              submitted_at: s.submitted_at ? new Date(s.submitted_at).toLocaleDateString('ar-SA') : 'مؤخراً',
+            }));
+            setSubmissions(subsList);
+          } else {
+            setSubmissions([]);
+          }
+        } catch (subErr) {
+          console.error('Fetch submissions error:', subErr);
+        }
+
+        // 4. Fetch upcoming live sessions count
+        let liveCount = 0;
+        try {
+          const { count } = await supabase
+            .from('live_sessions')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'scheduled');
+          liveCount = count || 0;
+        } catch (liveErr) {
+          console.error('Fetch live sessions count error:', liveErr);
+        }
+
+        // 5. Update stats
+        const totalCalculatedHours = coursesList.reduce(
+          (acc, c: any) => acc + (Number(c.hours) || 0),
+          0
+        );
+        setStats({
+          coursesCount: coursesList.length,
+          studentsCount: enrolledCount,
+          pendingSubmissions: subsList.filter((s) => s.status === 'submitted').length,
+          upcomingLiveCount: liveCount,
+          averageRating: 4.9,
+          totalHours: totalCalculatedHours || 30,
+        });
       } catch (err) {
         console.error(err);
       } finally {
@@ -157,18 +248,37 @@ export default function InstructorDashboardPage() {
     loadData();
   }, []);
 
-  // Handle Quick Grade Submission
+  // Handle Quick Grade Submission with real Supabase persistence
   const handleSaveGrade = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSubForGrading) return;
 
     setIsGrading(true);
     try {
-      // Update local state
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const numGrade = Number(gradeInput);
+
+      const { error } = await supabase
+        .from('assignment_submissions')
+        .update({
+          grade: numGrade,
+          feedback: feedbackInput,
+          status: 'graded',
+          graded_at: new Date().toISOString(),
+          graded_by: user?.id || null,
+        })
+        .eq('id', selectedSubForGrading.id);
+
+      if (error) {
+        alert(`فشل حفظ التقييم: ${error.message}`);
+        return;
+      }
+
       setSubmissions((prev) =>
         prev.map((s) =>
           s.id === selectedSubForGrading.id
-            ? { ...s, grade: Number(gradeInput), feedback: feedbackInput, status: 'graded' }
+            ? { ...s, grade: numGrade, feedback: feedbackInput, status: 'graded' }
             : s
         )
       );
@@ -177,8 +287,9 @@ export default function InstructorDashboardPage() {
         pendingSubmissions: Math.max(0, prev.pendingSubmissions - 1),
       }));
       setSelectedSubForGrading(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert('حدث خطأ أثناء حفظ التقييم');
     } finally {
       setIsGrading(false);
     }
@@ -475,43 +586,51 @@ export default function InstructorDashboardPage() {
             </div>
 
             <div className="space-y-3">
-              {submissions.map((sub) => (
-                <div
-                  key={sub.id}
-                  className={`p-3.5 rounded-2xl border transition-all space-y-2 ${
-                    sub.status === 'graded'
-                      ? 'bg-emerald-50/60 border-emerald-200 opacity-80'
-                      : 'bg-white border-slate-200/90 hover:border-amber-400 shadow-xs'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h5 className="font-black text-xs sm:text-sm text-slate-900">{sub.studentName}</h5>
-                      <p className="text-xs text-slate-500 truncate max-w-[220px]">{sub.assignmentTitle}</p>
+              {submissions.length === 0 ? (
+                <div className="p-6 text-center rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+                  <p className="text-xs font-black text-slate-700">لا توجد واجبات بانتظار التقييم حالياً</p>
+                  <p className="text-[11px] text-slate-500 font-bold">تم تقييم كافة التكليفات المسلمة بنجاح.</p>
+                </div>
+              ) : (
+                submissions.map((sub) => (
+                  <div
+                    key={sub.id}
+                    className={`p-3.5 rounded-2xl border transition-all space-y-2 ${
+                      sub.status === 'graded'
+                        ? 'bg-emerald-50/60 border-emerald-200 opacity-80'
+                        : 'bg-white border-slate-200/90 hover:border-amber-400 shadow-xs'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h5 className="font-black text-xs sm:text-sm text-slate-900">{sub.studentName}</h5>
+                        <p className="text-xs text-slate-500 truncate max-w-[220px]">{sub.assignmentTitle}</p>
+                      </div>
+
+                      {sub.status === 'graded' ? (
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-black">
+                          تم التقييم ({sub.grade}/100)
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedSubForGrading(sub)}
+                          className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-xs cursor-pointer transition-colors flex items-center gap-1"
+                        >
+                          <FileCheck className="w-3.5 h-3.5" />
+                          <span>تقييم الآن</span>
+                        </button>
+                      )}
                     </div>
 
-                    {sub.status === 'graded' ? (
-                      <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-black">
-                        تم التقييم ({sub.grade}/100)
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setSelectedSubForGrading(sub)}
-                        className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-xs cursor-pointer transition-colors flex items-center gap-1"
-                      >
-                        <FileCheck className="w-3.5 h-3.5" />
-                        <span>تقييم الآن</span>
-                      </button>
-                    )}
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold pt-1 border-t border-slate-100">
+                      <span>{sub.courseTitle.substring(0, 28)}...</span>
+                      <span>{sub.submitted_at}</span>
+                    </div>
                   </div>
-
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold pt-1 border-t border-slate-100">
-                    <span>{sub.courseTitle.substring(0, 28)}...</span>
-                    <span>{sub.submitted_at}</span>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -542,60 +661,46 @@ export default function InstructorDashboardPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            {
-              name: 'عبدالله بن محمد الشمري',
-              course: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-              progress: 95,
-              date: '15 مايو 2026',
-              status: 'مستمر',
-            },
-            {
-              name: 'سارة بنت خالد العتيبي',
-              course: 'المهارات الأكاديمية والتفكير الناقد',
-              progress: 100,
-              date: '12 مايو 2026',
-              status: 'مكتمل',
-            },
-            {
-              name: 'م. خالد بن فهد الدوسري',
-              course: 'دورة استخدام الحاسب الالي في الاعمال المكتبية',
-              progress: 60,
-              date: '10 مايو 2026',
-              status: 'مستمر',
-            },
-          ].map((st, idx) => (
-            <div key={idx} className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 space-y-3 shadow-xs">
-              <div className="flex items-center justify-between">
-                <span className="font-black text-xs sm:text-sm text-slate-900">{st.name}</span>
-                <span
-                  className={`px-3 py-1 rounded-xl text-xs font-black ${
-                    st.status === 'مكتمل'
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-blue-50 text-[#173A7C]'
-                  }`}
-                >
-                  {st.status}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 truncate">{st.course}</p>
+        {recentStudents.length === 0 ? (
+          <div className="p-8 text-center rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+            <Users className="w-8 h-8 text-slate-400 mx-auto" />
+            <p className="text-xs font-black text-slate-700">لا يوجد متدربون مسجلون حديثاً</p>
+            <p className="text-[11px] text-slate-500 font-bold">سيظهر المتدربون الجدد فور تسجيلهم في برامجك التدريبية.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {recentStudents.map((st, idx) => (
+              <div key={idx} className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 space-y-3 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-black text-xs sm:text-sm text-slate-900">{st.name}</span>
+                  <span
+                    className={`px-3 py-1 rounded-xl text-xs font-black ${
+                      st.status === 'مكتمل'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : 'bg-blue-50 text-[#173A7C]'
+                    }`}
+                  >
+                    {st.status}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 truncate">{st.course}</p>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs font-black text-slate-600">
-                  <span>نسبة الإنجاز</span>
-                  <span className="text-[#173A7C]">{st.progress}%</span>
-                </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/60">
-                  <div
-                    className="h-full bg-gradient-to-r from-[#173A7C] to-emerald-500 rounded-full"
-                    style={{ width: `${st.progress}%` }}
-                  />
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-black text-slate-600">
+                    <span>نسبة الإنجاز</span>
+                    <span className="text-[#173A7C]">{st.progress}%</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/60">
+                    <div
+                      className="h-full bg-gradient-to-r from-[#173A7C] to-emerald-500 rounded-full"
+                      style={{ width: `${st.progress}%` }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── 5. QUICK GRADING MODAL ── */}

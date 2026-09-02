@@ -53,11 +53,16 @@ export default function AdminTrainersPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [trainerToDelete, setTrainerToDelete] = useState<Trainer | null>(null);
 
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$';
+    return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  };
+
   // New Trainer Form State
   const [newTrainerName, setNewTrainerName] = useState('');
   const [newTrainerSpecialty, setNewTrainerSpecialty] = useState('');
   const [newTrainerEmail, setNewTrainerEmail] = useState('');
-  const [newTrainerPassword, setNewTrainerPassword] = useState('12345678');
+  const [newTrainerPassword, setNewTrainerPassword] = useState(() => generatePassword());
   const [newTrainerPhone, setNewTrainerPhone] = useState('');
 
   // Created Success Credentials Modal
@@ -205,7 +210,7 @@ export default function AdminTrainersPage() {
       setNewTrainerSpecialty('');
       setNewTrainerEmail('');
       setNewTrainerPhone('');
-      setNewTrainerPassword('12345678');
+      setNewTrainerPassword(generatePassword());
       loadTrainers();
     } catch (err) {
       console.error(err);
@@ -238,8 +243,8 @@ export default function AdminTrainersPage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-              <GraduationCap className="w-3.5 h-3.5" />
+            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+              <GraduationCap className="w-4 h-4 text-blue-600 shrink-0" />
               <span>الهيئة التدريبية والأكاديمية</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">

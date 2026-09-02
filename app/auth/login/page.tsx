@@ -100,14 +100,27 @@ function LoginForm() {
 
       window.dispatchEvent(new Event('nabd_user_updated'));
 
-      const role = String(data.user?.app_metadata?.role || 'STUDENT').toUpperCase();
+      const role = String(data.user?.app_metadata?.role || '').toUpperCase();
       let targetUrl = '/dashboard/student';
       if (role === 'ADMIN' || role === 'SUPERADMIN' || role === 'SUPER_ADMIN') {
         targetUrl = '/dashboard/admin';
       } else if (role === 'INSTRUCTOR' || role === 'TRAINER' || role === 'TEACHER') {
         targetUrl = '/dashboard/instructor';
-      } else if (redirectParam && redirectParam.startsWith('/')) {
-        targetUrl = redirectParam;
+      } else {
+        // Fallback: check profiles table for role
+        const { data: profileRole } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user?.id)
+          .single();
+        const dbRole = String(profileRole?.role || '').toUpperCase().trim();
+        if (['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN'].includes(dbRole)) {
+          targetUrl = '/dashboard/admin';
+        } else if (['INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(dbRole)) {
+          targetUrl = '/dashboard/instructor';
+        } else if (redirectParam && redirectParam.startsWith('/')) {
+          targetUrl = redirectParam;
+        }
       }
       window.location.href = targetUrl;
     } catch (err) {

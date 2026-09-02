@@ -126,9 +126,19 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
   }, []);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    window.location.href = '/login';
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('instructor_avatar');
+        localStorage.removeItem('instructor_name');
+      }
+      await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      window.location.href = '/auth/login';
+    }
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {

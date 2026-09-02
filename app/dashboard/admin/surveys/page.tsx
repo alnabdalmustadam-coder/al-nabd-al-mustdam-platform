@@ -54,28 +54,6 @@ export default function AdminSurveysPage() {
 
       if (data && data.length > 0) {
         setSurveys(data);
-      } else {
-        // Fallback sample surveys
-        setSurveys([
-          {
-            id: 'srv-1',
-            title: 'استبيان قياس رضا المتدربين عن جودة المحتوى التدريبي',
-            description: 'تقييم شامل للمادة العلمية والمدرب وسرعة الاستجابة',
-            target_course_id: 'دبلوم التسامح والسلام',
-            responses_count: 142,
-            is_active: true,
-            created_at: new Date().toISOString(),
-          },
-          {
-            id: 'srv-2',
-            title: 'استطلاع رأي حول مواعيد الورش الحية واللقاءات التفاعلية',
-            description: 'تحديد الأوقات الأنسب للمتدربين لحضور البث الحي',
-            target_course_id: 'عام لكافة المسارات',
-            responses_count: 98,
-            is_active: true,
-            created_at: new Date().toISOString(),
-          },
-        ]);
       }
     } catch (err) {
       console.error(err);
@@ -136,8 +114,8 @@ export default function AdminSurveysPage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-              <BarChart2 className="w-3.5 h-3.5" />
+            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+              <BarChart2 className="w-4 h-4 text-blue-600 shrink-0" />
               <span>قياس الرضا والجودة الأكاديمية</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">

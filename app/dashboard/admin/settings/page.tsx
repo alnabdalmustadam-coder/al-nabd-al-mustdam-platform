@@ -76,17 +76,26 @@ export default function AdminSettingsPage() {
       const user = authData?.user;
 
       const entries = Object.entries(platformSettings);
+      const errors: string[] = [];
       for (const [key, value] of entries) {
-        await supabase.from('platform_settings').upsert({
+        const { error } = await supabase.from('platform_settings').upsert({
           key,
           value: typeof value === 'string' ? value : JSON.stringify(value),
           updated_at: new Date().toISOString(),
           updated_by: user?.id || null,
         });
+        if (error) {
+          console.error(`Failed to save setting "${key}":`, error);
+          errors.push(key);
+        }
       }
 
-      setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 3500);
+      if (errors.length > 0) {
+        alert(`فشل حفظ الإعدادات التالية: ${errors.join('، ')}`);
+      } else {
+        setSavedSuccess(true);
+        setTimeout(() => setSavedSuccess(false), 3500);
+      }
     } catch (err) {
       console.error(err);
       alert('حدث خطأ أثناء حفظ الإعدادات');
@@ -106,8 +115,8 @@ export default function AdminSettingsPage() {
       >
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-              <Settings className="w-3.5 h-3.5" />
+            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+              <Settings className="w-4 h-4 text-blue-600 shrink-0" />
               <span>إعدادات وتكاملات منصة النبض المستدام</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">

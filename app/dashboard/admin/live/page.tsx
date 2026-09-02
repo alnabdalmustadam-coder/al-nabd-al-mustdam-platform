@@ -65,20 +65,6 @@ export default function AdminLiveSessionsPage() {
 
       if (data && data.length > 0) {
         setSessions(data);
-      } else {
-        // Fallback samples if empty
-        setSessions([
-          {
-            id: 'ls-1',
-            title: 'اللقاء المباشر التفاعلي: ورشة عمل الحوار وتطبيقات التسامح',
-            course_id: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-            meeting_url: 'https://zoom.us',
-            platform: 'Zoom',
-            scheduled_at: new Date().toISOString(),
-            duration_minutes: 90,
-            status: 'scheduled',
-          },
-        ]);
       }
     } catch (err) {
       console.error(err);
@@ -135,10 +121,16 @@ export default function AdminLiveSessionsPage() {
     if (!confirm('هل أنت متأكد من حذف هذه الجلسة المباشرة؟')) return;
     try {
       const supabase = createClient();
-      await supabase.from('live_sessions').delete().eq('id', id);
+      const { error } = await supabase.from('live_sessions').delete().eq('id', id);
+      if (error) {
+        console.error('Delete session error:', error);
+        alert(`فشل حذف الجلسة: ${error.message}`);
+        return;
+      }
       setSessions((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
       console.error(err);
+      alert('حدث خطأ في الاتصال بالخادم');
     }
   };
 
@@ -155,8 +147,8 @@ export default function AdminLiveSessionsPage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-black border border-red-200">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+            <div className="admin-hero-tag bg-red-50 text-red-700 border border-red-200">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping shrink-0" />
               <span>القاعات الافتراضية واللقاءات الحية</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">

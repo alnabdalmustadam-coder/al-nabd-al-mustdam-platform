@@ -59,28 +59,6 @@ export default function AdminCouponsPage() {
 
       if (data && data.length > 0) {
         setCoupons(data);
-      } else {
-        // Fallback sample coupons if empty
-        setCoupons([
-          {
-            id: 'cp-1',
-            code: 'SUSTAIN2026',
-            discount_percent: 20,
-            max_uses: 500,
-            used_count: 312,
-            expires_at: '2026-12-31T23:59:59Z',
-            is_active: true,
-          },
-          {
-            id: 'cp-2',
-            code: 'WELCOME100',
-            discount_percent: 15,
-            max_uses: 200,
-            used_count: 198,
-            expires_at: '2026-08-15T23:59:59Z',
-            is_active: true,
-          },
-        ]);
       }
     } catch (err) {
       console.error(err);
@@ -132,10 +110,16 @@ export default function AdminCouponsPage() {
     if (!confirm('هل أنت متأكد من حذف هذا الكوبون؟')) return;
     try {
       const supabase = createClient();
-      await supabase.from('coupons').delete().eq('id', id);
+      const { error } = await supabase.from('coupons').delete().eq('id', id);
+      if (error) {
+        console.error('Delete coupon error:', error);
+        alert(`فشل حذف الكوبون: ${error.message}`);
+        return;
+      }
       setCoupons((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       console.error(err);
+      alert('حدث خطأ في الاتصال بالخادم');
     }
   };
 
@@ -155,8 +139,8 @@ export default function AdminCouponsPage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-              <Ticket className="w-3.5 h-3.5" />
+            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+              <Ticket className="w-4 h-4 text-blue-600 shrink-0" />
               <span>الحملات التسويقية والخصومات</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">

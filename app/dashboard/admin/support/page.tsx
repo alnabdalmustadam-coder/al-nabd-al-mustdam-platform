@@ -86,23 +86,6 @@ export default function AdminSupportPage() {
           const updated = mapped.find((t) => t.id === selectedTicket.id);
           if (updated) setSelectedTicket(updated);
         }
-      } else {
-        // Fallback sample tickets
-        setTickets([
-          {
-            id: 'tck-101',
-            ticket_number: 'TICK-802',
-            email: 'student@example.com',
-            studentName: 'عبدالله بن محمد الشمري',
-            subject: 'استفسار بشأن موعد اصدار شهادة دبلوم التسامح',
-            category: 'academic',
-            created_at: new Date().toISOString(),
-            status: 'OPEN',
-            priority: 'HIGH',
-            message: 'السلام عليكم، أود الاستفسار متى سيتم اعتماد وتوثيق الشهادة بعد إكمال مشروع التخرج؟',
-            replies: [],
-          },
-        ]);
       }
     } catch (err) {
       console.error(err);
@@ -182,8 +165,8 @@ export default function AdminSupportPage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-              <Headphones className="w-3.5 h-3.5" />
+            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+              <Headphones className="w-4 h-4 text-blue-600 shrink-0" />
               <span>خدمة العملاء والدعم الأكاديمي والتقني</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">

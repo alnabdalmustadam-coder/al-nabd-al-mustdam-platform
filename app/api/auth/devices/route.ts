@@ -182,8 +182,18 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Check if user is admin/instructor — exempt from device limits
+    const { data: userProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    const userRoleRaw = String(userProfile?.role || '').toUpperCase().trim();
+    const isPrivileged = ['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(userRoleRaw);
+
     // 2. Case B: New device, but user already has 2 active devices -> Limit Reached!
-    if (activeDevices.length >= 2) {
+    //    (Only enforce for students)
+    if (activeDevices.length >= 2 && !isPrivileged) {
       return NextResponse.json(
         {
           success: false,

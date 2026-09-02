@@ -114,8 +114,8 @@ const expandedServices: Service[] = [
     tags: ['تصميم', 'هوية بصرية', 'شعار', 'براندينج'],
     status: 'active',
     rating_avg: 4.9,
-    rating_count: 47,
-    orders_count: 128,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: true,
     category_id: 'cat-1',
     category_name: 'تصميم وهويات بصرية',
@@ -137,8 +137,8 @@ const expandedServices: Service[] = [
     tags: ['برمجة', 'Next.js', 'React', 'موقع'],
     status: 'active',
     rating_avg: 5.0,
-    rating_count: 23,
-    orders_count: 56,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: true,
     category_id: 'cat-2',
     category_name: 'برمجة وتطوير ويب',
@@ -160,8 +160,8 @@ const expandedServices: Service[] = [
     tags: ['UI/UX', 'Figma', 'تصميم تطبيقات', 'تجربة مستخدم'],
     status: 'active',
     rating_avg: 4.9,
-    rating_count: 38,
-    orders_count: 94,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: true,
     category_id: 'cat-3',
     category_name: 'تصميم واجهات UI/UX',
@@ -183,8 +183,8 @@ const expandedServices: Service[] = [
     tags: ['كتابة', 'سيو', 'SEO', 'تسويق'],
     status: 'active',
     rating_avg: 4.8,
-    rating_count: 89,
-    orders_count: 312,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: false,
     category_id: 'cat-4',
     category_name: 'كتابة محتوى وسيو',
@@ -206,8 +206,8 @@ const expandedServices: Service[] = [
     tags: ['تسويق', 'إعلانات', 'Google Ads', 'سوشال ميديا'],
     status: 'active',
     rating_avg: 4.7,
-    rating_count: 34,
-    orders_count: 78,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: true,
     category_id: 'cat-5',
     category_name: 'تسويق وإعلانات ممولة',
@@ -229,8 +229,8 @@ const expandedServices: Service[] = [
     tags: ['استشارات', 'NELC', 'اعتماد', 'تدريب'],
     status: 'active',
     rating_avg: 5.0,
-    rating_count: 19,
-    orders_count: 45,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: true,
     category_id: 'cat-6',
     category_name: 'استشارات واعتماد NELC',
@@ -252,8 +252,8 @@ const expandedServices: Service[] = [
     tags: ['مونتاج', 'فيديو', 'ريلز', 'موشن'],
     status: 'active',
     rating_avg: 4.9,
-    rating_count: 52,
-    orders_count: 160,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: false,
     category_id: 'cat-7',
     category_name: 'مونتاج وفيديو موشن',
@@ -275,8 +275,8 @@ const expandedServices: Service[] = [
     tags: ['بيانات', 'Excel', 'Power BI', 'تحليل مالي'],
     status: 'active',
     rating_avg: 4.8,
-    rating_count: 67,
-    orders_count: 210,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: false,
     category_id: 'cat-8',
     category_name: 'تحليل بيانات وإكسل',
@@ -298,8 +298,8 @@ const expandedServices: Service[] = [
     tags: ['عروض', 'PowerPoint', 'Pitch Deck', 'تصميم'],
     status: 'active',
     rating_avg: 4.9,
-    rating_count: 41,
-    orders_count: 135,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: false,
     category_id: 'cat-1',
     category_name: 'تصميم وهويات بصرية',
@@ -321,8 +321,8 @@ const expandedServices: Service[] = [
     tags: ['سلة', 'زد', 'متجر إلكتروني', 'تجارة'],
     status: 'active',
     rating_avg: 5.0,
-    rating_count: 28,
-    orders_count: 82,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: true,
     category_id: 'cat-2',
     category_name: 'برمجة وتطوير ويب',
@@ -344,8 +344,8 @@ const expandedServices: Service[] = [
     tags: ['UI/UX', 'Audit', 'تحسين', 'Figma'],
     status: 'active',
     rating_avg: 4.9,
-    rating_count: 22,
-    orders_count: 64,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: false,
     category_id: 'cat-3',
     category_name: 'تصميم واجهات UI/UX',
@@ -367,8 +367,8 @@ const expandedServices: Service[] = [
     tags: ['بروفايل شركة', 'كتابة', 'تسويق', 'محتوى'],
     status: 'active',
     rating_avg: 4.8,
-    rating_count: 53,
-    orders_count: 140,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: false,
     category_id: 'cat-4',
     category_name: 'كتابة محتوى وسيو',
@@ -390,8 +390,8 @@ const expandedServices: Service[] = [
     tags: ['تصميم', 'سوشال ميديا', 'إعلانات', 'انستغرام'],
     status: 'active',
     rating_avg: 4.9,
-    rating_count: 76,
-    orders_count: 230,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: false,
     category_id: 'cat-1',
     category_name: 'تصميم وهويات بصرية',
@@ -413,8 +413,8 @@ const expandedServices: Service[] = [
     tags: ['موشن جرافيك', 'فيديو', 'تعليق صوتي', 'تسويق'],
     status: 'active',
     rating_avg: 5.0,
-    rating_count: 31,
-    orders_count: 88,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: true,
     category_id: 'cat-7',
     category_name: 'مونتاج وفيديو موشن',
@@ -436,8 +436,8 @@ const expandedServices: Service[] = [
     tags: ['دراسة جدوى', 'خطة عمل', 'استشارات', 'مشاريع'],
     status: 'active',
     rating_avg: 4.9,
-    rating_count: 25,
-    orders_count: 62,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: true,
     category_id: 'cat-6',
     category_name: 'استشارات واعتماد NELC',
@@ -459,8 +459,8 @@ const expandedServices: Service[] = [
     tags: ['قواعد بيانات', 'إكسل', 'تنظيم', 'تقارير'],
     status: 'active',
     rating_avg: 4.8,
-    rating_count: 44,
-    orders_count: 175,
+    rating_count: 0,
+    orders_count: 0,
     is_featured: false,
     category_id: 'cat-8',
     category_name: 'تحليل بيانات وإكسل',
@@ -497,42 +497,20 @@ export default function MarketplacePage() {
     setSavedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
-  /* ── Live Supabase enrichment if available ── */
+  /* ── Live Database synchronization with Admin Panel ── */
   useEffect(() => {
     async function loadData() {
       try {
-        const supabase = createClient();
-        const { data: srvs } = await supabase
-          .from('services')
-          .select('*, service_categories(name, slug)')
-          .eq('status', 'active');
-
-        if (srvs && srvs.length > 0) {
-          const enriched = await Promise.all(
-            srvs.map(async (s: any) => {
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('full_name, avatar_url, bio')
-                .eq('id', s.provider_id)
-                .maybeSingle();
-
-              return {
-                ...s,
-                image_url: s.thumbnail_url || (s.service_categories?.slug === 'development' ? '/services/development.jpg' : s.service_categories?.slug === 'writing' ? '/services/writing.jpg' : '/services/branding.jpg'),
-                tags: Array.isArray(s.tags) ? s.tags : ['خدمة معتمدة'],
-                provider_name: profile?.full_name || 'مقدم خدمة معتمد',
-                provider_role: profile?.bio || 'خبير معتمد',
-                category_name: s.service_categories?.name || 'خدمات عامة',
-                category_slug: s.service_categories?.slug || 'design',
-              };
-            })
-          );
-          setServices([...enriched, ...expandedServices]);
+        const res = await fetch(`/api/services?t=${Date.now()}`, { cache: 'no-store' });
+        const data = await res.json();
+        if (data.success && Array.isArray(data.services) && data.services.length > 0) {
+          setServices(data.services);
         }
       } catch (err) {
-        console.error(err);
+        console.error('Marketplace fetch services error:', err);
       }
     }
+
     loadData();
   }, []);
 
@@ -854,16 +832,25 @@ export default function MarketplacePage() {
                         {service.description}
                       </p>
 
-                      {/* Clean Rating & Orders Meta */}
+                      {/* Clean Authentic Rating & Orders Meta */}
                       <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-600 font-medium">
                         <div className="flex items-center gap-1">
-                          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                          <strong className="text-slate-900 font-black">{service.rating_avg}</strong>
-                          <span className="text-slate-400">({service.rating_count})</span>
+                          {service.rating_count > 0 ? (
+                            <>
+                              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                              <strong className="text-slate-900 font-black">{service.rating_avg}</strong>
+                              <span className="text-slate-400">({service.rating_count})</span>
+                            </>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-200">
+                              <Star className="w-3 h-3 text-emerald-600 fill-emerald-600" />
+                              <span>خدمة جديدة ومتاحة</span>
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-1 text-slate-400 text-[11px]">
-                          <ShoppingCart className="w-3.5 h-3.5" />
-                          <span>{service.orders_count} طلب</span>
+                          <ShoppingCart className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{service.orders_count > 0 ? `${service.orders_count} طلب مكتمل` : 'جاهزة للتنفيذ'}</span>
                         </div>
                       </div>
 

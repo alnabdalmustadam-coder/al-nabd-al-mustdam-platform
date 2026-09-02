@@ -252,8 +252,8 @@ export default function AdminArticlesPage() {
       >
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+              <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
               <span>لوحة الإدارة العليا • المدونة والنشر الأكاديمي</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">

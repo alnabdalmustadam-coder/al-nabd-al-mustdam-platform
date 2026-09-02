@@ -56,36 +56,8 @@ export default function AdminFinancePage() {
         setOrders(data);
         const sum = data.reduce((acc: number, curr: any) => acc + Number(curr.final_amount || 0), 0);
         setTotalRevenue(sum);
-      } else {
-        // Fallback sample orders
-        setOrders([
-          {
-            id: 'tx-1',
-            order_number: 'INV-2026-9921',
-            email: 'student1@example.com',
-            total_amount: 900,
-            final_amount: 900,
-            discount_amount: 0,
-            status: 'COMPLETED',
-            payment_gateway: 'TAMARA',
-            created_at: new Date().toISOString(),
-            items_json: [{ title: 'دورة استخدام الحاسب الالي في الاعمال المكتبية' }],
-          },
-          {
-            id: 'tx-2',
-            order_number: 'INV-2026-9922',
-            email: 'student2@example.com',
-            total_amount: 1300,
-            final_amount: 1300,
-            discount_amount: 0,
-            status: 'COMPLETED',
-            payment_gateway: 'MADA',
-            created_at: new Date().toISOString(),
-            items_json: [{ title: 'دورات ادخال بيانات ومعالجة نصوص' }],
-          },
-        ]);
-        setTotalRevenue(2200);
       }
+      // No fallback — empty state is shown when no real data exists
     } catch (err) {
       console.error(err);
     } finally {
@@ -122,8 +94,8 @@ export default function AdminFinancePage() {
       >
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-200">
-              <ShieldCheck className="w-3.5 h-3.5" />
+            <div className="admin-hero-tag bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>المعاملات المالية والفواتير الضريبية</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
@@ -210,7 +182,27 @@ export default function AdminFinancePage() {
                     </div>
 
                     <button
-                      onClick={() => alert(`تنزيل الفاتورة الضريبية رقم: ${ord.order_number}`)}
+                      onClick={() => {
+                        const invoice = [
+                          `فاتورة ضريبية مبسطة`,
+                          `رقم الفاتورة: ${ord.order_number}`,
+                          `التاريخ: ${new Date(ord.created_at).toLocaleDateString('ar-SA')}`,
+                          `البريد: ${ord.email}`,
+                          `الدورة: ${getCourseTitle(ord)}`,
+                          `المبلغ الإجمالي: ${ord.total_amount} ر.س`,
+                          `الخصم: ${ord.discount_amount} ر.س`,
+                          `المبلغ النهائي: ${ord.final_amount} ر.س`,
+                          `وسيلة الدفع: ${ord.payment_gateway || 'غير محدد'}`,
+                          `الحالة: ${ord.status}`,
+                        ].join('\n');
+                        const blob = new Blob(['\uFEFF' + invoice], { type: 'text/plain;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `invoice_${ord.order_number}.txt`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }}
                       className="px-4 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black flex items-center gap-1.5 hover:bg-[#1E4D9D] transition-colors cursor-pointer"
                     >
                       <Download className="w-3.5 h-3.5" />

@@ -380,8 +380,8 @@ export default function AdminProfilePage() {
             </div>
 
             <div className="space-y-1.5">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-black border border-amber-200">
-                <Crown className="w-3.5 h-3.5 text-amber-600" />
+              <div className="admin-hero-tag bg-amber-50 text-amber-800 border border-amber-200">
+                <Crown className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>{adminData.roleTitle}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
