@@ -7,6 +7,7 @@ import { StudentHeader } from '@/components/student/student-header';
 import { StudentSidebar } from '@/components/student/student-sidebar';
 import { DeviceLimitModal, RegisteredDevice } from '@/components/student/device-limit-modal';
 import { getDeviceInfo } from '@/utils/device';
+import { BrandLoadingScreen } from '@/components/ui/BrandLoadingScreen';
 
 export default function StudentDashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -107,9 +108,10 @@ export default function StudentDashboardLayout({ children }: { children: React.R
 
   if (isCheckingRole) {
     return (
-      <div className="min-h-screen liquid-dashboard-backdrop flex items-center justify-center font-[family-name:var(--font-cairo)]" dir="rtl">
-        <div className="w-10 h-10 border-4 border-[#173A7C]/20 border-t-[#173A7C] rounded-full animate-spin" />
-      </div>
+      <BrandLoadingScreen
+        message="جاري تجهيز لوحة التحكم..."
+        subMessage="التحقق من بيانات الصلاحيات والاعتماد الأكاديمي"
+      />
     );
   }
 
