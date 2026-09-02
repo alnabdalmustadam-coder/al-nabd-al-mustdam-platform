@@ -1,14 +1,19 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
 import { StudentHeader } from '@/components/student/student-header';
 import { StudentSidebar } from '@/components/student/student-sidebar';
 import { DeviceLimitModal, RegisteredDevice } from '@/components/student/device-limit-modal';
 import { getDeviceInfo } from '@/utils/device';
 
 export default function StudentDashboardLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCheckingRole, setIsCheckingRole] = useState(true);
 
   // Device Limit & Enforcement State
   const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
@@ -45,12 +50,68 @@ export default function StudentDashboardLayout({ children }: { children: React.R
   };
 
   useEffect(() => {
+    let isMounted = true;
+    async function verifyRole() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          if (isMounted) setIsCheckingRole(false);
+          return;
+        }
+
+        let role = (user.app_metadata?.role || '').toUpperCase();
+        if (!['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(role)) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle();
+          if (profile?.role) {
+            role = String(profile.role).toUpperCase().trim();
+          }
+        }
+
+        if (['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN'].includes(role)) {
+          const target = pathname.includes('/profile') ? '/dashboard/admin/profile' : '/dashboard/admin';
+          router.replace(target);
+          return;
+        }
+
+        if (['INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(role)) {
+          const target = pathname.includes('/profile') ? '/dashboard/instructor/profile' : '/dashboard/instructor';
+          router.replace(target);
+          return;
+        }
+
+        if (isMounted) setIsCheckingRole(false);
+      } catch (err) {
+        console.warn('Role check error:', err);
+        if (isMounted) setIsCheckingRole(false);
+      }
+    }
+
+    verifyRole();
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname, router]);
+
+  useEffect(() => {
     checkAndRegisterDevice();
 
     // Heartbeat every 5 minutes while active
     const interval = setInterval(checkAndRegisterDevice, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  if (isCheckingRole) {
+    return (
+      <div className="min-h-screen liquid-dashboard-backdrop flex items-center justify-center font-[family-name:var(--font-cairo)]" dir="rtl">
+        <div className="w-10 h-10 border-4 border-[#173A7C]/20 border-t-[#173A7C] rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen liquid-dashboard-backdrop text-slate-800 font-[family-name:var(--font-cairo)] relative overflow-x-clip" dir="rtl">

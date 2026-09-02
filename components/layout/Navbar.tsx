@@ -54,7 +54,7 @@ export default function Navbar() {
   const [localUserEmail, setLocalUserEmail] = useState<string | null>(null);
   const [localUserName, setLocalUserName] = useState<string | null>(null);
   const [localUserAvatar, setLocalUserAvatar] = useState<string | null>(null);
-  const [userDashboardUrl, setUserDashboardUrl] = useState<string>("/dashboard/student");
+  const [userDashboardUrl, setUserDashboardUrl] = useState<string>("/dashboard");
   const [userRoleLabel, setUserRoleLabel] = useState<string>("لوحة التحكم");
   const [userRole, setUserRole] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -88,7 +88,7 @@ export default function Navbar() {
             setLocalUserEmail(null);
             setLocalUserName(null);
             setLocalUserAvatar(null);
-            setUserDashboardUrl("/dashboard/student");
+            setUserDashboardUrl("/dashboard");
             setUserRoleLabel("لوحة التحكم");
             setUserRole(null);
           }
@@ -98,7 +98,7 @@ export default function Navbar() {
           setLocalUserEmail(null);
           setLocalUserName(null);
           setLocalUserAvatar(null);
-          setUserDashboardUrl("/dashboard/student");
+          setUserDashboardUrl("/dashboard");
           setUserRoleLabel("لوحة التحكم");
           setUserRole(null);
         }

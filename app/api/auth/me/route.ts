@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase as supabaseAdmin } from "@/lib/supabase";
-import { requireUser, getDashboardUrlForRole, getRoleDisplayName } from "@/lib/security/auth";
+import { requireUser, getDashboardUrlForRole, getRoleDisplayName, isAdminRole, isInstructorRole } from "@/lib/security/auth";
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,10 +8,10 @@ export async function GET(req: NextRequest) {
     if (!auth.ok) return auth.response;
     const user = auth.user;
 
-    // Fetch full name and role from profiles using admin client
+    // Fetch full name, avatar, and role from profiles using admin client
     let { data: profile } = await supabaseAdmin
       .from("profiles")
-      .select("full_name, avatar_url")
+      .select("full_name, avatar_url, role")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -51,7 +51,16 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const effectiveRole = auth.role;
+    let effectiveRole = auth.role;
+    if (!isAdminRole(effectiveRole) && !isInstructorRole(effectiveRole)) {
+      if (profile?.role) {
+        const dbRole = String(profile.role).toUpperCase().trim();
+        if (['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(dbRole)) {
+          effectiveRole = dbRole as any;
+        }
+      }
+    }
+
     const dashboardUrl = getDashboardUrlForRole(effectiveRole);
     const roleLabel = getRoleDisplayName(effectiveRole);
 

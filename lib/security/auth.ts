@@ -8,6 +8,8 @@ import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
   getTrustedRole,
+  isAdminRole,
+  isInstructorRole,
   type AppRole,
 } from '@/lib/security/roles';
 
@@ -92,10 +94,25 @@ export async function requireUser(request?: Request): Promise<AuthorizationResul
       // MFA enforcement is enabled.
     }
 
+    let userRole = getTrustedRole(user);
+    if (!isAdminRole(userRole) && !isInstructorRole(userRole)) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (profile?.role) {
+        const dbRole = String(profile.role).toUpperCase().trim();
+        if (['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN', 'INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(dbRole)) {
+          userRole = dbRole as any;
+        }
+      }
+    }
+
     return {
       ok: true,
       user,
-      role: getTrustedRole(user),
+      role: userRole,
       supabase,
       assuranceLevel,
     };

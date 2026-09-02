@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, Variants } from 'framer-motion';
 import { User, Mail, Phone, Key, Shield, Laptop, Smartphone, Trash2, CheckCircle2, UserCheck, RefreshCw, Loader2, Save, AlertCircle, Camera, UploadCloud } from 'lucide-react';
 import { DefaultAvatar } from '@/components/student/default-avatar';
@@ -86,6 +87,7 @@ const textItemVariants: Variants = {
 };
 
 export default function StudentProfilePage() {
+  const router = useRouter();
   const [student, setStudent] = useState({
     id: '',
     fullName: '',
@@ -209,6 +211,16 @@ export default function StudentProfilePage() {
             .select('*')
             .eq('id', user.id)
             .maybeSingle();
+
+          const role = (user.app_metadata?.role || profile?.role || '').toUpperCase();
+          if (['ADMIN', 'SUPERADMIN', 'SUPER_ADMIN'].includes(role)) {
+            router.replace('/dashboard/admin/profile');
+            return;
+          }
+          if (['INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(role)) {
+            router.replace('/dashboard/instructor/profile');
+            return;
+          }
 
           const activeEmail = profile?.email || userEmail;
           const finalAvatar = profile?.avatar_url || metaAvatar || cachedAvatar || null;
