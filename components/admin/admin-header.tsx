@@ -7,8 +7,6 @@ import { useRouter } from 'next/navigation';
 import {
   Search,
   Home,
-  LogOut,
-  Settings,
   PanelLeftClose,
   PanelLeftOpen,
   Menu,
@@ -18,10 +16,6 @@ import {
   CheckCircle2,
   AlertCircle,
   UserPlus,
-  ChevronDown,
-  ShieldCheck,
-  User,
-  Crown,
   Users,
   BookOpen,
   UserCheck,
@@ -46,7 +40,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   onToggleMobileMenu,
 }) => {
   const router = useRouter();
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -57,84 +50,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
-
-  const [adminProfile, setAdminProfile] = useState<{
-    fullName: string;
-    avatarUrl: string | null;
-  }>({
-    fullName: 'سعود القحطاني',
-    avatarUrl: null,
-  });
-
-  useEffect(() => {
-    async function loadAdminUser() {
-      try {
-        const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('admin_avatar') : null;
-        const cachedName = typeof window !== 'undefined' ? localStorage.getItem('admin_name') : null;
-        if (cachedAvatar || cachedName) {
-          setAdminProfile((prev) => ({
-            ...prev,
-            avatarUrl: cachedAvatar || prev.avatarUrl,
-            fullName: cachedName || prev.fullName,
-          }));
-        }
-
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
-          const metaAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
-
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('full_name, avatar_url')
-            .eq('id', user.id)
-            .maybeSingle();
-
-          const resolvedAvatar = profile?.avatar_url || metaAvatar || cachedAvatar || null;
-          const resolvedName = profile?.full_name || metaName || cachedName || 'سعود القحطاني';
-
-          setAdminProfile({
-            fullName: resolvedName,
-            avatarUrl: resolvedAvatar,
-          });
-
-          if (resolvedAvatar && typeof window !== 'undefined') localStorage.setItem('admin_avatar', resolvedAvatar);
-          if (resolvedName && typeof window !== 'undefined') localStorage.setItem('admin_name', resolvedName);
-        }
-      } catch (err) {
-        console.error('Error loading admin user in header:', err);
-      }
-    }
-
-    loadAdminUser();
-
-    const handleProfileUpdate = (e: any) => {
-      if (e?.detail) {
-        setAdminProfile((prev) => ({
-          ...prev,
-          avatarUrl: e.detail.avatarUrl !== undefined ? e.detail.avatarUrl : prev.avatarUrl,
-          fullName: e.detail.fullName || prev.fullName,
-        }));
-      } else {
-        loadAdminUser();
-      }
-    };
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', handleProfileUpdate);
-      window.addEventListener('admin-profile-updated', handleProfileUpdate);
-      window.addEventListener('profileUpdated', handleProfileUpdate);
-    }
-
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('storage', handleProfileUpdate);
-        window.removeEventListener('admin-profile-updated', handleProfileUpdate);
-        window.removeEventListener('profileUpdated', handleProfileUpdate);
-      }
-    };
-  }, []);
 
   // Close search suggestions on click outside
   useEffect(() => {
@@ -153,21 +68,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     setIsSearchFocused(false);
     setIsMobileSearchOpen(false);
     router.push(`/dashboard/admin/users?q=${encodeURIComponent(searchQuery.trim())}`);
-  };
-
-  const handleLogout = async () => {
-    try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-    } catch (err) {
-      console.error('Error signing out:', err);
-    } finally {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('admin_avatar');
-        localStorage.removeItem('admin_name');
-      }
-      router.push('/auth/login');
-    }
   };
 
   const adminSearchCategories = [
@@ -439,7 +339,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <button
               onClick={() => {
                 setShowNotifications(!showNotifications);
-                setShowProfileMenu(false);
               }}
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center relative"
               title="الإشعارات"
@@ -694,105 +593,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   document.body
                 )
               : null}
-          </div>
-
-          {/* Admin Profile Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setShowProfileMenu(!showProfileMenu);
-                setShowNotifications(false);
-              }}
-              className="h-10 px-2 sm:px-3 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 flex items-center gap-2.5 cursor-pointer"
-              title="حساب الإدارة"
-            >
-              <div className="relative shrink-0">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl overflow-hidden shadow-xs ring-2 ring-[#173A7C]/20 border border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center">
-                  {adminProfile.avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={adminProfile.avatarUrl}
-                      alt={adminProfile.fullName}
-                      className="w-full h-full object-cover object-top"
-                    />
-                  ) : (
-                    <Crown className="w-4 h-4 text-amber-300" />
-                  )}
-                </div>
-                <span className="absolute -bottom-0.5 -left-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-white shadow-2xs animate-pulse" />
-              </div>
-              <div className="hidden sm:block text-right">
-                <span className="font-black text-xs text-slate-900 block leading-tight max-w-[120px] truncate">{adminProfile.fullName}</span>
-                <span className="font-extrabold text-[10px] text-amber-700 block">مدير المنصة 👑</span>
-              </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-            </button>
-
-            {/* Profile Dropdown Menu */}
-            {showProfileMenu && (
-              <>
-                <div
-                  className="fixed inset-0 z-[990]"
-                  onClick={() => setShowProfileMenu(false)}
-                />
-                <div
-                  className="absolute top-full mt-2 left-0 w-64 rounded-2xl border border-slate-200 p-2 shadow-2xl z-[1000] text-right space-y-1 bg-white text-slate-800"
-                  style={{ boxShadow: '0 20px 50px rgba(15, 23, 42, 0.15)' }}
-                >
-                  <div className="p-2.5 pb-3 border-b border-slate-100">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-xl overflow-hidden shadow-xs ring-2 ring-[#173A7C]/20 border border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center shrink-0">
-                        {adminProfile.avatarUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={adminProfile.avatarUrl}
-                            alt={adminProfile.fullName}
-                            className="w-full h-full object-cover object-top"
-                          />
-                        ) : (
-                          <Crown className="w-5 h-5 text-amber-300" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
-                          <h4 className="font-black text-xs text-slate-900 truncate">{adminProfile.fullName}</h4>
-                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        </div>
-                        <p className="text-[10px] text-amber-700 font-bold truncate">مدير المنصة الرئيسي 👑</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Link
-                    href="/dashboard/admin/profile"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
-                  >
-                    <User className="w-4 h-4 text-[#173A7C]" />
-                    <span>الملف الشخصي للمدير</span>
-                  </Link>
-
-                  <Link
-                    href="/dashboard/admin/settings"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
-                  >
-                    <Settings className="w-4 h-4 text-slate-500" />
-                    <span>إعدادات النظام</span>
-                  </Link>
-
-                  <div className="border-t border-slate-100 my-1 pt-1">
-                    <button
-                      onClick={() => { setShowProfileMenu(false); handleLogout(); }}
-                      className="w-full flex items-center gap-2.5 p-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4 text-red-500" />
-                      <span>تسجيل الخروج</span>
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </div>
       </div>
