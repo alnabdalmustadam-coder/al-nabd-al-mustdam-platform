@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Menu, X, Home, Info, BookOpen, Briefcase,
   Users, UserCheck, Phone, ChevronDown, FileText, ChevronLeft, User,
-  ShoppingCart, Heart, LayoutDashboard, LogOut, Settings
+  ShoppingCart, Heart, LayoutDashboard, LogOut, Settings, Crown, Shield
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
@@ -65,27 +65,14 @@ export default function Navbar() {
     let isMounted = true;
     const updateAuth = async () => {
       try {
-        if (typeof window !== 'undefined') {
-          const cachedAvatar = localStorage.getItem('student_avatar');
-          const cachedName = localStorage.getItem('student_name');
-          if (cachedAvatar && isMounted) setLocalUserAvatar(cachedAvatar);
-          if (cachedName && isMounted) setLocalUserName(cachedName);
-        }
-
         const res = await fetch("/api/auth/me");
         if (res.ok) {
           const data = await res.json();
           if (isMounted) {
             setLocalUserEmail(data.user?.email || null);
-            if (data.user?.name) {
-              setLocalUserName(data.user.name);
-            }
-            if (data.user?.avatarUrl) {
-              setLocalUserAvatar(data.user.avatarUrl);
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('student_avatar', data.user.avatarUrl);
-              }
-            }
+            setLocalUserName(data.user?.name || null);
+            // Set user's real avatarUrl or null (never preserve old cross-role cached avatars)
+            setLocalUserAvatar(data.user?.avatarUrl || null);
             if (data.user?.dashboardUrl) {
               setUserDashboardUrl(data.user.dashboardUrl);
             }
@@ -126,7 +113,7 @@ export default function Navbar() {
 
     const handleProfileUpdate = (e: any) => {
       if (e?.detail) {
-        if (e.detail.avatarUrl !== undefined) setLocalUserAvatar(e.detail.avatarUrl);
+        if (e.detail.avatarUrl !== undefined) setLocalUserAvatar(e.detail.avatarUrl || null);
         if (e.detail.fullName) setLocalUserName(e.detail.fullName);
       }
       updateAuth();
@@ -134,12 +121,16 @@ export default function Navbar() {
 
     window.addEventListener("nabd_user_updated", handleProfileUpdate);
     window.addEventListener("student-profile-updated", handleProfileUpdate);
+    window.addEventListener("admin-profile-updated", handleProfileUpdate);
+    window.addEventListener("instructor-profile-updated", handleProfileUpdate);
     window.addEventListener("profileUpdated", handleProfileUpdate);
 
     return () => {
       isMounted = false;
       window.removeEventListener("nabd_user_updated", handleProfileUpdate);
       window.removeEventListener("student-profile-updated", handleProfileUpdate);
+      window.removeEventListener("admin-profile-updated", handleProfileUpdate);
+      window.removeEventListener("instructor-profile-updated", handleProfileUpdate);
       window.removeEventListener("profileUpdated", handleProfileUpdate);
     };
   }, [pathname]);
@@ -169,11 +160,16 @@ export default function Navbar() {
         localStorage.removeItem('student_name');
         localStorage.removeItem('student_phone');
         localStorage.removeItem('student_national_id');
+        localStorage.removeItem('admin_avatar');
+        localStorage.removeItem('admin_name');
+        localStorage.removeItem('instructor_avatar');
+        localStorage.removeItem('instructor_name');
         window.dispatchEvent(new Event('nabd_user_updated'));
       }
       setLocalUserEmail(null);
       setLocalUserName(null);
       setLocalUserAvatar(null);
+      setUserRole(null);
       router.push('/auth/login');
     }
   };
@@ -372,10 +368,16 @@ export default function Navbar() {
                   type="button"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="relative group p-0.5 rounded-full transition-transform hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#173A7C]/30"
-                  aria-label="حساب المتدرب"
+                  aria-label="حساب المستخدم"
                   aria-expanded={userMenuOpen}
                 >
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden ring-2 ring-[#173A7C]/25 group-hover:ring-[#173A7C]/50 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
+                  <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border-2 border-white flex items-center justify-center shadow-sm group-hover:shadow-md transition-all ${
+                    userRole === 'ADMIN'
+                      ? "ring-2 ring-amber-400/60 group-hover:ring-amber-400 bg-gradient-to-br from-[#0B1A3B] via-[#122A5E] to-[#1C3F8B]"
+                      : userRole === 'INSTRUCTOR'
+                      ? "ring-2 ring-emerald-500/40 group-hover:ring-emerald-500 bg-gradient-to-br from-[#173A7C] to-[#5CB07C]"
+                      : "ring-2 ring-[#173A7C]/25 group-hover:ring-[#173A7C]/50 bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB]"
+                  }`}>
                     {localUserAvatar ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -386,6 +388,10 @@ export default function Navbar() {
                         crossOrigin="anonymous"
                         onError={() => setLocalUserAvatar(null)}
                       />
+                    ) : userRole === 'ADMIN' ? (
+                      <Crown className="w-5 h-5 text-amber-300" />
+                    ) : userRole === 'INSTRUCTOR' ? (
+                      <UserCheck className="w-5 h-5 text-emerald-200" />
                     ) : (
                       <span className="text-white text-base font-black">
                         {localUserName ? localUserName.charAt(0) : <User className="w-5 h-5 text-white" />}
@@ -393,18 +399,28 @@ export default function Navbar() {
                     )}
                   </div>
                   {/* Online indicator */}
-                  <span className="absolute bottom-0 left-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs" />
+                  <span className={`absolute bottom-0 left-0 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs ${
+                    userRole === 'ADMIN' ? "bg-amber-400 animate-pulse" : "bg-emerald-500"
+                  }`} />
                 </button>
 
                 {/* Modern Dropdown Menu */}
                 {userMenuOpen && (
                   <div 
-                    className="absolute left-0 mt-3 w-64 rounded-2xl border border-slate-200/90 bg-white/98 backdrop-blur-2xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                    className="absolute left-0 mt-3 w-68 rounded-2xl border border-slate-200/90 bg-white/98 backdrop-blur-2xl shadow-2xl p-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
                     dir="rtl"
                   >
                     {/* User Identity Card */}
-                    <div className="p-3 bg-slate-50/90 rounded-xl border border-slate-100 mb-1 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden ring-1 ring-slate-200 shrink-0 bg-[#173A7C]/10 flex items-center justify-center">
+                    <div className={`p-3 rounded-xl border mb-1.5 flex items-center gap-3 ${
+                      userRole === 'ADMIN' 
+                        ? "bg-amber-50/50 border-amber-200/70"
+                        : "bg-slate-50/90 border-slate-100"
+                    }`}>
+                      <div className={`w-11 h-11 rounded-full overflow-hidden ring-1 shrink-0 flex items-center justify-center ${
+                        userRole === 'ADMIN'
+                          ? "bg-gradient-to-br from-[#0B1A3B] to-[#173A7C] ring-amber-300 text-amber-300"
+                          : "bg-[#173A7C]/10 ring-slate-200 text-[#173A7C]"
+                      }`}>
                         {localUserAvatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
@@ -414,19 +430,29 @@ export default function Navbar() {
                             referrerPolicy="no-referrer"
                             crossOrigin="anonymous"
                           />
+                        ) : userRole === 'ADMIN' ? (
+                          <Crown className="w-5 h-5 text-amber-300" />
+                        ) : userRole === 'INSTRUCTOR' ? (
+                          <UserCheck className="w-5 h-5 text-emerald-600" />
                         ) : (
                           <User className="w-5 h-5 text-[#173A7C]" />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-xs font-black text-slate-900 truncate">
-                          {localUserName || "متدرب معتمد"}
+                          {localUserName || (userRole === 'ADMIN' ? "المدير العام (Super Admin)" : "مستخدم معتمد")}
                         </div>
                         <div className="text-[10px] text-slate-500 font-bold truncate">
                           {localUserEmail}
                         </div>
-                        <span className="inline-block mt-1 text-[9px] font-black px-2 py-0.5 rounded-full bg-blue-50 text-[#173A7C] border border-blue-200/60">
-                          {userRoleLabel}
+                        <span className={`inline-block mt-1 text-[9px] font-black px-2.5 py-0.5 rounded-full border ${
+                          userRole === 'ADMIN'
+                            ? "bg-amber-100/90 text-amber-900 border-amber-300"
+                            : userRole === 'INSTRUCTOR'
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                            : "bg-blue-50 text-[#173A7C] border-blue-200/60"
+                        }`}>
+                          {userRole === 'ADMIN' ? '👑 مدير المنصة (Super Admin)' : userRoleLabel}
                         </span>
                       </div>
                     </div>
@@ -439,17 +465,34 @@ export default function Navbar() {
                         className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-[#173A7C]/8 hover:text-[#173A7C] transition-colors"
                       >
                         <LayoutDashboard className="w-4 h-4 text-[#173A7C]" />
-                        <span>لوحة التحكم</span>
+                        <span>{userRole === 'ADMIN' ? 'لوحة الإدارة المركزية' : userRole === 'INSTRUCTOR' ? 'لوحة تحكم المدرب' : 'لوحة التحكم'}</span>
                       </Link>
 
                       <Link
-                        href="/dashboard/student/profile"
+                        href={
+                          userRole === 'ADMIN'
+                            ? '/dashboard/admin/profile'
+                            : userRole === 'INSTRUCTOR'
+                            ? '/dashboard/instructor/profile'
+                            : '/dashboard/student/profile'
+                        }
                         onClick={() => setUserMenuOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-[#173A7C]/8 hover:text-[#173A7C] transition-colors"
                       >
                         <Settings className="w-4 h-4 text-[#173A7C]" />
-                        <span>الملف الشخصي والإعدادات</span>
+                        <span>{userRole === 'ADMIN' ? 'الملف الشخصي للمدير' : userRole === 'INSTRUCTOR' ? 'الملف الشخصي للمدرب' : 'الملف الشخصي والإعدادات'}</span>
                       </Link>
+
+                      {userRole === 'ADMIN' && (
+                        <Link
+                          href="/dashboard/admin/settings"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-[#173A7C]/8 hover:text-[#173A7C] transition-colors"
+                        >
+                          <Shield className="w-4 h-4 text-amber-600" />
+                          <span>إعدادات وتراخيص المنصة</span>
+                        </Link>
+                      )}
                     </div>
 
                     <div className="h-px bg-slate-100 my-1.5" />
@@ -610,8 +653,16 @@ export default function Navbar() {
               <div className="w-full h-11 rounded-xl bg-slate-200/70 animate-pulse" />
             ) : localUserEmail ? (
               <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-                  <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-[#173A7C]/20 shrink-0 bg-[#173A7C]/10 flex items-center justify-center">
+                <div className={`flex items-center gap-3 p-3 rounded-2xl border shadow-xs ${
+                  userRole === 'ADMIN' ? "bg-amber-50/60 border-amber-200" : "bg-white border-slate-200/80"
+                }`}>
+                  <div className={`w-11 h-11 rounded-full overflow-hidden shrink-0 flex items-center justify-center ${
+                    userRole === 'ADMIN'
+                      ? "bg-gradient-to-br from-[#0B1A3B] to-[#173A7C] ring-2 ring-amber-300 text-amber-300"
+                      : userRole === 'INSTRUCTOR'
+                      ? "bg-gradient-to-br from-[#173A7C] to-[#5CB07C] ring-2 ring-emerald-400 text-white"
+                      : "bg-[#173A7C]/10 ring-2 ring-[#173A7C]/20 text-[#173A7C]"
+                  }`}>
                     {localUserAvatar ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -621,22 +672,34 @@ export default function Navbar() {
                         referrerPolicy="no-referrer"
                         crossOrigin="anonymous"
                       />
+                    ) : userRole === 'ADMIN' ? (
+                      <Crown className="w-5 h-5 text-amber-300" />
+                    ) : userRole === 'INSTRUCTOR' ? (
+                      <UserCheck className="w-5 h-5 text-emerald-200" />
                     ) : (
                       <User className="w-5 h-5 text-[#173A7C]" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h4 className="text-xs font-black text-slate-900 truncate">{localUserName || 'متدرب معتمد'}</h4>
+                    <h4 className="text-xs font-black text-slate-900 truncate">
+                      {localUserName || (userRole === 'ADMIN' ? 'المدير العام (Super Admin)' : 'مستخدم معتمد')}
+                    </h4>
                     <p className="text-[10px] text-slate-500 font-bold truncate">{localUserEmail}</p>
-                    <span className="inline-block mt-0.5 text-[9px] font-black px-2 py-0.5 rounded-full bg-blue-50 text-[#173A7C] border border-blue-200/60">
-                      {userRoleLabel}
+                    <span className={`inline-block mt-0.5 text-[9px] font-black px-2 py-0.5 rounded-full border ${
+                      userRole === 'ADMIN'
+                        ? "bg-amber-100 text-amber-900 border-amber-300"
+                        : userRole === 'INSTRUCTOR'
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                        : "bg-blue-50 text-[#173A7C] border-blue-200/60"
+                    }`}>
+                      {userRole === 'ADMIN' ? '👑 مدير المنصة (Super Admin)' : userRoleLabel}
                     </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <Button href={userDashboardUrl} size="sm" className="w-full justify-center text-xs font-black">
                     <LayoutDashboard className="w-3.5 h-3.5 ml-1.5" />
-                    لوحة التحكم
+                    {userRole === 'ADMIN' ? 'لوحة الإدارة' : 'لوحة التحكم'}
                   </Button>
                   <button
                     type="button"
