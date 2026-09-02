@@ -31,6 +31,7 @@ import {
   Loader2,
   Trash2,
   AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 
 interface UserRecord {
@@ -71,6 +72,13 @@ function AdminUsersPageContent() {
   const [newNationalId, setNewNationalId] = useState('');
   const [newRole, setNewRole] = useState<'STUDENT' | 'INSTRUCTOR' | 'ADMIN'>('STUDENT');
 
+  // Courses State for Enrollment / Assignment
+  const [coursesList, setCoursesList] = useState<{ id: number | string; slug: string; title: string; category?: string }[]>([]);
+  const [selectedCourseSlugs, setSelectedCourseSlugs] = useState<string[]>([]);
+  const [isCustomCourseActive, setIsCustomCourseActive] = useState(false);
+  const [customCourseTitle, setCustomCourseTitle] = useState('');
+  const [courseSearchTerm, setCourseSearchTerm] = useState('');
+
   // Deletion Modal State
   const [userToDelete, setUserToDelete] = useState<UserRecord | null>(null);
 
@@ -80,8 +88,21 @@ function AdminUsersPageContent() {
     password: string;
     name: string;
     role?: string;
+    courses?: string[];
   } | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const loadCourses = async () => {
+    try {
+      const res = await fetch('/api/courses');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.courses)) {
+        setCoursesList(data.courses);
+      }
+    } catch (err) {
+      console.error('Error fetching courses list:', err);
+    }
+  };
 
   const loadUsers = async () => {
     try {
@@ -100,6 +121,7 @@ function AdminUsersPageContent() {
 
   useEffect(() => {
     loadUsers();
+    loadCourses();
   }, []);
 
   const handleAddUser = async (e: React.FormEvent) => {
@@ -121,6 +143,8 @@ function AdminUsersPageContent() {
           phone: newPhone,
           nationalId: newNationalId,
           role: newRole,
+          selectedCourseSlugs: newRole !== 'ADMIN' ? selectedCourseSlugs : [],
+          customCourseTitle: newRole !== 'ADMIN' && isCustomCourseActive ? customCourseTitle : '',
         }),
       });
 
@@ -131,11 +155,14 @@ function AdminUsersPageContent() {
         return;
       }
 
+      const assignedList = json.user?.enrolledCourses || json.user?.assignedCourses || [];
+
       setCreatedCredentials({
         name: newName,
         email: newEmail,
         password: newPassword,
         role: newRole === 'ADMIN' ? 'أدمن ومدير نظام' : newRole === 'INSTRUCTOR' ? 'مدرب ومعلم' : 'متدرب وطالب',
+        courses: assignedList,
       });
 
       setIsAddUserModalOpen(false);
@@ -145,6 +172,10 @@ function AdminUsersPageContent() {
       setNewNationalId('');
       setNewPassword(generatePassword());
       setNewRole('STUDENT');
+      setSelectedCourseSlugs([]);
+      setIsCustomCourseActive(false);
+      setCustomCourseTitle('');
+      setCourseSearchTerm('');
       loadUsers();
     } catch (err) {
       console.error('Add user error:', err);
@@ -179,7 +210,11 @@ function AdminUsersPageContent() {
 
   const handleCopyCredentials = () => {
     if (!createdCredentials) return;
-    const text = `بيانات الدخول للوحة تحكم المتدرب:\nالاسم: ${createdCredentials.name}\nالبريد: ${createdCredentials.email}\nكلمة المرور: ${createdCredentials.password}\nالرابط: ${window.location.origin}/auth/login`;
+    const coursesText =
+      createdCredentials.courses && createdCredentials.courses.length > 0
+        ? `\nالدورات المعتمدة: ${createdCredentials.courses.join('، ')}`
+        : '';
+    const text = `بيانات الدخول لمنصة النبض المستدام:\nالاسم: ${createdCredentials.name}\nنوع الصلاحية: ${createdCredentials.role || 'متدرب'}\nالبريد: ${createdCredentials.email}\nكلمة المرور: ${createdCredentials.password}${coursesText}\nرابط الدخول: ${window.location.origin}/auth/login`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -546,18 +581,18 @@ function AdminUsersPageContent() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-lg bg-white/95 backdrop-blur-xl text-slate-900 rounded-xl sm:rounded-2xl border border-white/80 p-6 sm:p-8 space-y-5 shadow-2xl overflow-hidden relative my-8"
+              className="w-full max-w-xl bg-white/95 backdrop-blur-xl text-slate-900 rounded-2xl border border-white/80 p-5 sm:p-7 shadow-2xl relative my-6 max-h-[90vh] flex flex-col"
             >
               <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#5CB07C] via-[#173A7C] to-emerald-400" />
 
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200/70">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200/70 shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20">
                     <Plus className="w-5 h-5" />
                   </div>
                   <div>
                     <h3 className="font-black text-lg text-[#152C5B] student-heading-h3">تسجيل مستخدم جديد في النظام</h3>
-                    <p className="text-xs text-slate-500 font-bold">إنشاء حساب (طالب / مدرب / أدمن) وتعيين الصلاحية</p>
+                    <p className="text-xs text-slate-500 font-bold">إنشاء حساب وتعيين الصلاحيات والدورات التدريبية فورياً</p>
                   </div>
                 </div>
                 <button
@@ -568,7 +603,7 @@ function AdminUsersPageContent() {
                 </button>
               </div>
 
-              <form onSubmit={handleAddUser} className="space-y-3.5 text-xs font-bold">
+              <form onSubmit={handleAddUser} className="flex-1 overflow-y-auto space-y-4 text-xs font-bold pr-1 pl-1 custom-scrollbar py-2">
                 {/* Role Selection */}
                 <div className="space-y-1.5">
                   <label className="text-slate-700 block">نوع الحساب والصلاحية <span className="text-rose-500">*</span></label>
@@ -612,6 +647,7 @@ function AdminUsersPageContent() {
                   </div>
                 </div>
 
+                {/* Name */}
                 <div className="space-y-1.5">
                   <label className="text-slate-700 block">الاسم الكامل <span className="text-rose-500">*</span></label>
                   <input
@@ -624,6 +660,7 @@ function AdminUsersPageContent() {
                   />
                 </div>
 
+                {/* Email */}
                 <div className="space-y-1.5">
                   <label className="text-slate-700 block">البريد الإلكتروني <span className="text-rose-500">*</span></label>
                   <input
@@ -636,21 +673,32 @@ function AdminUsersPageContent() {
                   />
                 </div>
 
+                {/* Password & Phone Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-slate-700 block">كلمة المرور <span className="text-rose-500">*</span></label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="12345678"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 font-mono focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        placeholder="12345678"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full p-3 pl-9 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 font-mono focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setNewPassword(generatePassword())}
+                        title="توليد كلمة مرور عشوائية قوية"
+                        className="absolute left-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#173A7C] transition-colors"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-slate-700 block">رقم الجوال</label>
+                    <label className="text-slate-700 block">رقم الجوال (اختياري)</label>
                     <input
                       type="text"
                       placeholder="+966 50 000 0000"
@@ -661,18 +709,159 @@ function AdminUsersPageContent() {
                   </div>
                 </div>
 
+                {/* National ID */}
                 <div className="space-y-1.5">
                   <label className="text-slate-700 block">رقم الهوية الوطنية / الإقامة (اختياري)</label>
                   <input
                     type="text"
-                    placeholder="10 أرقام"
+                    placeholder="10 أرقام (اختياري)"
                     value={newNationalId}
                     onChange={(e) => setNewNationalId(e.target.value)}
                     className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
                   />
                 </div>
 
-                <div className="pt-4 flex gap-3 border-t border-slate-200/70">
+                {/* COURSES ENROLLMENT / ASSIGNMENT SECTION (STUDENT & INSTRUCTOR) */}
+                {newRole !== 'ADMIN' && (
+                  <div className="p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200/90 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-slate-800">
+                        <BookOpen className="w-4 h-4 text-[#173A7C]" />
+                        <span className="font-black text-xs">
+                          {newRole === 'STUDENT'
+                            ? 'صلاحيات الاشتراك في الدورات (اختياري)'
+                            : 'تكليف المدرب بالدورات التدريبية (اختياري)'}
+                        </span>
+                      </div>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-600 font-bold">
+                        اختياري
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 font-normal leading-relaxed">
+                      {newRole === 'STUDENT'
+                        ? 'حدد دورة أو عدة دورات لمنح هذا المتدرب وصولاً واشتراكاً فورياً إليها عند إنشاء حسابه:'
+                        : 'حدد الدورات التي سيشرف عليها هذا المدرب ويحاضر فيها بالمنصة:'}
+                    </p>
+
+                    {/* Search inside available courses */}
+                    {coursesList.length > 3 && (
+                      <div className="relative">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          placeholder="ابحث عن دورة لتحديدها..."
+                          value={courseSearchTerm}
+                          onChange={(e) => setCourseSearchTerm(e.target.value)}
+                          className="w-full pr-8 pl-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#5CB07C]"
+                        />
+                      </div>
+                    )}
+
+                    {/* Courses Selectable List */}
+                    <div className="max-h-40 overflow-y-auto space-y-1.5 pr-0.5 custom-scrollbar">
+                      {coursesList
+                        .filter(
+                          (c) =>
+                            !courseSearchTerm.trim() ||
+                            c.title.toLowerCase().includes(courseSearchTerm.toLowerCase().trim())
+                        )
+                        .map((course) => {
+                          const isSelected = selectedCourseSlugs.includes(course.slug);
+                          return (
+                            <label
+                              key={course.slug || course.id}
+                              className={`flex items-center gap-2.5 p-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
+                                isSelected
+                                  ? 'bg-emerald-50/80 border-[#5CB07C] text-emerald-950 shadow-xs'
+                                  : 'bg-white border-slate-200/70 text-slate-700 hover:border-slate-300'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => {
+                                  if (isSelected) {
+                                    setSelectedCourseSlugs((prev) => prev.filter((s) => s !== course.slug));
+                                  } else {
+                                    setSelectedCourseSlugs((prev) => [...prev, course.slug]);
+                                  }
+                                }}
+                                className="w-4 h-4 text-[#5CB07C] focus:ring-[#5CB07C] border-slate-300 rounded cursor-pointer"
+                              />
+                              <span className="flex-1 truncate">{course.title}</span>
+                              {isSelected && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-600 text-white font-bold shrink-0">
+                                  محدد
+                                </span>
+                              )}
+                            </label>
+                          );
+                        })}
+                      {coursesList.length === 0 && (
+                        <p className="text-center py-2 text-xs text-slate-400 font-normal">
+                          جاري تحميل قائمة الدورات من النظام...
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Selected count info & clear button */}
+                    {selectedCourseSlugs.length > 0 && (
+                      <div className="flex items-center justify-between text-[11px] text-emerald-700 font-bold bg-emerald-50/60 px-2.5 py-1.5 rounded-lg border border-emerald-200/60">
+                        <span>تم تحديد {selectedCourseSlugs.length} دورة للمستخدم</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedCourseSlugs([])}
+                          className="text-rose-500 hover:text-rose-700 text-[11px] font-bold underline cursor-pointer"
+                        >
+                          إلغاء التحديد
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Option to Add a Custom / New Course Title */}
+                    <div className="pt-2 border-t border-slate-200/60 space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsCustomCourseActive(!isCustomCourseActive)}
+                        className="flex items-center gap-1.5 text-xs text-[#173A7C] hover:text-[#1E4D9D] font-bold cursor-pointer transition-colors"
+                      >
+                        <Plus
+                          className={`w-3.5 h-3.5 transition-transform ${
+                            isCustomCourseActive ? 'rotate-45 text-rose-500' : ''
+                          }`}
+                        />
+                        <span>
+                          {isCustomCourseActive
+                            ? 'إلغاء إضافة دورة جديدة'
+                            : '+ إضافة دورة جديدة غير مدرجة بالقائمة'}
+                        </span>
+                      </button>
+
+                      {isCustomCourseActive && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-1 pt-1"
+                        >
+                          <input
+                            type="text"
+                            placeholder="اكتب اسم الدورة التدريبية الجديدة هنا..."
+                            value={customCourseTitle}
+                            onChange={(e) => setCustomCourseTitle(e.target.value)}
+                            className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15"
+                          />
+                          <p className="text-[10px] text-slate-400 font-normal">
+                            سيتم ربط المتدرب بهذه الدورة فور إنشائها واعتماده كمسجل فيها.
+                          </p>
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="pt-3 flex gap-3 border-t border-slate-200/70 shrink-0">
                   <button
                     type="button"
                     onClick={() => setIsAddUserModalOpen(false)}
@@ -743,6 +932,26 @@ function AdminUsersPageContent() {
                   <span className="text-slate-500">كلمة المرور:</span>
                   <span className="text-emerald-700 font-mono font-black">{createdCredentials.password}</span>
                 </div>
+                {createdCredentials.courses && createdCredentials.courses.length > 0 && (
+                  <div className="pt-2 border-t border-slate-200/60 space-y-1.5">
+                    <span className="text-slate-500 block text-[11px] font-bold">
+                      {createdCredentials.role?.includes('مدرب')
+                        ? 'الدورات المكلف بها:'
+                        : 'الدورات المسجل بها فورياً:'}
+                    </span>
+                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                      {createdCredentials.courses.map((title, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 text-[11px] bg-emerald-100/90 text-emerald-800 font-bold px-2.5 py-1 rounded-lg border border-emerald-200"
+                        >
+                          <BookOpen className="w-3 h-3 text-emerald-600 shrink-0" />
+                          <span className="truncate max-w-[220px]">{title}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
                   <span className="text-slate-500">رابط الدخول:</span>
                   <span className="text-slate-800 font-mono text-[11px]">/auth/login</span>
