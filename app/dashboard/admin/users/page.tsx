@@ -575,304 +575,331 @@ function AdminUsersPageContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 md:p-6 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-xl bg-white/95 backdrop-blur-xl text-slate-900 rounded-2xl border border-white/80 p-5 sm:p-7 shadow-2xl relative my-6 max-h-[90vh] flex flex-col"
+              className="w-full max-w-xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl bg-white/95 backdrop-blur-xl text-slate-900 rounded-2xl sm:rounded-3xl border border-white/80 p-5 sm:p-7 shadow-2xl relative max-h-[92vh] flex flex-col my-auto"
             >
               <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#5CB07C] via-[#173A7C] to-emerald-400" />
 
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200/70 shrink-0">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200/70 shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20">
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20">
                     <Plus className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg text-[#152C5B] student-heading-h3">تسجيل مستخدم جديد في النظام</h3>
+                    <h3 className="font-black text-lg sm:text-xl text-[#152C5B] student-heading-h3">تسجيل مستخدم جديد في النظام</h3>
                     <p className="text-xs text-slate-500 font-bold">إنشاء حساب وتعيين الصلاحيات والدورات التدريبية فورياً</p>
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setIsAddUserModalOpen(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="p-2.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <form onSubmit={handleAddUser} className="flex-1 overflow-y-auto space-y-4 text-xs font-bold pr-1 pl-1 custom-scrollbar py-2">
-                {/* Role Selection */}
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">نوع الحساب والصلاحية <span className="text-rose-500">*</span></label>
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setNewRole('STUDENT')}
-                      className={`py-2.5 px-3 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                        newRole === 'STUDENT'
-                          ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white border-[#173A7C] shadow-sm'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
-                      }`}
-                    >
-                      <GraduationCap className="w-3.5 h-3.5" />
-                      <span>طالب</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewRole('INSTRUCTOR')}
-                      className={`py-2.5 px-3 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                        newRole === 'INSTRUCTOR'
-                          ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-sm'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
-                      }`}
-                    >
-                      <UserCheck className="w-3.5 h-3.5" />
-                      <span>مدرب / معلم</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewRole('ADMIN')}
-                      className={`py-2.5 px-3 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                        newRole === 'ADMIN'
-                          ? 'bg-gradient-to-r from-purple-700 to-indigo-800 text-white border-purple-700 shadow-sm'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
-                      }`}
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>أدمن (مدير)</span>
-                    </button>
-                  </div>
-                </div>
+              {/* Form Content - 2 Columns on Desktop, 1 Column on Mobile */}
+              <form onSubmit={handleAddUser} className="flex-1 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-3 text-xs font-bold">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 items-start">
+                  
+                  {/* RIGHT COLUMN (In RTL): User Profile Information */}
+                  <div className="space-y-3.5">
+                    {/* Role Selection */}
+                    <div className="space-y-1.5">
+                      <label className="text-slate-700 block">نوع الحساب والصلاحية <span className="text-rose-500">*</span></label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setNewRole('STUDENT')}
+                          className={`py-2.5 px-2 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                            newRole === 'STUDENT'
+                              ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white border-[#173A7C] shadow-sm'
+                              : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
+                          }`}
+                        >
+                          <GraduationCap className="w-3.5 h-3.5" />
+                          <span>طالب</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setNewRole('INSTRUCTOR')}
+                          className={`py-2.5 px-2 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                            newRole === 'INSTRUCTOR'
+                              ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-sm'
+                              : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
+                          }`}
+                        >
+                          <UserCheck className="w-3.5 h-3.5" />
+                          <span>مدرب</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setNewRole('ADMIN')}
+                          className={`py-2.5 px-2 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                            newRole === 'ADMIN'
+                              ? 'bg-gradient-to-r from-purple-700 to-indigo-800 text-white border-purple-700 shadow-sm'
+                              : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
+                          }`}
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>أدمن</span>
+                        </button>
+                      </div>
+                    </div>
 
-                {/* Name */}
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">الاسم الكامل <span className="text-rose-500">*</span></label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="مثال: أحمد عبدالأمير العلي"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                  />
-                </div>
-
-                {/* Email */}
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">البريد الإلكتروني <span className="text-rose-500">*</span></label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="name@example.com"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                  />
-                </div>
-
-                {/* Password & Phone Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-slate-700 block">كلمة المرور <span className="text-rose-500">*</span></label>
-                    <div className="relative">
+                    {/* Name */}
+                    <div className="space-y-1.5">
+                      <label className="text-slate-700 block">الاسم الكامل <span className="text-rose-500">*</span></label>
                       <input
                         type="text"
                         required
-                        placeholder="12345678"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full p-3 pl-9 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 font-mono focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
+                        placeholder="مثال: أحمد عبدالأمير العلي"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setNewPassword(generatePassword())}
-                        title="توليد كلمة مرور عشوائية قوية"
-                        className="absolute left-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#173A7C] transition-colors"
-                      >
-                        <RefreshCw className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-slate-700 block">رقم الجوال (اختياري)</label>
-                    <input
-                      type="text"
-                      placeholder="+966 50 000 0000"
-                      value={newPhone}
-                      onChange={(e) => setNewPhone(e.target.value)}
-                      className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* National ID */}
-                <div className="space-y-1.5">
-                  <label className="text-slate-700 block">رقم الهوية الوطنية / الإقامة (اختياري)</label>
-                  <input
-                    type="text"
-                    placeholder="10 أرقام (اختياري)"
-                    value={newNationalId}
-                    onChange={(e) => setNewNationalId(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all"
-                  />
-                </div>
-
-                {/* COURSES ENROLLMENT / ASSIGNMENT SECTION (STUDENT & INSTRUCTOR) */}
-                {newRole !== 'ADMIN' && (
-                  <div className="p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200/90 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-slate-800">
-                        <BookOpen className="w-4 h-4 text-[#173A7C]" />
-                        <span className="font-black text-xs">
-                          {newRole === 'STUDENT'
-                            ? 'صلاحيات الاشتراك في الدورات (اختياري)'
-                            : 'تكليف المدرب بالدورات التدريبية (اختياري)'}
-                        </span>
-                      </div>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-600 font-bold">
-                        اختياري
-                      </span>
                     </div>
 
-                    <p className="text-[11px] text-slate-500 font-normal leading-relaxed">
-                      {newRole === 'STUDENT'
-                        ? 'حدد دورة أو عدة دورات لمنح هذا المتدرب وصولاً واشتراكاً فورياً إليها عند إنشاء حسابه:'
-                        : 'حدد الدورات التي سيشرف عليها هذا المدرب ويحاضر فيها بالمنصة:'}
-                    </p>
-
-                    {/* Search inside available courses */}
-                    {coursesList.length > 3 && (
-                      <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        <input
-                          type="text"
-                          placeholder="ابحث عن دورة لتحديدها..."
-                          value={courseSearchTerm}
-                          onChange={(e) => setCourseSearchTerm(e.target.value)}
-                          className="w-full pr-8 pl-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#5CB07C]"
-                        />
-                      </div>
-                    )}
-
-                    {/* Courses Selectable List */}
-                    <div className="max-h-40 overflow-y-auto space-y-1.5 pr-0.5 custom-scrollbar">
-                      {coursesList
-                        .filter(
-                          (c) =>
-                            !courseSearchTerm.trim() ||
-                            c.title.toLowerCase().includes(courseSearchTerm.toLowerCase().trim())
-                        )
-                        .map((course) => {
-                          const isSelected = selectedCourseSlugs.includes(course.slug);
-                          return (
-                            <label
-                              key={course.slug || course.id}
-                              className={`flex items-center gap-2.5 p-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
-                                isSelected
-                                  ? 'bg-emerald-50/80 border-[#5CB07C] text-emerald-950 shadow-xs'
-                                  : 'bg-white border-slate-200/70 text-slate-700 hover:border-slate-300'
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isSelected}
-                                onChange={() => {
-                                  if (isSelected) {
-                                    setSelectedCourseSlugs((prev) => prev.filter((s) => s !== course.slug));
-                                  } else {
-                                    setSelectedCourseSlugs((prev) => [...prev, course.slug]);
-                                  }
-                                }}
-                                className="w-4 h-4 text-[#5CB07C] focus:ring-[#5CB07C] border-slate-300 rounded cursor-pointer"
-                              />
-                              <span className="flex-1 truncate">{course.title}</span>
-                              {isSelected && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-600 text-white font-bold shrink-0">
-                                  محدد
-                                </span>
-                              )}
-                            </label>
-                          );
-                        })}
-                      {coursesList.length === 0 && (
-                        <p className="text-center py-2 text-xs text-slate-400 font-normal">
-                          جاري تحميل قائمة الدورات من النظام...
-                        </p>
-                      )}
+                    {/* Email */}
+                    <div className="space-y-1.5">
+                      <label className="text-slate-700 block">البريد الإلكتروني <span className="text-rose-500">*</span></label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="name@example.com"
+                        value={newEmail}
+                        onChange={(e) => setNewEmail(e.target.value)}
+                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
+                      />
                     </div>
 
-                    {/* Selected count info & clear button */}
-                    {selectedCourseSlugs.length > 0 && (
-                      <div className="flex items-center justify-between text-[11px] text-emerald-700 font-bold bg-emerald-50/60 px-2.5 py-1.5 rounded-lg border border-emerald-200/60">
-                        <span>تم تحديد {selectedCourseSlugs.length} دورة للمستخدم</span>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCourseSlugs([])}
-                          className="text-rose-500 hover:text-rose-700 text-[11px] font-bold underline cursor-pointer"
-                        >
-                          إلغاء التحديد
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Option to Add a Custom / New Course Title */}
-                    <div className="pt-2 border-t border-slate-200/60 space-y-2">
-                      <button
-                        type="button"
-                        onClick={() => setIsCustomCourseActive(!isCustomCourseActive)}
-                        className="flex items-center gap-1.5 text-xs text-[#173A7C] hover:text-[#1E4D9D] font-bold cursor-pointer transition-colors"
-                      >
-                        <Plus
-                          className={`w-3.5 h-3.5 transition-transform ${
-                            isCustomCourseActive ? 'rotate-45 text-rose-500' : ''
-                          }`}
-                        />
-                        <span>
-                          {isCustomCourseActive
-                            ? 'إلغاء إضافة دورة جديدة'
-                            : '+ إضافة دورة جديدة غير مدرجة بالقائمة'}
-                        </span>
-                      </button>
-
-                      {isCustomCourseActive && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="space-y-1 pt-1"
-                        >
+                    {/* Password & Phone Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-slate-700 block">كلمة المرور <span className="text-rose-500">*</span></label>
+                        <div className="relative">
                           <input
                             type="text"
-                            placeholder="اكتب اسم الدورة التدريبية الجديدة هنا..."
-                            value={customCourseTitle}
-                            onChange={(e) => setCustomCourseTitle(e.target.value)}
-                            className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15"
+                            required
+                            placeholder="12345678"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className="w-full p-3 pl-9 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 font-mono focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
                           />
-                          <p className="text-[10px] text-slate-400 font-normal">
-                            سيتم ربط المتدرب بهذه الدورة فور إنشائها واعتماده كمسجل فيها.
-                          </p>
-                        </motion.div>
-                      )}
+                          <button
+                            type="button"
+                            onClick={() => setNewPassword(generatePassword())}
+                            title="توليد كلمة مرور عشوائية قوية"
+                            className="absolute left-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#173A7C] transition-colors cursor-pointer"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-slate-700 block">رقم الجوال (اختياري)</label>
+                        <input
+                          type="text"
+                          placeholder="+966 50 000 0000"
+                          value={newPhone}
+                          onChange={(e) => setNewPhone(e.target.value)}
+                          className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    {/* National ID */}
+                    <div className="space-y-1.5">
+                      <label className="text-slate-700 block">رقم الهوية الوطنية / الإقامة (اختياري)</label>
+                      <input
+                        type="text"
+                        placeholder="10 أرقام (اختياري)"
+                        value={newNationalId}
+                        onChange={(e) => setNewNationalId(e.target.value)}
+                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
+                      />
                     </div>
                   </div>
-                )}
 
-                <div className="pt-3 flex gap-3 border-t border-slate-200/70 shrink-0">
+                  {/* LEFT COLUMN (In RTL): Courses & Privileges Assignment */}
+                  <div className="flex flex-col h-full">
+                    {newRole !== 'ADMIN' ? (
+                      <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/90 space-y-3 flex-1 flex flex-col">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-slate-800">
+                            <BookOpen className="w-4 h-4 text-[#173A7C]" />
+                            <span className="font-black text-xs">
+                              {newRole === 'STUDENT'
+                                ? 'صلاحيات الاشتراك في الدورات (اختياري)'
+                                : 'تكليف المدرب بالدورات التدريبية (اختياري)'}
+                            </span>
+                          </div>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600 font-bold">
+                            اختياري
+                          </span>
+                        </div>
+
+                        <p className="text-[11px] text-slate-500 font-normal leading-relaxed">
+                          {newRole === 'STUDENT'
+                            ? 'حدد دورة أو عدة دورات لمنح هذا المتدرب وصولاً واشتراكاً فورياً إليها عند إنشاء حسابه:'
+                            : 'حدد الدورات التي سيشرف عليها هذا المدرب ويحاضر فيها بالمنصة:'}
+                        </p>
+
+                        {/* Search inside available courses */}
+                        {coursesList.length > 2 && (
+                          <div className="relative">
+                            <Search className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            <input
+                              type="text"
+                              placeholder="ابحث عن دورة لتحديدها..."
+                              value={courseSearchTerm}
+                              onChange={(e) => setCourseSearchTerm(e.target.value)}
+                              className="w-full pr-8 pl-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#5CB07C]"
+                            />
+                          </div>
+                        )}
+
+                        {/* Courses Selectable List (NO VISIBLE SCROLLBAR) */}
+                        <div className="flex-1 min-h-[170px] max-h-[230px] overflow-y-auto space-y-1.5 pr-0.5 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                          {coursesList
+                            .filter(
+                              (c) =>
+                                !courseSearchTerm.trim() ||
+                                c.title.toLowerCase().includes(courseSearchTerm.toLowerCase().trim())
+                            )
+                            .map((course) => {
+                              const isSelected = selectedCourseSlugs.includes(course.slug);
+                              return (
+                                <label
+                                  key={course.slug || course.id}
+                                  className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
+                                    isSelected
+                                      ? 'bg-emerald-50/90 border-[#5CB07C] text-emerald-950 shadow-xs'
+                                      : 'bg-white border-slate-200/80 text-slate-700 hover:border-slate-300'
+                                  }`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => {
+                                      if (isSelected) {
+                                        setSelectedCourseSlugs((prev) => prev.filter((s) => s !== course.slug));
+                                      } else {
+                                        setSelectedCourseSlugs((prev) => [...prev, course.slug]);
+                                      }
+                                    }}
+                                    className="w-4 h-4 text-[#5CB07C] focus:ring-[#5CB07C] border-slate-300 rounded cursor-pointer shrink-0"
+                                  />
+                                  <span className="flex-1 truncate">{course.title}</span>
+                                  {isSelected && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-600 text-white font-bold shrink-0">
+                                      محدد
+                                    </span>
+                                  )}
+                                </label>
+                              );
+                            })}
+                          {coursesList.length === 0 && (
+                            <p className="text-center py-4 text-xs text-slate-400 font-normal">
+                              جاري تحميل قائمة الدورات من النظام...
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Selected count info & clear button */}
+                        {selectedCourseSlugs.length > 0 && (
+                          <div className="flex items-center justify-between text-[11px] text-emerald-700 font-bold bg-emerald-50/70 px-3 py-1.5 rounded-lg border border-emerald-200/70">
+                            <span>تم تحديد {selectedCourseSlugs.length} دورة للمستخدم</span>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedCourseSlugs([])}
+                              className="text-rose-500 hover:text-rose-700 text-[11px] font-bold underline cursor-pointer"
+                            >
+                              إلغاء التحديد
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Option to Add a Custom / New Course Title */}
+                        <div className="pt-2 border-t border-slate-200/60 space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsCustomCourseActive(!isCustomCourseActive)}
+                            className="flex items-center gap-1.5 text-xs text-[#173A7C] hover:text-[#1E4D9D] font-bold cursor-pointer transition-colors"
+                          >
+                            <Plus
+                              className={`w-3.5 h-3.5 transition-transform ${
+                                isCustomCourseActive ? 'rotate-45 text-rose-500' : ''
+                              }`}
+                            />
+                            <span>
+                              {isCustomCourseActive
+                                ? 'إلغاء إضافة دورة جديدة'
+                                : '+ إضافة دورة جديدة غير مدرجة بالقائمة'}
+                            </span>
+                          </button>
+
+                          {isCustomCourseActive && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="space-y-1 pt-1"
+                            >
+                              <input
+                                type="text"
+                                placeholder="اكتب اسم الدورة التدريبية الجديدة هنا..."
+                                value={customCourseTitle}
+                                onChange={(e) => setCustomCourseTitle(e.target.value)}
+                                className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15"
+                              />
+                              <p className="text-[10px] text-slate-400 font-normal">
+                                سيتم ربط المستخدم بهذه الدورة فور إنشائها واعتماده فيها.
+                              </p>
+                            </motion.div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      /* Admin Privileges Guidance Box */
+                      <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-purple-50/50 to-slate-50 border border-indigo-100 flex-1 flex flex-col justify-center items-center text-center space-y-3 min-h-[260px]">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 text-white flex items-center justify-center shadow-lg shadow-purple-600/20">
+                          <ShieldCheck className="w-7 h-7" />
+                        </div>
+                        <h4 className="font-black text-sm sm:text-base text-slate-800">صلاحيات الإدارة والتحكم الكاملة</h4>
+                        <p className="text-xs text-slate-500 leading-relaxed max-w-xs">
+                          حساب الأدمن (مدير النظام) يمتلك صلاحية الوصول الشاملة لكافة لوحات التحكم، إعدادات المنصة، السجلات، وإدارة الأعضاء.
+                        </p>
+                        <div className="text-[11px] font-bold text-indigo-700 bg-indigo-100/70 px-3 py-1.5 rounded-full border border-indigo-200/70">
+                          البيانات الإلزامية: الاسم، البريد، وكلمة المرور فقط
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+
+                {/* MODAL FOOTER BUTTONS - ALWAYS VISIBLE AT BOTTOM */}
+                <div className="pt-4 mt-3 flex items-center justify-end gap-3 border-t border-slate-200/70 shrink-0">
                   <button
                     type="button"
                     onClick={() => setIsAddUserModalOpen(false)}
-                    className="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer transition-colors"
+                    className="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all border border-white/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all border border-white/20 flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {saving ? (
                       <>
@@ -897,13 +924,13 @@ function AdminUsersPageContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-2xl relative text-right font-[family-name:var(--font-cairo)]"
+              className="w-full max-w-lg bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-6 space-y-4 shadow-2xl relative text-right font-[family-name:var(--font-cairo)]"
             >
               <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
                 <div className="p-3 rounded-xl bg-emerald-100 text-emerald-700">
@@ -939,7 +966,7 @@ function AdminUsersPageContent() {
                         ? 'الدورات المكلف بها:'
                         : 'الدورات المسجل بها فورياً:'}
                     </span>
-                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                       {createdCredentials.courses.map((title, idx) => (
                         <span
                           key={idx}
