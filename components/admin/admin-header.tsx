@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -47,7 +48,12 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -428,8 +434,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <span className="hidden sm:inline">الرئيسية</span>
           </Link>
 
-          {/* Notifications Button & Dropdown */}
-          <div className="relative">
+          {/* Notifications Button & Panels */}
+          <div className="relative shrink-0">
             <button
               onClick={() => {
                 setShowNotifications(!showNotifications);
@@ -445,15 +451,15 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               )}
             </button>
 
-            {/* Notifications Dropdown Panel */}
+            {/* 1. DESKTOP NOTIFICATIONS DROPDOWN (Directly centered under the bell icon) */}
             {showNotifications && (
-              <>
+              <div className="hidden sm:block">
                 <div
-                  className="fixed inset-0 z-[990] bg-slate-900/20 sm:bg-transparent backdrop-blur-[1px] sm:backdrop-blur-none"
+                  className="fixed inset-0 z-[990]"
                   onClick={() => setShowNotifications(false)}
                 />
                 <div
-                  className="fixed inset-x-3 top-20 sm:top-full sm:mt-2 sm:inset-x-auto sm:start-0 sm:w-96 rounded-2xl border border-slate-200/90 p-4 shadow-2xl z-[1000] text-right space-y-3 bg-white/98 backdrop-blur-xl text-slate-800 max-w-sm sm:max-w-none mx-auto sm:mx-0 overflow-hidden"
+                  className="absolute top-full mt-2.5 left-1/2 -translate-x-1/2 w-96 rounded-2xl border border-slate-200/90 p-4 shadow-2xl z-[1000] text-right space-y-3 bg-white text-slate-800"
                   style={{ boxShadow: '0 20px 50px rgba(15, 23, 42, 0.18)' }}
                 >
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -485,6 +491,14 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                           محدّث
                         </span>
                       )}
+                      <button
+                        type="button"
+                        onClick={() => setShowNotifications(false)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                        title="إغلاق"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
 
@@ -544,8 +558,142 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                     )}
                   </div>
                 </div>
-              </>
+              </div>
             )}
+
+            {/* 2. MOBILE NOTIFICATIONS SIDEBAR DRAWER (Full height sidebar with prominent X button, rendered via Portal directly to body) */}
+            {showNotifications && isMounted && typeof document !== 'undefined'
+              ? createPortal(
+                  <div className="sm:hidden">
+                    {/* Backdrop */}
+                    <div
+                      className="fixed inset-0 z-[9998] bg-slate-950/70 backdrop-blur-sm transition-opacity"
+                      onClick={() => setShowNotifications(false)}
+                    />
+
+                    {/* Sidebar Drawer */}
+                    <aside
+                      className="fixed inset-y-0 right-0 z-[9999] w-[340px] max-w-[88vw] h-full flex flex-col border-l border-slate-200 text-right font-[family-name:var(--font-cairo)] animate-in slide-in-from-right duration-300 shadow-2xl"
+                      style={{
+                        backgroundColor: '#ffffff',
+                        boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.35)',
+                      }}
+                      dir="rtl"
+                    >
+                      {/* Drawer Header */}
+                      <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50 shrink-0">
+                        <div className="flex items-center gap-2.5">
+                          <div className="p-2 rounded-xl bg-[#173A7C] text-white shadow-sm shadow-[#173A7C]/20">
+                            <BellRing className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-extrabold text-sm text-[#152C5B]">
+                              إشعارات النظام
+                            </h4>
+                            <p className="text-[10px] text-slate-400 font-bold">العمليات والأنشطة اللحظية</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowNotifications(false)}
+                          className="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-200/70 transition-colors cursor-pointer"
+                          aria-label="إغلاق الإشعارات"
+                        >
+                          <X className="w-5 h-5 text-slate-600" />
+                        </button>
+                      </div>
+
+                      {/* Drawer Unread Status Bar */}
+                      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-100/70 border-b border-slate-200/70 shrink-0">
+                        {unreadCount > 0 ? (
+                          <>
+                            <span className="text-[11px] font-black text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+                              {unreadCount} جديد
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handleMarkAllAsRead}
+                              className="text-xs text-[#173A7C] font-bold hover:underline cursor-pointer"
+                            >
+                              قراءة الكل
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-[11px] font-bold text-slate-600 bg-slate-200/90 px-2.5 py-0.5 rounded-full">
+                              محدّث
+                            </span>
+                            <span className="text-[11px] text-slate-400 font-medium">لا توجد تنبيهات جديدة</span>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Drawer Notification Items List */}
+                      <div className="flex-1 overflow-y-auto p-4 space-y-2.5 no-scrollbar bg-white">
+                        {notifications.length > 0 ? (
+                          notifications.map((n) => {
+                            const IconComponent =
+                              n.type === 'user'
+                                ? UserPlus
+                                : n.type === 'course'
+                                ? BookOpen
+                                : n.type === 'warning'
+                                ? AlertCircle
+                                : Bell;
+
+                            const iconBg =
+                              n.type === 'user'
+                                ? 'bg-blue-50 text-blue-600'
+                                : n.type === 'course'
+                                ? 'bg-emerald-50 text-emerald-600'
+                                : n.type === 'warning'
+                                ? 'bg-amber-50 text-amber-600'
+                                : 'bg-slate-100 text-[#173A7C]';
+
+                            return (
+                              <div
+                                key={n.id}
+                                className={`p-3.5 rounded-2xl border transition-all text-xs space-y-1.5 ${
+                                  n.unread
+                                    ? 'bg-amber-50/80 border-amber-200/90 shadow-xs'
+                                    : 'bg-slate-50/90 border-slate-200/70'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between font-black text-slate-900 gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <div className={`p-1.5 rounded-lg shrink-0 ${iconBg}`}>
+                                      <IconComponent className="w-4 h-4" />
+                                    </div>
+                                    <span className="text-xs font-bold leading-tight truncate">{n.title}</span>
+                                  </div>
+                                  <span className="text-[9px] font-medium text-slate-400 shrink-0">{n.time}</span>
+                                </div>
+                                <p className="text-[11px] text-slate-600 font-medium leading-relaxed pr-7">
+                                  {n.desc}
+                                </p>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="py-16 text-center space-y-3 bg-white">
+                            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+                              <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                            </div>
+                            <p className="text-sm font-bold text-slate-700">لا توجد إشعارات جديدة</p>
+                            <p className="text-xs text-slate-400">أنت مطلع على كافة التحديثات والعمليات بالكامل</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Drawer Footer */}
+                      <div className="p-3.5 border-t border-slate-100 text-center bg-slate-50 shrink-0">
+                        <span className="text-[11px] text-slate-400 font-bold">النبض المستدام • مركز الإشعارات</span>
+                      </div>
+                    </aside>
+                  </div>,
+                  document.body
+                )
+              : null}
           </div>
 
           {/* Admin Profile Dropdown */}

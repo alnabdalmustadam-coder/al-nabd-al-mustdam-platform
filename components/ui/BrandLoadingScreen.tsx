@@ -74,12 +74,7 @@ export function BrandLoadingScreen({
 
         {/* Smooth Shimmer Progress Track */}
         <div className="w-40 h-1.5 bg-slate-100/90 rounded-full overflow-hidden relative shadow-inner">
-          <div
-            className="absolute inset-y-0 w-2/5 rounded-full bg-gradient-to-r from-[#5CB07C] via-[#3E8B5C] to-[#173A7C] animate-[shimmer_1.8s_ease-in-out_infinite]"
-            style={{
-              animation: 'shimmer 1.8s ease-in-out infinite alternate',
-            }}
-          />
+          <div className="absolute inset-y-0 w-2/5 rounded-full bg-gradient-to-r from-[#5CB07C] via-[#3E8B5C] to-[#173A7C] animate-brand-shimmer" />
         </div>
 
         {/* Brand Micro Footer */}
@@ -87,17 +82,6 @@ export function BrandLoadingScreen({
           منصة النبض المستدام للتدريب
         </span>
       </div>
-
-      <style jsx>{`
-        @keyframes shimmer {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(180%);
-          }
-        }
-      `}</style>
     </div>
   );
 }

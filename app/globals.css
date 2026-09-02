@@ -1312,4 +1312,16 @@ p, .subtext, .desc {
   height: 0 !important;
 }
 
+@keyframes brand-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(180%);
+  }
+}
+.animate-brand-shimmer {
+  animation: brand-shimmer 1.8s ease-in-out infinite alternate;
+}
+
 
