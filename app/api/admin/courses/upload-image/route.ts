@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import fs from 'fs';
-import path from 'path';
 import { requireInstructorOrAdmin } from '@/lib/security/auth';
 import { IMAGE_UPLOAD_POLICY, validateUpload } from '@/lib/security/uploads';
 import { optimizeToWebp } from '@/lib/media/image-processor';
+import { removeReplacedPublicImage, uploadPublicWebp } from '@/lib/media/public-image-storage';
+
+export const runtime = 'nodejs';
+
+const COURSE_IMAGES_BUCKET = 'course-thumbnails';
 
 export async function POST(req: Request) {
   try {
@@ -38,8 +40,11 @@ export async function POST(req: Request) {
       });
       optimizedWebpBuffer = opt.buffer;
     } catch (procErr) {
-      console.error('Course image WebP conversion failed, using raw buffer:', procErr);
-      optimizedWebpBuffer = rawBuffer;
+      console.error('Course image WebP conversion failed:', procErr);
+      return NextResponse.json(
+        { success: false, error: 'تعذر معالجة الصورة وتحويلها إلى WebP' },
+        { status: 422 },
+      );
     }
 
     // 2. Deterministic naming based on course slug if available to prevent storage accumulation
@@ -53,73 +58,29 @@ export async function POST(req: Request) {
       ? `course_${cleanSlug}.webp`
       : `course_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.webp`;
 
-    let finalPublicUrl = '';
+    // 3. Persist directly in Supabase. Vercel's deployment filesystem is not writable storage.
+    const uploaded = await uploadPublicWebp({
+      bucketName: COURSE_IMAGES_BUCKET,
+      objectPath: `courses/${fileName}`,
+      buffer: optimizedWebpBuffer,
+    });
 
-    // 3. Try Supabase Storage 'course-thumbnails' with upsert: true
-    try {
-      const { data, error } = await supabase.storage
-        .from('course-thumbnails')
-        .upload(fileName, optimizedWebpBuffer, {
-          contentType: 'image/webp',
-          upsert: true,
-        });
+    await removeReplacedPublicImage(
+      COURSE_IMAGES_BUCKET,
+      existingImageUrl,
+      uploaded.objectPath,
+    );
 
-      if (!error && data) {
-        const { data: publicUrlData } = supabase.storage
-          .from('course-thumbnails')
-          .getPublicUrl(fileName);
-
-        if (publicUrlData?.publicUrl) {
-          finalPublicUrl = `${publicUrlData.publicUrl}?t=${Date.now()}`;
-        }
-      }
-
-      // If existing image had a different name in supabase storage, try removing it to prevent accumulation
-      if (existingImageUrl && existingImageUrl.includes('/course-thumbnails/')) {
-        const oldFile = existingImageUrl.split('/course-thumbnails/')[1]?.split('?')[0];
-        if (oldFile && oldFile !== fileName) {
-          try {
-            await supabase.storage.from('course-thumbnails').remove([oldFile]);
-          } catch {}
-        }
-      }
-    } catch (supaErr) {
-      console.warn('Supabase storage upload fallback for course image:', supaErr);
-    }
-
-    // 4. Local fallback for development / offline resilience
-    if (!finalPublicUrl) {
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'courses');
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-      }
-
-      // Clean up previous image if it was local and had different name or extension
-      if (cleanSlug) {
-        try {
-          const existingFiles = fs.readdirSync(uploadsDir);
-          for (const existing of existingFiles) {
-            if (existing.startsWith(`course_${cleanSlug}.`)) {
-              try {
-                fs.unlinkSync(path.join(uploadsDir, existing));
-              } catch {}
-            }
-          }
-        } catch {}
-      }
-
-      const filePath = path.join(uploadsDir, fileName);
-      fs.writeFileSync(filePath, optimizedWebpBuffer);
-      finalPublicUrl = `/uploads/courses/${fileName}?t=${Date.now()}`;
-    }
+    const finalPublicUrl = `${uploaded.publicUrl}?t=${Date.now()}`;
 
     return NextResponse.json({
       success: true,
       imageUrl: finalPublicUrl,
       format: 'webp',
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Course image upload error:', err);
-    return NextResponse.json({ success: false, error: err.message || 'تعذر رفع الصورة' }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'تعذر رفع الصورة';
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
