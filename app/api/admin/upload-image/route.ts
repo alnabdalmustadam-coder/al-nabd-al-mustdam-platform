@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import fs from 'fs';
-import path from 'path';
 import { requireInstructorOrAdmin } from '@/lib/security/auth';
 import { IMAGE_UPLOAD_POLICY, validateUpload } from '@/lib/security/uploads';
 import { optimizeToWebp } from '@/lib/media/image-processor';
+import { removeReplacedPublicImage, uploadPublicWebp } from '@/lib/media/public-image-storage';
+
+export const runtime = 'nodejs';
 
 /**
  * Universal WebP Image Upload Route for Admin & Instructors
@@ -45,7 +45,10 @@ export async function POST(req: Request) {
       optimizedWebpBuffer = opt.buffer;
     } catch (procErr) {
       console.error('WebP conversion failed in upload-image:', procErr);
-      optimizedWebpBuffer = rawBuffer;
+      return NextResponse.json(
+        { success: false, error: 'تعذر معالجة الصورة وتحويلها إلى WebP' },
+        { status: 422 },
+      );
     }
 
     // 2. Deterministic naming to guarantee in-place updates and prevent storage accumulation
@@ -60,74 +63,27 @@ export async function POST(req: Request) {
       ? `${cleanFolder}_${cleanSlug}.webp`
       : `${cleanFolder}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.webp`;
 
-    let finalPublicUrl = '';
     const bucketName = 'course-thumbnails'; // Reusable public bucket
 
-    // 3. Try Supabase Storage with upsert: true
-    try {
-      const { data, error } = await supabase.storage
-        .from(bucketName)
-        .upload(fileName, optimizedWebpBuffer, {
-          contentType: 'image/webp',
-          upsert: true,
-        });
+    // 3. Persist directly in Supabase. Runtime writes under public/ do not survive on Vercel.
+    const uploaded = await uploadPublicWebp({
+      bucketName,
+      objectPath: `${cleanFolder}/${fileName}`,
+      buffer: optimizedWebpBuffer,
+    });
 
-      if (!error && data) {
-        const { data: publicUrlData } = supabase.storage
-          .from(bucketName)
-          .getPublicUrl(fileName);
+    await removeReplacedPublicImage(bucketName, existingImageUrl, uploaded.objectPath);
 
-        if (publicUrlData?.publicUrl) {
-          finalPublicUrl = `${publicUrlData.publicUrl}?t=${Date.now()}`;
-        }
-      }
-
-      // If replacing a file with a different key, purge old file
-      if (existingImageUrl && existingImageUrl.includes(`/${bucketName}/`)) {
-        const oldFile = existingImageUrl.split(`/${bucketName}/`)[1]?.split('?')[0];
-        if (oldFile && oldFile !== fileName) {
-          try {
-            await supabase.storage.from(bucketName).remove([oldFile]);
-          } catch {}
-        }
-      }
-    } catch (supaErr) {
-      console.warn('Supabase storage fallback in universal upload-image:', supaErr);
-    }
-
-    // 4. Local fallback for development / offline resilience
-    if (!finalPublicUrl) {
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads', cleanFolder);
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-      }
-
-      // Clean up previous file if name changed
-      if (cleanSlug) {
-        try {
-          const existingFiles = fs.readdirSync(uploadsDir);
-          for (const existing of existingFiles) {
-            if (existing.startsWith(`${cleanFolder}_${cleanSlug}.`)) {
-              try {
-                fs.unlinkSync(path.join(uploadsDir, existing));
-              } catch {}
-            }
-          }
-        } catch {}
-      }
-
-      const filePath = path.join(uploadsDir, fileName);
-      fs.writeFileSync(filePath, optimizedWebpBuffer);
-      finalPublicUrl = `/uploads/${cleanFolder}/${fileName}?t=${Date.now()}`;
-    }
+    const finalPublicUrl = `${uploaded.publicUrl}?t=${Date.now()}`;
 
     return NextResponse.json({
       success: true,
       imageUrl: finalPublicUrl,
       format: 'webp',
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Universal upload-image error:', err);
-    return NextResponse.json({ success: false, error: err.message || 'تعذر رفع الصورة' }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'تعذر رفع الصورة';
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
