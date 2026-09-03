@@ -519,6 +519,8 @@ export default function AdminCertificatesPage() {
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('templateId', editingTemplateId || `draft-${Date.now()}`);
+    formData.append('existingImageUrl', designerForm.imageUrl || '');
 
     try {
       setIsUploadingBg(true);

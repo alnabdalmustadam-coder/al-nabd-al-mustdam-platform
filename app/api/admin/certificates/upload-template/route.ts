@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import fs from 'fs';
-import path from 'path';
 import { requireAdmin } from '@/lib/security/auth';
 import { IMAGE_UPLOAD_POLICY, validateUpload } from '@/lib/security/uploads';
 import { optimizeToWebp } from '@/lib/media/image-processor';
+import { removeReplacedPublicImage, uploadPublicWebp } from '@/lib/media/public-image-storage';
+
+export const runtime = 'nodejs';
+
+const CERTIFICATE_TEMPLATES_BUCKET = 'certificate-templates';
 
 export async function POST(req: Request) {
   try {
@@ -14,6 +16,7 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const templateId = (formData.get('templateId') || 'standard') as string;
+    const existingImageUrl = (formData.get('existingImageUrl') || '') as string;
 
     if (!file) {
       return NextResponse.json({ success: false, error: 'لم يتم اختيار ملف صورة' }, { status: 400 });
@@ -26,7 +29,7 @@ export async function POST(req: Request) {
     const rawBytes = await file.arrayBuffer();
     const rawBuffer = Buffer.from(rawBytes);
 
-    // 1. Convert and compress strictly to WebP
+    // Convert and compress strictly to WebP.
     let optimizedWebpBuffer: Buffer;
     try {
       const opt = await optimizeToWebp(rawBuffer, {
@@ -37,55 +40,39 @@ export async function POST(req: Request) {
       });
       optimizedWebpBuffer = opt.buffer;
     } catch (procErr) {
-      console.error('Certificate WebP conversion failed, using raw buffer:', procErr);
-      optimizedWebpBuffer = rawBuffer;
+      console.error('Certificate WebP conversion failed:', procErr);
+      return NextResponse.json(
+        { success: false, error: 'تعذر معالجة صورة الشهادة وتحويلها إلى WebP' },
+        { status: 422 },
+      );
     }
 
     const cleanId = String(templateId).replace(/[^a-z0-9_-]/gi, '_').slice(0, 40);
-    const fileName = `cert_tpl_${cleanId}.webp`;
-    let finalPublicUrl = '';
+    const fileName = cleanId && cleanId !== 'standard'
+      ? `cert_tpl_${cleanId}.webp`
+      : `cert_tpl_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.webp`;
+    const uploaded = await uploadPublicWebp({
+      bucketName: CERTIFICATE_TEMPLATES_BUCKET,
+      objectPath: `templates/${fileName}`,
+      buffer: optimizedWebpBuffer,
+    });
 
-    // 2. Try Supabase Storage with upsert: true (replaces existing template in place)
-    try {
-      const { data, error } = await supabase.storage
-        .from('certificate-templates')
-        .upload(fileName, optimizedWebpBuffer, {
-          contentType: 'image/webp',
-          upsert: true,
-        });
+    await removeReplacedPublicImage(
+      CERTIFICATE_TEMPLATES_BUCKET,
+      existingImageUrl,
+      uploaded.objectPath,
+    );
 
-      if (!error && data) {
-        const { data: publicUrlData } = supabase.storage
-          .from('certificate-templates')
-          .getPublicUrl(fileName);
-
-        if (publicUrlData?.publicUrl) {
-          finalPublicUrl = `${publicUrlData.publicUrl}?t=${Date.now()}`;
-        }
-      }
-    } catch (supaErr) {
-      console.warn('Supabase storage upload fallback for certificates:', supaErr);
-    }
-
-    // 3. Local fallback for development
-    if (!finalPublicUrl) {
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'certificates');
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-      }
-
-      const filePath = path.join(uploadsDir, fileName);
-      fs.writeFileSync(filePath, optimizedWebpBuffer);
-      finalPublicUrl = `/uploads/certificates/${fileName}?t=${Date.now()}`;
-    }
+    const finalPublicUrl = `${uploaded.publicUrl}?t=${Date.now()}`;
 
     return NextResponse.json({
       success: true,
       imageUrl: finalPublicUrl,
       format: 'webp',
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Certificate template image upload error:', err);
-    return NextResponse.json({ success: false, error: err.message || 'تعذر رفع القالب' }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'تعذر رفع القالب';
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

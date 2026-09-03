@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import {
+  CertificatePersistenceError,
   issueCertificate,
   toggleCertificateStatus,
   deleteIssuedCertificate,
@@ -7,6 +8,14 @@ import {
 import { requireAdmin } from '@/lib/security/auth';
 
 export const dynamic = 'force-dynamic';
+
+function certificateErrorResponse(error: unknown, fallback: string) {
+  const message = error instanceof Error ? error.message : fallback;
+  return NextResponse.json(
+    { success: false, error: message },
+    { status: error instanceof CertificatePersistenceError ? 503 : 500 },
+  );
+}
 
 export async function POST(req: Request) {
   try {
@@ -20,7 +29,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'مسمى الدورة مطلوب' }, { status: 400 });
     }
 
-    const issued = issueCertificate({
+    const issued = await issueCertificate({
       studentName: body.studentName.trim(),
       courseTitle: body.courseTitle.trim(),
       studentEmail: body.studentEmail,
@@ -32,9 +41,9 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, certificate: issued });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Admin issue certificate error:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return certificateErrorResponse(err, 'تعذر إصدار الشهادة');
   }
 }
 
@@ -47,15 +56,15 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ success: false, error: 'معرّف الشهادة مطلوب' }, { status: 400 });
     }
 
-    const toggled = toggleCertificateStatus(body.id);
+    const toggled = await toggleCertificateStatus(body.id);
     if (!toggled) {
       return NextResponse.json({ success: false, error: 'لم يتم العثور على الشهادة' }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, certificate: toggled });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Admin toggle certificate status error:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return certificateErrorResponse(err, 'تعذر تحديث حالة الشهادة');
   }
 }
 
@@ -69,14 +78,14 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ success: false, error: 'معرّف الشهادة مطلوب' }, { status: 400 });
     }
 
-    const deleted = deleteIssuedCertificate(id);
+    const deleted = await deleteIssuedCertificate(id);
     if (!deleted) {
       return NextResponse.json({ success: false, error: 'لم يتم العثور على الشهادة' }, { status: 404 });
     }
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Admin delete issued certificate error:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return certificateErrorResponse(err, 'تعذر حذف الشهادة');
   }
 }

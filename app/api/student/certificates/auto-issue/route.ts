@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  CertificatePersistenceError,
   getAllIssuedCertificates,
   getAllTemplates,
   issueCertificate,
@@ -52,8 +53,10 @@ export async function POST(req: NextRequest) {
     const name = profile?.full_name || auth.user.user_metadata?.full_name || 'المتدرب المتميز';
     const title = enrollment.course_title || courseTitle || 'الدورة التدريبية المعتمدة';
 
-    const allIssued = getAllIssuedCertificates();
-    const allTemplates = getAllTemplates();
+    const [allIssued, allTemplates] = await Promise.all([
+      getAllIssuedCertificates(),
+      getAllTemplates(),
+    ]);
 
     // Check if certificate already exists
     const existing = allIssued.find(
@@ -94,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     const matchedTemplate = allTemplates.find((t) => t.id === targetTemplateId) || allTemplates[0];
 
-    const newCert = issueCertificate({
+    const newCert = await issueCertificate({
       studentName: name,
       studentEmail: email,
       courseTitle: title,
@@ -111,8 +114,12 @@ export async function POST(req: NextRequest) {
         template: matchedTemplate,
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error in auto-issue route:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'تعذر إصدار الشهادة';
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: err instanceof CertificatePersistenceError ? 503 : 500 },
+    );
   }
 }

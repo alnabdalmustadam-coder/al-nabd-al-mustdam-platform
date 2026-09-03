@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  CertificatePersistenceError,
   getAllIssuedCertificates,
   getAllTemplates,
   issueCertificate,
@@ -45,8 +46,10 @@ export async function GET(req: NextRequest) {
       studentName = 'المتدرب';
     }
 
-    const allTemplates = getAllTemplates();
-    const allIssued = getAllIssuedCertificates();
+    const [allTemplates, allIssued] = await Promise.all([
+      getAllTemplates(),
+      getAllIssuedCertificates(),
+    ]);
 
     // 2. Check for completed enrollments to auto-issue any pending certificates
     try {
@@ -96,7 +99,7 @@ export async function GET(req: NextRequest) {
                 allTemplates.find((t) => t.autoIssue) ||
                 allTemplates[0];
 
-              const issuedCertificate = issueCertificate({
+              const issuedCertificate = await issueCertificate({
                 studentName: studentName || 'المتدرب المتميز',
                 studentEmail,
                 courseTitle,
@@ -115,7 +118,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 3. Refresh issued list from store after potential auto-issue
-    const freshIssued = getAllIssuedCertificates();
+    const freshIssued = await getAllIssuedCertificates();
 
     // 4. Filter certificates for this student
     // Certificate ownership is based exclusively on the authenticated account.
@@ -144,6 +147,9 @@ export async function GET(req: NextRequest) {
   } catch (err: unknown) {
     console.error('Error in student certificates GET route:', err);
     const message = err instanceof Error ? err.message : 'تعذر تحميل الشهادات';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: err instanceof CertificatePersistenceError ? 503 : 500 },
+    );
   }
 }
