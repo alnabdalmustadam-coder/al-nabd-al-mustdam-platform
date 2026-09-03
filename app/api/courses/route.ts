@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAllCoursesAsync, saveCourseAsync, deleteCourseAsync } from '@/lib/courses-store';
+import { CoursePersistenceError, getAllCoursesAsync, saveCourseAsync, deleteCourseAsync } from '@/lib/courses-store';
 import { requireInstructorOrAdmin } from '@/lib/security/auth';
 import { cleanString, readJsonObject, safeErrorMessage, ValidationError } from '@/lib/security/validation';
 import type { Course } from '@/types';
@@ -43,8 +43,13 @@ export async function POST(req: Request) {
   } catch (err: unknown) {
     console.error('API /api/courses POST error:', err);
     return NextResponse.json(
-      { success: false, error: safeErrorMessage(err, 'تعذر حفظ الدورة') },
-      { status: err instanceof ValidationError ? 400 : 500 },
+      {
+        success: false,
+        error: err instanceof CoursePersistenceError
+          ? err.message
+          : safeErrorMessage(err, 'تعذر حفظ الدورة'),
+      },
+      { status: err instanceof ValidationError ? 400 : err instanceof CoursePersistenceError ? 503 : 500 },
     );
   }
 }

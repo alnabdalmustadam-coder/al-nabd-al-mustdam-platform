@@ -32,6 +32,13 @@ type LessonInput = {
   subLessons?: string[];
 };
 
+export class CoursePersistenceError extends Error {
+  constructor(message = 'تعذر حفظ الدورة في قاعدة البيانات. حاول مرة أخرى بعد التحقق من إعدادات Supabase.') {
+    super(message);
+    this.name = 'CoursePersistenceError';
+  }
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
@@ -189,12 +196,11 @@ function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 
 }
 
 export async function saveCourseAsync(courseData: CourseInput, actorId?: string): Promise<Course> {
+  const requestedSlug = normalizeSlug(courseData.title, courseData.slug);
   const existing = courseData.id
     ? (await getAllCoursesAsync({ includeUnpublished: true })).find((course) => String(course.id) === String(courseData.id))
-    : courseData.slug
-      ? await getCourseBySlugAsync(courseData.slug, { includeUnpublished: true })
-      : undefined;
-  const payload = buildCoursePayload(courseData, existing);
+    : await getCourseBySlugAsync(requestedSlug, { includeUnpublished: true });
+  const payload = buildCoursePayload({ ...courseData, slug: requestedSlug }, existing);
   const status = courseData.status || 'published';
   const values = {
     slug: payload.slug,
@@ -207,37 +213,42 @@ export async function saveCourseAsync(courseData: CourseInput, actorId?: string)
     updated_at: new Date().toISOString(),
   };
 
-  let savedCourse: Course | undefined;
-
   try {
     const query = existing
       ? getSupabaseAdmin().from('course_catalog').update(values).eq('id', existing.id)
-      : getSupabaseAdmin().from('course_catalog').insert(values);
+      : getSupabaseAdmin().from('course_catalog').upsert(values, { onConflict: 'slug' });
     const { data, error } = await query.select('id, slug, title, price, status, payload').single();
-    if (!error && data) {
-      savedCourse = toCourse(data as CourseRow);
+    if (error || !data) {
+      logger.error('courses.supabase_write_failed', {
+        error,
+        courseSlug: payload.slug,
+        operation: existing ? 'update' : 'upsert',
+      });
+      throw new CoursePersistenceError();
     }
+
+    const savedCourse = toCourse(data as CourseRow);
+
+    // Local JSON is only a development convenience. Vercel's deployment
+    // filesystem is immutable and must never be treated as durable storage.
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        const list = readLocalCourses();
+        const idx = list.findIndex((course) => String(course.id) === String(savedCourse.id) || course.slug === savedCourse.slug);
+        if (idx >= 0) list[idx] = savedCourse;
+        else list.unshift(savedCourse);
+        writeLocalCourses(list);
+      } catch (error) {
+        logger.warn('courses.local_sync_failed', { error });
+      }
+    }
+
+    return savedCourse;
   } catch (err) {
-    logger.warn('courses.supabase_write_fallback', { err });
+    if (err instanceof CoursePersistenceError) throw err;
+    logger.error('courses.supabase_write_failed', { err, courseSlug: payload.slug });
+    throw new CoursePersistenceError();
   }
-
-  // Sync to local JSON database for guaranteed availability
-  const resultCourse: Course = savedCourse || {
-    id: existing?.id || Date.now(),
-    ...payload,
-  };
-
-  try {
-    const list = readLocalCourses();
-    const idx = list.findIndex((c) => String(c.id) === String(resultCourse.id) || c.slug === resultCourse.slug);
-    if (idx >= 0) list[idx] = resultCourse;
-    else list.unshift(resultCourse);
-    writeLocalCourses(list);
-  } catch (err) {
-    logger.error('courses.local_sync_failed', { err });
-  }
-
-  return resultCourse;
 }
 
 export async function deleteCourseAsync(slugOrId: string | number): Promise<boolean> {

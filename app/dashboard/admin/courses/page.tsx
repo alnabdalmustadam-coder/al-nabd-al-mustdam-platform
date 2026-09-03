@@ -1023,7 +1023,7 @@ export default function AdminCoursesPage() {
 
         loadCourses();
       } else {
-        showToast(data.error || 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø­ÙØ¸ Ø§Ù„Ø¯ÙˆØ±Ø©', 'error');
+        showToast(data.error || data.message || 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø­ÙØ¸ Ø§Ù„Ø¯ÙˆØ±Ø©', 'error');
       }
     } catch (err: any) {
       console.error('Error saving course:', err);
@@ -1612,1389 +1612,229 @@ export default function AdminCoursesPage() {
                         aspectRatio="video"
                       />
 
-                      {/* Presets */}
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-bold pt-1">
-                        <span>Ø£Ùˆ Ø§Ø®ØªØ± Ù…Ù† Ø§Ù„Ù†Ù…Ø§Ø°Ø¬ Ø§Ù„Ø¬Ø§Ù‡Ø²Ø©:</span>
-                        {['/logo.webp', '/1.png', '/2.png'].map((preset) => (
-                          <button
-                            key={preset}
-                            type="button"
-                            onClick={() => setFormImage(preset)}
-                            className={`px-2 py-0.5 rounded-lg border text-[10px] transition-colors cursor-pointer ${
-                              formImage === preset
-                                ? 'bg-blue-50 border-blue-300 text-[#173A7C] font-black'
-                                : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-600'
-                            }`}
-                          >
-                            {preset === '/logo.webp' ? 'Ø´Ø¹Ø§Ø± Ø§Ù„Ù…Ø¹Ù‡Ø¯' : preset === '/1.png' ? 'Ù†Ù…ÙˆØ°Ø¬ 1' : 'Ù†Ù…ÙˆØ°Ø¬ 2'}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Course Core Details */}
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-black text-slate-700 mb-1.5">Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ø¯ÙˆØ±Ø© Ø§Ù„ØªØ¯Ø±ÙŠØ¨ÙŠØ© *</label>
-                        <input
-                          type="text"
-                          required
-                          value={formTitle}
-                          onChange={(e) => setFormTitle(e.target.value)}
-                          placeholder="Ù…Ø«Ø§Ù„: Ø¯ÙˆØ±Ø© Ù‡Ù†Ø¯Ø³Ø© Ø§Ù„Ø£ÙˆØ§Ù…Ø± ÙˆØ§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø§Ù„Ù…ØªÙ‚Ø¯Ù…"
-                          className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* 1. Academic Category */}
-                        <div>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <label className="block text-xs font-black text-slate-700">Ø§Ù„ØªØµÙ†ÙŠÙ Ø§Ù„Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠ</label>
-                            <button
-                              type="button"
-                              onClick={() => setIsAddingNewCategory(!isAddingNewCategory)}
-                              className="text-[11px] text-[#173A7C] hover:text-[#1E4D9D] hover:underline font-black cursor-pointer flex items-center gap-1 transition-colors"
-                            >
-                              <Plus className="w-3 h-3" />
-                              <span>{isAddingNewCategory ? 'Ø§Ø®ØªÙŠØ§Ø± Ù…Ù† Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©' : 'Ø¥Ø¶Ø§ÙØ© ØªØµÙ†ÙŠÙ Ø¬Ø¯ÙŠØ¯'}</span>
-                            </button>
-                          </div>
-
-                          {isAddingNewCategory ? (
-                            <div className="flex items-center gap-1.5">
-                              <input
-                                type="text"
-                                autoFocus
-                                value={newCategoryName}
-                                onChange={(e) => setNewCategoryName(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    handleAddNewCategory();
-                                  }
-                                }}
-                                placeholder="Ø§ÙƒØªØ¨ Ø§Ø³Ù… Ø§Ù„ØªØµÙ†ÙŠÙ Ø§Ù„Ø¬Ø¯ÙŠØ¯..."
-                                className="flex-1 px-3.5 py-2.5 text-xs font-bold text-slate-800 bg-white rounded-xl border-2 border-[#173A7C] focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20"
-                              />
-                              <button
-                                type="button"
-                                onClick={handleAddNewCategory}
-                                className="px-3.5 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs font-black transition-all cursor-pointer shrink-0 shadow-xs"
-                              >
-                                Ø¥Ø¶Ø§ÙØ©
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setIsAddingNewCategory(false)}
-                                className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-all cursor-pointer shrink-0"
-                                title="Ø¥Ù„ØºØ§Ø¡"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
-                          ) : (
-                            <select
-                              value={formCategory}
-                              onChange={(e) => {
-                                if (e.target.value === '__add_new__') {
-                                  setIsAddingNewCategory(true);
-                                } else {
-                                  setFormCategory(e.target.value);
-                                }
-                              }}
-                              className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C] cursor-pointer"
-                            >
-                              {categoriesList.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                  {cat.label}
-                                </option>
-                              ))}
-                              <option value="__add_new__" className="text-[#173A7C] font-black bg-blue-50">
-                                Ø¥Ø¶Ø§ÙØ© ØªØµÙ†ÙŠÙ Ø¬Ø¯ÙŠØ¯...
-                              </option>
-                            </select>
-                          )}
-                        </div>
-
-                        {/* 2. Certified Instructor */}
-                        <div>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <label className="block text-xs font-black text-slate-700">Ø§Ù„Ù…Ø­Ø§Ø¶Ø± Ø§Ù„Ù…Ø¹ØªÙ…Ø¯</label>
-                            <button
-                              type="button"
-                              onClick={() => setIsAddingNewInstructor(!isAddingNewInstructor)}
-                              className="text-[11px] text-[#173A7C] hover:text-[#1E4D9D] hover:underline font-black cursor-pointer flex items-center gap-1 transition-colors"
-                            >
-                              <Plus className="w-3 h-3" />
-                              <span>{isAddingNewInstructor ? 'Ø§Ø®ØªÙŠØ§Ø± Ù…Ù† Ø§Ù„Ù…Ø³Ø¬Ù„ÙŠÙ†' : 'Ø¥Ø¶Ø§ÙØ© Ù…Ø¯Ø±Ø¨ Ø¬Ø¯ÙŠØ¯'}</span>
-                            </button>
-                          </div>
-
-                          {isAddingNewInstructor ? (
-                            <div className="flex items-center gap-1.5">
-                              <input
-                                type="text"
-                                autoFocus
-                                value={newInstructorName}
-                                onChange={(e) => setNewInstructorName(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    handleAddNewInstructor();
-                                  }
-                                }}
-                                placeholder="Ø§ÙƒØªØ¨ Ø§Ø³Ù… Ø§Ù„Ù…Ø­Ø§Ø¶Ø± / Ø§Ù„Ù…Ø¯Ø±Ø¨..."
-                                className="flex-1 px-3.5 py-2.5 text-xs font-bold text-slate-800 bg-white rounded-xl border-2 border-[#173A7C] focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20"
-                              />
-                              <button
-                                type="button"
-                                onClick={handleAddNewInstructor}
-                                className="px-3.5 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs font-black transition-all cursor-pointer shrink-0 shadow-xs"
-                              >
-                                Ø¥Ø¶Ø§ÙØ©
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setIsAddingNewInstructor(false)}
-                                className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-all cursor-pointer shrink-0"
-                                title="Ø¥Ù„ØºØ§Ø¡"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
-                          ) : (
-                            <select
-                              value={formTrainer}
-                              onChange={(e) => {
-                                if (e.target.value === '__add_new__') {
-                                  setIsAddingNewInstructor(true);
-                                } else {
-                                  setFormTrainer(e.target.value);
-                                }
-                              }}
-                              className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C] cursor-pointer"
-                            >
-                              {instructorsList.map((tName) => (
-                                <option key={tName} value={tName}>
-                                  {tName}
-                                </option>
-                              ))}
-                              <option value="__add_new__" className="text-[#173A7C] font-black bg-blue-50">
-                                Ø¥Ø¶Ø§ÙØ© Ù…Ø¯Ø±Ø¨ / Ù…Ø­Ø§Ø¶Ø± Ø¬Ø¯ÙŠØ¯...
-                              </option>
-                            </select>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs font-black text-slate-700 mb-1.5">Ø±Ø³ÙˆÙ… Ø§Ù„Ø¯ÙˆØ±Ø© (Ø±.Ø³)</label>
-                          <input
-                            type="number"
-                            value={formPrice}
-                            onChange={(e) => setFormPrice(e.target.value)}
-                            placeholder="0 Ù„Ù„Ø¯ÙˆØ±Ø§Øª Ø§Ù„Ù…Ø¬Ø§Ù†ÙŠØ©"
-                            className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-black text-slate-700 mb-1.5">Ø¹Ø¯Ø¯ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ø¹ØªÙ…Ø¯Ø©</label>
-                          <input
-                            type="number"
-                            value={formHours}
-                            onChange={(e) => setFormHours(e.target.value)}
-                            placeholder="Ø¹Ø¯Ø¯ Ø§Ù„Ø³Ø§Ø¹Ø§Øª (Ù…Ø«Ø§Ù„: 30)"
-                            className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-black text-slate-700 mb-1.5">Ù†Ø¨Ø°Ø© ÙˆÙˆØµÙ Ø§Ù„Ø¯ÙˆØ±Ø©</label>
-                        <textarea
-                          rows={3}
-                          value={formDescription}
-                          onChange={(e) => setFormDescription(e.target.value)}
-                          placeholder="Ø§ÙƒØªØ¨ ÙˆØµÙØ§Ù‹ Ù…ÙØµÙ„Ø§Ù‹ ÙŠÙˆØ¶Ø­ Ø£Ù‡Ø¯Ø§Ù Ø§Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬ ÙˆØ§Ù„Ù…Ø®Ø±Ø¬Ø§Øª Ø§Ù„ØªØ¹Ù„ÙŠÙ…ÙŠØ©..."
-                          className="w-full px-4 py-2.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-                {/* TAB 2: CURRICULUM WITH SECTIONS & SUB-LESSONS STUDIO */}
-                {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-                {modalActiveTab === 'curriculum' && (
-                  <div className="space-y-6 animate-fade-in-up">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                      <div>
-                        <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                          <Layers className="w-4 h-4 text-[#173A7C]" />
-                          <span>Ø§Ù„ÙˆØ­Ø¯Ø§Øª ÙˆØ§Ù„Ù…Ù‚Ø§Ø·Ø¹ Ø§Ù„ÙØ±Ø¹ÙŠØ© Ù„Ù„Ù…Ù†Ù‡Ø¬ Ø§Ù„ØªØ¯Ø±ÙŠØ¨ÙŠ</span>
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-blue-100 text-[#173A7C] font-black">
-                            {formSections.length} ÙˆØ­Ø¯Ø§Øª
-                          </span>
-                        </h4>
-                        <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                          ÙŠÙ…ÙƒÙ†Ùƒ Ø¥Ø¶Ø§ÙØ© Ø¹Ø¯Ø© Ù…Ù‚Ø§Ø·Ø¹ ÙˆÙÙŠØ¯ÙŠÙˆÙ‡Ø§Øª ÙˆÙ…Ù„ÙØ§Øª PDF ÙØ±Ø¹ÙŠØ© Ø¯Ø§Ø®Ù„ ÙƒÙ„ ÙˆØ­Ø¯Ø© ØªØ¹Ù„ÙŠÙ…ÙŠØ© ðŸŽ¬
-                        </p>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={handleAddSection}
-                        className="px-4 py-2 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs font-black flex items-center gap-1.5 shadow-xs transition-all cursor-pointer self-start sm:self-auto"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>Ø¥Ø¶Ø§ÙØ© ÙˆØ­Ø¯Ø© ØªØ¹Ù„ÙŠÙ…ÙŠØ© Ø¬Ø¯ÙŠØ¯Ø©</span>
-                      </button>
-                    </div>
-
-                    {/* Sections Container */}
-                    <div className="space-y-5">
-                      {formSections.map((sec, secIdx) => (
-                        <div
-                          key={sec.id || secIdx}
-                          className="p-5 rounded-2xl bg-slate-50 border-2 border-slate-200/90 shadow-xs space-y-4 transition-all hover:border-blue-300"
-                        >
-                          {/* Section Card Header */}
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3 bg-white p-3 rounded-xl">
-                            <div className="flex items-center gap-2.5 flex-1">
-                              <span className="w-7 h-7 rounded-lg bg-[#173A7C] text-white font-black text-xs flex items-center justify-center shadow-xs">
-                                {secIdx + 1}
-                              </span>
-                              <div className="flex-1">
-                                <label className="block text-[10px] font-black text-slate-500 mb-0.5">
-                                  Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ÙˆØ­Ø¯Ø© / Ø§Ù„Ø¯Ø±Ø³ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ *
-                                </label>
-                                <input
-                                  type="text"
-                                  required
-                                  value={sec.title}
-                                  onChange={(e) => handleUpdateSection(secIdx, 'title', e.target.value)}
-                                  placeholder="Ù…Ø«Ø§Ù„: Ø§Ù„ÙˆØ­Ø¯Ø© Ø§Ù„Ø£ÙˆÙ„Ù‰: Ø£Ø³Ø§Ø³ÙŠØ§Øª Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ"
-                                  className="w-full px-3 py-1.5 text-xs font-black text-slate-800 bg-slate-50 rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C] focus:bg-white"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                              <div className="w-28">
-                                <label className="block text-[10px] font-black text-slate-500 mb-0.5">Ø§Ù„Ù…Ø¯Ø©</label>
-                                <input
-                                  type="text"
-                                  value={sec.duration}
-                                  onChange={(e) => handleUpdateSection(secIdx, 'duration', e.target.value)}
-                                  placeholder="45 Ø¯Ù‚ÙŠÙ‚Ø©"
-                                  className="w-full px-2.5 py-1.5 text-xs font-bold text-slate-800 bg-slate-50 rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                                />
-                              </div>
-
-                              <label className="flex items-center gap-1 text-[11px] font-bold text-slate-600 cursor-pointer pt-3">
-                                <input
-                                  type="checkbox"
-                                  checked={!sec.isLocked}
-                                  onChange={(e) => handleUpdateSection(secIdx, 'isLocked', !e.target.checked)}
-                                  className="w-3.5 h-3.5 text-[#173A7C] rounded cursor-pointer"
-                                />
-                                <span>Ù…Ø¹Ø§ÙŠÙ†Ø© Ù…Ø¬Ø§Ù†ÙŠØ©</span>
-                              </label>
-
-                              {formSections.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveSection(secIdx)}
-                                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer mt-3"
-                                  title="Ø­Ø°Ù Ù‡Ø°Ù‡ Ø§Ù„ÙˆØ­Ø¯Ø© Ø¨Ø§Ù„ÙƒØ§Ù…Ù„"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Section Attachment (Optional PDF summary for whole module) */}
-                          <div className="flex items-center justify-between gap-2 px-3 py-2 bg-white/70 rounded-xl border border-slate-200 text-xs">
-                            <div className="flex items-center gap-2">
-                              <Paperclip className="w-3.5 h-3.5 text-blue-600" />
-                              <span className="font-bold text-slate-700">Ù…Ù„Ø­Ù‚ Ø§Ù„ÙˆØ­Ø¯Ø© (PDF / ÙˆÙˆØ±Ø¯):</span>
-                              {sec.fileName ? (
-                                <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-mono text-[11px] border border-emerald-200 flex items-center gap-1">
-                                  <FileCheck className="w-3 h-3" />
-                                  <span>{sec.fileName} ({sec.fileSize || 'PDF'})</span>
-                                </span>
-                              ) : (
-                                <span className="text-[11px] text-slate-400">Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ù„Ø­Ù‚ Ø­Ø§Ù„ÙŠØ§Ù‹</span>
-                              )}
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => triggerAttachmentUploadForTarget(secIdx)}
-                                disabled={isUploadingAttachment}
-                                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-[#173A7C] font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
-                              >
-                                {uploadingAttachmentTarget?.secIdx === secIdx && uploadingAttachmentTarget?.subIdx === undefined ? (
-                                  <>
-                                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#173A7C]" />
-                                    <span>Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø±ÙØ¹ {attachmentUploadProgress}%</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <UploadCloud className="w-3.5 h-3.5" />
-                                    <span>{sec.fileName ? 'ØªØºÙŠÙŠØ± Ø§Ù„Ù…Ù„Ù' : 'Ø¥Ø±ÙØ§Ù‚ Ù…Ù„Ù PDF Ù„Ù„ÙˆØ­Ø¯Ø©'}</span>
-                                  </>
-                                )}
-                              </button>
-
-                              {sec.fileName && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    handleUpdateSection(secIdx, 'fileUrl', undefined);
-                                    handleUpdateSection(secIdx, 'fileName', undefined);
-                                  }}
-                                  className="text-rose-500 hover:text-rose-700 text-[10px] font-bold"
-                                >
-                                  Ø¥Ù„ØºØ§Ø¡
-                                </button>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Progress bar for module attachment */}
-                          {uploadingAttachmentTarget?.secIdx === secIdx && uploadingAttachmentTarget?.subIdx === undefined && (
-                            <div className="w-full space-y-1 p-2 bg-blue-50 rounded-xl border border-blue-200">
-                              <div className="flex items-center justify-between text-[11px] font-bold text-[#173A7C]">
-                                <span>Ø¬Ø§Ø±ÙŠ Ø±ÙØ¹ ÙˆÙ…Ø¹Ø§Ù„Ø¬Ø© Ù…Ù„Ø­Ù‚ Ø§Ù„ÙˆØ­Ø¯Ø© (PDF / Word)...</span>
-                                <span className="font-mono">{attachmentUploadProgress}%</span>
-                              </div>
-                              <div className="w-full bg-blue-100 rounded-full h-1.5 overflow-hidden">
-                                <div
-                                  className="bg-gradient-to-r from-[#173A7C] to-emerald-500 h-full rounded-full transition-all duration-300"
-                                  style={{ width: `${attachmentUploadProgress}%` }}
-                                />
-                              </div>
-                            </div>
-                          )}
-
-                          {/* â”€â”€ SUB-ITEMS / SUB-LESSONS LIST â”€â”€ */}
-                          <div className="space-y-3 bg-white p-4 rounded-xl border border-blue-100 shadow-2xs">
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                              <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
-                                <Video className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>Ø§Ù„Ù…Ù‚Ø§Ø·Ø¹ ÙˆØ§Ù„Ù…Ø­Ø§Ø¶Ø±Ø§Øª Ø§Ù„ÙØ±Ø¹ÙŠØ© Ø¯Ø§Ø®Ù„ Ù‡Ø°Ø§ Ø§Ù„Ø¯Ø±Ø³ ({sec.subItems?.length || 0})</span>
-                              </span>
-                              <span className="text-[10px] text-slate-400 font-medium">
-                                ÙŠÙ…ÙƒÙ†Ùƒ Ø¥Ø¶Ø§ÙØ© Ø¹Ø¯Ø© ÙÙŠØ¯ÙŠÙˆÙ‡Ø§Øª Ø£Ùˆ Ù…Ù„ÙØ§Øª Ù„Ù„Ù…Ø­Ø§Ø¶Ø±Ø© Ø§Ù„ÙˆØ§Ø­Ø¯Ø©
-                              </span>
-                            </div>
-
-                            <div className="space-y-3">
-                              {sec.subItems?.map((sub, subIdx) => (
-                                <div
-                                  key={sub.id || subIdx}
-                                  className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3 transition-all hover:border-slate-300"
-                                >
-                                  {/* Sub-Item Top Bar */}
-                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-2">
-                                    <div className="flex items-center gap-2 flex-1">
-                                      <span className="w-5 h-5 rounded-md bg-blue-100 text-[#173A7C] font-black text-[10px] flex items-center justify-center">
-                                        {secIdx + 1}.{subIdx + 1}
-                                      </span>
-                                      <input
-                                        type="text"
-                                        required
-                                        value={sub.title}
-                                        onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'title', e.target.value)}
-                                        placeholder="Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù…Ù‚Ø·Ø¹ Ø£Ùˆ Ø§Ù„Ù…Ø­Ø§Ø¶Ø±Ø© Ø§Ù„ÙØ±Ø¹ÙŠØ©..."
-                                        className="flex-1 px-3 py-1 text-xs font-bold text-slate-800 bg-white rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                                      />
-                                    </div>
-
-                                    <div className="flex items-center gap-2 shrink-0">
-                                      {/* Type Selector */}
-                                      <select
-                                        value={sub.type}
-                                        onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'type', e.target.value)}
-                                        className="px-2 py-1 text-[11px] font-bold bg-white text-slate-700 rounded-lg border border-slate-200"
-                                      >
-                                        <option value="video">ðŸŽ¬ ÙÙŠØ¯ÙŠÙˆ</option>
-                                        <option value="pdf">ðŸ“„ Ù…Ù„Ù PDF / ÙˆÙˆØ±Ø¯</option>
-                                        <option value="quiz">â“ Ø§Ø®ØªØ¨Ø§Ø± / ÙƒÙˆÙŠØ²</option>
-                                      </select>
-
-                                      <div className="w-24">
-                                        <input
-                                          type="text"
-                                          value={sub.duration}
-                                          onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'duration', e.target.value)}
-                                          placeholder="15 Ø¯Ù‚ÙŠÙ‚Ø©"
-                                          className="w-full px-2 py-1 text-[11px] font-bold text-slate-700 bg-white rounded-lg border border-slate-200"
-                                          title="ÙŠØªÙ… Ø§Ø­ØªØ³Ø§Ø¨ Ø§Ù„Ù…Ø¯Ø© ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ ÙÙˆØ± Ø±ÙØ¹ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ Ø£Ùˆ ÙŠÙ…ÙƒÙ†Ùƒ ØªØ¹Ø¯ÙŠÙ„Ù‡Ø§"
-                                        />
-                                      </div>
-
-                                      {sec.subItems.length > 1 && (
-                                        <button
-                                          type="button"
-                                          onClick={() => handleRemoveSubItem(secIdx, subIdx)}
-                                          className="p-1 text-slate-400 hover:text-rose-600 rounded cursor-pointer"
-                                          title="Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„Ù…Ù‚Ø·Ø¹ Ø§Ù„ÙØ±Ø¹ÙŠ"
-                                        >
-                                          <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  {/* Sub-Item Content By Type */}
-                                  {sub.type === 'video' && (
-                                    <div>
-                                      <div className="flex items-center gap-2">
-                                        <input
-                                          type="text"
-                                          value={sub.videoUrl}
-                                          onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'videoUrl', e.target.value)}
-                                          placeholder="Ù…Ø¹Ø±Ù ÙÙŠØ¯ÙŠÙˆ Bunny Stream (GUID) Ø£Ùˆ Ø±Ø§Ø¨Ø· Ø§Ù„ÙÙŠØ¯ÙŠÙˆ Ø§Ù„Ù…Ø¹ØªÙ…Ø¯..."
-                                          className="flex-1 px-3 py-1.5 text-xs font-mono text-slate-800 bg-white rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                                        />
-
-                                        <button
-                                          type="button"
-                                          onClick={() => triggerVideoUpload(secIdx, subIdx)}
-                                          disabled={uploadingTarget?.secIdx === secIdx && uploadingTarget?.subIdx === subIdx}
-                                          className="px-3 py-1.5 rounded-lg bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shrink-0 disabled:opacity-50"
-                                        >
-                                          {uploadingTarget?.secIdx === secIdx && uploadingTarget?.subIdx === subIdx ? (
-                                            <>
-                                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                              <span>{lessonUploadProgress}%</span>
-                                            </>
-                                          ) : (
-                                            <>
-                                              <UploadCloud className="w-3.5 h-3.5" />
-                                              <span>Ø±ÙØ¹ ÙÙŠØ¯ÙŠÙˆ Bunny</span>
-                                            </>
-                                          )}
-                                        </button>
-                                      </div>
-
-                                      {/* Upload Progress */}
-                                      {uploadingTarget?.secIdx === secIdx && uploadingTarget?.subIdx === subIdx && (
-                                        <div className="w-full bg-slate-200 rounded-full h-1.5 mt-2 overflow-hidden">
-                                          <div
-                                            className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300"
-                                            style={{ width: `${lessonUploadProgress}%` }}
-                                          />
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {sub.type === 'pdf' && (
-                                    <div className="flex flex-col gap-2 p-2.5 bg-white rounded-lg border border-slate-200 text-xs">
-                                      <div className="flex items-center justify-between gap-2">
-                                        <div className="flex items-center gap-2 min-w-0">
-                                          <FileText className="w-4 h-4 text-blue-600 shrink-0" />
-                                          <div className="min-w-0">
-                                            <span className="font-bold text-slate-800 truncate block">
-                                              {sub.fileName || 'Ù…Ù„Ù PDF / Word ØºÙŠØ± Ù…Ø±ÙÙˆØ¹'}
-                                            </span>
-                                            <span className="text-[10px] text-slate-400 font-mono">
-                                              {sub.fileSize || 'Ù…Ù„Ù Ù…Ø³ØªÙ†Ø¯'}
-                                            </span>
-                                          </div>
-                                        </div>
-
-                                        <button
-                                          type="button"
-                                          onClick={() => triggerAttachmentUploadForTarget(secIdx, subIdx)}
-                                          disabled={isUploadingAttachment}
-                                          className="px-3 py-1.5 rounded-lg bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-all disabled:opacity-50 shrink-0 shadow-xs"
-                                        >
-                                          {uploadingAttachmentTarget?.secIdx === secIdx && uploadingAttachmentTarget?.subIdx === subIdx ? (
-                                            <>
-                                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                              <span>Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø±ÙØ¹ {attachmentUploadProgress}%</span>
-                                            </>
-                                          ) : (
-                                            <>
-                                              <UploadCloud className="w-3.5 h-3.5" />
-                                              <span>{sub.fileUrl ? 'ØªØºÙŠÙŠØ± Ø§Ù„Ù…Ù„Ù' : 'Ø±ÙØ¹ Ù…Ù„Ù PDF/Word'}</span>
-                                            </>
-                                          )}
-                                        </button>
-                                      </div>
-
-                                      {/* Animated Progress Bar for Sub-Item Document */}
-                                      {uploadingAttachmentTarget?.secIdx === secIdx && uploadingAttachmentTarget?.subIdx === subIdx && (
-                                        <div className="w-full space-y-1 pt-1">
-                                          <div className="flex items-center justify-between text-[11px] font-bold text-blue-700">
-                                            <span>Ø¬Ø§Ø±ÙŠ Ø±ÙØ¹ ÙˆÙ…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„Ù…Ø³ØªÙ†Ø¯...</span>
-                                            <span className="font-mono">{attachmentUploadProgress}%</span>
-                                          </div>
-                                          <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden border border-slate-200">
-                                            <div
-                                              className="bg-gradient-to-r from-blue-600 to-emerald-500 h-full rounded-full transition-all duration-300"
-                                              style={{ width: `${attachmentUploadProgress}%` }}
-                                            />
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {sub.type === 'quiz' && (
-                                    <div className="p-3 bg-amber-50/70 rounded-lg border border-amber-200/80 space-y-2">
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                                          <HelpCircle className="w-4 h-4 text-amber-600" />
-                                          <span>Ø£Ø³Ø¦Ù„Ø© ÙƒÙˆÙŠØ² Ø§Ù„ÙˆØ­Ø¯Ø© ({sub.quizData?.questions?.length || 0} Ø£Ø³Ø¦Ù„Ø©)</span>
-                                        </span>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const currentQuestions = sub.quizData?.questions || [];
-                                            const nextQ: QuizQuestion = {
-                                              id: `q-${Date.now()}-${currentQuestions.length + 1}`,
-                                              question: `Ø§Ù„Ø³Ø¤Ø§Ù„ ${currentQuestions.length + 1}: `,
-                                              options: ['Ø§Ù„Ø®ÙŠØ§Ø± 1 (Ø§Ù„ØµØ­ÙŠØ­)', 'Ø§Ù„Ø®ÙŠØ§Ø± 2', 'Ø§Ù„Ø®ÙŠØ§Ø± 3', 'Ø§Ù„Ø®ÙŠØ§Ø± 4'],
-                                              correctIndex: 0,
-                                              explanation: 'Ø´Ø±Ø­ Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø© Ø§Ù„ØµØ­ÙŠØ­Ø©.',
-                                            };
-                                            handleUpdateSubItem(secIdx, subIdx, 'quizData', {
-                                              title: `Ø§Ø®ØªØ¨Ø§Ø± ${sub.title}`,
-                                              passingScore: 70,
-                                              questions: [...currentQuestions, nextQ],
-                                            });
-                                          }}
-                                          className="text-[11px] font-bold text-[#173A7C] hover:underline cursor-pointer flex items-center gap-1"
-                                        >
-                                          <Plus className="w-3 h-3" />
-                                          <span>Ø¥Ø¶Ø§ÙØ© Ø³Ø¤Ø§Ù„ Ù„Ù„ÙƒÙˆÙŠØ²</span>
-                                        </button>
-                                      </div>
-
-                                      {sub.quizData?.questions?.map((q, qIdx) => (
-                                        <div key={q.id || qIdx} className="p-2.5 bg-white rounded border border-amber-100 space-y-1.5 text-xs">
-                                          <div className="flex items-center justify-between">
-                                            <span className="font-bold text-slate-800">Ø§Ù„Ø³Ø¤Ø§Ù„ #{qIdx + 1}</span>
-                                            {sub.quizData!.questions.length > 1 && (
-                                              <button
-                                                type="button"
-                                                onClick={() => {
-                                                  const filtered = sub.quizData!.questions.filter((_, idx) => idx !== qIdx);
-                                                  handleUpdateSubItem(secIdx, subIdx, 'quizData', {
-                                                    ...sub.quizData,
-                                                    questions: filtered,
-                                                  });
-                                                }}
-                                                className="text-rose-500 hover:text-rose-700 text-[10px] font-bold"
-                                              >
-                                                Ø­Ø°Ù
-                                              </button>
-                                            )}
-                                          </div>
-                                          <input
-                                            type="text"
-                                            value={q.question}
-                                            onChange={(e) => {
-                                              const updated = [...sub.quizData!.questions];
-                                              updated[qIdx].question = e.target.value;
-                                              handleUpdateSubItem(secIdx, subIdx, 'quizData', {
-                                                ...sub.quizData,
-                                                questions: updated,
-                                              });
-                                            }}
-                                            placeholder="Ù†Øµ Ø§Ù„Ø³Ø¤Ø§Ù„..."
-                                            className="w-full px-2 py-1 text-xs font-bold bg-slate-50 border border-slate-200 rounded"
-                                          />
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-
-                            {/* Add Sub-Item Actions */}
-                            <div className="pt-2 flex flex-wrap items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleAddSubItemToSection(secIdx, 'video')}
-                                className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#173A7C] font-black text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-blue-200"
-                              >
-                                <PlusCircle className="w-3.5 h-3.5 text-blue-600" />
-                                <span>Ø¥Ø¶Ø§ÙØ© Ù…Ù‚Ø·Ø¹ / ÙÙŠØ¯ÙŠÙˆ ÙØ±Ø¹ÙŠ</span>
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleAddSubItemToSection(secIdx, 'pdf')}
-                                className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-emerald-200"
-                              >
-                                <FilePlus className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>Ù…Ù„Ù PDF ÙØ±Ø¹ÙŠ</span>
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleAddSubItemToSection(secIdx, 'quiz')}
-                                className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-amber-200"
-                              >
-                                <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
-                                <span>ÙƒÙˆÙŠØ² Ù„Ù„ÙˆØ­Ø¯Ø©</span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-                {/* TAB 3: ATTACHMENTS & RESOURCES BAG */}
-                {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-                {modalActiveTab === 'attachments' && (
-                  <div className="space-y-6 animate-fade-in-up">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                      <div>
-                        <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                          <Paperclip className="w-4 h-4 text-[#173A7C]" />
-                          <span>Ø§Ù„Ø­Ù‚ÙŠØ¨Ø© Ø§Ù„ØªØ¯Ø±ÙŠØ¨ÙŠØ© ÙˆÙ…Ù„ÙØ§Øª Ø§Ù„Ø¯ÙˆØ±Ø© Ø§Ù„Ù…Ø±ÙÙ‚Ø© (PDF / Word / ZIP)</span>
-                        </h4>
-                        <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                          Ø§Ù„Ù…Ù„ÙØ§Øª Ø§Ù„Ù…Ø±ÙÙˆØ¹Ø© Ù‡Ù†Ø§ Ø³ØªÙƒÙˆÙ† Ù…ØªØ§Ø­Ø© Ù„Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø·Ù„Ø§Ø¨ Ø§Ù„Ù…Ø³Ø¬Ù„ÙŠÙ† Ø¨Ø§Ù„Ø¯ÙˆØ±Ø© ÙÙŠ ØªØ¨ÙˆÙŠØ¨ Ø§Ù„Ù…Ø±ÙÙ‚Ø§Øª ðŸ“„
-                        </p>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => attachmentFileInputRef.current?.click()}
-                        disabled={isUploadingAttachment}
-                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black flex items-center gap-1.5 shadow-xs transition-all cursor-pointer self-start sm:self-auto"
-                      >
-                        {isUploadingAttachment ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Ø¬Ø§Ø±ÙŠ Ø±ÙØ¹ Ø§Ù„Ù…Ù„Ù...</span>
-                          </>
-                        ) : (
-                          <>
-                            <UploadCloud className="w-4 h-4" />
-                            <span>Ø±ÙØ¹ Ù…Ù„Ù Ø¬Ø¯ÙŠØ¯ Ù„Ù„Ø­Ù‚ÙŠØ¨Ø© (PDF/Word)</span>
-                          </>
-                        )}
-                      </button>
-                      <input
-                        ref={attachmentFileInputRef}
-                        type="file"
-                        accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.rar"
-                        onChange={handleCourseBagAttachmentUpload}
-                        className="hidden"
-                      />
-                    </div>
-
-                    {formAttachments.length === 0 ? (
-                      <div className="p-8 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 text-center space-y-3">
-                        <FolderOpen className="w-10 h-10 text-slate-400 mx-auto" />
-                        <div className="text-xs font-black text-slate-700">Ù„Ù… ÙŠØªÙ… Ø±ÙØ¹ Ù…Ù„ÙØ§Øª Ù„Ø­Ù‚ÙŠØ¨Ø© Ù‡Ø°Ù‡ Ø§Ù„Ø¯ÙˆØ±Ø© Ø¨Ø¹Ø¯</div>
-                        <p className="text-[11px] text-slate-400 max-w-md mx-auto">
-                          Ø§Ø¶ØºØ· Ø¹Ù„Ù‰ Ø²Ø± Ø§Ù„Ø±ÙØ¹ Ø£Ø¹Ù„Ø§Ù‡ Ù„Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ø­Ù‚ÙŠØ¨Ø© Ø§Ù„ØªØ¯Ø±ÙŠØ¨ÙŠØ©ØŒ Ø§Ù„ÙƒØªØ¨ Ø§Ù„Ù…Ø¹ØªÙ…Ø¯Ø©ØŒ Ø£Ùˆ Ø£ÙˆØ±Ø§Ù‚ Ø§Ù„Ø¹Ù…Ù„ Ø¨ØªÙ†Ø³ÙŠÙ‚ PDF Ø£Ùˆ Word.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {formAttachments.map((att, idx) => (
-                          <div
-                            key={att.id || idx}
-                            className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 hover:border-slate-300 transition-all"
-                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#173A7C] flex items-center justify-center shrink-0">
-                                <FileText className="w-5 h-5" />
-                              </div>
-                              <div className="min-w-0">
-                                <input
-                                  type="text"
-                                  value={att.title}
-                                  onChange={(e) => {
-                                    const updated = [...formAttachments];
-                                    updated[idx].title = e.target.value;
-                                    setFormAttachments(updated);
-                                  }}
-                                  className="text-xs font-black text-slate-900 bg-white px-2 py-1 rounded border border-slate-200 focus:outline-none focus:border-[#173A7C] w-full max-w-sm"
-                                  placeholder="Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù…Ù„Ù Ø§Ù„Ù…Ø±ÙÙ‚"
-                                />
-                                <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono mt-1">
-                                  <span>{att.fileSize}</span>
-                                  <span>â€¢</span>
-                                  <span className="uppercase">{att.fileType}</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                              <a
-                                href={att.fileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 rounded-xl bg-white hover:bg-blue-50 text-[#173A7C] border border-slate-200 text-xs font-bold flex items-center gap-1 transition-colors"
-                              >
-                                <Download className="w-3.5 h-3.5" />
-                                <span>ØªØ­Ù…ÙŠÙ„</span>
-                              </a>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveAttachmentFromBag(att.id)}
-                                className="p-2 rounded-xl bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 border border-slate-200 transition-colors cursor-pointer"
-                                title="Ø­Ø°Ù Ø§Ù„Ù…Ù„Ù"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-                {/* TAB 4: FINAL COURSE EXAM BUILDER */}
-                {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-                {modalActiveTab === 'exam' && (
-                  <div className="space-y-6 animate-fade-in-up">
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-                      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
-                            <Award className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="text-xs font-black text-slate-800">Ø§Ù„Ø§Ø®ØªØ¨Ø§Ø± Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ Ø§Ù„Ø´Ø§Ù…Ù„ Ù„Ù„Ø¯ÙˆØ±Ø©</h4>
-                            <p className="text-[10px] text-slate-500 font-medium">
-                              ÙŠØ¤Ø¯ÙŠ Ø§Ù„Ù…ØªØ¯Ø±Ø¨ Ø§Ù„Ø§Ø®ØªØ¨Ø§Ø± ÙˆØªØµØ¯Ø± Ø§Ù„Ø´Ù‡Ø§Ø¯Ø© Ø§Ù„Ù…Ø¹ØªÙ…Ø¯Ø© ÙÙˆØ± Ø§Ø¬ØªÙŠØ§Ø²Ù‡ Ø¨Ù†Ø¬Ø§Ø­
-                            </p>
-                          </div>
-                        </div>
-
-                        <label className="flex items-center gap-2 text-xs font-black text-slate-800 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={hasFinalExam}
-                            onChange={(e) => setHasFinalExam(e.target.checked)}
-                            className="w-4 h-4 text-[#173A7C] rounded cursor-pointer"
-                          />
-                          <span>ØªÙØ¹ÙŠÙ„ Ø§Ù„Ø§Ø®ØªØ¨Ø§Ø± Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ Ù„Ù„Ø¯ÙˆØ±Ø©</span>
-                        </label>
-                      </div>
-
-                      {hasFinalExam && (
-                        <div className="space-y-5">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-xs font-black text-slate-700 mb-1">Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ø§Ø®ØªØ¨Ø§Ø±</label>
-                              <input
-                                type="text"
-                                value={formFinalExam.title}
-                                onChange={(e) => setFormFinalExam({ ...formFinalExam, title: e.target.value })}
-                                placeholder="Ù…Ø«Ø§Ù„: Ø§Ù„Ø§Ø®ØªØ¨Ø§Ø± Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ Ù„Ù„Ø¨Ø±Ù†Ø§Ù…Ø¬ Ø§Ù„ØªØ¯Ø±ÙŠØ¨ÙŠ"
-                                className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-xs font-black text-slate-700 mb-1">Ù†Ø³Ø¨Ø© Ø§Ù„Ù†Ø¬Ø§Ø­ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© (%)</label>
-                              <input
-                                type="number"
-                                min={50}
-                                max={100}
-                                value={formFinalExam.passingScore || 70}
-                                onChange={(e) => setFormFinalExam({ ...formFinalExam, passingScore: parseInt(e.target.value, 10) || 70 })}
-                                placeholder="70"
-                                className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Questions List */}
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <h5 className="text-xs font-black text-slate-800">
-                                Ø¨Ù†Ùƒ Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø§Ø®ØªØ¨Ø§Ø± ({formFinalExam.questions?.length || 0} Ø£Ø³Ø¦Ù„Ø©)
-                              </h5>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const nextQNum = (formFinalExam.questions?.length || 0) + 1;
-                                  setFormFinalExam({
-                                    ...formFinalExam,
-                                    questions: [
-                                      ...(formFinalExam.questions || []),
-                                      {
-                                        id: `q-${Date.now()}-${nextQNum}`,
-                                        question: `Ø§Ù„Ø³Ø¤Ø§Ù„ ${nextQNum}: `,
-                                        options: ['Ø§Ù„Ø®ÙŠØ§Ø± Ø£ (Ø§Ù„ØµØ­ÙŠØ­)', 'Ø§Ù„Ø®ÙŠØ§Ø± Ø¨', 'Ø§Ù„Ø®ÙŠØ§Ø± Ø¬', 'Ø§Ù„Ø®ÙŠØ§Ø± Ø¯'],
-                                        correctIndex: 0,
-                                        explanation: 'ØªÙˆØ¶ÙŠØ­ Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø© Ø§Ù„ØµØ­ÙŠØ­Ø©.',
-                                      },
-                                    ],
-                                  });
-                                }}
-                                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs flex items-center gap-1 cursor-pointer"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>Ø¥Ø¶Ø§ÙØ© Ø³Ø¤Ø§Ù„ Ø¬Ø¯ÙŠØ¯</span>
-                              </button>
-                            </div>
-
-                            {formFinalExam.questions?.map((q, qIdx) => (
-                              <div
-                                key={q.id || qIdx}
-                                className="p-4 rounded-xl bg-white border border-slate-200 space-y-3 shadow-2xs"
-                              >
-                                <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
-                                  <span className="text-xs font-black text-[#173A7C]">Ø§Ù„Ø³Ø¤Ø§Ù„ #{qIdx + 1}</span>
-                                  {formFinalExam.questions.length > 1 && (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setFormFinalExam({
-                                          ...formFinalExam,
-                                          questions: formFinalExam.questions.filter((_, idx) => idx !== qIdx),
-                                        });
-                                      }}
-                                      className="p-1 text-slate-400 hover:text-rose-600 rounded cursor-pointer"
-                                      title="Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„Ø³Ø¤Ø§Ù„"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                  )}
-                                </div>
-
-                                <div>
-                                  <label className="block text-[11px] font-black text-slate-600 mb-1">Ù†Øµ Ø§Ù„Ø³Ø¤Ø§Ù„ *</label>
-                                  <input
-                                    type="text"
-                                    required
-                                    value={q.question}
-                                    onChange={(e) => {
-                                      const updated = [...formFinalExam.questions];
-                                      updated[qIdx].question = e.target.value;
-                                      setFormFinalExam({ ...formFinalExam, questions: updated });
-                                    }}
-                                    placeholder="Ø§ÙƒØªØ¨ Ù†Øµ Ø§Ù„Ø³Ø¤Ø§Ù„ Ù‡Ù†Ø§..."
-                                    className="w-full px-3 py-2 text-xs font-bold text-slate-800 bg-slate-50 rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                                  />
-                                </div>
-
-                                <div className="space-y-2">
-                                  <label className="block text-[11px] font-black text-slate-600">
-                                    Ø®ÙŠØ§Ø±Ø§Øª Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø© (Ø­Ø¯Ø¯ Ø§Ù„Ø¯Ø§Ø¦Ø±Ø© Ø¨Ø¬Ø§Ù†Ø¨ Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø© Ø§Ù„ØµØ­ÙŠØ­Ø©):
-                                  </label>
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {q.options.map((opt, optIdx) => (
-                                      <div
-                                        key={optIdx}
-                                        className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
-                                          q.correctIndex === optIdx
-                                            ? 'bg-emerald-50/70 border-emerald-300'
-                                            : 'bg-slate-50 border-slate-200'
-                                        }`}
-                                      >
-                                        <input
-                                          type="radio"
-                                          name={`q-${qIdx}-correct`}
-                                          checked={q.correctIndex === optIdx}
-                                          onChange={() => {
-                                            const updated = [...formFinalExam.questions];
-                                            updated[qIdx].correctIndex = optIdx;
-                                            setFormFinalExam({ ...formFinalExam, questions: updated });
-                                          }}
-                                          className="w-4 h-4 text-emerald-600 cursor-pointer"
-                                        />
-                                        <input
-                                          type="text"
-                                          value={opt}
-                                          onChange={(e) => {
-                                            const updated = [...formFinalExam.questions];
-                                            updated[qIdx].options[optIdx] = e.target.value;
-                                            setFormFinalExam({ ...formFinalExam, questions: updated });
-                                          }}
-                                          placeholder={`Ø§Ù„Ø®ÙŠØ§Ø± ${optIdx + 1}`}
-                                          className="flex-1 px-2 py-1 text-xs font-bold text-slate-800 bg-white rounded border border-slate-200"
-                                        />
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Modal Footer Controls */}
-                <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs transition-colors cursor-pointer"
-                  >
-                    Ø¥Ù„ØºØ§Ø¡
-                  </button>
-
-                  <div className="flex items-center gap-2">
-                    {modalActiveTab !== 'basic' && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (modalActiveTab === 'exam') setModalActiveTab('attachments');
-                          else if (modalActiveTab === 'attachments') setModalActiveTab('curriculum');
-                          else if (modalActiveTab === 'curriculum') setModalActiveTab('basic');
-                        }}
-                        className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer"
-                      >
-                        Ø§Ù„Ø³Ø§Ø¨Ù‚
-                      </button>
-                    )}
-
-                    {modalActiveTab !== 'exam' && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (modalActiveTab === 'basic') setModalActiveTab('curriculum');
-                          else if (modalActiveTab === 'curriculum') setModalActiveTab('attachments');
-                          else if (modalActiveTab === 'attachments') setModalActiveTab('exam');
-                        }}
-                        className="px-4 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs cursor-pointer"
-                      >
-                        Ø§Ù„ØªØ§Ù„ÙŠ âž”
-                      </button>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="px-7 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-black text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø­ÙØ¸ ÙˆØ§Ù„Ù…Ø²Ø§Ù…Ù†Ø© Ø§Ù„Ø³Ø­Ø§Ø¨ÙŠØ©...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Check className="w-4 h-4" />
-                          <span>{editingCourse ? 'Ø­ÙØ¸ ÙˆØªØ­Ø¯ÙŠØ« ÙƒØ§Ù…Ù„ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„Ø§Øª âš¡' : 'Ù†Ø´Ø± Ø§Ù„Ø¯ÙˆØ±Ø© Ù…Ø¹ Ø§Ù„Ù…Ù†Ù‡Ø¬ ÙˆØ§Ù„Ù…Ø±ÙÙ‚Ø§Øª ðŸš€'}</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-      {/* 2. STANDALONE MEDIA & LESSONS STUDIO MODAL */}
-      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-      <AnimatePresence>
-        {selectedCourseForLessons && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]"
-            >
-              {/* Modal Header */}
-              <div className="p-5 sm:p-6 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] text-white flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center">
-                    <Video className="w-5 h-5 text-emerald-300" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-white/20 text-[10px] font-black">
-                        Bunny Stream DRM
-                      </span>
-                      <span className="text-xs text-emerald-300 font-bold">Ù…ÙƒØªØ¨Ø© Ø±Ù‚Ù…: #729792</span>
-                    </div>
-                    <h3 className="text-base sm:text-lg font-black mt-0.5">{selectedCourseForLessons.title}</h3>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setSelectedCourseForLessons(null);
-                    setPreviewVideoUrl(null);
-                    setPreviewSignedIframeUrl(null);
-                    setPreviewError(null);
-                  }}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Modal Body */}
-              <div className="p-6 overflow-y-auto space-y-6 flex-1">
-                {/* 1. Add New Lesson & Upload Section */}
-                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-black text-slate-800 flex items-center gap-2">
-                      <Plus className="w-4 h-4 text-[#173A7C]" />
-                      <span>Ø¥Ø¶Ø§ÙØ© Ù…Ø­Ø§Ø¶Ø±Ø© Ø£Ùˆ Ø¯Ø±Ø³ Ø¬Ø¯ÙŠØ¯ Ù„Ù„Ø¯ÙˆØ±Ø©</span>
-                    </h4>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setUploadMethod('file')}
-                        className={`px-3 py-1 rounded-lg text-xs font-black transition-colors cursor-pointer ${
-                          uploadMethod === 'file'
-                            ? 'bg-[#173A7C] text-white'
-                            : 'bg-white text-slate-600 border border-slate-200'
-                        }`}
-                      >
-                        Ø±ÙØ¹ ÙÙŠØ¯ÙŠÙˆ Ù…Ø¨Ø§Ø´Ø± (Bunny Stream)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setUploadMethod('url')}
-                        className={`px-3 py-1 rounded-lg text-xs font-black transition-colors cursor-pointer ${
-                          uploadMethod === 'url'
-                            ? 'bg-[#173A7C] text-white'
-                            : 'bg-white text-slate-600 border border-slate-200'
-                        }`}
-                      >
-                        Ø¥Ø¯Ø®Ø§Ù„ ÙƒÙˆØ¯ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ / Ø±Ø§Ø¨Ø·
-                      </button>
-                    </div>
-                  </div>
-
-                  <form onSubmit={handleSaveLesson} className="space-y-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="sm:col-span-2">
-                        <label className="block text-[11px] font-black text-slate-700 mb-1">
-                          Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù…Ø­Ø§Ø¶Ø±Ø© Ø£Ùˆ Ø§Ù„Ø¯Ø±Ø³ *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={newLessonTitle}
-                          onChange={(e) => setNewLessonTitle(e.target.value)}
-                          placeholder="Ù…Ø«Ø§Ù„: Ø§Ù„Ø¯Ø±Ø³ Ø§Ù„Ø£ÙˆÙ„: Ø§Ù„ØªØ£Ø³ÙŠØ³ ÙˆØ§Ù„Ù…ÙØ§Ù‡ÙŠÙ… Ø§Ù„Ø¬ÙˆÙ‡Ø±ÙŠØ©"
-                          className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-black text-slate-700 mb-1">
-                          Ø§Ù„Ù…Ø¯Ø© (ØªÙØ­Ø³Ø¨ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹)
-                        </label>
-                        <input
-                          type="text"
-                          value={newLessonDuration}
-                          onChange={(e) => setNewLessonDuration(e.target.value)}
-                          placeholder="ØªÙØ­Ø³Ø¨ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø±ÙØ¹ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ"
-                          className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                        />
-                      </div>
-                    </div>
-
-                    {uploadMethod === 'file' ? (
-                      <div className="p-4 rounded-xl bg-white border-2 border-dashed border-slate-200 text-center space-y-2">
-                        <UploadCloud className="w-8 h-8 text-[#173A7C] mx-auto" />
-                        <div className="text-xs font-black text-slate-700">
-                          Ø§Ø®ØªØ± Ù…Ù„Ù Ø§Ù„ÙÙŠØ¯ÙŠÙˆ Ù„Ù„Ø±ÙØ¹ Ø§Ù„Ù…Ø¨Ø§Ø´Ø± Ø¥Ù„Ù‰ Bunny.net Stream
-                        </div>
-                        <p className="text-[11px] text-slate-400 font-medium">
-                          ÙŠØªÙ… Ø§Ø­ØªØ³Ø§Ø¨ ÙˆØªØ¹Ø¨Ø¦Ø© Ù…Ø¯Ø© Ø§Ù„ÙÙŠØ¯ÙŠÙˆ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ ÙÙˆØ± Ø§Ø®ØªÙŠØ§Ø±Ù‡
-                        </p>
-
-                        <div className="pt-2">
-                          <input
-                            ref={standaloneFileInputRef}
-                            type="file"
-                            accept="video/*"
-                            onChange={handleDirectVideoUpload}
-                            disabled={isUploading}
-                            className="hidden"
-                            id="standalone-video-upload-input"
-                          />
-                          <label
-                            htmlFor="standalone-video-upload-input"
-                            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs font-black cursor-pointer transition-all shadow-xs ${
-                              isUploading ? 'opacity-50 pointer-events-none' : ''
-                            }`}
-                          >
-                            {isUploading ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø±ÙØ¹ ÙˆØ§Ù„Ù…Ø¹Ø§Ù„Ø¬Ø© ({uploadProgress}%)...</span>
-                              </>
-                            ) : (
-                              <>
-                                <UploadCloud className="w-4 h-4" />
-                                <span>Ø§Ø®ØªÙŠØ§Ø± Ù…Ù„Ù ÙÙŠØ¯ÙŠÙˆ Ù…Ù† Ø¬Ù‡Ø§Ø²Ùƒ</span>
-                              </>
-                            )}
-                          </label>
-                        </div>
-
-                        {isUploading && (
-                          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-3">
-                            <div
-                              className="bg-emerald-500 h-full transition-all duration-300"
-                              style={{ width: `${uploadProgress}%` }}
-                            />
-                          </div>
-                        )}
-
-                        {uploadSuccess && (
-                          <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 text-right flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                              <span>{uploadSuccess}</span>
-                            </div>
-                            {newLessonUrl && (
-                              <button
-                                type="button"
-                                onClick={() => handlePreviewVideo(newLessonUrl)}
-                                className="px-3 py-1.5 rounded-lg bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-[11px] font-black transition-all cursor-pointer shrink-0 shadow-xs flex items-center gap-1.5 self-start sm:self-auto"
-                              >
-                                <PlayCircle className="w-3.5 h-3.5 text-emerald-300" />
-                                <span>Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„ÙÙŠØ¯ÙŠÙˆ Ø§Ù„Ø¢Ù†</span>
-                              </button>
-                            )}
-                          </div>
-                        )}
-
-                        {uploadError && (
-                          <div className="p-2.5 rounded-lg bg-rose-50 text-rose-800 text-xs font-bold border border-rose-200 text-right flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                            <span>{uploadError}</span>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-[11px] font-black text-slate-700">
-                            Ù…Ø¹Ø±Ù Ø§Ù„ÙÙŠØ¯ÙŠÙˆ Ù…Ù† Bunny.net (Video ID / GUID) Ø£Ùˆ ÙƒÙˆØ¯ Ø§Ù„ØªØ¶Ù…ÙŠÙ†
-                          </label>
-                          {newLessonUrl && (
-                            <button
-                              type="button"
-                              onClick={() => handlePreviewVideo(newLessonUrl)}
-                              className="text-[11px] text-[#173A7C] hover:underline font-bold flex items-center gap-1 cursor-pointer"
-                            >
-                              <PlayCircle className="w-3.5 h-3.5 text-blue-600" />
-                              <span>Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„Ø±Ø§Ø¨Ø· Ø§Ù„Ù…ÙƒØªÙˆØ¨</span>
-                            </button>
-                          )}
-                        </div>
-                        <input
-                          type="text"
-                          required
-                          value={newLessonUrl}
-                          onChange={(e) => setNewLessonUrl(e.target.value)}
-                          placeholder="Ù…Ø«Ø§Ù„: 425e04f2-2081-48a4-bf1f-53042736aba4 Ø£Ùˆ Ù…Ø¹Ø±Ù ÙŠÙˆØªÙŠÙˆØ¨"
-                          className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                        />
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-end pt-2">
-                      <button
-                        type="submit"
-                        disabled={isUploading}
-                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…Ø­Ø§Ø¶Ø±Ø© Ù„Ù„Ù…Ù†Ù‡Ø¬</span>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-
-                {/* 2. Video Preview Player (If Selected) */}
-                {previewVideoUrl && (
-                  <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-3 shadow-xl border border-slate-800 animate-fade-in-up">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs font-black text-emerald-400">
-                        <PlayCircle className="w-4 h-4" />
-                        <span>Ù…Ø¹Ø§ÙŠÙ†Ø© Ù…Ø´ØºÙ„ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ Ø§Ù„ØªÙØ§Ø¹Ù„ÙŠ ÙˆØ§Ù„Ø¢Ù…Ù† (Bunny DRM Stream)</span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setPreviewVideoUrl(null);
-                          setPreviewSignedIframeUrl(null);
-                          setPreviewError(null);
-                        }}
-                        className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-                      >
-                        âœ• Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ù…Ø´ØºÙ„
-                      </button>
-                    </div>
-
-                    <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black flex items-center justify-center border border-slate-800 shadow-inner">
-                      {previewLoading ? (
-                        <div className="flex flex-col items-center justify-center gap-3 text-slate-300 text-xs font-bold p-8">
-                          <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
-                          <span>Ø¬Ø§Ø±ÙŠ Ø¥Ø¹Ø¯Ø§Ø¯ Ù…Ø´ØºÙ„ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ ÙˆØªÙˆÙ„ÙŠØ¯ ØªØµØ±ÙŠØ­ Ø§Ù„Ù…Ø´Ø§Ù‡Ø¯Ø© Ø§Ù„Ø¢Ù…Ù†...</span>
-                        </div>
-                      ) : previewError ? (
-                        <div className="flex flex-col items-center justify-center gap-2 text-rose-400 text-xs font-bold p-8 text-center">
-                          <AlertCircle className="w-7 h-7 text-rose-500" />
-                          <span>{previewError}</span>
-                          <button
-                            onClick={() => handlePreviewVideo(previewVideoUrl)}
-                            className="mt-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-white text-xs font-black transition-colors cursor-pointer"
-                          >
-                            Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©
-                          </button>
-                        </div>
-                      ) : previewSignedIframeUrl ? (
-                        <iframe
-                          src={previewSignedIframeUrl}
-                          loading="lazy"
-                          className="border-0 absolute top-0 left-0 h-full w-full"
-                          allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
-                          allowFullScreen={true}
-                        />
-                      ) : (
-                        <div className="text-slate-400 text-xs font-bold">Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø±Ø§Ø¨Ø· ÙÙŠØ¯ÙŠÙˆ Ù…ØªØ§Ø­ Ù„Ù„Ù…Ø¹Ø§ÙŠÙ†Ø©</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. Existing Lessons List */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-black text-slate-800">
-                      Ù‚Ø§Ø¦Ù…Ø© Ø¯Ø±ÙˆØ³ ÙˆÙ…Ø­Ø§Ø¶Ø±Ø§Øª Ø§Ù„Ø¯ÙˆØ±Ø© ({courseLessons.length} Ø¯Ø±Ø³)
-                    </h4>
-                    <span className="text-[11px] text-slate-500 font-bold">
-                      ÙŠØªÙ… Ø­ÙØ¸ Ø§Ù„ØªØ±ØªÙŠØ¨ ÙˆØ§Ù„Ù…Ø´Ø§Ù‡Ø¯Ø§Øª ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹
-                    </span>
-                  </div>
-
-                  {lessonsLoading ? (
-                    <div className="p-8 text-center text-slate-500 text-xs font-bold flex items-center justify-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin text-[#173A7C]" />
-                      <span>Ø¬Ø§Ø±ÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¯Ø±ÙˆØ³...</span>
-                    </div>
-                  ) : courseLessons.length === 0 ? (
-                    <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
-                      <Video className="w-8 h-8 text-slate-400 mx-auto" />
-                      <div className="text-xs font-black text-slate-700">Ù„Ù… ÙŠØªÙ… Ø¥Ø¶Ø§ÙØ© Ø¯Ø±ÙˆØ³ Ø¨Ø¹Ø¯</div>
-                      <p className="text-[11px] text-slate-400">
-                        Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ Ø£Ø¹Ù„Ø§Ù‡ Ù„Ø±ÙØ¹ Ø£ÙˆÙ„ ÙÙŠØ¯ÙŠÙˆ Ø£Ùˆ Ø¯Ø±Ø³ Ù„Ù‡Ø°Ù‡ Ø§Ù„Ø¯ÙˆØ±Ø©
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2.5">
-                      {courseLessons.map((lesson: any, idx: number) => (
-                        <div
-                          key={lesson.id || idx}
-                          className="p-3.5 rounded-2xl bg-white border border-slate-200 flex items-center justify-between gap-3 hover:border-slate-300 transition-all"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-7 h-7 rounded-xl bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center shrink-0">
-                              {idx + 1}
-                            </span>
-                            <div>
-                              <h5 className="text-xs font-black text-slate-900">{lesson.title}</h5>
-                              <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium mt-0.5">
-                                <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-slate-400" />
-                                  <span>{lesson.duration}</span>
-                                </span>
-                                <span>â€¢</span>
-                                  <span className="text-blue-600 font-mono">
-                                    {lesson.videoUrl
-                                      ? lesson.videoUrl.includes('-') && lesson.videoUrl.length > 20
-                                        ? `Bunny: ${lesson.videoUrl.substring(0, 10)}...`
-                                        : `ÙÙŠØ¯ÙŠÙˆ: ${lesson.videoUrl.substring(0, 15)}...`
-                                      : 'Ø¨Ø¯ÙˆÙ† ÙÙŠØ¯ÙŠÙˆ'}
-                                  </span>
-                                {lesson.items && lesson.items.length > 0 && (
-                                  <>
-                                    <span>â€¢</span>
-                                    <span className="text-emerald-700 font-bold">
-                                      {lesson.items.length} Ù…Ù‚Ø§Ø·Ø¹ ÙØ±Ø¹ÙŠØ©
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {lesson.videoUrl && (
-                              <button
-                                onClick={() => handlePreviewVideo(lesson.videoUrl)}
-                                className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#173A7C] text-[11px] font-black transition-colors flex items-center gap-1 cursor-pointer"
-                              >
-                                <PlayCircle className="w-3.5 h-3.5 text-blue-600" />
-                                <span>Ù…Ø¹Ø§ÙŠÙ†Ø©</span>
-                              </button>
-                            )}
-
-                            <button
-                              onClick={() => handleDeleteLesson(lesson.id)}
-                              className="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-                              title="Ø­Ø°Ù Ø§Ù„Ø¯Ø±Ø³"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-bold">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Ø¬Ù…ÙŠØ¹ Ø§Ù„ÙÙŠØ¯ÙŠÙˆÙ‡Ø§Øª Ù…Ø´ÙØ±Ø© ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ ÙˆØªØ¹Ù…Ù„ Ù…Ø¹ ØªÙ‚Ù†ÙŠØ© Ø§Ù„Ø­Ù…Ø§ÙŠØ© Ù…Ù† Ø§Ù„Ù‚Ø±ØµÙ†Ø© ÙˆØªÙˆØ«ÙŠÙ‚ Ø§Ù„Ø·Ø§Ù„Ø¨</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCourseForLessons(null);
-                    setPreviewVideoUrl(null);
-                    setPreviewSignedIframeUrl(null);
-                    setPreviewError(null);
-                  }}
-                  className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-black cursor-pointer transition-colors"
-                >
-                  Ø¥ØºÙ„Ø§Ù‚
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
+                      {/* Presets#]<Ókh‘éì¶»§q«^tÜÝX‹™š[S˜[YH	öava6`HˆÈÛÜ™6.¶b¶,H6av,v`vb6.IßBˆÜÜ[‚ˆÜ[ˆÛ\ÜÓ˜[YOH^VÌLH^\Û]KM›Û[[Û›È‚ˆÜÝX‹™š[TÚ^™H	öava6`H6av,ö*¶a¶+ÉßBˆÜÜ[‚ˆÙ]‚ˆÙ]‚‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆšYÙÙ\]XÚY[\ØY›Ü•\™Ù]
+ÙXÒYÝX’Y
+_Bˆ\ØX›Y^Ú\Õ\ØY[™Ð]XÚY[BˆÛ\ÜÓ˜[YOHœLÈKLKH›Ý[™Y[È™ËVÈÌMÌÐMÐ×HÝ™\Ž˜™ËVÈÌQMQH^]Ú]H›ÛX›Û^^È›^][\ËXÙ[\ˆØ\LHÝ\œÛÜ‹\Ú[\ˆ˜[œÚ][Û‹X[\ØX›Y›ÜXÚ]KMLÚš[šËLÚYÝË^È‚ˆ‚ˆÝ\ØY[™Ð]XÚY[\™Ù]ËœÙXÒYOOHÙXÒY	‰ˆ\ØY[™Ð]XÚY[\™Ù]ËœÝX’YOOHÝX’YÈ
+ˆ‚ˆØY\ŒˆÛ\ÜÓ˜[YOHËLËHLËH[š[X]K\Ü[ˆˆÏ‚ˆÜ[¶+6)ö,vbˆ6)öa6,v`v.HØ]XÚY[\ØY›ÙÜ™\ÜßIOÜÜ[‚ˆÏ‚ˆ
+Hˆ
+ˆ‚ˆ\ØYÛÝYÛ\ÜÓ˜[YOHËLËHLËHˆÏ‚ˆÜ[žÜÝX‹™š[U\›È	ö*¶.¶b¶b¶,H6)öa6ava6`IÈˆ	ö,v`v.H6ava6`H‹ÕÛÜ™	ßOÜÜ[‚ˆÏ‚ˆ
+_BˆØ]Û‚ˆÙ]‚‚ˆËÊˆ[š[X]Y›ÙÜ™\ÜÈ˜\ˆ›ÜˆÝX‹R][HØÝ[Y[
+‹ßBˆÝ\ØY[™Ð]XÚY[\™Ù]ËœÙXÒYOOHÙXÒY	‰ˆ\ØY[™Ð]XÚY[\™Ù]ËœÝX’YOOHÝX’Y	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOHËY[ÜXÙK^KLHLH‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆ^VÌL\H›ÛX›Û^X›YKMÌ‚ˆÜ[¶+6)ö,vbˆ6,v`v.H6b6av.v)öa6+6*H6)öa6av,ö*¶a¶+Ë‹‹ÜÜ[‚ˆÜ[ˆÛ\ÜÓ˜[YOH™›Û[[Û›ÈžØ]XÚY[\ØY›ÙÜ™\ÜßIOÜÜ[‚ˆÙ]‚ˆ]ˆÛ\ÜÓ˜[YOHËY[™Ë\Û]KLL›Ý[™YY[LKHÝ™\™›ÝËZY[ˆ›Ü™\ˆ›Ü™\‹\Û]KLŒ‚ˆ]‚ˆÛ\ÜÓ˜[YOH˜™ËYÜ˜YY[]Ë\ˆœ›ÛKX›YKMŒËY[Y\˜[MLY[›Ý[™YY[˜[œÚ][Û‹X[\˜][Û‹LÌ‚ˆÝ[O^ÞÈÚYˆ	Ø]XÚY[\ØY›ÙÜ™\ÜßIX_BˆÏ‚ˆÙ]‚ˆÙ]‚ˆ
+_BˆÙ]‚ˆ
+_B‚ˆÜÝX‹\HOOH	Ü]Z^‰È	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOHœLÈ™ËX[X™\‹MLÍÌ›Ý[™Y[È›Ü™\ˆ›Ü™\‹X[X™\‹LŒÎÜXÙK^KLˆ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆ‚ˆÜ[ˆÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^X[X™\‹NL›^][\ËXÙ[\ˆØ\LKH‚ˆ[Ú\˜ÛHÛ\ÜÓ˜[YOHËMM^X[X™\‹MŒˆÏ‚ˆÜ[¶(ö,ö)¶a6*H6`öb6b¶,ˆ6)öa6b6+v+ö*H
+ÜÝX‹œ]Z^‘]OËœ]Y\Ý[ÛœÏË›[™ÝH6(ö,ö)¶a6*JOÜÜ[‚ˆÜÜ[‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÂˆÛÛœÝÝ\œ™[]Y\Ý[ÛœÈHÝX‹œ]Z^‘]OËœ]Y\Ý[ÛœÈ×NÂˆÛÛœÝ™^Nˆ]Z^”]Y\Ý[ÛˆHÂˆYˆKIÑ]K››ÝÊ
+_KIØÝ\œ™[]Y\Ý[ÛœË›[™Ý
+È_Xˆ]Y\Ý[ÛŽˆ6)öa6,ö)6)öa	ØÝ\œ™[]Y\Ý[ÛœË›[™Ý
+È_NˆˆÜ[ÛœÎˆÉö)öa6+¶b¶)ö,HH
+6)öa6-v+vb¶+JIË	ö)öa6+¶b¶)ö,H‰Ë	ö)öa6+¶b¶)ö,HÉË	ö)öa6+¶b¶)ö,H	×KˆÛÜœ™XÝ[™^ˆˆ^[˜][ÛŽˆ	ö-6,v+H6)öa6)v+6)ö*6*H6)öa6-v+vb¶+v*K‰ËˆNÂˆ[™U\]TÝX’][JÙXÒYÝX’Y	Ü]Z^‘]IËÂˆ]Nˆ6)ö+¶*¶*6)ö,H	ÜÝX‹]_Xˆ\ÜÚ[™ÔØÛÜ™NˆÌˆ]Y\Ý[ÛœÎˆË‹‹˜Ý\œ™[]Y\Ý[ÛœË™^WKˆJNÂˆ_BˆÛ\ÜÓ˜[YOH^VÌL\H›ÛX›Û^VÈÌMÌÐMÐ×HÝ™\Ž[™\›[™HÝ\œÛÜ‹\Ú[\ˆ›^][\ËXÙ[\ˆØ\LH‚ˆ‚ˆ\ÈÛ\ÜÓ˜[YOHËLÈLÈˆÏ‚ˆÜ[¶)v-¶)ö`v*H6,ö)6)öa6a6a6`öb6b¶,ÜÜ[‚ˆØ]Û‚ˆÙ]‚‚ˆÜÝX‹œ]Z^‘]OËœ]Y\Ý[ÛœÏË›X\
+
+KRY
+HOˆ
+ˆ]ˆÙ^O^ÜKšYRYHÛ\ÜÓ˜[YOHœL‹H™Ë]Ú]H›Ý[™Y›Ü™\ˆ›Ü™\‹X[X™\‹LLÜXÙK^KLKH^^È‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆ‚ˆÜ[ˆÛ\ÜÓ˜[YOH™›ÛX›Û^\Û]KN¶)öa6,ö)6)öaÞÜRY
+È_OÜÜ[‚ˆÜÝX‹œ]Z^‘]HKœ]Y\Ý[ÛœË›[™ÝˆH	‰ˆ
+ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÂˆÛÛœÝš[\™YHÝX‹œ]Z^‘]HKœ]Y\Ý[ÛœË™š[\Š
+ËY
+HOˆYOOHRY
+NÂˆ[™U\]TÝX’][JÙXÒYÝX’Y	Ü]Z^‘]IËÂˆ‹‹œÝX‹œ]Z^‘]Kˆ]Y\Ý[ÛœÎˆš[\™YˆJNÂˆ_BˆÛ\ÜÓ˜[YOH^\›ÜÙKMLÝ™\Ž^\›ÜÙKMÌ^VÌLH›ÛX›Û‚ˆ‚ˆ6+v,6`BˆØ]Û‚ˆ
+_BˆÙ]‚ˆ[œ]ˆ\OH^‚ˆ˜[YO^ÜKœ]Y\Ý[ÛŸBˆÛÚ[™ÙO^ÊJHOˆÂˆÛÛœÝ\]YHË‹‹œÝX‹œ]Z^‘]HKœ]Y\Ý[Ûœ×NÂˆ\]YÜRYKœ]Y\Ý[ÛˆHK\™Ù]˜[YNÂˆ[™U\]TÝX’][JÙXÒYÝX’Y	Ü]Z^‘]IËÂˆ‹‹œÝX‹œ]Z^‘]Kˆ]Y\Ý[ÛœÎˆ\]YˆJNÂˆ_BˆXÙZÛ\H¶a¶-H6)öa6,ö)6)öa‹‹ˆ‚ˆÛ\ÜÓ˜[YOHËY[LˆKLH^^È›ÛX›Û™Ë\Û]KML›Ü™\ˆ›Ü™\‹\Û]KLŒ›Ý[™Y‚ˆÏ‚ˆÙ]‚ˆ
+J_BˆÙ]‚ˆ
+_BˆÙ]‚ˆ
+J_BˆÙ]‚‚ˆËÊˆYÝX‹R][HXÝ[ÛœÈ
+‹ßBˆ]ˆÛ\ÜÓ˜[YOHœLˆ›^›^]Ü˜\][\ËXÙ[\ˆØ\Lˆ‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆ[™PYÝX’][UÔÙXÝ[ÛŠÙXÒY	ÝšY[ÉÊ_BˆÛ\ÜÓ˜[YOHœLÈKLKH›Ý[™Y[È™ËX›YKMLÝ™\Ž˜™ËX›YKLL^VÈÌMÌÐMÐ×H›ÛX›XÚÈ^^È›^][\ËXÙ[\ˆØ\LKH˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ›Ü™\ˆ›Ü™\‹X›YKLŒ‚ˆ‚ˆ\ÐÚ\˜ÛHÛ\ÜÓ˜[YOHËLËHLËH^X›YKMŒˆÏ‚ˆÜ[¶)v-¶)ö`v*H6av`¶-ö.HÈ6`vb¶+öb¶b6`v,v.vbÜÜ[‚ˆØ]Û‚‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆ[™PYÝX’][UÔÙXÝ[ÛŠÙXÒY	Ü‰Ê_BˆÛ\ÜÓ˜[YOHœLÈKLKH›Ý[™Y[È™ËY[Y\˜[MLÝ™\Ž˜™ËY[Y\˜[LL^Y[Y\˜[N›ÛX›Û^^È›^][\ËXÙ[\ˆØ\LH˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ›Ü™\ˆ›Ü™\‹Y[Y\˜[LŒ‚ˆ‚ˆš[T\ÈÛ\ÜÓ˜[YOHËLËHLËH^Y[Y\˜[MŒˆÏ‚ˆÜ[¶ava6`Hˆ6`v,v.vbÜÜ[‚ˆØ]Û‚‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆ[™PYÝX’][UÔÙXÝ[ÛŠÙXÒY	Ü]Z^‰Ê_BˆÛ\ÜÓ˜[YOHœLÈKLKH›Ý[™Y[È™ËX[X™\‹MLÝ™\Ž˜™ËX[X™\‹LL^X[X™\‹N›ÛX›Û^^È›^][\ËXÙ[\ˆØ\LH˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ›Ü™\ˆ›Ü™\‹X[X™\‹LŒ‚ˆ‚ˆ[Ú\˜ÛHÛ\ÜÓ˜[YOHËLËHLËH^X[X™\‹MŒˆÏ‚ˆÜ[¶`öb6b¶,ˆ6a6a6b6+v+ö*OÜÜ[‚ˆØ]Û‚ˆÙ]‚ˆÙ]‚ˆÙ]‚ˆ
+J_BˆÙ]‚ˆÙ]‚ˆ
+_B‚ˆËÊˆ8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d
+‹ßBˆËÊˆPˆÎˆUPÒQS•È	ˆ‘TÓÕTÑTÈQÈ
+‹ßBˆËÊˆ8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d
+‹ßBˆÛ[Ù[XÝ]™UXˆOOH	Ø]XÚY[ÉÈ	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOHœÜXÙK^KMˆ[š[X]KY˜YKZ[‹]\‚ˆ]ˆÛ\ÜÓ˜[YOH™›^›^XÛÛÛN™›^\›ÝÈÛNš][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆØ\Lˆ›Ü™\‹Xˆ›Ü™\‹\Û]KLŒ‹LÈ‚ˆ]‚ˆÛ\ÜÓ˜[YOH^\ÛH›ÛX›XÚÈ^\Û]KNL›^][\ËXÙ[\ˆØ\Lˆ‚ˆ\\˜Û\Û\ÜÓ˜[YOHËMM^VÈÌMÌÐMÐ×HˆÏ‚ˆÜ[¶)öa6+v`¶b¶*6*H6)öa6*¶+ö,vb¶*6b¶*H6b6ava6`v)ö*ˆ6)öa6+öb6,v*H6)öa6av,v`v`¶*H
+ˆÈÛÜ™È’T
+OÜÜ[‚ˆÚ‚ˆÛ\ÜÓ˜[YOH^VÌL\H^\Û]KML›Û[YY][H]LH‚ˆ6)öa6ava6`v)ö*ˆ6)öa6av,v`vb6.v*H6aöa¶)È6,ö*¶`öb6aˆ6av*¶)ö+v*H6a6+6avb¶.H6)öa6-öa6)ö*6)öa6av,ö+6a6b¶aˆ6*6)öa6+öb6,v*H6`vbˆ6*¶*6b6b¶*6)öa6av,v`v`¶)ö*ˆ<'äáˆÜ‚ˆÙ]‚‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆ]XÚY[š[R[œ]™Y‹˜Ý\œ™[Ë˜ÛXÚÊ
+_Bˆ\ØX›Y^Ú\Õ\ØY[™Ð]XÚY[BˆÛ\ÜÓ˜[YOHœMKLˆ›Ý[™Y^™ËYÜ˜YY[]Ë\ˆœ›ÛKY[Y\˜[MLË]X[MŒÝ™\Ž™œ›ÛKY[Y\˜[MŒÝ™\ŽË]X[MÌ^]Ú]H^^È›ÛX›XÚÈ›^][\ËXÙ[\ˆØ\LKHÚYÝË^È˜[œÚ][Û‹X[Ý\œÛÜ‹\Ú[\ˆÙ[‹\Ý\ÛNœÙ[‹X]]È‚ˆ‚ˆÚ\Õ\ØY[™Ð]XÚY[È
+ˆ‚ˆØY\ŒˆÛ\ÜÓ˜[YOHËMM[š[X]K\Ü[ˆˆÏ‚ˆÜ[¶+6)ö,vbˆ6,v`v.H6)öa6ava6`K‹‹ÜÜ[‚ˆÏ‚ˆ
+Hˆ
+ˆ‚ˆ\ØYÛÝYÛ\ÜÓ˜[YOHËMMˆÏ‚ˆÜ[¶,v`v.H6ava6`H6+6+öb¶+È6a6a6+v`¶b¶*6*H
+‹ÕÛÜ™
+OÜÜ[‚ˆÏ‚ˆ
+_BˆØ]Û‚ˆ[œ]ˆ™Y^Ø]XÚY[š[R[œ]™YŸBˆ\OH™š[H‚ˆXØÙ\H‹œ‹™ØË™ØÞœœžš\œ˜\ˆ‚ˆÛÚ[™ÙO^Ú[™PÛÝ\œÙP˜YÐ]XÚY[\ØYBˆÛ\ÜÓ˜[YOHšY[ˆ‚ˆÏ‚ˆÙ]‚‚ˆÙ›Ü›P]XÚY[Ë›[™ÝOOHÈ
+ˆ]ˆÛ\ÜÓ˜[YOHœN›Ý[™YLž™Ë\Û]KML›Ü™\‹Lˆ›Ü™\‹Y\ÚY›Ü™\‹\Û]KLŒ^XÙ[\ˆÜXÙK^KLÈ‚ˆ›Û\“Ü[ˆÛ\ÜÓ˜[YOHËLLLL^\Û]KM^X]]ÈˆÏ‚ˆ]ˆÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^\Û]KMÌ¶a6aH6b¶*¶aH6,v`v.H6ava6`v)ö*ˆ6a6+v`¶b¶*6*H6aö,6aÈ6)öa6+öb6,v*H6*6.v+ÏÙ]‚ˆÛ\ÜÓ˜[YOH^VÌL\H^\Û]KMX^]Ë[Y^X]]È‚ˆ6)ö-¶.¶-È6.va6bH6,¶,H6)öa6,v`v.H6(ö.va6)öaÈ6a6)v-¶)ö`v*H6)öa6+v`¶b¶*6*H6)öa6*¶+ö,vb¶*6b¶*v#6)öa6`ö*¶*6)öa6av.v*¶av+ö*v#6(öb6(öb6,v)ö`ˆ6)öa6.vava6*6*¶a¶,öb¶`ˆˆ6(öbÛÜ™‚ˆÜ‚ˆÙ]‚ˆ
+Hˆ
+ˆ]ˆÛ\ÜÓ˜[YOHœÜXÙK^KLÈ‚ˆÙ›Ü›P]XÚY[Ë›X\
+
+]Y
+HOˆ
+ˆ]‚ˆÙ^O^Ø]šYYBˆÛ\ÜÓ˜[YOHœM›Ý[™YLž™Ë\Û]KML›Ü™\ˆ›Ü™\‹\Û]KLŒ›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆØ\LÈÝ™\Ž˜›Ü™\‹\Û]KLÌ˜[œÚ][Û‹X[‚ˆ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\LÈZ[‹]ËL‚ˆ]ˆÛ\ÜÓ˜[YOHËLLLL›Ý[™Y^™ËX›YKLL^VÈÌMÌÐMÐ×H›^][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆÚš[šËL‚ˆš[U^Û\ÜÓ˜[YOHËMHMHˆÏ‚ˆÙ]‚ˆ]ˆÛ\ÜÓ˜[YOH›Z[‹]ËL‚ˆ[œ]ˆ\OH^‚ˆ˜[YO^Ø]]_BˆÛÚ[™ÙO^ÊJHOˆÂˆÛÛœÝ\]YHË‹‹™›Ü›P]XÚY[×NÂˆ\]YÚYK]HHK\™Ù]˜[YNÂˆÙ]›Ü›P]XÚY[Ê\]Y
+NÂˆ_BˆÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^\Û]KNL™Ë]Ú]HLˆKLH›Ý[™Y›Ü™\ˆ›Ü™\‹\Û]KLŒ›ØÝ\Î›Ý][™K[›Û™H›ØÝ\Î˜›Ü™\‹VÈÌMÌÐMÐ×HËY[X^]Ë\ÛH‚ˆXÙZÛ\H¶.va¶b6)öaˆ6)öa6ava6`H6)öa6av,v`v`ˆ‚ˆÏ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ^VÌLH^\Û]KML›Û[[Û›È]LH‚ˆÜ[žØ]™š[TÚ^™_OÜÜ[‚ˆÜ[¸ (ÜÜ[‚ˆÜ[ˆÛ\ÜÓ˜[YOH\\˜Ø\ÙHžØ]™š[U\_OÜÜ[‚ˆÙ]‚ˆÙ]‚ˆÙ]‚‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\LˆÚš[šËL‚ˆBˆ™Y^Ø]™š[U\›Bˆ\™Ù]H—Ø›[šÈ‚ˆ™[H››ÛÜ[™\ˆ›Ü™Y™\œ™\ˆ‚ˆÛ\ÜÓ˜[YOHœLˆ›Ý[™Y^™Ë]Ú]HÝ™\Ž˜™ËX›YKML^VÈÌMÌÐMÐ×H›Ü™\ˆ›Ü™\‹\Û]KLŒ^^È›ÛX›Û›^][\ËXÙ[\ˆØ\LH˜[œÚ][Û‹XÛÛÜœÈ‚ˆ‚ˆÝÛ›ØYÛ\ÜÓ˜[YOHËLËHLËHˆÏ‚ˆÜ[¶*¶+vavb¶aÜÜ[‚ˆØO‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆ[™T™[[Ý™P]XÚY[œ›ÛP˜YÊ]šY
+_BˆÛ\ÜÓ˜[YOHœLˆ›Ý[™Y^™Ë]Ú]HÝ™\Ž˜™Ë\›ÜÙKML^\Û]KMÝ™\Ž^\›ÜÙKMŒ›Ü™\ˆ›Ü™\‹\Û]KLŒ˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ‚ˆ]OH¶+v,6`H6)öa6ava6`H‚ˆ‚ˆ˜\ÚˆÛ\ÜÓ˜[YOHËLËHLËHˆÏ‚ˆØ]Û‚ˆÙ]‚ˆÙ]‚ˆ
+J_BˆÙ]‚ˆ
+_BˆÙ]‚ˆ
+_B‚ˆËÊˆ8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d
+‹ßBˆËÊˆPˆˆ’SSÓÕT”ÑHVSH•RSTˆ
+‹ßBˆËÊˆ8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d
+‹ßBˆÛ[Ù[XÝ]™UXˆOOH	Ù^[IÈ	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOHœÜXÙK^KMˆ[š[X]KY˜YKZ[‹]\‚ˆ]ˆÛ\ÜÓ˜[YOHœM›Ý[™YLž™Ë\Û]KML›Ü™\ˆ›Ü™\‹\Û]KLŒÜXÙK^KM‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆ›Ü™\‹Xˆ›Ü™\‹\Û]KLŒ‹LÈ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\L‹H‚ˆ]ˆÛ\ÜÓ˜[YOHËNHNH›Ý[™Y^™ËX[X™\‹LL^X[X™\‹MÌ›^][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆ‚ˆ]Ø\™Û\ÜÓ˜[YOHËMHMHˆÏ‚ˆÙ]‚ˆ]‚ˆÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^\Û]KN¶)öa6)ö+¶*¶*6)ö,H6)öa6a¶aö)ö)¶bˆ6)öa6-6)öava6a6a6+öb6,v*OÚ‚ˆÛ\ÜÓ˜[YOH^VÌLH^\Û]KML›Û[YY][H‚ˆ6b¶)6+öbˆ6)öa6av*¶+ö,v*6)öa6)ö+¶*¶*6)ö,H6b6*¶-v+ö,H6)öa6-6aö)ö+ö*H6)öa6av.v*¶av+ö*H6`vb6,H6)ö+6*¶b¶)ö,¶aÈ6*6a¶+6)ö+BˆÜ‚ˆÙ]‚ˆÙ]‚‚ˆX™[Û\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ^^È›ÛX›XÚÈ^\Û]KNÝ\œÛÜ‹\Ú[\ˆ‚ˆ[œ]ˆ\OH˜ÚXÚØ›Þ‚ˆÚXÚÙY^Ú\Ñš[˜[^[_BˆÛÚ[™ÙO^ÊJHOˆÙ]\Ñš[˜[^[JK\™Ù]˜ÚXÚÙY
+_BˆÛ\ÜÓ˜[YOHËMM^VÈÌMÌÐMÐ×H›Ý[™YÝ\œÛÜ‹\Ú[\ˆ‚ˆÏ‚ˆÜ[¶*¶`v.vb¶a6)öa6)ö+¶*¶*6)ö,H6)öa6a¶aö)ö)¶bˆ6a6a6+öb6,v*OÜÜ[‚ˆÛX™[‚ˆÙ]‚‚ˆÚ\Ñš[˜[^[H	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOHœÜXÙK^KMH‚ˆ]ˆÛ\ÜÓ˜[YOH™ÜšYÜšYXÛÛËLHÛN™ÜšYXÛÛËLˆØ\M‚ˆ]‚ˆX™[Û\ÜÓ˜[YOH˜›ØÚÈ^^È›ÛX›XÚÈ^\Û]KMÌX‹LH¶.va¶b6)öaˆ6)öa6)ö+¶*¶*6)ö,OÛX™[‚ˆ[œ]ˆ\OH^‚ˆ˜[YO^Ù›Ü›Qš[˜[^[K]_BˆÛÚ[™ÙO^ÊJHOˆÙ]›Ü›Qš[˜[^[JÈ‹‹™›Ü›Qš[˜[^[K]NˆK\™Ù]˜[YHJ_BˆXÙZÛ\H¶av*ö)öaˆ6)öa6)ö+¶*¶*6)ö,H6)öa6a¶aö)ö)¶bˆ6a6a6*6,va¶)öav+6)öa6*¶+ö,vb¶*6bˆ‚ˆÛ\ÜÓ˜[YOHËY[LËHKLˆ^^È›ÛX›Û^\Û]KN™Ë]Ú]H›Ý[™Y^›Ü™\ˆ›Ü™\‹\Û]KLŒ›ØÝ\Î›Ý][™K[›Û™H›ØÝ\Î˜›Ü™\‹VÈÌMÌÐMÐ×H‚ˆÏ‚ˆÙ]‚‚ˆ]‚ˆX™[Û\ÜÓ˜[YOH˜›ØÚÈ^^È›ÛX›XÚÈ^\Û]KMÌX‹LH¶a¶,ö*6*H6)öa6a¶+6)ö+H6)öa6av-öa6b6*6*H
+	JOÛX™[‚ˆ[œ]ˆ\OH›[X™\ˆ‚ˆZ[^ÍLBˆX^^ÌLBˆ˜[YO^Ù›Ü›Qš[˜[^[Kœ\ÜÚ[™ÔØÛÜ™HÌBˆÛÚ[™ÙO^ÊJHOˆÙ]›Ü›Qš[˜[^[JÈ‹‹™›Ü›Qš[˜[^[K\ÜÚ[™ÔØÛÜ™Nˆ\œÙR[
+K\™Ù]˜[YKL
+HÌJ_BˆXÙZÛ\HÌ‚ˆÛ\ÜÓ˜[YOHËY[LËHKLˆ^^È›ÛX›Û^\Û]KN™Ë]Ú]H›Ý[™Y^›Ü™\ˆ›Ü™\‹\Û]KLŒ›ØÝ\Î›Ý][™K[›Û™H›ØÝ\Î˜›Ü™\‹VÈÌMÌÐMÐ×H‚ˆÏ‚ˆÙ]‚ˆÙ]‚‚ˆËÊˆ]Y\Ý[ÛœÈ\Ý
+‹ßBˆ]ˆÛ\ÜÓ˜[YOHœÜXÙK^KM‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆ‚ˆHÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^\Û]KN‚ˆ6*6a¶`È6(ö,ö)¶a6*H6)öa6)ö+¶*¶*6)ö,H
+Ù›Ü›Qš[˜[^[Kœ]Y\Ý[ÛœÏË›[™ÝH6(ö,ö)¶a6*JBˆÚO‚‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÂˆÛÛœÝ™^S[HH
+›Ü›Qš[˜[^[Kœ]Y\Ý[ÛœÏË›[™Ý
+H
+ÈNÂˆÙ]›Ü›Qš[˜[^[JÂˆ‹‹™›Ü›Qš[˜[^[Kˆ]Y\Ý[ÛœÎˆÂˆ‹‹Š›Ü›Qš[˜[^[Kœ]Y\Ý[ÛœÈ×JKˆÂˆYˆKIÑ]K››ÝÊ
+_KIÛ™^S[_Xˆ]Y\Ý[ÛŽˆ6)öa6,ö)6)öa	Û™^S[_NˆˆÜ[ÛœÎˆÉö)öa6+¶b¶)ö,H6(È
+6)öa6-v+vb¶+JIË	ö)öa6+¶b¶)ö,H6*	Ë	ö)öa6+¶b¶)ö,H6+	Ë	ö)öa6+¶b¶)ö,H6+É×KˆÛÜœ™XÝ[™^ˆˆ^[˜][ÛŽˆ	ö*¶b6-¶b¶+H6)öa6)v+6)ö*6*H6)öa6-v+vb¶+v*K‰ËˆKˆKˆJNÂˆ_BˆÛ\ÜÓ˜[YOHœLÈKLKH›Ý[™Y^™ËX[X™\‹MLÝ™\Ž˜™ËX[X™\‹MŒ^]Ú]H›ÛX›XÚÈ^^È›^][\ËXÙ[\ˆØ\LHÝ\œÛÜ‹\Ú[\ˆ‚ˆ‚ˆ\ÈÛ\ÜÓ˜[YOHËLËHLËHˆÏ‚ˆÜ[¶)v-¶)ö`v*H6,ö)6)öa6+6+öb¶+ÏÜÜ[‚ˆØ]Û‚ˆÙ]‚‚ˆÙ›Ü›Qš[˜[^[Kœ]Y\Ý[ÛœÏË›X\
+
+KRY
+HOˆ
+ˆ]‚ˆÙ^O^ÜKšYRYBˆÛ\ÜÓ˜[YOHœM›Ý[™Y^™Ë]Ú]H›Ü™\ˆ›Ü™\‹\Û]KLŒÜXÙK^KLÈÚYÝËLžÈ‚ˆ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆØ\Lˆ›Ü™\‹Xˆ›Ü™\‹\Û]KLL‹Lˆ‚ˆÜ[ˆÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^VÈÌMÌÐMÐ×H¶)öa6,ö)6)öaÞÜRY
+È_OÜÜ[‚ˆÙ›Ü›Qš[˜[^[Kœ]Y\Ý[ÛœË›[™ÝˆH	‰ˆ
+ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÂˆÙ]›Ü›Qš[˜[^[JÂˆ‹‹™›Ü›Qš[˜[^[Kˆ]Y\Ý[ÛœÎˆ›Ü›Qš[˜[^[Kœ]Y\Ý[ÛœË™š[\Š
+ËY
+HOˆYOOHRY
+KˆJNÂˆ_BˆÛ\ÜÓ˜[YOHœLH^\Û]KMÝ™\Ž^\›ÜÙKMŒ›Ý[™YÝ\œÛÜ‹\Ú[\ˆ‚ˆ]OH¶+v,6`H6aö,6)È6)öa6,ö)6)öa‚ˆ‚ˆ˜\ÚˆÛ\ÜÓ˜[YOHËLËHLËHˆÏ‚ˆØ]Û‚ˆ
+_BˆÙ]‚‚ˆ]‚ˆX™[Û\ÜÓ˜[YOH˜›ØÚÈ^VÌL\H›ÛX›XÚÈ^\Û]KMŒX‹LH¶a¶-H6)öa6,ö)6)öa
+ÛX™[‚ˆ[œ]ˆ\OH^‚ˆ™\]Z\™Yˆ˜[YO^ÜKœ]Y\Ý[ÛŸBˆÛÚ[™ÙO^ÊJHOˆÂˆÛÛœÝ\]YHË‹‹™›Ü›Qš[˜[^[Kœ]Y\Ý[Ûœ×NÂˆ\]YÜRYKœ]Y\Ý[ÛˆHK\™Ù]˜[YNÂˆÙ]›Ü›Qš[˜[^[JÈ‹‹™›Ü›Qš[˜[^[K]Y\Ý[ÛœÎˆ\]YJNÂˆ_BˆXÙZÛ\H¶)ö`ö*¶*6a¶-H6)öa6,ö)6)öa6aöa¶)Ë‹‹ˆ‚ˆÛ\ÜÓ˜[YOHËY[LÈKLˆ^^È›ÛX›Û^\Û]KN™Ë\Û]KML›Ý[™Y[È›Ü™\ˆ›Ü™\‹\Û]KLŒ›ØÝ\Î›Ý][™K[›Û™H›ØÝ\Î˜›Ü™\‹VÈÌMÌÐMÐ×H‚ˆÏ‚ˆÙ]‚‚ˆ]ˆÛ\ÜÓ˜[YOHœÜXÙK^KLˆ‚ˆX™[Û\ÜÓ˜[YOH˜›ØÚÈ^VÌL\H›ÛX›XÚÈ^\Û]KMŒ‚ˆ6+¶b¶)ö,v)ö*ˆ6)öa6)v+6)ö*6*H
+6+v+ö+È6)öa6+ö)ö)¶,v*H6*6+6)öa¶*6)öa6)v+6)ö*6*H6)öa6-v+vb¶+v*JN‚ˆÛX™[‚ˆ]ˆÛ\ÜÓ˜[YOH™ÜšYÜšYXÛÛËLHÛN™ÜšYXÛÛËLˆØ\Lˆ‚ˆÜK›Ü[ÛœË›X\
+
+ÜÜY
+HOˆ
+ˆ]‚ˆÙ^O^ÛÜYBˆÛ\ÜÓ˜[YO^Ø›^][\ËXÙ[\ˆØ\LˆLˆ›Ý[™Y[È›Ü™\ˆ˜[œÚ][Û‹X[	ÂˆK˜ÛÜœ™XÝ[™^OOHÜYˆÈ	Ø™ËY[Y\˜[MLÍÌ›Ü™\‹Y[Y\˜[LÌ	Âˆˆ	Ø™Ë\Û]KML›Ü™\‹\Û]KLŒ	ÂˆXBˆ‚ˆ[œ]ˆ\OHœ˜Y[È‚ˆ˜[YO^ØKIÜRYKXÛÜœ™XÝBˆÚXÚÙY^ÜK˜ÛÜœ™XÝ[™^OOHÜYBˆÛÚ[™ÙO^Ê
+HOˆÂˆÛÛœÝ\]YHË‹‹™›Ü›Qš[˜[^[Kœ]Y\Ý[Ûœ×NÂˆ\]YÜRYK˜ÛÜœ™XÝ[™^HÜYÂˆÙ]›Ü›Qš[˜[^[JÈ‹‹™›Ü›Qš[˜[^[K]Y\Ý[ÛœÎˆ\]YJNÂˆ_BˆÛ\ÜÓ˜[YOHËMM^Y[Y\˜[MŒÝ\œÛÜ‹\Ú[\ˆ‚ˆÏ‚ˆ[œ]ˆ\OH^‚ˆ˜[YO^ÛÜBˆÛÚ[™ÙO^ÊJHOˆÂˆÛÛœÝ\]YHË‹‹™›Ü›Qš[˜[^[Kœ]Y\Ý[Ûœ×NÂˆ\]YÜRYK›Ü[ÛœÖÛÜYHHK\™Ù]˜[YNÂˆÙ]›Ü›Qš[˜[^[JÈ‹‹™›Ü›Qš[˜[^[K]Y\Ý[ÛœÎˆ\]YJNÂˆ_BˆXÙZÛ\^Ø6)öa6+¶b¶)ö,H	ÛÜY
+È_XBˆÛ\ÜÓ˜[YOH™›^LHLˆKLH^^È›ÛX›Û^\Û]KN™Ë]Ú]H›Ý[™Y›Ü™\ˆ›Ü™\‹\Û]KLŒ‚ˆÏ‚ˆÙ]‚ˆ
+J_BˆÙ]‚ˆÙ]‚ˆÙ]‚ˆ
+J_BˆÙ]‚ˆÙ]‚ˆ
+_BˆÙ]‚ˆÙ]‚ˆ
+_B‚ˆËÊˆ[Ù[›ÛÝ\ˆÛÛ›ÛÈ
+‹ßBˆ]ˆÛ\ÜÓ˜[YOHœM›Ü™\‹]›Ü™\‹\Û]KLŒ›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆØ\LÈ‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÙ]\Ó[Ù[Ü[Š˜[ÙJ_BˆÛ\ÜÓ˜[YOHœMHKL‹H›Ý[™Y^™Ë\Û]KLLÝ™\Ž˜™Ë\Û]KLŒ^\Û]KMÌ›ÛX›XÚÈ^^È˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ‚ˆ‚ˆ6)va6.¶)ö(BˆØ]Û‚‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ‚ˆÛ[Ù[XÝ]™UXˆOOH	Ø˜\ÚXÉÈ	‰ˆ
+ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÂˆYˆ
+[Ù[XÝ]™UXˆOOH	Ù^[IÊHÙ][Ù[XÝ]™UXŠ	Ø]XÚY[ÉÊNÂˆ[ÙHYˆ
+[Ù[XÝ]™UXˆOOH	Ø]XÚY[ÉÊHÙ][Ù[XÝ]™UXŠ	ØÝ\œšXÝ[[IÊNÂˆ[ÙHYˆ
+[Ù[XÝ]™UXˆOOH	ØÝ\œšXÝ[[IÊHÙ][Ù[XÝ]™UXŠ	Ø˜\ÚXÉÊNÂˆ_BˆÛ\ÜÓ˜[YOHœMKL‹H›Ý[™Y^™Ë\Û]KLLÝ™\Ž˜™Ë\Û]KLŒ^\Û]KMÌ›ÛX›Û^^ÈÝ\œÛÜ‹\Ú[\ˆ‚ˆ‚ˆ6)öa6,ö)ö*6`‚ˆØ]Û‚ˆ
+_B‚ˆÛ[Ù[XÝ]™UXˆOOH	Ù^[IÈ	‰ˆ
+ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÂˆYˆ
+[Ù[XÝ]™UXˆOOH	Ø˜\ÚXÉÊHÙ][Ù[XÝ]™UXŠ	ØÝ\œšXÝ[[IÊNÂˆ[ÙHYˆ
+[Ù[XÝ]™UXˆOOH	ØÝ\œšXÝ[[IÊHÙ][Ù[XÝ]™UXŠ	Ø]XÚY[ÉÊNÂˆ[ÙHYˆ
+[Ù[XÝ]™UXˆOOH	Ø]XÚY[ÉÊHÙ][Ù[XÝ]™UXŠ	Ù^[IÊNÂˆ_BˆÛ\ÜÓ˜[YOHœMKL‹H›Ý[™Y^™ËVÈÌMÌÐMÐ×HÝ™\Ž˜™ËVÈÌQMQH^]Ú]H›ÛX›Û^^ÈÝ\œÛÜ‹\Ú[\ˆ‚ˆ‚ˆ6)öa6*¶)öa6bˆ8§¥ˆØ]Û‚ˆ
+_B‚ˆ]Û‚ˆ\OHœÝX›Z]‚ˆ\ØX›Y^Ú\ÔÝX›Z][™ßBˆÛ\ÜÓ˜[YOHœMÈKL‹H›Ý[™Y^™ËYÜ˜YY[]Ë\ˆœ›ÛKY[Y\˜[MŒË]X[MÌÝ™\Ž™œ›ÛKY[Y\˜[MÌÝ™\ŽË]X[N^]Ú]H›ÛX›XÚÈ^^ÈÚYÝË[Y˜[œÚ][Û‹X[Ý\œÛÜ‹\Ú[\ˆ›^][\ËXÙ[\ˆØ\LKH\ØX›Y›ÜXÚ]KMLXÝ]™NœØØ[KNMH‚ˆ‚ˆÚ\ÔÝX›Z][™ÈÈ
+ˆ‚ˆØY\ŒˆÛ\ÜÓ˜[YOHËMM[š[X]K\Ü[ˆˆÏ‚ˆÜ[¶+6)ö,vbˆ6)öa6+v`v.6b6)öa6av,¶)öava¶*H6)öa6,ö+v)ö*6b¶*K‹‹ÜÜ[‚ˆÏ‚ˆ
+Hˆ
+ˆ‚ˆÚXÚÈÛ\ÜÓ˜[YOHËMMˆÏ‚ˆÜ[žÙY][™ÐÛÝ\œÙHÈ	ö+v`v.6b6*¶+v+öb¶*È6`ö)öava6)öa6*¶.v+öb¶a6)ö*ˆ8¦¨IÈˆ	öa¶-6,H6)öa6+öb6,v*H6av.H6)öa6ava¶aö+6b6)öa6av,v`v`¶)ö*ˆ<'æ 	ßOÜÜ[‚ˆÏ‚ˆ
+_BˆØ]Û‚ˆÙ]‚ˆÙ]‚ˆÙ›Ü›O‚ˆÛ[Ý[Û‹™]‚ˆÙ]‚ˆ
+_BˆÐ[š[X]T™\Ù[˜ÙO‚‚ˆËÊˆ8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d
+‹ßBˆËÊˆ‹ˆÕS‘SÓ‘HQQPH	ˆTÔÓÓ”ÈÕQSÈSÑS
+‹ßBˆËÊˆ8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d8¥d
+‹ßBˆ[š[X]T™\Ù[˜ÙO‚ˆÜÙ[XÝYÛÝ\œÙQ›Ü“\ÜÛÛœÈ	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOH™š^Y[œÙ]L‹ML›^][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆLÈÛNœM™Ë\Û]KNLÍÌ˜XÚÙ›ÜX›\‹\ÛH‚ˆ[Ý[Û‹™]‚ˆ[š]X[^ÞÈÜXÚ]NˆØØ[NˆŽMKNˆŒ_Bˆ[š[X]O^ÞÈÜXÚ]NˆKØØ[NˆKNˆ_Bˆ^]^ÞÈÜXÚ]NˆØØ[NˆŽMKNˆŒ_BˆÛ\ÜÓ˜[YOHËY[X^]ËM^™Ë]Ú]H›Ý[™YLÞÚYÝËLž›Ü™\ˆ›Ü™\‹\Û]KLLÝ™\™›ÝËZY[ˆ›^›^XÛÛX^ZVÎLšH‚ˆ‚ˆËÊˆ[Ù[XY\ˆ
+‹ßBˆ]ˆÛ\ÜÓ˜[YOHœMHÛNœMˆ™ËYÜ˜YY[]Ë\ˆœ›ÛKVÈÌMÌÐMÐ×HšXKVÈÌQMQHËVÈÌÌŒÍ—H^]Ú]H›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆÚš[šËL‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\LÈ‚ˆ]ˆÛ\ÜÓ˜[YOHËLLHLLH›Ý[™YLž™ËY[Y\˜[MLÌŒ›Ü™\ˆ›Ü™\‹Y[Y\˜[MÌÌ›^][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆ‚ˆšY[ÈÛ\ÜÓ˜[YOHËMHMH^Y[Y\˜[LÌˆÏ‚ˆÙ]‚ˆ]‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ‚ˆÜ[ˆÛ\ÜÓ˜[YOHœLˆKLH›Ý[™Y[Y™Ë]Ú]KÌŒ^VÌLH›ÛX›XÚÈ‚ˆ[›žHÝ™X[H“BˆÜÜ[‚ˆÜ[ˆÛ\ÜÓ˜[YOH^^È^Y[Y\˜[LÌ›ÛX›Û¶av`ö*¶*6*H6,v`¶aNˆÍÌŽMÎLÜÜ[‚ˆÙ]‚ˆÈÛ\ÜÓ˜[YOH^X˜\ÙHÛN^[È›ÛX›XÚÈ]LHžÜÙ[XÝYÛÝ\œÙQ›Ü“\ÜÛÛœË]_OÚÏ‚ˆÙ]‚ˆÙ]‚ˆ]Û‚ˆÛÛXÚÏ^Ê
+HOˆÂˆÙ]Ù[XÝYÛÝ\œÙQ›Ü“\ÜÛÛœÊ[
+NÂˆÙ]™]šY]ÕšY[Õ\›
+[
+NÂˆÙ]™]šY]ÔÚYÛ™YYœ˜[YU\›
+[
+NÂˆÙ]™]šY]Ñ\œ›ÜŠ[
+NÂˆ_BˆÛ\ÜÓ˜[YOHËNN›Ý[™YY[™Ë]Ú]KÌLÝ™\Ž˜™Ë]Ú]KÌŒ›^][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆ^]Ú]H˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ‚ˆ‚ˆÛ\ÜÓ˜[YOHËMMˆÏ‚ˆØ]Û‚ˆÙ]‚‚ˆËÊˆ[Ù[›ÙH
+‹ßBˆ]ˆÛ\ÜÓ˜[YOHœMˆÝ™\™›ÝË^KX]]ÈÜXÙK^KMˆ›^LH‚ˆËÊˆKˆY™]È\ÜÛÛˆ	ˆ\ØYÙXÝ[Ûˆ
+‹ßBˆ]ˆÛ\ÜÓ˜[YOHœMH›Ý[™YLž™Ë\Û]KML›Ü™\ˆ›Ü™\‹\Û]KLŒÜXÙK^KM‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆ‚ˆÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^\Û]KN›^][\ËXÙ[\ˆØ\Lˆ‚ˆ\ÈÛ\ÜÓ˜[YOHËMM^VÈÌMÌÐMÐ×HˆÏ‚ˆÜ[¶)v-¶)ö`v*H6av+v)ö-¶,v*H6(öb6+ö,v,È6+6+öb¶+È6a6a6+öb6,v*OÜÜ[‚ˆÚ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÙ]\ØYY]Ù
+	Ùš[IÊ_BˆÛ\ÜÓ˜[YO^ØLÈKLH›Ý[™Y[È^^È›ÛX›XÚÈ˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ	Âˆ\ØYY]ÙOOH	Ùš[IÂˆÈ	Ø™ËVÈÌMÌÐMÐ×H^]Ú]IÂˆˆ	Ø™Ë]Ú]H^\Û]KMŒ›Ü™\ˆ›Ü™\‹\Û]KLŒ	ÂˆXBˆ‚ˆ6,v`v.H6`vb¶+öb¶b6av*6)ö-6,H
+[›žHÝ™X[JBˆØ]Û‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÙ]\ØYY]Ù
+	Ý\›	Ê_BˆÛ\ÜÓ˜[YO^ØLÈKLH›Ý[™Y[È^^È›ÛX›XÚÈ˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ	Âˆ\ØYY]ÙOOH	Ý\›	ÂˆÈ	Ø™ËVÈÌMÌÐMÐ×H^]Ú]IÂˆˆ	Ø™Ë]Ú]H^\Û]KMŒ›Ü™\ˆ›Ü™\‹\Û]KLŒ	ÂˆXBˆ‚ˆ6)v+ö+¶)öa6`öb6+È6)öa6`vb¶+öb¶bÈ6,v)ö*6-ÂˆØ]Û‚ˆÙ]‚ˆÙ]‚‚ˆ›Ü›HÛ”ÝX›Z]^Ú[™TØ]™S\ÜÛÛŸHÛ\ÜÓ˜[YOHœÜXÙK^KLÈ‚ˆ]ˆÛ\ÜÓ˜[YOH™ÜšYÜšYXÛÛËLHÛN™ÜšYXÛÛËLÈØ\LÈ‚ˆ]ˆÛ\ÜÓ˜[YOHœÛN˜ÛÛ\Ü[‹Lˆ‚ˆX™[Û\ÜÓ˜[YOH˜›ØÚÈ^VÌL\H›ÛX›XÚÈ^\Û]KMÌX‹LH‚ˆ6.va¶b6)öaˆ6)öa6av+v)ö-¶,v*H6(öb6)öa6+ö,v,È
+‚ˆÛX™[‚ˆ[œ]ˆ\OH^‚ˆ™\]Z\™Yˆ˜[YO^Û™]Ó\ÜÛÛ•]_BˆÛÚ[™ÙO^ÊJHOˆÙ]™]Ó\ÜÛÛ•]JK\™Ù]˜[YJ_BˆXÙZÛ\H¶av*ö)öaˆ6)öa6+ö,v,È6)öa6(öb6aˆ6)öa6*¶(ö,öb¶,È6b6)öa6av`v)öaöb¶aH6)öa6+6b6aö,vb¶*H‚ˆÛ\ÜÓ˜[YOHËY[LËHKLˆ^^È›ÛX›Û^\Û]KN™Ë]Ú]H›Ý[™Y^›Ü™\ˆ›Ü™\‹\Û]KLŒ›ØÝ\Î›Ý][™K[›Û™H›ØÝ\Î˜›Ü™\‹VÈÌMÌÐMÐ×H‚ˆÏ‚ˆÙ]‚ˆ]‚ˆX™[Û\ÜÓ˜[YOH˜›ØÚÈ^VÌL\H›ÛX›XÚÈ^\Û]KMÌX‹LH‚ˆ6)öa6av+ö*H
+6*¶cö+v,ö*6*¶a6`¶)ö)¶b¶)öbÊBˆÛX™[‚ˆ[œ]ˆ\OH^‚ˆ˜[YO^Û™]Ó\ÜÛÛ‘\˜][ÛŸBˆÛÚ[™ÙO^ÊJHOˆÙ]™]Ó\ÜÛÛ‘\˜][ÛŠK\™Ù]˜[YJ_BˆXÙZÛ\H¶*¶cö+v,ö*6*¶a6`¶)ö)¶b¶)öbÈ6.va¶+È6,v`v.H6)öa6`vb¶+öb¶b‚ˆÛ\ÜÓ˜[YOHËY[LËHKLˆ^^È›ÛX›Û^\Û]KN™Ë]Ú]H›Ý[™Y^›Ü™\ˆ›Ü™\‹\Û]KLŒ›ØÝ\Î›Ý][™K[›Û™H›ØÝ\Î˜›Ü™\‹VÈÌMÌÐMÐ×H‚ˆÏ‚ˆÙ]‚ˆÙ]‚‚ˆÝ\ØYY]ÙOOH	Ùš[IÈÈ
+ˆ]ˆÛ\ÜÓ˜[YOHœM›Ý[™Y^™Ë]Ú]H›Ü™\‹Lˆ›Ü™\‹Y\ÚY›Ü™\‹\Û]KLŒ^XÙ[\ˆÜXÙK^KLˆ‚ˆ\ØYÛÝYÛ\ÜÓ˜[YOHËNN^VÈÌMÌÐMÐ×H^X]]ÈˆÏ‚ˆ]ˆÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^\Û]KMÌ‚ˆ6)ö+¶*¶,H6ava6`H6)öa6`vb¶+öb¶b6a6a6,v`v.H6)öa6av*6)ö-6,H6)va6bH[›žK›™]Ý™X[BˆÙ]‚ˆÛ\ÜÓ˜[YOH^VÌL\H^\Û]KM›Û[YY][H‚ˆ6b¶*¶aH6)ö+v*¶,ö)ö*6b6*¶.v*6)¶*H6av+ö*H6)öa6`vb¶+öb¶b6*¶a6`¶)ö)¶b¶)öbÈ6`vb6,H6)ö+¶*¶b¶)ö,vaÂˆÜ‚‚ˆ]ˆÛ\ÜÓ˜[YOHœLˆ‚ˆ[œ]ˆ™Y^ÜÝ[™[Û™Qš[R[œ]™YŸBˆ\OH™š[H‚ˆXØÙ\HšY[ËÊˆ‚ˆÛÚ[™ÙO^Ú[™Q\™XÝšY[Õ\ØYBˆ\ØX›Y^Ú\Õ\ØY[™ßBˆÛ\ÜÓ˜[YOHšY[ˆ‚ˆYHœÝ[™[Û™K]šY[Ë]\ØYZ[œ]‚ˆÏ‚ˆX™[ˆ[›ÜHœÝ[™[Û™K]šY[Ë]\ØYZ[œ]‚ˆÛ\ÜÓ˜[YO^Ø[›[™KY›^][\ËXÙ[\ˆØ\LˆMHKL‹H›Ý[™Y^™ËVÈÌMÌÐMÐ×HÝ™\Ž˜™ËVÈÌQMQH^]Ú]H^^È›ÛX›XÚÈÝ\œÛÜ‹\Ú[\ˆ˜[œÚ][Û‹X[ÚYÝË^È	Âˆ\Õ\ØY[™ÈÈ	ÛÜXÚ]KMLÚ[\‹Y]™[Ë[›Û™IÈˆ	ÉÂˆXBˆ‚ˆÚ\Õ\ØY[™ÈÈ
+ˆ‚ˆØY\ŒˆÛ\ÜÓ˜[YOHËMM[š[X]K\Ü[ˆˆÏ‚ˆÜ[¶+6)ö,vbˆ6)öa6,v`v.H6b6)öa6av.v)öa6+6*H
+Ý\ØY›ÙÜ™\ÜßIJK‹‹ÜÜ[‚ˆÏ‚ˆ
+Hˆ
+ˆ‚ˆ\ØYÛÝYÛ\ÜÓ˜[YOHËMMˆÏ‚ˆÜ[¶)ö+¶*¶b¶)ö,H6ava6`H6`vb¶+öb¶b6avaˆ6+6aö)ö,¶`ÏÜÜ[‚ˆÏ‚ˆ
+_BˆÛX™[‚ˆÙ]‚‚ˆÚ\Õ\ØY[™È	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOHËY[™Ë\Û]KLL›Ý[™YY[LˆÝ™\™›ÝËZY[ˆ]LÈ‚ˆ]‚ˆÛ\ÜÓ˜[YOH˜™ËY[Y\˜[MLY[˜[œÚ][Û‹X[\˜][Û‹LÌ‚ˆÝ[O^ÞÈÚYˆ	Ý\ØY›ÙÜ™\ÜßIX_BˆÏ‚ˆÙ]‚ˆ
+_B‚ˆÝ\ØYÝXØÙ\ÜÈ	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOHœLÈ›Ý[™Y^™ËY[Y\˜[ML^Y[Y\˜[N^^È›ÛX›Û›Ü™\ˆ›Ü™\‹Y[Y\˜[LŒ^\šYÚ›^›^XÛÛÛN™›^\›ÝÈÛNš][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆØ\Lˆ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ‚ˆÚXÚÐÚ\˜ÛLˆÛ\ÜÓ˜[YOHËMM^Y[Y\˜[MŒÚš[šËLˆÏ‚ˆÜ[žÝ\ØYÝXØÙ\ÜßOÜÜ[‚ˆÙ]‚ˆÛ™]Ó\ÜÛÛ•\›	‰ˆ
+ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆ[™T™]šY]ÕšY[Ê™]Ó\ÜÛÛ•\›
+_BˆÛ\ÜÓ˜[YOHœLÈKLKH›Ý[™Y[È™ËVÈÌMÌÐMÐ×HÝ™\Ž˜™ËVÈÌQMQH^]Ú]H^VÌL\H›ÛX›XÚÈ˜[œÚ][Û‹X[Ý\œÛÜ‹\Ú[\ˆÚš[šËLÚYÝË^È›^][\ËXÙ[\ˆØ\LKHÙ[‹\Ý\ÛNœÙ[‹X]]È‚ˆ‚ˆ^PÚ\˜ÛHÛ\ÜÓ˜[YOHËLËHLËH^Y[Y\˜[LÌˆÏ‚ˆÜ[¶av.v)öb¶a¶*H6)öa6`vb¶+öb¶b6)öa6(¶aÜÜ[‚ˆØ]Û‚ˆ
+_BˆÙ]‚ˆ
+_B‚ˆÝ\ØY\œ›Üˆ	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOHœL‹H›Ý[™Y[È™Ë\›ÜÙKML^\›ÜÙKN^^È›ÛX›Û›Ü™\ˆ›Ü™\‹\›ÜÙKLŒ^\šYÚ›^][\ËXÙ[\ˆØ\Lˆ‚ˆ[\Ú\˜ÛHÛ\ÜÓ˜[YOHËMM^\›ÜÙKMŒÚš[šËLˆÏ‚ˆÜ[žÝ\ØY\œ›ÜŸOÜÜ[‚ˆÙ]‚ˆ
+_BˆÙ]‚ˆ
+Hˆ
+ˆ]‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆX‹LH‚ˆX™[Û\ÜÓ˜[YOH˜›ØÚÈ^VÌL\H›ÛX›XÚÈ^\Û]KMÌ‚ˆ6av.v,v`H6)öa6`vb¶+öb¶b6avaˆ[›žK›™]
+šY[ÈQÈÕRQ
+H6(öb6`öb6+È6)öa6*¶-¶avb¶a‚ˆÛX™[‚ˆÛ™]Ó\ÜÛÛ•\›	‰ˆ
+ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆ[™T™]šY]ÕšY[Ê™]Ó\ÜÛÛ•\›
+_BˆÛ\ÜÓ˜[YOH^VÌL\H^VÈÌMÌÐMÐ×HÝ™\Ž[™\›[™H›ÛX›Û›^][\ËXÙ[\ˆØ\LHÝ\œÛÜ‹\Ú[\ˆ‚ˆ‚ˆ^PÚ\˜ÛHÛ\ÜÓ˜[YOHËLËHLËH^X›YKMŒˆÏ‚ˆÜ[¶av.v)öb¶a¶*H6)öa6,v)ö*6-È6)öa6av`ö*¶b6*ÜÜ[‚ˆØ]Û‚ˆ
+_BˆÙ]‚ˆ[œ]ˆ\OH^‚ˆ™\]Z\™Yˆ˜[YO^Û™]Ó\ÜÛÛ•\›BˆÛÚ[™ÙO^ÊJHOˆÙ]™]Ó\ÜÛÛ•\›
+K\™Ù]˜[YJ_BˆXÙZÛ\H¶av*ö)öaˆYLŒ‹LŒKMMX™ŒY‹MLÌÌÍ˜X˜M6(öb6av.v,v`H6b¶b6*¶b¶b6*‚ˆÛ\ÜÓ˜[YOHËY[LËHKLˆ^^È›ÛX›Û^\Û]KN™Ë]Ú]H›Ý[™Y^›Ü™\ˆ›Ü™\‹\Û]KLŒ›ØÝ\Î›Ý][™K[›Û™H›ØÝ\Î˜›Ü™\‹VÈÌMÌÐMÐ×H‚ˆÏ‚ˆÙ]‚ˆ
+_B‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKY[™Lˆ‚ˆ]Û‚ˆ\OHœÝX›Z]‚ˆ\ØX›Y^Ú\Õ\ØY[™ßBˆÛ\ÜÓ˜[YOHœMˆKL‹H›Ý[™Y^™ËYÜ˜YY[]Ë\ˆœ›ÛKY[Y\˜[MLË]X[MŒÝ™\Ž™œ›ÛKY[Y\˜[MŒÝ™\ŽË]X[MÌ^]Ú]H›ÛX›XÚÈ^^ÈÚYÝË[Y˜[œÚ][Û‹X[›^][\ËXÙ[\ˆØ\LˆÝ\œÛÜ‹\Ú[\ˆXÝ]™NœØØ[KNMH‚ˆ‚ˆ\ÈÛ\ÜÓ˜[YOHËMMˆÏ‚ˆÜ[¶)v-¶)ö`v*H6)öa6av+v)ö-¶,v*H6a6a6ava¶aö+ÜÜ[‚ˆØ]Û‚ˆÙ]‚ˆÙ›Ü›O‚ˆÙ]‚‚ˆËÊˆ‹ˆšY[È™]šY]È^Y\ˆ
+YˆÙ[XÝY
+H
+‹ßBˆÜ™]šY]ÕšY[Õ\›	‰ˆ
+ˆ]ˆÛ\ÜÓ˜[YOHœM›Ý[™YLž™Ë\Û]KNL^]Ú]HÜXÙK^KLÈÚYÝË^›Ü™\ˆ›Ü™\‹\Û]KN[š[X]KY˜YKZ[‹]\‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ^^È›ÛX›XÚÈ^Y[Y\˜[M‚ˆ^PÚ\˜ÛHÛ\ÜÓ˜[YOHËMMˆÏ‚ˆÜ[¶av.v)öb¶a¶*H6av-6.¶a6)öa6`vb¶+öb¶b6)öa6*¶`v)ö.va6bˆ6b6)öa6(¶avaˆ
+[›žH“HÝ™X[JOÜÜ[‚ˆÙ]‚ˆ]Û‚ˆÛÛXÚÏ^Ê
+HOˆÂˆÙ]™]šY]ÕšY[Õ\›
+[
+NÂˆÙ]™]šY]ÔÚYÛ™YYœ˜[YU\›
+[
+NÂˆÙ]™]šY]Ñ\œ›ÜŠ[
+NÂˆ_BˆÛ\ÜÓ˜[YOH^^È^\Û]KMÝ™\Ž^]Ú]HL‹HKLH›Ý[™Y[ÈÝ™\Ž˜™Ë\Û]KN˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ‚ˆ‚ˆ8§%H6)v.¶a6)ö`ˆ6)öa6av-6.¶aˆØ]Û‚ˆÙ]‚‚ˆ]ˆÛ\ÜÓ˜[YOHœ™[]]™H\ÜXÝ]šY[ÈËY[›Ý[™Y^Ý™\™›ÝËZY[ˆ™ËX›XÚÈ›^][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆ›Ü™\ˆ›Ü™\‹\Û]KNÚYÝËZ[›™\ˆ‚ˆÜ™]šY]ÓØY[™ÈÈ
+ˆ]ˆÛ\ÜÓ˜[YOH™›^›^XÛÛ][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆØ\LÈ^\Û]KLÌ^^È›ÛX›ÛN‚ˆØY\ŒˆÛ\ÜÓ˜[YOHËNN[š[X]K\Ü[ˆ^Y[Y\˜[MˆÏ‚ˆÜ[¶+6)ö,vbˆ6)v.v+ö)ö+È6av-6.¶a6)öa6`vb¶+öb¶b6b6*¶b6a6b¶+È6*¶-v,vb¶+H6)öa6av-6)öaö+ö*H6)öa6(¶ava‹‹‹ÜÜ[‚ˆÙ]‚ˆ
+Hˆ™]šY]Ñ\œ›ÜˆÈ
+ˆ]ˆÛ\ÜÓ˜[YOH™›^›^XÛÛ][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆØ\Lˆ^\›ÜÙKM^^È›ÛX›ÛN^XÙ[\ˆ‚ˆ[\Ú\˜ÛHÛ\ÜÓ˜[YOHËMÈMÈ^\›ÜÙKMLˆÏ‚ˆÜ[žÜ™]šY]Ñ\œ›ÜŸOÜÜ[‚ˆ]Û‚ˆÛÛXÚÏ^Ê
+HOˆ[™T™]šY]ÕšY[Ê™]šY]ÕšY[Õ\›
+_BˆÛ\ÜÓ˜[YOH›]LˆLËHKLKH™Ë\Û]KNÝ™\Ž˜™Ë\Û]KMÌ›Ý[™Y[È^]Ú]H^^È›ÛX›XÚÈ˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ‚ˆ‚ˆ6)v.v)ö+ö*H6)öa6av+v)öb6a6*BˆØ]Û‚ˆÙ]‚ˆ
+Hˆ™]šY]ÔÚYÛ™YYœ˜[YU\›È
+ˆYœ˜[YBˆÜ˜Ï^Ü™]šY]ÔÚYÛ™YYœ˜[YU\›BˆØY[™ÏH›^žH‚ˆÛ\ÜÓ˜[YOH˜›Ü™\‹LXœÛÛ]HÜLYLY[ËY[‚ˆ[ÝÏH˜XØÙ[\›ÛY]\ŽÙÞ\›ÜØÛÜNØ]]Ü^NÙ[˜Üž\Y[YYXNÜXÝ\™KZ[‹\XÝ\™NÈ‚ˆ[ÝÑ[ØÜ™Y[^ÝY_BˆÏ‚ˆ
+Hˆ
+ˆ]ˆÛ\ÜÓ˜[YOH^\Û]KM^^È›ÛX›Û¶a6)È6b¶b6+6+È6,v)ö*6-È6`vb¶+öb¶b6av*¶)ö+H6a6a6av.v)öb¶a¶*OÙ]‚ˆ
+_BˆÙ]‚ˆÙ]‚ˆ
+_B‚ˆËÊˆËˆ^\Ý[™È\ÜÛÛœÈ\Ý
+‹ßBˆ]ˆÛ\ÜÓ˜[YOHœÜXÙK^KLÈ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆ‚ˆÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^\Û]KN‚ˆ6`¶)ö)¶av*H6+ö,vb6,È6b6av+v)ö-¶,v)ö*ˆ6)öa6+öb6,v*H
+ØÛÝ\œÙS\ÜÛÛœË›[™ÝH6+ö,v,ÊBˆÚ‚ˆÜ[ˆÛ\ÜÓ˜[YOH^VÌL\H^\Û]KML›ÛX›Û‚ˆ6b¶*¶aH6+v`v.6)öa6*¶,v*¶b¶*6b6)öa6av-6)öaö+ö)ö*ˆ6*¶a6`¶)ö)¶b¶)öbÂˆÜÜ[‚ˆÙ]‚‚ˆÛ\ÜÛÛœÓØY[™ÈÈ
+ˆ]ˆÛ\ÜÓ˜[YOHœN^XÙ[\ˆ^\Û]KML^^È›ÛX›Û›^][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆØ\Lˆ‚ˆØY\ŒˆÛ\ÜÓ˜[YOHËMHMH[š[X]K\Ü[ˆ^VÈÌMÌÐMÐ×HˆÏ‚ˆÜ[¶+6)ö,vbˆ6*¶+vavb¶a6)öa6+ö,vb6,Ë‹‹ÜÜ[‚ˆÙ]‚ˆ
+HˆÛÝ\œÙS\ÜÛÛœË›[™ÝOOHÈ
+ˆ]ˆÛ\ÜÓ˜[YOHœN›Ý[™YLž™Ë\Û]KML›Ü™\ˆ›Ü™\‹\Û]KLŒ^XÙ[\ˆÜXÙK^KLˆ‚ˆšY[ÈÛ\ÜÓ˜[YOHËNN^\Û]KM^X]]ÈˆÏ‚ˆ]ˆÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^\Û]KMÌ¶a6aH6b¶*¶aH6)v-¶)ö`v*H6+ö,vb6,È6*6.v+ÏÙ]‚ˆÛ\ÜÓ˜[YOH^VÌL\H^\Û]KM‚ˆ6)ö,ö*¶+¶+öaH6)öa6a¶avb6,6+6(ö.va6)öaÈ6a6,v`v.H6(öb6a6`vb¶+öb¶b6(öb6+ö,v,È6a6aö,6aÈ6)öa6+öb6,v*BˆÜ‚ˆÙ]‚ˆ
+Hˆ
+ˆ]ˆÛ\ÜÓ˜[YOHœÜXÙK^KL‹H‚ˆØÛÝ\œÙS\ÜÛÛœË›X\
+
+\ÜÛÛŽˆ[žKYˆ[X™\ŠHOˆ
+ˆ]‚ˆÙ^O^Û\ÜÛÛ‹šYYBˆÛ\ÜÓ˜[YOHœLËH›Ý[™YLž™Ë]Ú]H›Ü™\ˆ›Ü™\‹\Û]KLŒ›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆØ\LÈÝ™\Ž˜›Ü™\‹\Û]KLÌ˜[œÚ][Û‹X[‚ˆ‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\LÈ‚ˆÜ[ˆÛ\ÜÓ˜[YOHËMÈMÈ›Ý[™Y^™Ë\Û]KLL^\Û]KMÌ^^È›ÛX›XÚÈ›^][\ËXÙ[\ˆ\ÝYžKXÙ[\ˆÚš[šËL‚ˆÚY
+È_BˆÜÜ[‚ˆ]‚ˆHÛ\ÜÓ˜[YOH^^È›ÛX›XÚÈ^\Û]KNLžÛ\ÜÛÛ‹]_OÚO‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ^VÌLH^\Û]KML›Û[YY][H]LH‚ˆÜ[ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\LH‚ˆÛØÚÈÛ\ÜÓ˜[YOHËLÈLÈ^\Û]KMˆÏ‚ˆÜ[žÛ\ÜÛÛ‹™\˜][ÛŸOÜÜ[‚ˆÜÜ[‚ˆÜ[¸ (ÜÜ[‚ˆÜ[ˆÛ\ÜÓ˜[YOH^X›YKMŒ›Û[[Û›È‚ˆÛ\ÜÛÛ‹šY[Õ\›ˆÈ\ÜÛÛ‹šY[Õ\›š[˜ÛY\Ê	ËIÊH	‰ˆ\ÜÛÛ‹šY[Õ\››[™ÝˆŒˆÈ[›žNˆ	Û\ÜÛÛ‹šY[Õ\›œÝXœÝš[™ÊL
+_K‹‹˜ˆˆ6`vb¶+öb¶bˆ	Û\ÜÛÛ‹šY[Õ\›œÝXœÝš[™ÊMJ_K‹‹˜ˆˆ	ö*6+öb6aˆ6`vb¶+öb¶b	ßBˆÜÜ[‚ˆÛ\ÜÛÛ‹š][\È	‰ˆ\ÜÛÛ‹š][\Ë›[™Ýˆ	‰ˆ
+ˆ‚ˆÜ[¸ (ÜÜ[‚ˆÜ[ˆÛ\ÜÓ˜[YOH^Y[Y\˜[MÌ›ÛX›Û‚ˆÛ\ÜÛÛ‹š][\Ë›[™ÝH6av`¶)ö-ö.H6`v,v.vb¶*BˆÜÜ[‚ˆÏ‚ˆ
+_BˆÙ]‚ˆÙ]‚ˆÙ]‚‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ‚ˆÛ\ÜÛÛ‹šY[Õ\›	‰ˆ
+ˆ]Û‚ˆÛÛXÚÏ^Ê
+HOˆ[™T™]šY]ÕšY[Ê\ÜÛÛ‹šY[Õ\›
+_BˆÛ\ÜÓ˜[YOHœLÈKLKH›Ý[™Y^™ËX›YKMLÝ™\Ž˜™ËX›YKLL^VÈÌMÌÐMÐ×H^VÌL\H›ÛX›XÚÈ˜[œÚ][Û‹XÛÛÜœÈ›^][\ËXÙ[\ˆØ\LHÝ\œÛÜ‹\Ú[\ˆ‚ˆ‚ˆ^PÚ\˜ÛHÛ\ÜÓ˜[YOHËLËHLËH^X›YKMŒˆÏ‚ˆÜ[¶av.v)öb¶a¶*OÜÜ[‚ˆØ]Û‚ˆ
+_B‚ˆ]Û‚ˆÛÛXÚÏ^Ê
+HOˆ[™Q[]S\ÜÛÛŠ\ÜÛÛ‹šY
+_BˆÛ\ÜÓ˜[YOHœLKH›Ý[™Y^™Ë\Û]KLLÝ™\Ž˜™Ë\›ÜÙKML^\Û]KMÝ™\Ž^\›ÜÙKMŒ˜[œÚ][Û‹XÛÛÜœÈÝ\œÛÜ‹\Ú[\ˆ‚ˆ]OH¶+v,6`H6)öa6+ö,v,È‚ˆ‚ˆ˜\ÚˆÛ\ÜÓ˜[YOHËMMˆÏ‚ˆØ]Û‚ˆÙ]‚ˆÙ]‚ˆ
+J_BˆÙ]‚ˆ
+_BˆÙ]‚ˆÙ]‚‚ˆËÊˆ[Ù[›ÛÝ\ˆ
+‹ßBˆ]ˆÛ\ÜÓ˜[YOHœM™Ë\Û]KML›Ü™\‹]›Ü™\‹\Û]KLL›^][\ËXÙ[\ˆ\ÝYžKX™]ÙY[ˆ^^È^\Û]KML›ÛX›Û‚ˆ]ˆÛ\ÜÓ˜[YOH™›^][\ËXÙ[\ˆØ\Lˆ‚ˆÚY[ÚXÚÈÛ\ÜÓ˜[YOHËMM^Y[Y\˜[MŒˆÏ‚ˆÜ[¶+6avb¶.H6)öa6`vb¶+öb¶b6aö)ö*ˆ6av-6`v,v*H6*¶a6`¶)ö)¶b¶)öbÈ6b6*¶.vava6av.H6*¶`¶a¶b¶*H6)öa6+vav)öb¶*H6avaˆ6)öa6`¶,v-va¶*H6b6*¶b6*öb¶`ˆ6)öa6-ö)öa6*ÜÜ[‚ˆÙ]‚ˆ]Û‚ˆ\OH˜]Ûˆ‚ˆÛÛXÚÏ^Ê
+HOˆÂˆÙ]Ù[XÝYÛÝ\œÙQ›Ü“\ÜÛÛœÊ[
+NÂˆÙ]™]šY]ÕšY[Õ\›
+[
+NÂˆÙ]™]šY]ÔÚYÛ™YYœ˜[YU\›
+[
+NÂˆÙ]™]šY]Ñ\œ›ÜŠ[
+NÂˆ_BˆÛ\ÜÓ˜[YOHœMHKLˆ›Ý[™Y^™Ë\Û]KLŒÝ™\Ž˜™Ë\Û]KLÌ^\Û]KN›ÛX›XÚÈÝ\œÛÜ‹\Ú[\ˆ˜[œÚ][Û‹XÛÛÜœÈ‚ˆ‚ˆ6)v.¶a6)ö`‚ˆØ]Û‚ˆÙ]‚ˆÛ[Ý[Û‹™]‚ˆÙ]‚ˆ
+_BˆÐ[š[X]T™\Ù[˜ÙO‚ˆÙ]‚ˆ
+NÂŸB

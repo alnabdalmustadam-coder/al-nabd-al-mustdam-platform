@@ -41,7 +41,7 @@ type RejectedRequest = {
 export type AuthorizationResult = AuthenticatedRequest | RejectedRequest;
 
 function errorResponse(message: string, status: number) {
-  return NextResponse.json({ success: false, message }, { status });
+  return NextResponse.json({ success: false, error: message, message }, { status });
 }
 
 function hasAllowedOrigin(request?: Request): boolean {
