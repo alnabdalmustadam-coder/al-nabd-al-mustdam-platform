@@ -142,10 +142,9 @@ export async function requireAdmin(request?: Request): Promise<AuthorizationResu
 
   const method = request?.method.toUpperCase() || 'GET';
   const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
-  const mfaConfigured = process.env.REQUIRE_ADMIN_MFA;
-  const requireMfa = mfaConfigured === 'true' || (
-    process.env.NODE_ENV === 'production' && mfaConfigured !== 'false'
-  );
+  // MFA is opt-in while the platform is being configured. Set
+  // REQUIRE_ADMIN_MFA=true before launch to enforce AAL2 for mutations.
+  const requireMfa = process.env.REQUIRE_ADMIN_MFA === 'true';
 
   if (isMutation && requireMfa && auth.assuranceLevel !== 'aal2') {
     return {

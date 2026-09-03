@@ -24,4 +24,5 @@ test('admin course UI displays authorization messages returned by the API', asyn
 
   assert.match(pageSource, /data\.error \|\| data\.message/);
   assert.match(authSource, /\{ success: false, error: message, message \}/);
+  assert.match(authSource, /const requireMfa = process\.env\.REQUIRE_ADMIN_MFA === 'true'/);
 });
