@@ -116,13 +116,14 @@ export default function StudentWishlistPage() {
                 className="group relative rounded-2xl sm:rounded-[28px] overflow-hidden bg-white/90 border border-slate-200/80 hover:border-slate-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
               >
                 {/* Top Image Section */}
-                <div className="relative h-44 bg-gradient-to-br from-slate-50 to-[#f0f4f8] p-6 flex items-center justify-center overflow-hidden">
-                  <div className="relative w-full h-full">
+                <div className="relative h-44 overflow-hidden bg-gradient-to-br from-slate-50 to-[#f0f4f8]">
+                  <div className="absolute inset-0">
                     <Image
                       src={course.image || '/logo.webp'}
                       alt={course.title}
                       fill
-                      className="object-contain group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
 

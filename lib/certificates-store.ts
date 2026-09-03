@@ -54,7 +54,7 @@ const CERTIFICATE_COLUMNS = 'id, certificate_code, issued_at, pdf_url, template_
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export class CertificatePersistenceError extends Error {
-  constructor(message = 'تعذر حفظ بيانات الشهادات في Supabase. تأكد من تطبيق ترحيل قاعدة البيانات ثم حاول مرة أخرى.') {
+  constructor(message = 'تعذر حفظ بيانات الشهادات في قاعدة البيانات. تأكد من اكتمال إعدادات الاتصال ثم حاول مرة أخرى.') {
     super(message);
     this.name = 'CertificatePersistenceError';
   }

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       const apiKey = process.env.BUNNY_STREAM_API_KEY || '';
 
       if (!apiKey || !libraryId) {
-        return NextResponse.json({ error: 'إعدادات Bunny Stream غير مكتملة' }, { status: 500 });
+        return NextResponse.json({ error: 'إعدادات رفع الفيديو غير مكتملة' }, { status: 500 });
       }
 
       // 1. Create Video Object in Bunny Stream
@@ -44,7 +44,8 @@ export async function POST(req: NextRequest) {
 
       if (!createRes.ok) {
         const errData = await createRes.json().catch(() => ({}));
-        throw new Error(errData.Message || 'فشل إنشاء سجل الفيديو في Bunny Stream');
+        console.error('Video record creation failed:', errData);
+        throw new Error('تعذر تجهيز الفيديو للرفع');
       }
 
       const videoData = await createRes.json();
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
       });
 
       if (!uploadRes.ok) {
-        throw new Error('فشل رفع ملف الفيديو إلى خوادم Bunny Stream');
+        throw new Error('تعذر رفع ملف الفيديو');
       }
 
       // 3. Generate initial playback token
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
         title,
         iframeUrl: playback.iframeUrl,
         embedUrl: playback.embedUrl,
-        message: 'تم رفع الفيديو ومعالجته بنجاح على Bunny Stream',
+        message: 'تم رفع الفيديو وتجهيزه بنجاح',
       });
     }
 
@@ -98,6 +99,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error('Error in Bunny video upload:', err);
-    return NextResponse.json({ error: err.message || 'فشل رفع الفيديو' }, { status: 500 });
+    return NextResponse.json({ error: 'فشل رفع الفيديو. حاول مرة أخرى.' }, { status: 500 });
   }
 }

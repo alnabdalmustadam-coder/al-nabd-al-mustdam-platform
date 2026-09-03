@@ -34,16 +34,14 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
         <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#173A7C] via-[#5CB07C] to-[#173A7C] z-30 opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
 
         {/* Top Image Section */}
-        <div className="relative h-48 sm:h-52 bg-gradient-to-br from-slate-50 to-[#f0f4f8] p-8 flex items-center justify-center overflow-hidden">
-          {/* Subtle Glow Background Behind Image */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent z-10 opacity-80"></div>
-
-          <div className="relative w-full h-full z-0">
+        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-slate-50 to-[#f0f4f8] sm:h-52">
+          <div className="absolute inset-0 z-0">
             <ShimmerImage
               src={imageUrl}
               alt={course.title}
               fill
-              className="object-contain opacity-90 group-hover:scale-110 transition-transform duration-700 drop-shadow-md"
+              className="object-cover group-hover:scale-105 transition-transform duration-700"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
 

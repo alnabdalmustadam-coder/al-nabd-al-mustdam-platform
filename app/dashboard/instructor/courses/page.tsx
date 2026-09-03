@@ -52,6 +52,8 @@ import {
 import { QuizData, QuizQuestion, CourseAttachment, SubLessonItem, Course } from '@/types';
 import { createClient } from '@/utils/supabase/client';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
+import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
+import { ShimmerImage } from '@/components/ui/ShimmerImage';
 
 interface CourseItem {
   id: string;
@@ -215,6 +217,7 @@ export default function InstructorCoursesPage() {
   const [modalActiveTab, setModalActiveTab] = useState<'basic' | 'curriculum' | 'attachments' | 'exam'>('basic');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  useMobileDialogScrollLock(isModalOpen);
   const [editingCourse, setEditingCourse] = useState<CourseItem | null>(null);
   const [formTitle, setFormTitle] = useState('');
   const [formSlug, setFormSlug] = useState('');
@@ -1080,13 +1083,13 @@ export default function InstructorCoursesPage() {
               className="p-4 sm:p-5 rounded-3xl liquid-glass-card liquid-glass-hover flex flex-col justify-between space-y-4 student-card-accent group relative overflow-hidden"
             >
               <div className="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-xs">
-                <img
+                <ShimmerImage
                   src={course.image || '/1.png'}
                   alt={course.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/1.png';
-                  }}
+                  fill
+                  fallbackSrc="/1.png"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
                 <div className="absolute top-3 right-3 left-3 flex items-center justify-between gap-2 pointer-events-none">
@@ -1171,24 +1174,24 @@ export default function InstructorCoursesPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+            className="fixed inset-0 z-[100] flex items-stretch justify-stretch bg-slate-950/80 backdrop-blur-md sm:items-center sm:justify-center sm:p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden my-auto flex flex-col max-h-[92vh]"
+              className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-white shadow-2xl sm:h-auto sm:max-h-[92vh] sm:max-w-5xl sm:rounded-3xl sm:border sm:border-slate-200/80"
             >
-              <div className="p-5 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] text-white flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
+              <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] px-4 py-3 text-white sm:p-5">
+                <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                  <div className="shrink-0 rounded-xl border border-white/20 bg-white/10 p-2 backdrop-blur-md sm:rounded-2xl sm:p-2.5">
                     <BookOpen className="w-5 h-5 text-amber-300" />
                   </div>
-                  <div>
-                    <h3 className="font-black text-base sm:text-lg">
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-black sm:text-lg">
                       {editingCourse ? `إدارة وتعديل: ${editingCourse.title}` : 'إنشاء دورة تدريبية جديدة'}
                     </h3>
-                    <p className="text-xs text-blue-100 font-bold">بوابة المحاضر لإدارة المناهج والوسائط والاختبارات</p>
+                    <p className="hidden text-xs font-bold text-blue-100 sm:block">بوابة المحاضر لإدارة المناهج والوسائط والاختبارات</p>
                   </div>
                 </div>
 
@@ -1201,61 +1204,66 @@ export default function InstructorCoursesPage() {
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 p-3 bg-slate-50 border-b border-slate-200 overflow-x-auto no-scrollbar shrink-0">
+              <div className="grid shrink-0 grid-cols-4 gap-1 border-b border-slate-200 bg-slate-50 p-2 sm:flex sm:items-center sm:gap-2 sm:overflow-x-auto sm:p-3">
                 <button
                   type="button"
                   onClick={() => setModalActiveTab('basic')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 cursor-pointer transition-all ${
+                  className={`flex cursor-pointer items-center justify-center gap-1 rounded-xl px-1 py-2 text-[10px] font-black transition-all sm:gap-2 sm:px-4 sm:text-xs ${
                     modalActiveTab === 'basic'
                       ? 'bg-[#173A7C] text-white shadow-sm'
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
                   <BookOpen className="w-4 h-4" />
-                  <span>1. البيانات الأساسية والغلاف</span>
+                  <span className="sm:hidden">البيانات</span>
+                  <span className="hidden sm:inline">1. البيانات الأساسية والغلاف</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setModalActiveTab('curriculum')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 cursor-pointer transition-all ${
+                  className={`flex cursor-pointer items-center justify-center gap-1 rounded-xl px-1 py-2 text-[10px] font-black transition-all sm:gap-2 sm:px-4 sm:text-xs ${
                     modalActiveTab === 'curriculum'
                       ? 'bg-[#173A7C] text-white shadow-sm'
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
                   <Layers className="w-4 h-4" />
-                  <span>2. المناهج والدروس والفيديوهات ({formSections.length})</span>
+                  <span className="sm:hidden">المنهج</span>
+                  <span className="hidden sm:inline">2. المناهج والدروس والفيديوهات ({formSections.length})</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setModalActiveTab('attachments')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 cursor-pointer transition-all ${
+                  className={`flex cursor-pointer items-center justify-center gap-1 rounded-xl px-1 py-2 text-[10px] font-black transition-all sm:gap-2 sm:px-4 sm:text-xs ${
                     modalActiveTab === 'attachments'
                       ? 'bg-[#173A7C] text-white shadow-sm'
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
                   <Paperclip className="w-4 h-4" />
-                  <span>3. الحقيبة والمرفقات ({formAttachments.length})</span>
+                  <span className="sm:hidden">المرفقات</span>
+                  <span className="hidden sm:inline">3. الحقيبة والمرفقات ({formAttachments.length})</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setModalActiveTab('exam')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 cursor-pointer transition-all ${
+                  className={`flex cursor-pointer items-center justify-center gap-1 rounded-xl px-1 py-2 text-[10px] font-black transition-all sm:gap-2 sm:px-4 sm:text-xs ${
                     modalActiveTab === 'exam'
                       ? 'bg-[#173A7C] text-white shadow-sm'
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
                   <Award className="w-4 h-4" />
-                  <span>4. الاختبار النهائي {hasFinalExam && '✓'}</span>
+                  <span className="sm:hidden">الاختبار</span>
+                  <span className="hidden sm:inline">4. الاختبار النهائي {hasFinalExam && '✓'}</span>
                 </button>
               </div>
 
-              <form onSubmit={handleSaveCourse} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+              <form onSubmit={handleSaveCourse} className="flex min-h-0 flex-1 flex-col overflow-hidden sm:block sm:space-y-6 sm:overflow-y-auto sm:p-6">
+                <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain p-4 sm:contents">
                 {modalActiveTab === 'basic' && (
                   <div className="space-y-4 text-xs font-bold">
                     <div className="space-y-1">
@@ -1371,8 +1379,8 @@ export default function InstructorCoursesPage() {
                       onChange={(url) => setFormImage(url)}
                       folder="courses"
                       slug={formSlug || 'course'}
-                      label="صورة وغلاف الدورة التدريبية (رفع مباشر من جهازك مع ضغط WebP)"
-                      recommendedSize="المقاس المثالي: 1280 × 720 بكسل (WebP / JPG / PNG)"
+                      label="صورة غلاف الدورة"
+                      recommendedSize="المقاس الموصى به: 1280 × 720 بكسل"
                       aspectRatio="video"
                     />
 
@@ -1397,7 +1405,7 @@ export default function InstructorCoursesPage() {
                         <div className="flex items-center justify-between">
                           <span className="flex items-center gap-2">
                             <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
-                            <span>جاري رفع ومعالجة الفيديو على سيرفر البث الآمن (Bunny Stream)...</span>
+                            <span>جاري رفع الفيديو وتجهيزه للمشاهدة الآمنة...</span>
                           </span>
                           <span className="font-mono">{lessonUploadProgress}%</span>
                         </div>
@@ -1701,11 +1709,12 @@ export default function InstructorCoursesPage() {
                   </div>
                 )}
 
-                <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 rounded-2xl">
+                </div>
+                <div className="flex shrink-0 items-center justify-between gap-2 border-t border-slate-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:mt-6 sm:rounded-2xl sm:bg-slate-50 sm:p-4">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs cursor-pointer"
+                    className="flex-1 cursor-pointer rounded-xl bg-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-300 sm:flex-none"
                   >
                     إلغاء
                   </button>
@@ -1713,7 +1722,7 @@ export default function InstructorCoursesPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-emerald-600 text-white font-black text-xs shadow-md hover:opacity-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-emerald-600 px-6 py-2.5 text-xs font-black text-white shadow-md hover:opacity-95 disabled:opacity-50 sm:flex-none"
                   >
                     {isSubmitting ? (
                       <>
@@ -1723,7 +1732,8 @@ export default function InstructorCoursesPage() {
                     ) : (
                       <>
                         <Check className="w-4 h-4" />
-                        <span>حفظ واعتماد التعديلات بالكامل</span>
+                        <span className="sm:hidden">حفظ الدورة</span>
+                        <span className="hidden sm:inline">حفظ واعتماد التعديلات بالكامل</span>
                       </>
                     )}
                   </button>

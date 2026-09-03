@@ -9,7 +9,7 @@ let adminClient: SupabaseClient | null = null;
 
 export function getSupabaseAdmin(): SupabaseClient {
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Supabase server credentials are not configured');
+    throw new Error('إعدادات الاتصال بقاعدة البيانات غير مكتملة');
   }
 
   if (!adminClient) {

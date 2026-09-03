@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { UploadCloud, CheckCircle2, AlertCircle, Loader2, Image as ImageIcon, X, RefreshCw } from 'lucide-react';
+import { UploadCloud, AlertCircle, Loader2, Image as ImageIcon, X, RefreshCw } from 'lucide-react';
+import { ShimmerImage } from '@/components/ui/ShimmerImage';
 
 interface DeviceImageUploaderProps {
   value?: string;
@@ -67,7 +68,7 @@ export function DeviceImageUploader({
   folder = 'general',
   slug = '',
   label = 'صورة الغلاف المعتمدة',
-  recommendedSize = 'المقاس الموصى به: 1200 × 800 بكسل (WebP / JPG / PNG)',
+  recommendedSize = 'المقاس الموصى به: 1200 × 800 بكسل',
   aspectRatio = 'video',
   className = '',
 }: DeviceImageUploaderProps) {
@@ -89,8 +90,9 @@ export function DeviceImageUploader({
     setErrorText(null);
     setIsUploading(true);
     setProgress(15);
-    setStatusText('جاري ضغط الصورة ومعالجتها إلى صيغة WebP...');
+    setStatusText('جاري تجهيز الصورة...');
 
+    let progressTimer: ReturnType<typeof setInterval> | undefined;
     try {
       // 1. Client-side compression to WebP
       let webpBlob: Blob;
@@ -102,7 +104,7 @@ export function DeviceImageUploader({
       }
 
       setProgress(45);
-      setStatusText('جاري رفع الصورة إلى التخزين السحابي...');
+      setStatusText('جاري حفظ الصورة...');
 
       // 2. Prepare Form Data
       const formData = new FormData();
@@ -113,7 +115,7 @@ export function DeviceImageUploader({
       if (value) formData.append('existingImageUrl', value);
 
       // 3. Upload with simulated smooth progress
-      const progressTimer = setInterval(() => {
+      progressTimer = setInterval(() => {
         setProgress((prev) => (prev < 90 ? prev + 10 : prev));
       }, 120);
 
@@ -130,7 +132,7 @@ export function DeviceImageUploader({
       }
 
       setProgress(100);
-      setStatusText('تم الرفع والضغط بنجاح (صيغة WebP فائقة السرعة)!');
+      setStatusText('تم حفظ الصورة بنجاح');
       onChange(data.imageUrl);
 
       setTimeout(() => {
@@ -138,12 +140,14 @@ export function DeviceImageUploader({
         setProgress(0);
         setStatusText('');
       }, 1200);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Image uploader error:', err);
-      setErrorText(err.message || 'حدث خطأ أثناء رفع الصورة');
+      setErrorText(err instanceof Error ? err.message : 'حدث خطأ أثناء رفع الصورة');
       setIsUploading(false);
       setProgress(0);
       setStatusText('');
+    } finally {
+      if (progressTimer) clearInterval(progressTimer);
     }
   };
 
@@ -156,21 +160,21 @@ export function DeviceImageUploader({
   };
 
   const aspectClasses = {
-    video: 'aspect-16/10 max-h-[195px]',
-    square: 'aspect-square max-h-[190px]',
-    banner: 'aspect-21/9 max-h-[150px]',
-    auto: 'min-h-[130px] max-h-[195px]',
+    video: 'aspect-video sm:aspect-16/10 sm:max-h-[195px]',
+    square: 'aspect-square sm:max-h-[190px]',
+    banner: 'aspect-21/9 sm:max-h-[150px]',
+    auto: 'min-h-[150px] sm:min-h-[130px] sm:max-h-[195px]',
   }[aspectRatio];
 
   return (
     <div className={`space-y-1.5 text-right ${className}`}>
-      <div className="flex items-center justify-between">
-        <label className="text-slate-700 text-xs font-black flex items-center gap-1.5">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <label className="text-slate-800 text-xs font-black flex items-center gap-1.5 leading-snug">
           <ImageIcon className="w-3.5 h-3.5 text-[#173A7C]" />
           <span>{label}</span>
         </label>
         {recommendedSize && (
-          <span className="text-[10px] text-slate-400 font-medium">
+          <span className="block pr-5 text-[10px] font-bold text-slate-400 sm:pr-0 sm:font-medium">
             {recommendedSize}
           </span>
         )}
@@ -194,7 +198,7 @@ export function DeviceImageUploader({
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
-        className={`relative overflow-hidden rounded-2xl border-2 transition-all duration-300 ${
+        className={`relative w-full overflow-hidden rounded-[1.25rem] border-2 transition-all duration-300 sm:rounded-2xl ${
           isDragging
             ? 'border-[#173A7C] bg-blue-50/50 scale-[1.01]'
             : 'border-dashed border-slate-300 hover:border-[#173A7C]/60 bg-slate-50/70 hover:bg-white'
@@ -202,25 +206,25 @@ export function DeviceImageUploader({
       >
         {/* Preview of Current Image */}
         {value && !isUploading && (
-          <div className="relative w-full h-full flex flex-col justify-between group">
-            <img
+          <div className="absolute inset-0 flex flex-col justify-between group">
+            <ShimmerImage
+              key={value}
               src={value}
               alt="معاينة الصورة"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/logo.webp';
-              }}
+              fill
+              sizes="(max-width: 640px) 100vw, 420px"
+              className="object-cover"
             />
             {/* Bottom Floating Action Bar */}
             <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-slate-950/85 via-slate-900/60 to-transparent flex items-center justify-between gap-2 text-white">
-              <span className="text-[10px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 px-2 py-0.5 rounded-md backdrop-blur-md">
-                ✓ WebP معتمد
+              <span className="rounded-md border border-emerald-300/30 bg-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-100 backdrop-blur-md">
+                صورة الغلاف
               </span>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-2.5 py-1 rounded-lg bg-white text-[#173A7C] text-[11px] font-black shadow-xs hover:bg-blue-50 transition-all flex items-center gap-1 cursor-pointer"
+                  className="flex min-h-10 cursor-pointer items-center gap-1 rounded-lg bg-white px-2.5 py-1 text-[11px] font-black text-[#173A7C] shadow-xs transition-all hover:bg-blue-50 sm:min-h-0"
                 >
                   <RefreshCw className="w-3 h-3" />
                   <span>تغيير</span>
@@ -228,8 +232,9 @@ export function DeviceImageUploader({
                 <button
                   type="button"
                   onClick={() => onChange('')}
-                  className="p-1 rounded-lg bg-rose-500/80 hover:bg-rose-600 text-white transition-all cursor-pointer"
+                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-rose-500/80 p-1 text-white transition-all hover:bg-rose-600 sm:h-auto sm:w-auto"
                   title="حذف الصورة"
+                  aria-label="حذف الصورة"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -240,9 +245,11 @@ export function DeviceImageUploader({
 
         {/* Empty State / Uploading State */}
         {(!value || isUploading) && (
-          <div
+          <button
+            type="button"
+            disabled={isUploading}
             onClick={() => !isUploading && fileInputRef.current?.click()}
-            className={`w-full h-full flex flex-col items-center justify-center p-4 text-center cursor-pointer ${
+            className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#173A7C] ${
               isUploading ? 'cursor-wait' : ''
             }`}
           >
@@ -264,26 +271,26 @@ export function DeviceImageUploader({
                     />
                   </div>
                 </div>
-                <span className="text-[10px] text-slate-400 block font-medium">
-                  يتم التحويل التلقائي لصيغة WebP لتسريع التحميل
+                <span className="block text-[10px] font-medium text-slate-400">
+                  ستظهر الصورة تلقائياً بعد اكتمال الحفظ
                 </span>
               </div>
             ) : (
-              <div className="space-y-1.5 group">
-                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-[#173A7C] flex items-center justify-center mx-auto shadow-xs group-hover:scale-105 group-hover:border-[#173A7C]/40 transition-all">
+              <div className="group space-y-2 sm:space-y-1.5">
+                <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl border border-blue-100 bg-white text-[#173A7C] shadow-sm transition-all group-hover:scale-105 group-hover:border-[#173A7C]/40 sm:h-10 sm:w-10 sm:rounded-xl sm:border-slate-200 sm:shadow-xs">
                   <UploadCloud className="w-5 h-5 text-[#173A7C]" />
                 </div>
                 <div>
                   <p className="text-xs font-black text-slate-800">
-                    اضغط لرفع صورة من جهازك <span className="text-[#173A7C]">أو اسحبها هنا</span>
+                    اضغط لاختيار صورة من جهازك
                   </p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">
-                    تُضغط وتُحوّل تلقائياً إلى صيغة WebP
+                  <p className="mt-1 text-[10px] font-medium text-slate-400">
+                    PNG أو JPG أو WebP — يتم تحسينها تلقائياً
                   </p>
                 </div>
               </div>
             )}
-          </div>
+          </button>
         )}
       </div>
 

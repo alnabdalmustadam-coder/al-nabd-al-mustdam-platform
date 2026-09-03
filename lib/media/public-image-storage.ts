@@ -20,7 +20,7 @@ function storageErrorMessage(error: unknown): string {
     const message = (error as StorageErrorLike).message;
     if (typeof message === 'string' && message.trim()) return message.trim();
   }
-  return 'Unknown Supabase Storage error';
+  return 'Unknown image storage error';
 }
 
 function storageErrorStatus(error: unknown): number | null {
@@ -45,7 +45,7 @@ function getAdminClient(): SupabaseClient {
     return getSupabaseAdmin();
   } catch (error) {
     console.error('Supabase Storage credentials are unavailable:', error);
-    throw new Error('إعدادات تخزين Supabase غير مكتملة على الخادم');
+    throw new Error('إعدادات حفظ الصور غير مكتملة على الخادم');
   }
 }
 
@@ -114,7 +114,8 @@ export async function uploadPublicWebp({
     });
 
   if (error || !data) {
-    throw new Error(`تعذر رفع الصورة إلى Supabase Storage: ${storageErrorMessage(error)}`);
+    console.error('Public image upload failed:', error);
+    throw new Error('تعذر حفظ الصورة في قاعدة البيانات. حاول مرة أخرى.');
   }
 
   const storedPath = data.path || objectPath;

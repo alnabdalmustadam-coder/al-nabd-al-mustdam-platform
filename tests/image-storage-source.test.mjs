@@ -35,5 +35,6 @@ test('public image storage reports upload errors and provisions the fixed bucket
   assert.match(source, /storage\.getBucket\(bucketName\)/);
   assert.match(source, /storage\.createBucket/);
   assert.match(source, /if \(error \|\| !data\)/);
-  assert.match(source, /تعذر رفع الصورة إلى Supabase Storage/);
+  assert.match(source, /تعذر حفظ الصورة في قاعدة البيانات/);
+  assert.doesNotMatch(source, /throw new Error\([^\n]*Supabase/);
 });

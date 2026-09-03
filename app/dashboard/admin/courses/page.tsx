@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as tus from 'tus-js-client';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import {
   BookOpen,
   Plus,
@@ -35,7 +34,6 @@ import {
   Loader2,
   Eye,
   RefreshCw,
-  Image as ImageIcon,
   Play,
   Check,
   Paperclip,
@@ -53,6 +51,8 @@ import {
 } from 'lucide-react';
 import { QuizData, QuizQuestion, CourseAttachment, SubLessonItem } from '@/types';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
+import { ShimmerImage } from '@/components/ui/ShimmerImage';
+import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
 
 interface CourseItem {
   id: string;
@@ -297,6 +297,7 @@ export default function AdminCoursesPage() {
 
   // Standalone Studio Modal State
   const [selectedCourseForLessons, setSelectedCourseForLessons] = useState<CourseItem | null>(null);
+  useMobileDialogScrollLock(isModalOpen || selectedCourseForLessons !== null);
   const [courseLessons, setCourseLessons] = useState<any[]>([]);
   const [lessonsLoading, setLessonsLoading] = useState(false);
 
@@ -737,7 +738,7 @@ export default function AdminCoursesPage() {
         handleUpdateSection(secIdx, 'videoUrl', videoId);
       }
 
-      showToast(`تم رفع الفيديو ومعالجته بنجاح على Bunny Stream! (المدة: ${calculatedDuration})`);
+      showToast(`تم رفع الفيديو وتجهيزه بنجاح (المدة: ${calculatedDuration})`);
     } catch (err: any) {
       console.error('Lesson video upload failed:', err);
       showToast(err.message || 'فشل رفع الفيديو', 'error');
@@ -1199,7 +1200,7 @@ export default function AdminCoursesPage() {
         return;
       }
 
-      // 1. Bunny Stream GUID extraction (36-character UUID)
+      // 1. Secure video GUID extraction (36-character UUID)
       const guidMatch = trimmed.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
       const videoGuid = guidMatch ? guidMatch[0] : (trimmed.length === 36 ? trimmed : null);
 
@@ -1222,7 +1223,7 @@ export default function AdminCoursesPage() {
       } else if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
         setPreviewSignedIframeUrl(trimmed);
       } else {
-        setPreviewError('معرّف الفيديو غير صالح. يرجى إدخال معرّف Bunny Stream GUID أو رابط فيديو مباشر.');
+        setPreviewError('معرّف الفيديو غير صالح. يرجى إدخال معرّف الفيديو أو رابط مباشر.');
       }
     } catch (err: any) {
       console.error('Error fetching preview token:', err);
@@ -1400,15 +1401,14 @@ export default function AdminCoursesPage() {
             >
               <div>
                 {/* 1. Clean Bright Image Section (Matches Original Platform Theme) */}
-                <div className="relative h-44 sm:h-48 rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 p-6 flex items-center justify-center overflow-hidden border border-slate-100/90 group-hover:border-blue-100 transition-colors mb-4">
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <img
+                <div className="relative h-44 sm:h-48 rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 overflow-hidden border border-slate-100/90 group-hover:border-blue-100 transition-colors mb-4">
+                  <div className="absolute inset-0">
+                    <ShimmerImage
                       src={course.image || '/logo.webp'}
                       alt={course.title}
-                      className="max-h-28 sm:max-h-32 w-auto object-contain p-2 opacity-95 group-hover:scale-105 transition-transform duration-500 drop-shadow-md"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/logo.webp';
-                      }}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
 
@@ -1498,24 +1498,27 @@ export default function AdminCoursesPage() {
       {/* ═════════════════════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-stretch justify-stretch bg-slate-900/70 backdrop-blur-sm sm:items-center sm:justify-center sm:p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[94vh]"
+              className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-white shadow-2xl sm:h-auto sm:max-h-[94vh] sm:max-w-5xl sm:rounded-3xl sm:border sm:border-slate-100"
             >
               {/* Modal Header */}
-              <div className="p-4 sm:p-6 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] text-white flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/10 flex items-center justify-center border border-white/15 shrink-0">
+              <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] px-4 py-3 text-white sm:p-6">
+                <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 sm:h-11 sm:w-11 sm:rounded-2xl">
                     <BookOpen className="w-5 h-5 text-emerald-300" />
                   </div>
-                  <div>
-                    <h3 className="text-sm sm:text-lg font-black">
-                      {editingCourse ? 'تعديل بيانات ومنهج ومرفقات الدورة' : 'إضافة دورة تدريبية جديدة مع المنهج والمرفقات'}
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-black sm:text-lg">
+                      <span className="sm:hidden">{editingCourse ? 'تعديل الدورة' : 'إضافة دورة جديدة'}</span>
+                      <span className="hidden sm:inline">
+                        {editingCourse ? 'تعديل بيانات ومنهج ومرفقات الدورة' : 'إضافة دورة تدريبية جديدة مع المنهج والمرفقات'}
+                      </span>
                     </h3>
-                    <p className="text-[11px] sm:text-xs text-blue-100">
+                    <p className="hidden text-[11px] text-blue-100 sm:block sm:text-xs">
                       دعم كامل لتقسيم الوحدات لمقاطع فرعية متعددة، ملفات PDF/Word، واختبارات تفاعلية ⚡
                     </p>
                   </div>
@@ -1541,7 +1544,8 @@ export default function AdminCoursesPage() {
                     }`}
                   >
                     <Settings className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">1. البيانات والغلاف</span>
+                    <span className="sm:hidden">البيانات</span>
+                    <span className="hidden truncate sm:inline">1. البيانات والغلاف</span>
                   </button>
 
                   <button
@@ -1554,7 +1558,8 @@ export default function AdminCoursesPage() {
                     }`}
                   >
                     <Video className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                    <span className="truncate">2. المنهج والمقاطع ({formSections.length})</span>
+                    <span className="sm:hidden">المنهج</span>
+                    <span className="hidden truncate sm:inline">2. المنهج والمقاطع ({formSections.length})</span>
                   </button>
 
                   <button
@@ -1567,7 +1572,8 @@ export default function AdminCoursesPage() {
                     }`}
                   >
                     <Paperclip className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span className="truncate">3. المرفقات PDF ({formAttachments.length})</span>
+                    <span className="sm:hidden">المرفقات</span>
+                    <span className="hidden truncate sm:inline">3. المرفقات PDF ({formAttachments.length})</span>
                   </button>
 
                   <button
@@ -1580,40 +1586,34 @@ export default function AdminCoursesPage() {
                     }`}
                   >
                     <HelpCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span className="truncate">4. الاختبار {hasFinalExam ? '✓' : ''}</span>
+                    <span className="sm:hidden">الاختبار</span>
+                    <span className="hidden truncate sm:inline">4. الاختبار {hasFinalExam ? '✓' : ''}</span>
                   </button>
                 </div>
               </div>
 
               {/* Form Content */}
-              <form onSubmit={handleSaveCourse} className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1">
+              <form onSubmit={handleSaveCourse} className="flex min-h-0 flex-1 flex-col overflow-hidden sm:block sm:space-y-6 sm:overflow-y-auto sm:p-6">
+                <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain p-4 sm:contents">
                 {/* ═══════════════════════════════════════════════════════════ */}
                 {/* TAB 1: BASIC INFO & COVER */}
                 {/* ═══════════════════════════════════════════════════════════ */}
                 {modalActiveTab === 'basic' && (
                   <div className="space-y-6 animate-fade-in-up">
                     {/* Course Cover Image Section */}
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-                      <label className="block text-xs font-black text-slate-800 flex items-center justify-between">
-                        <span className="flex items-center gap-1.5">
-                          <ImageIcon className="w-4 h-4 text-[#173A7C]" />
-                          <span>صورة وغلاف الدورة التدريبية (Thumbnail)</span>
-                        </span>
-                        <span className="text-[10px] text-slate-500 font-medium">يتم الحفظ في Supabase والموقع فوراً</span>
-                      </label>
-
+                    <div className="space-y-3 rounded-2xl border border-slate-200/80 bg-slate-50 p-3 sm:p-4">
                       <DeviceImageUploader
                         value={formImage}
                         onChange={(url) => setFormImage(url)}
                         folder="courses"
                         slug={formSlug || 'course'}
-                        label="صورة وغلاف الدورة التدريبية (رفع مباشر من جهازك مع ضغط WebP)"
-                        recommendedSize="المقاس المثالي: 1280 × 720 بكسل (WebP / JPG / PNG)"
+                        label="صورة غلاف الدورة"
+                        recommendedSize="المقاس الموصى به: 1280 × 720 بكسل"
                         aspectRatio="video"
                       />
 
                       {/* Presets */}
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-bold pt-1">
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] font-bold text-slate-500">
                         <span>أو اختر من النماذج الجاهزة:</span>
                         {['/logo.webp', '/1.png', '/2.png'].map((preset) => (
                           <button
@@ -2062,7 +2062,7 @@ export default function AdminCoursesPage() {
                                           type="text"
                                           value={sub.videoUrl}
                                           onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'videoUrl', e.target.value)}
-                                          placeholder="معرف فيديو Bunny Stream (GUID) أو رابط الفيديو المعتمد..."
+                                          placeholder="معرّف الفيديو أو رابط الفيديو المعتمد..."
                                           className="flex-1 px-3 py-1.5 text-xs font-mono text-slate-800 bg-white rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C]"
                                         />
 
@@ -2080,7 +2080,7 @@ export default function AdminCoursesPage() {
                                           ) : (
                                             <>
                                               <UploadCloud className="w-3.5 h-3.5" />
-                                              <span>رفع فيديو Bunny</span>
+                                              <span>رفع فيديو</span>
                                             </>
                                           )}
                                         </button>
@@ -2547,17 +2547,18 @@ export default function AdminCoursesPage() {
                   </div>
                 )}
 
+                </div>
                 {/* Modal Footer Controls */}
-                <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-3">
+                <div className="flex shrink-0 items-center justify-between gap-2 border-t border-slate-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:mt-6 sm:gap-3 sm:bg-transparent sm:p-0 sm:pt-4">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs transition-colors cursor-pointer"
+                    className="hidden cursor-pointer rounded-xl bg-slate-100 px-5 py-2.5 text-xs font-black text-slate-700 transition-colors hover:bg-slate-200 sm:block"
                   >
                     إلغاء
                   </button>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex w-full items-center gap-2 sm:w-auto">
                     {modalActiveTab !== 'basic' && (
                       <button
                         type="button"
@@ -2566,7 +2567,7 @@ export default function AdminCoursesPage() {
                           else if (modalActiveTab === 'attachments') setModalActiveTab('curriculum');
                           else if (modalActiveTab === 'curriculum') setModalActiveTab('basic');
                         }}
-                        className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer"
+                        className="flex-1 cursor-pointer rounded-xl bg-slate-100 px-3 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:flex-none sm:px-4"
                       >
                         السابق
                       </button>
@@ -2580,7 +2581,7 @@ export default function AdminCoursesPage() {
                           else if (modalActiveTab === 'curriculum') setModalActiveTab('attachments');
                           else if (modalActiveTab === 'attachments') setModalActiveTab('exam');
                         }}
-                        className="px-4 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs cursor-pointer"
+                        className="flex-1 cursor-pointer rounded-xl bg-[#173A7C] px-3 py-2.5 text-xs font-bold text-white hover:bg-[#1E4D9D] sm:flex-none sm:px-4"
                       >
                         التالي ➔
                       </button>
@@ -2589,17 +2590,20 @@ export default function AdminCoursesPage() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="px-7 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-black text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
+                      className="flex flex-[1.35] cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 px-3 py-2.5 text-xs font-black text-white shadow-md transition-all hover:from-emerald-700 hover:to-teal-800 active:scale-95 disabled:opacity-50 sm:flex-none sm:px-7"
                     >
                       {isSubmitting ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>جاري الحفظ والمزامنة السحابية...</span>
+                          <span>جاري حفظ الدورة...</span>
                         </>
                       ) : (
                         <>
                           <Check className="w-4 h-4" />
-                          <span>{editingCourse ? 'حفظ وتحديث كامل التعديلات ⚡' : 'نشر الدورة مع المنهج والمرفقات 🚀'}</span>
+                          <span className="sm:hidden">{editingCourse ? 'حفظ الدورة' : 'نشر الدورة'}</span>
+                          <span className="hidden sm:inline">
+                            {editingCourse ? 'حفظ وتحديث كامل التعديلات ⚡' : 'نشر الدورة مع المنهج والمرفقات 🚀'}
+                          </span>
                         </>
                       )}
                     </button>
@@ -2616,27 +2620,27 @@ export default function AdminCoursesPage() {
       {/* ═════════════════════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {selectedCourseForLessons && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-stretch justify-stretch bg-slate-900/70 backdrop-blur-sm sm:items-center sm:justify-center sm:p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]"
+              className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-white shadow-2xl sm:h-auto sm:max-h-[92vh] sm:max-w-5xl sm:rounded-3xl sm:border sm:border-slate-100"
             >
               {/* Modal Header */}
-              <div className="p-5 sm:p-6 bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] text-white flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center">
+              <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] px-4 py-3 text-white sm:p-6">
+                <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-500/20 sm:h-11 sm:w-11 sm:rounded-2xl">
                     <Video className="w-5 h-5 text-emerald-300" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
+                  <div className="min-w-0">
+                    <div className="hidden items-center gap-2 sm:flex">
                       <span className="px-2 py-0.5 rounded-md bg-white/20 text-[10px] font-black">
-                        Bunny Stream DRM
+                        بث فيديو آمن
                       </span>
-                      <span className="text-xs text-emerald-300 font-bold">مكتبة رقم: #729792</span>
+                      <span className="text-xs text-emerald-300 font-bold">محتوى محمي</span>
                     </div>
-                    <h3 className="text-base sm:text-lg font-black mt-0.5">{selectedCourseForLessons.title}</h3>
+                    <h3 className="mt-0.5 truncate text-sm font-black sm:text-lg">{selectedCourseForLessons.title}</h3>
                   </div>
                 </div>
                 <button
@@ -2653,15 +2657,15 @@ export default function AdminCoursesPage() {
               </div>
 
               {/* Modal Body */}
-              <div className="p-6 overflow-y-auto space-y-6 flex-1">
+              <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6">
                 {/* 1. Add New Lesson & Upload Section */}
-                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-                  <div className="flex items-center justify-between">
+                <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                  <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <h4 className="text-xs font-black text-slate-800 flex items-center gap-2">
                       <Plus className="w-4 h-4 text-[#173A7C]" />
                       <span>إضافة محاضرة أو درس جديد للدورة</span>
                     </h4>
-                    <div className="flex items-center gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
                       <button
                         type="button"
                         onClick={() => setUploadMethod('file')}
@@ -2671,7 +2675,7 @@ export default function AdminCoursesPage() {
                             : 'bg-white text-slate-600 border border-slate-200'
                         }`}
                       >
-                        رفع فيديو مباشر (Bunny Stream)
+                        رفع فيديو مباشر
                       </button>
                       <button
                         type="button"
@@ -2720,7 +2724,7 @@ export default function AdminCoursesPage() {
                       <div className="p-4 rounded-xl bg-white border-2 border-dashed border-slate-200 text-center space-y-2">
                         <UploadCloud className="w-8 h-8 text-[#173A7C] mx-auto" />
                         <div className="text-xs font-black text-slate-700">
-                          اختر ملف الفيديو للرفع المباشر إلى Bunny.net Stream
+                          اختر ملف الفيديو لرفعه إلى مكتبة الدورة
                         </div>
                         <p className="text-[11px] text-slate-400 font-medium">
                           يتم احتساب وتعبئة مدة الفيديو تلقائياً فور اختياره
@@ -2795,7 +2799,7 @@ export default function AdminCoursesPage() {
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <label className="block text-[11px] font-black text-slate-700">
-                            معرف الفيديو من Bunny.net (Video ID / GUID) أو كود التضمين
+                            معرّف الفيديو أو الرابط أو كود التضمين
                           </label>
                           {newLessonUrl && (
                             <button
@@ -2838,7 +2842,7 @@ export default function AdminCoursesPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-xs font-black text-emerald-400">
                         <PlayCircle className="w-4 h-4" />
-                        <span>معاينة مشغل الفيديو التفاعلي والآمن (Bunny DRM Stream)</span>
+                        <span>معاينة مشغل الفيديو الآمن</span>
                       </div>
                       <button
                         onClick={() => {
@@ -2930,7 +2934,7 @@ export default function AdminCoursesPage() {
                                   <span className="text-blue-600 font-mono">
                                     {lesson.videoUrl
                                       ? lesson.videoUrl.includes('-') && lesson.videoUrl.length > 20
-                                        ? `Bunny: ${lesson.videoUrl.substring(0, 10)}...`
+                                        ? `فيديو محمي: ${lesson.videoUrl.substring(0, 10)}...`
                                         : `فيديو: ${lesson.videoUrl.substring(0, 15)}...`
                                       : 'بدون فيديو'}
                                   </span>
@@ -2973,8 +2977,8 @@ export default function AdminCoursesPage() {
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-bold">
-                <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center justify-between border-t border-slate-100 bg-slate-50 p-3 text-xs font-bold text-slate-500 sm:p-4">
+                <div className="hidden items-center gap-2 sm:flex">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>جميع الفيديوهات مشفرة تلقائياً وتعمل مع تقنية الحماية من القرصنة وتوثيق الطالب</span>
                 </div>
@@ -2986,7 +2990,7 @@ export default function AdminCoursesPage() {
                     setPreviewSignedIframeUrl(null);
                     setPreviewError(null);
                   }}
-                  className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-black cursor-pointer transition-colors"
+                  className="w-full cursor-pointer rounded-xl bg-slate-200 px-5 py-2.5 font-black text-slate-800 transition-colors hover:bg-slate-300 sm:w-auto sm:py-2"
                 >
                   إغلاق
                 </button>

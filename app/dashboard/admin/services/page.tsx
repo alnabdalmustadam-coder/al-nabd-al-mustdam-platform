@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
+import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
 
 interface AdminServiceItem {
   id: string;
@@ -76,6 +77,7 @@ export default function AdminServicesPage() {
 
   // Modal State (Create / Edit)
   const [isModalOpen, setIsModalOpen] = useState(false);
+  useMobileDialogScrollLock(isModalOpen);
   const [editingService, setEditingService] = useState<Partial<AdminServiceItem> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [newDeliverableInput, setNewDeliverableInput] = useState('');
@@ -696,24 +698,24 @@ export default function AdminServicesPage() {
       {/* ── 5. CREATE / EDIT MODAL ── */}
       <AnimatePresence>
         {isModalOpen && editingService && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-md overflow-y-auto">
+          <div className="fixed inset-0 z-[100] flex items-stretch justify-stretch bg-slate-950/70 backdrop-blur-md sm:items-center sm:justify-center sm:p-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              className="bg-white rounded-3xl max-w-5xl w-full shadow-2xl border border-slate-200/80 my-auto max-h-[92vh] flex flex-col overflow-hidden text-right"
+              className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-white text-right shadow-2xl sm:h-auto sm:max-h-[92vh] sm:max-w-5xl sm:rounded-3xl sm:border sm:border-slate-200/80"
             >
               {/* Fixed Header */}
-              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/70">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center shadow-md shrink-0">
+              <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-3 sm:px-6 sm:py-4">
+                <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md sm:h-10 sm:w-10">
                     <Briefcase className="w-5 h-5" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-black text-slate-900 leading-tight">
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-black leading-tight text-slate-900 sm:text-base">
                       {editingService.id ? 'تعديل بيانات الخدمة' : 'إضافة خدمة أو استشارة جديدة'}
                     </h3>
-                    <p className="text-[11px] font-bold text-slate-500 mt-0.5">
+                    <p className="mt-0.5 hidden text-[11px] font-bold text-slate-500 sm:block">
                       حدد كافة التفاصيل والشروط والمخرجات المعتمدة للظهور في المتجر العام
                     </p>
                   </div>
@@ -730,7 +732,7 @@ export default function AdminServicesPage() {
               {/* Form Body & Footer */}
               <form onSubmit={handleSaveService} className="flex-1 flex flex-col overflow-hidden">
                 {/* Scrollable 2-Column Grid */}
-                <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     
                     {/* ── RIGHT COLUMN (7 COLS): Info, Pricing & Deliverables ── */}
@@ -900,13 +902,13 @@ export default function AdminServicesPage() {
                     {/* ── LEFT COLUMN (5 COLS): Image, Visibility & Live Preview ── */}
                     <div className="lg:col-span-5 space-y-4">
                       {/* Device Image Uploader */}
-                      <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
+                      <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 sm:p-4">
                         <DeviceImageUploader
                           value={editingService.image || ''}
                           onChange={(url) => setEditingService({ ...editingService, image: url })}
                           folder="services"
                           slug={editingService.id || 'service'}
-                          label="صورة وبنر الخدمة (WebP معتمد)"
+                          label="صورة غلاف الخدمة"
                           recommendedSize="المقاس: 1200 × 750 بكسل"
                           aspectRatio="video"
                         />
@@ -975,22 +977,22 @@ export default function AdminServicesPage() {
                 </div>
 
                 {/* Fixed Bottom Footer */}
-                <div className="px-6 py-3.5 border-t border-slate-100 flex items-center justify-between bg-slate-50/80 shrink-0">
+                <div className="flex shrink-0 items-center justify-between border-t border-slate-100 bg-slate-50/90 px-4 py-3 sm:px-6 sm:py-3.5">
                   <span className="text-[11px] font-medium text-slate-400 hidden sm:inline">
                     سيتم تطبيق التعديلات فوراً على متجر الخدمات العام وقاعدة البيانات
                   </span>
-                  <div className="flex items-center gap-3">
+                  <div className="flex w-full items-center gap-2 sm:w-auto sm:gap-3">
                     <button
                       type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-200/60 font-black text-xs cursor-pointer transition-colors"
+                      className="flex-1 cursor-pointer rounded-xl px-4 py-2.5 text-xs font-black text-slate-600 transition-colors hover:bg-slate-200/60 sm:flex-none sm:py-2"
                     >
                       إلغاء
                     </button>
                     <button
                       type="submit"
                       disabled={isSaving}
-                      className="px-6 py-2 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-black text-xs flex items-center gap-2 cursor-pointer shadow-md transition-all disabled:opacity-50"
+                      className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#173A7C] px-6 py-2.5 text-xs font-black text-white shadow-md transition-all hover:bg-[#1E4D9D] disabled:opacity-50 sm:flex-none sm:py-2"
                     >
                       {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                       <span>{editingService.id ? 'حفظ التعديلات' : 'إنشاء ونشر الخدمة'}</span>

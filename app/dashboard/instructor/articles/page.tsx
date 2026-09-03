@@ -27,6 +27,7 @@ import { createClient } from '@/utils/supabase/client';
 
 import { blogPosts } from '@/data/blogPosts';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
+import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
 
 interface ArticleItem {
   id: string | number;
@@ -80,6 +81,7 @@ export default function InstructorArticlesPage() {
 
   // Modal State (Create / Edit)
   const [isModalOpen, setIsModalOpen] = useState(false);
+  useMobileDialogScrollLock(isModalOpen);
   const [editingArticle, setEditingArticle] = useState<Partial<ArticleItem> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [tagInput, setTagInput] = useState('');
@@ -484,26 +486,26 @@ export default function InstructorArticlesPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+            className="fixed inset-0 z-[100] flex items-stretch justify-stretch bg-slate-950/75 backdrop-blur-md sm:items-center sm:justify-center sm:p-6"
           >
             <motion.div
               initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.96, opacity: 0 }}
-              className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden my-auto max-h-[92vh] flex flex-col text-right"
+              className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-white text-right shadow-2xl sm:h-auto sm:max-h-[92vh] sm:max-w-5xl sm:rounded-3xl sm:border sm:border-slate-200/80"
             >
               <form onSubmit={handleSaveArticle} className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="px-6 py-4 bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-between shrink-0">
-                  <div className="flex items-center gap-3">
+                <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] px-4 py-3 text-white sm:px-6 sm:py-4">
+                  <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
                     <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs text-amber-300">
                       <Newspaper className="w-5 h-5" />
                     </div>
-                    <div>
-                      <h3 className="font-black text-sm sm:text-base leading-tight">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-black leading-tight sm:text-base">
                         {editingArticle.id ? 'تعديل المقال الأكاديمي' : 'كتابة مقال أكاديمي جديد'}
                       </h3>
-                      <p className="text-[11px] text-blue-100/90 mt-0.5">النشر والمشاركة في المدونة الرسمية للمنصة</p>
+                      <p className="mt-0.5 hidden text-[11px] text-blue-100/90 sm:block">النشر والمشاركة في المدونة الرسمية للمنصة</p>
                     </div>
                   </div>
                   <button
@@ -519,7 +521,7 @@ export default function InstructorArticlesPage() {
                 </div>
 
                 {/* Scrollable 2-Column Grid */}
-                <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
                     {/* ── RIGHT COLUMN (7 COLS): Info, Excerpt & Content ── */}
@@ -665,13 +667,13 @@ export default function InstructorArticlesPage() {
                     {/* ── LEFT COLUMN (5 COLS): Image, Status & Live Preview ── */}
                     <div className="lg:col-span-5 space-y-4">
                       {/* Device Image Uploader */}
-                      <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
+                      <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50/80 p-3 sm:p-4">
                         <DeviceImageUploader
                           value={editingArticle.image || ''}
                           onChange={(url) => setEditingArticle({ ...editingArticle, image: url })}
                           folder="articles"
                           slug={editingArticle.slug || 'article'}
-                          label="صورة غلاف المقال (WebP معتمد)"
+                          label="صورة غلاف المقال"
                           recommendedSize="المقاس: 1200 × 630 بكسل"
                           aspectRatio="video"
                         />
@@ -727,14 +729,14 @@ export default function InstructorArticlesPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+                <div className="flex shrink-0 items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3 sm:px-6 sm:py-3.5">
                   <button
                     type="button"
                     onClick={() => {
                       setIsModalOpen(false);
                       setEditingArticle(null);
                     }}
-                    className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-200/60 font-bold text-xs cursor-pointer transition-colors"
+                    className="flex-1 cursor-pointer rounded-xl px-4 py-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200/60 sm:flex-none sm:py-2"
                   >
                     إلغاء
                   </button>
@@ -742,7 +744,7 @@ export default function InstructorArticlesPage() {
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-emerald-600 text-white font-black text-xs shadow-md hover:opacity-95 flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-all"
+                    className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#173A7C] to-emerald-600 px-6 py-2.5 text-xs font-black text-white shadow-md transition-all hover:opacity-95 disabled:opacity-50 sm:flex-none"
                   >
                     {isSaving ? (
                       <>

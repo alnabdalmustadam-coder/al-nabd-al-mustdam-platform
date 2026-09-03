@@ -780,6 +780,7 @@ export default function MarketplacePage() {
                         alt={service.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                       />
 
                       {/* Image Overlay Gradient */}

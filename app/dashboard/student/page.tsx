@@ -24,6 +24,7 @@ import { ProgressCard } from '@/components/student/progress-card';
 import { createClient } from '@/utils/supabase/client';
 import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
+import { ShimmerImage } from '@/components/ui/ShimmerImage';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -268,12 +269,16 @@ export default function StudentDashboardPage() {
             <div className="absolute -bottom-16 -left-16 w-44 h-44 bg-[#5CB07C]/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex flex-col md:flex-row items-stretch relative z-10">
-              <div className="md:w-72 relative min-h-[160px] sm:min-h-[190px] overflow-hidden shrink-0 bg-gradient-to-br from-slate-50 to-blue-50/40 flex items-center justify-center p-5 border-b md:border-b-0 md:border-l border-slate-100">
-                <img
-                  src={topCourse.thumbnailUrl || '/logo.webp'}
-                  alt={topCourse.title}
-                  className="w-full h-full object-contain max-h-32 group-hover:scale-105 transition-transform duration-700 drop-shadow-sm"
-                />
+              <div className="relative min-h-[160px] shrink-0 overflow-hidden border-b border-slate-100 bg-gradient-to-br from-slate-50 to-blue-50/40 sm:min-h-[190px] md:w-72 md:border-b-0 md:border-l">
+                <div className="absolute inset-0">
+                  <ShimmerImage
+                    src={topCourse.thumbnailUrl || '/logo.webp'}
+                    alt={topCourse.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 288px"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-white/20 via-transparent to-transparent pointer-events-none" />
                 <span className="absolute top-2.5 right-2.5 text-[10px] sm:text-[11px] font-black text-white px-3 py-1 rounded-full border border-white/30 shadow-lg"
                   style={{ background: 'rgba(23, 58, 124, 0.85)', backdropFilter: 'blur(14px)' }}

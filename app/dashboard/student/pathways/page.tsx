@@ -384,17 +384,14 @@ export default function StudentPathwaysPage() {
               >
                 <div>
                   {/* Top Image Section with Glow & Badges */}
-                  <div className="relative h-44 sm:h-48 rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 p-6 flex items-center justify-center overflow-hidden border border-slate-100/90 group-hover:border-blue-100 transition-colors mb-4">
-                    {/* Subtle Top Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent z-10 opacity-70" />
-
-                    <div className="relative w-full h-full z-0 flex items-center justify-center">
+                  <div className="relative mb-4 h-44 overflow-hidden rounded-2xl border border-slate-100/90 bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 transition-colors group-hover:border-blue-100 sm:h-48">
+                    <div className="absolute inset-0 z-0">
                       <Image
                         src={course.image || '/logo.webp'}
                         alt={course.title}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-contain p-4 opacity-90 group-hover:scale-105 transition-transform duration-500 drop-shadow-md"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
 

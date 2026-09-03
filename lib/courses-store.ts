@@ -33,7 +33,7 @@ type LessonInput = {
 };
 
 export class CoursePersistenceError extends Error {
-  constructor(message = 'تعذر حفظ الدورة في قاعدة البيانات. حاول مرة أخرى بعد التحقق من إعدادات Supabase.') {
+  constructor(message = 'تعذر حفظ الدورة في قاعدة البيانات. حاول مرة أخرى بعد التحقق من إعدادات الاتصال.') {
     super(message);
     this.name = 'CoursePersistenceError';
   }
