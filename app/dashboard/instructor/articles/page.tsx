@@ -27,6 +27,7 @@ import { createClient } from '@/utils/supabase/client';
 
 import { blogPosts } from '@/data/blogPosts';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
+import { CardImage } from '@/components/ui/CardImage';
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
 
 interface ArticleItem {
@@ -375,15 +376,12 @@ export default function InstructorArticlesPage() {
               className="p-4 sm:p-5 rounded-3xl liquid-glass-card liquid-glass-hover flex flex-col justify-between space-y-4 student-card-accent group relative overflow-hidden"
             >
               {/* Thumbnail Image */}
-              <div className="relative w-full h-40 rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/60 shadow-xs">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+              <div className="relative w-full shrink-0 rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/60 shadow-xs">
+                <CardImage
                   src={art.image || '/1.png'}
                   alt={art.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/1.png';
-                  }}
+                  fallbackSrc="/1.png"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
 
@@ -708,7 +706,7 @@ export default function InstructorArticlesPage() {
                             <img
                               src={editingArticle.image || '/1.png'}
                               alt="Preview"
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                               onError={(e) => { (e.target as HTMLImageElement).src = '/logo.webp'; }}
                             />
                           </div>

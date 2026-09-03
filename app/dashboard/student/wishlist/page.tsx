@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { CardImage } from '@/components/ui/CardImage';
 import { motion, Variants } from 'framer-motion';
 import { Heart, ShoppingBag, ArrowLeft, Trash2, BookOpen, Clock, Users, Sparkles, Check } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
@@ -116,14 +116,12 @@ export default function StudentWishlistPage() {
                 className="group relative rounded-2xl sm:rounded-[28px] overflow-hidden bg-white/90 border border-slate-200/80 hover:border-slate-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
               >
                 {/* Top Image Section */}
-                <div className="relative h-44 overflow-hidden bg-gradient-to-br from-slate-50 to-[#f0f4f8]">
-                  <div className="absolute inset-0">
-                    <Image
+                <div className="relative shrink-0 overflow-hidden bg-gradient-to-br from-slate-50 to-[#f0f4f8]">
+                  <div className="relative w-full">
+                    <CardImage
                       src={course.image || '/logo.webp'}
                       alt={course.title}
-                      fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
 

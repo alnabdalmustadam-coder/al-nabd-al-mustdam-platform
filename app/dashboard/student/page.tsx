@@ -24,7 +24,7 @@ import { ProgressCard } from '@/components/student/progress-card';
 import { createClient } from '@/utils/supabase/client';
 import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
-import { ShimmerImage } from '@/components/ui/ShimmerImage';
+import { CardImage } from '@/components/ui/CardImage';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -269,14 +269,12 @@ export default function StudentDashboardPage() {
             <div className="absolute -bottom-16 -left-16 w-44 h-44 bg-[#5CB07C]/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex flex-col md:flex-row items-stretch relative z-10">
-              <div className="relative min-h-[160px] shrink-0 overflow-hidden border-b border-slate-100 bg-gradient-to-br from-slate-50 to-blue-50/40 sm:min-h-[190px] md:w-72 md:border-b-0 md:border-l">
-                <div className="absolute inset-0">
-                  <ShimmerImage
+              <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-gradient-to-br from-slate-50 to-blue-50/40 md:w-72 md:border-b-0 md:border-l">
+                <div className="relative w-full">
+                  <CardImage
                     src={topCourse.thumbnailUrl || '/logo.webp'}
                     alt={topCourse.title}
-                    fill
                     sizes="(max-width: 768px) 100vw, 288px"
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-white/20 via-transparent to-transparent pointer-events-none" />
@@ -405,7 +403,7 @@ export default function StudentDashboardPage() {
                 <img
                   src={course.thumbnailUrl}
                   alt={course.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="absolute inset-0 w-full h-full object-contain"
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent" />

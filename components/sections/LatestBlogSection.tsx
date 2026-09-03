@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { BookOpen, Calendar, ArrowLeft, Clock, ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import { CardImage } from '@/components/ui/CardImage';
 import { blogPosts } from "@/data/blogPosts";
 
 export default function LatestBlogSection() {
@@ -50,12 +50,10 @@ export default function LatestBlogSection() {
                   <div className="relative rounded-[1.75rem] overflow-hidden border border-slate-200/70 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_-12px_rgba(23,58,124,0.12)] hover:border-[#173A7C]/25 hover:-translate-y-1.5 transition-all duration-400 h-full flex flex-col">
                     
                     {/* Clear, Bright, High-Res Image Container */}
-                    <div className="relative h-52 sm:h-56 overflow-hidden flex-shrink-0 bg-slate-100">
-                      <Image
+                    <div className="relative overflow-hidden flex-shrink-0 bg-slate-100">
+                      <CardImage
                         src={post.image}
                         alt={post.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-600 ease-out"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
 

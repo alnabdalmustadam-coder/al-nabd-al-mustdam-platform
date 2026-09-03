@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShimmerImage } from "@/components/ui/ShimmerImage";
+import { CardImage } from '@/components/ui/CardImage';
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -105,13 +105,11 @@ export default function BlogIndexPage() {
           <div className="p-1 rounded-[2.5rem] bg-gradient-to-r from-[#173A7C]/20 via-[#5CB07C]/20 to-[#173A7C]/20 shadow-xl">
             <div className="rounded-[2.4rem] bg-white p-6 sm:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               {/* Image side */}
-              <div className="lg:col-span-6 relative h-[260px] sm:h-[340px] rounded-3xl overflow-hidden bg-slate-900 shadow-md">
-                <ShimmerImage
+              <div className="lg:col-span-6 relative rounded-3xl overflow-hidden bg-slate-900 shadow-md">
+                <CardImage
                   src={featuredPost.image}
                   alt={featuredPost.title}
-                  fill
-                  priority
-                  className="object-cover hover:scale-105 transition-transform duration-700"
+                  preload
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
                 <span className="absolute top-4 right-4 bg-[#173A7C] text-white text-xs font-bold px-3.5 py-1.5 rounded-full shadow-md">
@@ -192,12 +190,10 @@ export default function BlogIndexPage() {
                 <Link href={`/blog/${post.slug}`} className="block h-full">
                   <div className="relative rounded-[2rem] overflow-hidden border border-slate-200/90 bg-white shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col">
                     {/* Image */}
-                    <div className="relative h-52 overflow-hidden bg-slate-100">
-                      <ShimmerImage
+                    <div className="relative shrink-0 overflow-hidden bg-slate-100">
+                      <CardImage
                         src={post.image}
                         alt={post.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                       <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />

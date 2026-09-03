@@ -51,7 +51,7 @@ import {
 } from 'lucide-react';
 import { QuizData, QuizQuestion, CourseAttachment, SubLessonItem } from '@/types';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
-import { ShimmerImage } from '@/components/ui/ShimmerImage';
+import { CardImage } from '@/components/ui/CardImage';
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
 
 interface CourseItem {
@@ -1401,14 +1401,12 @@ export default function AdminCoursesPage() {
             >
               <div>
                 {/* 1. Clean Bright Image Section (Matches Original Platform Theme) */}
-                <div className="relative h-44 sm:h-48 rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 overflow-hidden border border-slate-100/90 group-hover:border-blue-100 transition-colors mb-4">
-                  <div className="absolute inset-0">
-                    <ShimmerImage
+                <div className="relative rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 overflow-hidden border border-slate-100/90 group-hover:border-blue-100 transition-colors mb-4">
+                  <div className="relative w-full">
+                    <CardImage
                       src={course.image || '/logo.webp'}
                       alt={course.title}
-                      fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
 

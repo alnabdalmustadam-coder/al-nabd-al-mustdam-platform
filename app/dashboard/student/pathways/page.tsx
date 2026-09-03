@@ -18,7 +18,7 @@ import {
   GraduationCap,
   ArrowRight
 } from 'lucide-react';
-import Image from 'next/image';
+import { CardImage } from '@/components/ui/CardImage';
 import { courses as allCatalogCourses } from '@/data/courses';
 import { Course } from '@/types';
 import { createClient } from '@/utils/supabase/client';
@@ -384,14 +384,12 @@ export default function StudentPathwaysPage() {
               >
                 <div>
                   {/* Top Image Section with Glow & Badges */}
-                  <div className="relative mb-4 h-44 overflow-hidden rounded-2xl border border-slate-100/90 bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 transition-colors group-hover:border-blue-100 sm:h-48">
-                    <div className="absolute inset-0 z-0">
-                      <Image
+                  <div className="relative mb-4 overflow-hidden rounded-2xl border border-slate-100/90 bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 transition-colors group-hover:border-blue-100">
+                    <div className="relative z-0 w-full">
+                      <CardImage
                         src={course.image || '/logo.webp'}
                         alt={course.title}
-                        fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
 

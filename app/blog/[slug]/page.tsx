@@ -3,6 +3,7 @@
 import { useState, use } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { CardImage } from '@/components/ui/CardImage';
 import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -542,12 +543,10 @@ export default function SingleBlogPostPage({
                 href={`/blog/${relPost.slug}`}
                 className="group rounded-2xl overflow-hidden bg-white border border-slate-200 hover:border-[#173A7C]/30 hover:shadow-xl transition-all duration-300 flex flex-col sm:flex-row"
               >
-                <div className="relative w-full sm:w-44 h-44 sm:h-auto shrink-0 bg-slate-900">
-                  <Image
+                <div className="relative w-full sm:w-44 shrink-0 bg-slate-900">
+                  <CardImage
                     src={relPost.image}
                     alt={relPost.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                     sizes="(max-width: 768px) 100vw, 200px"
                   />
                   <span className="absolute top-3 right-3 bg-black/50 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full">

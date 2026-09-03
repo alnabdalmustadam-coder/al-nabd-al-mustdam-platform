@@ -213,7 +213,7 @@ export function DeviceImageUploader({
               alt="معاينة الصورة"
               fill
               sizes="(max-width: 640px) 100vw, 420px"
-              className="object-cover"
+              className="object-contain"
             />
             {/* Bottom Floating Action Bar */}
             <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-slate-950/85 via-slate-900/60 to-transparent flex items-center justify-between gap-2 text-white">

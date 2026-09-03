@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { blogPosts } from '@/data/blogPosts';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
+import { CardImage } from '@/components/ui/CardImage';
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
 
 interface AdminArticleItem {
@@ -487,12 +488,12 @@ export default function AdminArticlesPage() {
             >
               <div>
                 {/* Image Header with Badges */}
-                <div className="relative h-48 w-full bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="relative w-full bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
+                  <CardImage
                     src={art.image || '/1.png'}
                     alt={art.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fallbackSrc="/1.png"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/25 to-transparent" />
 
@@ -884,7 +885,7 @@ export default function AdminArticlesPage() {
                             <img
                               src={editingArticle.image || '/1.png'}
                               alt="Preview"
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                               onError={(e) => { (e.target as HTMLImageElement).src = '/logo.webp'; }}
                             />
                           </div>

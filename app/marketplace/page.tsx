@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShimmerImage } from '@/components/ui/ShimmerImage';
+import { CardImage } from '@/components/ui/CardImage';
 import { ServiceCardSkeleton } from '@/components/ui/CardSkeleton';
 import { motion } from 'framer-motion';
 import {
@@ -773,13 +773,11 @@ export default function MarketplacePage() {
                     {/* Top Accent Gradient Bar */}
                     <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] z-30 opacity-80 group-hover:opacity-100 transition-opacity" />
 
-                    {/* Real Image Thumbnail with Skeleton Shimmer & Hover Zoom */}
-                    <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100">
-                      <ShimmerImage
+                    {/* Full artwork without cropping or hover zoom */}
+                    <div className="relative w-full shrink-0 overflow-hidden bg-slate-100">
+                      <CardImage
                         src={service.image_url}
                         alt={service.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
                         sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                       />
 

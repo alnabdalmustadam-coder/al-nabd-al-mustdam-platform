@@ -53,7 +53,7 @@ import { QuizData, QuizQuestion, CourseAttachment, SubLessonItem, Course } from 
 import { createClient } from '@/utils/supabase/client';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
-import { ShimmerImage } from '@/components/ui/ShimmerImage';
+import { CardImage } from '@/components/ui/CardImage';
 
 interface CourseItem {
   id: string;
@@ -1082,14 +1082,12 @@ export default function InstructorCoursesPage() {
               key={course.id}
               className="p-4 sm:p-5 rounded-3xl liquid-glass-card liquid-glass-hover flex flex-col justify-between space-y-4 student-card-accent group relative overflow-hidden"
             >
-              <div className="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-xs">
-                <ShimmerImage
+              <div className="relative w-full shrink-0 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-xs">
+                <CardImage
                   src={course.image || '/1.png'}
                   alt={course.title}
-                  fill
                   fallbackSrc="/1.png"
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
                 <div className="absolute top-3 right-3 left-3 flex items-center justify-between gap-2 pointer-events-none">

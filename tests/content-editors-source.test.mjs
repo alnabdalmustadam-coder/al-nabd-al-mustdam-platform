@@ -33,7 +33,7 @@ test('course editor footers sit outside the mobile scrolling content', async () 
   }
 });
 
-test('course card covers fill their slots at mobile and desktop breakpoints', async () => {
+test('content cards use natural-ratio images without fixed-height cropping or zoom', async () => {
   const paths = [
     'components/ui/CourseCard.tsx',
     'app/dashboard/admin/courses/page.tsx',
@@ -42,20 +42,43 @@ test('course card covers fill their slots at mobile and desktop breakpoints', as
     'app/dashboard/student/page.tsx',
     'app/dashboard/student/wishlist/page.tsx',
     'app/dashboard/student/pathways/page.tsx',
+    'app/dashboard/admin/articles/page.tsx',
+    'app/dashboard/admin/services/page.tsx',
+    'app/dashboard/instructor/articles/page.tsx',
+    'app/dashboard/instructor/services/page.tsx',
+    'app/blog/page.tsx',
+    'app/blog/[slug]/page.tsx',
+    'app/marketplace/page.tsx',
+    'components/sections/LatestBlogSection.tsx',
   ];
   for (const path of paths) {
     const source = await readSource(path);
-    assert.match(source, /object-cover/, path);
-    assert.doesNotMatch(source, /object-contain/, path);
-    assert.match(source, /sizes="\(max-width:/, path);
+    const file = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    let images = 0;
+    const inspect = node => {
+      if (ts.isJsxSelfClosingElement(node) && node.tagName.getText(file) === 'CardImage') {
+        images++;
+        const attributes = node.attributes.properties.map(attribute => attribute.name?.getText(file));
+        assert.ok(attributes.includes('sizes'), path);
+        assert.ok(!attributes.includes('fill') && !attributes.includes('className'), path);
+        const container = node.parent;
+        assert.ok(ts.isJsxElement(container), path);
+        const className = container.openingElement.attributes.properties.find(attribute => attribute.name?.getText(file) === 'className');
+        assert.doesNotMatch(className?.initializer?.getText(file) || '', /(?:^|[ "'])(?:sm:|md:)?(?:max-|min-)?h-(?:\d|\[)|absolute/, path);
+      }
+      ts.forEachChild(node, inspect);
+    };
+    inspect(file);
+    assert.ok(images > 0, path);
   }
-  for (const role of ['admin', 'instructor']) {
-    for (const kind of ['articles', 'services']) {
-      const source = await readSource(`app/dashboard/${role}/${kind}/page.tsx`);
-      assert.match(source, /w-full h-full object-cover/);
-      assert.doesNotMatch(source, /object-contain/);
-    }
-  }
+});
+
+test('shared card artwork is full width with automatic height and no hover scaling', async () => {
+  const source = await readSource('components/ui/CardImage.tsx');
+  assert.match(source, /className="block h-auto w-full"/);
+  assert.match(source, /width: '100%', height: 'auto'/);
+  assert.match(source, /key=\{imageSrc\}/);
+  assert.doesNotMatch(source, /object-cover|object-fill|scale-|\sfill[\s=/>]/);
 });
 
 test('image preview uses its whole slot and resets when a new cover is selected', async () => {
@@ -63,7 +86,7 @@ test('image preview uses its whole slot and resets when a new cover is selected'
   assert.match(source, /absolute inset-0 flex flex-col justify-between/);
   assert.match(source, /key=\{value\}/);
   assert.match(source, /aspect-video sm:aspect-16\/10/);
-  assert.match(source, /className="object-cover"/);
+  assert.match(source, /className="object-contain"/);
   assert.match(source, /finally \{\s+if \(progressTimer\) clearInterval\(progressTimer\)/);
   const course = await readSource('app/dashboard/admin/courses/page.tsx');
   assert.equal((course.match(/label="صورة غلاف الدورة"/g) || []).length, 1);

@@ -90,7 +90,7 @@ export function CartDrawer() {
                           src={item.image || '/logo.webp'}
                           alt={item.title}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                         />
                       </div>
 

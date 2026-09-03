@@ -20,7 +20,7 @@ import {
 import { createClient } from '@/utils/supabase/client';
 import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
-import { ShimmerImage } from '@/components/ui/ShimmerImage';
+import { CardImage } from '@/components/ui/CardImage';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -331,14 +331,12 @@ function StudentCoursesContent() {
                 >
                   <div>
                     {/* Top Image Section with Clean Light Glow */}
-                    <div className="relative mb-4 h-44 overflow-hidden rounded-2xl border border-slate-100/90 bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 transition-colors group-hover:border-blue-100 sm:h-48">
-                      <div className="absolute inset-0">
-                        <ShimmerImage
+                    <div className="relative mb-4 overflow-hidden rounded-2xl border border-slate-100/90 bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 transition-colors group-hover:border-blue-100">
+                      <div className="relative w-full">
+                        <CardImage
                           src={course.thumbnailUrl || '/logo.webp'}
                           alt={course.title}
-                          fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       </div>
 
