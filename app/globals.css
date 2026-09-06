@@ -401,6 +401,32 @@ p, .subtext, .desc {
   line-height: 1.7;
 }
 
+.course-card-description {
+  font-size: 0.75rem;
+  line-height: 1.75;
+}
+
+.course-detail-summary {
+  font-size: 0.75rem;
+  line-height: 1.8;
+}
+
+.course-detail-full-description {
+  font-size: 0.8125rem;
+  line-height: 2;
+}
+
+@media (min-width: 640px) {
+  .course-card-description,
+  .course-detail-summary {
+    font-size: 0.8125rem;
+  }
+
+  .course-detail-full-description {
+    font-size: 0.875rem;
+  }
+}
+
 .section-badge-glass {
   display: inline-flex;
   align-items: center;
@@ -1323,5 +1349,4 @@ p, .subtext, .desc {
 .animate-brand-shimmer {
   animation: brand-shimmer 1.8s ease-in-out infinite alternate;
 }
-
 

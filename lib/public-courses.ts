@@ -2,8 +2,16 @@ import type { Course } from '@/types';
 
 export const COURSES_LOAD_ERROR = 'تعذر تحميل أحدث الدورات. حاول مرة أخرى.';
 
+function decodeCourseIdentifier(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export function normalizeCourseIdentifier(value?: string | number): string {
-  return String(value ?? '')
+  return decodeCourseIdentifier(String(value ?? ''))
     .normalize('NFKC')
     .toLowerCase()
     .trim()

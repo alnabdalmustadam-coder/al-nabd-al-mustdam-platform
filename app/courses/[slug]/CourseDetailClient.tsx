@@ -169,7 +169,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                 </h1>
 
                 {/* Course Description */}
-                <p className="card-desc-premium text-[11px] sm:text-xs leading-[1.75] line-clamp-4 sm:line-clamp-5">
+                <p className="card-desc-premium course-detail-summary line-clamp-4 sm:line-clamp-5">
                   {course.description}
                 </p>
               </div>
@@ -423,7 +423,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                   {fullDescription && (
                     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-3">
                       <h2 className="card-title-royal-blue text-lg sm:text-xl">نبذة كاملة عن الدورة</h2>
-                      <p className="card-desc-premium whitespace-pre-line text-xs sm:text-[13px] leading-8">
+                      <p className="card-desc-premium course-detail-full-description whitespace-pre-line">
                         {fullDescription}
                       </p>
                     </div>

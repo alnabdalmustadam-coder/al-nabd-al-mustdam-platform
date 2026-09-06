@@ -28,6 +28,7 @@ test('new Arabic course slugs and external course IDs resolve to the live catalo
   };
 
   assert.equal(findCourseByIdentifier([liveCourse], liveCourse.slug), liveCourse);
+  assert.equal(findCourseByIdentifier([liveCourse], encodeURIComponent(liveCourse.slug)), liveCourse);
   assert.equal(findCourseByIdentifier([liveCourse], `course-${liveCourse.slug}`), liveCourse);
   assert.equal(findCourseByIdentifier([liveCourse], '91'), liveCourse);
   assert.equal(findCourseByIdentifier([liveCourse], 'hazmat-2026'), liveCourse);
