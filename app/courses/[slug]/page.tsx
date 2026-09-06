@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { use } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { getCourseBySlug, courses } from "@/data/courses";
 import { Course } from "@/types";
 import CourseCard from "@/components/ui/CourseCard";
+import { CardImage } from "@/components/ui/CardImage";
 import Badge from "@/components/ui/Badge";
 import SmartCourseAction from "@/components/ui/SmartCourseAction";
 import { useCart } from "@/context/CartContext";
@@ -343,13 +343,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ slug: s
             <div className="lg:col-span-6 flex flex-col">
               <div className="h-full flex flex-col justify-between rounded-3xl bg-white/95 backdrop-blur-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-[0_15px_40px_rgba(23,58,124,0.08)] group overflow-hidden">
                 
-                <div className="relative flex-1 w-full min-h-[300px] sm:min-h-[360px] rounded-2xl bg-slate-100 border border-slate-200/80 flex items-center justify-center overflow-hidden">
-                  <Image
+                <div className="relative w-full rounded-2xl bg-slate-100 border border-slate-200/80 overflow-hidden">
+                  <CardImage
                     src={course.image || "/logo.webp"}
                     alt={course.title}
-                    fill
-                    priority
-                    className="object-cover group-hover:scale-102 transition-transform duration-500"
+                    preload
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                   />
 
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors pointer-events-none" />

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CardImage } from '@/components/ui/CardImage';
 import {
   Star,
   Clock,
@@ -606,11 +607,12 @@ export default function ServiceDetailPage() {
 
             {/* Real Photo Banner Card */}
             <div className="rounded-[2rem] border border-slate-200/90 shadow-[0_12px_40px_rgba(23,58,124,0.08)] overflow-hidden bg-white">
-              <div className="h-72 sm:h-96 w-full relative overflow-hidden bg-slate-100">
-                <img
+              <div className="w-full relative overflow-hidden bg-slate-100">
+                <CardImage
                   src={service.image_url || '/services/branding.jpg'}
                   alt={service.title}
-                  className="w-full h-full object-cover"
+                  preload
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
                 

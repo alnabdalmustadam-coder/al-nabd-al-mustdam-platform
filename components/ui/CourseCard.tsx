@@ -88,7 +88,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
               {course.title}
             </h3>
           </Link>
-          <p className="card-desc-premium mb-5 line-clamp-2 leading-relaxed flex-1">
+          <p className="card-desc-premium mb-5 line-clamp-3 leading-relaxed flex-1">
             {course.description}
           </p>
 

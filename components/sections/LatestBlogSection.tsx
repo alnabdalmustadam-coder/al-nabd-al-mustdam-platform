@@ -87,8 +87,8 @@ export default function LatestBlogSection() {
                         {post.shortTitle || post.title}
                       </h3>
 
-                      {/* Concise 2-line Excerpt */}
-                      <p className="text-slate-500 text-xs sm:text-[13px] leading-relaxed mb-5 line-clamp-2 flex-grow">
+                      {/* Concise excerpt with enough context for scanning */}
+                      <p className="text-slate-500 text-xs sm:text-[13px] leading-relaxed mb-5 line-clamp-3 flex-grow">
                         {post.excerpt}
                       </p>
 

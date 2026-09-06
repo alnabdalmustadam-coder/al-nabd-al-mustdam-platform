@@ -9,7 +9,7 @@ export function CourseCardSkeleton() {
   return (
     <div className="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-xs flex flex-col h-full animate-pulse">
       {/* Image Banner Shimmer */}
-      <div className="relative aspect-16/10 w-full animate-skeleton-shimmer bg-slate-100">
+      <div className="relative aspect-video w-full animate-skeleton-shimmer bg-slate-100">
         <div className="absolute top-4 right-4 w-16 h-6 rounded-full bg-slate-200" />
         <div className="absolute top-4 left-4 w-9 h-9 rounded-full bg-slate-200" />
       </div>
@@ -49,7 +49,7 @@ export function ServiceCardSkeleton() {
   return (
     <div className="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-xs flex flex-col h-full animate-pulse">
       {/* Thumbnail */}
-      <div className="relative aspect-16/10 w-full animate-skeleton-shimmer bg-slate-100">
+      <div className="relative aspect-video w-full animate-skeleton-shimmer bg-slate-100">
         <div className="absolute top-4 right-4 w-20 h-6 rounded-full bg-slate-200" />
       </div>
 
@@ -80,7 +80,7 @@ export function ArticleCardSkeleton() {
   return (
     <div className="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-xs flex flex-col h-full animate-pulse">
       {/* Image Banner */}
-      <div className="relative aspect-16/10 w-full animate-skeleton-shimmer bg-slate-100" />
+      <div className="relative aspect-video w-full animate-skeleton-shimmer bg-slate-100" />
 
       {/* Content */}
       <div className="p-5 sm:p-6 flex flex-col flex-1 gap-3">

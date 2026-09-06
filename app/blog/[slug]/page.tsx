@@ -2,7 +2,6 @@
 
 import { useState, use } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { CardImage } from '@/components/ui/CardImage';
 import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
@@ -211,14 +210,12 @@ export default function SingleBlogPostPage({
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
-          className="relative h-[280px] sm:h-[400px] md:h-[480px] rounded-3xl overflow-hidden border border-slate-200/90 shadow-[0_20px_50px_-15px_rgba(23,58,124,0.15)] bg-slate-900"
+          className="relative rounded-3xl overflow-hidden border border-slate-200/90 shadow-[0_20px_50px_-15px_rgba(23,58,124,0.15)] bg-slate-900"
         >
-          <Image
+          <CardImage
             src={post.image}
             alt={post.title}
-            fill
-            priority
-            className="object-cover"
+            preload
             sizes="(max-width: 1200px) 100vw, 1200px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />

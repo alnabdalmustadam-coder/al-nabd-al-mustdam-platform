@@ -910,7 +910,7 @@ export default function AdminServicesPage() {
                           folder="services"
                           slug={editingService.id || 'service'}
                           label="صورة غلاف الخدمة"
-                          recommendedSize="المقاس: 1200 × 750 بكسل"
+                          recommendedSize="المقاس الموصى به: 1280 × 720 بكسل"
                           aspectRatio="video"
                         />
                       </div>

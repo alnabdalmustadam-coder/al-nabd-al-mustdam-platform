@@ -208,10 +208,10 @@ export default function BlogIndexPage() {
 
                     {/* Content */}
                     <div className="p-5 flex flex-col flex-grow">
-                      <h3 className="text-base font-bold text-slate-900 mb-2 leading-snug group-hover:text-[#173A7C] transition-colors line-clamp-1">
+                      <h3 className="text-base font-bold text-slate-900 mb-2 leading-snug group-hover:text-[#173A7C] transition-colors line-clamp-2">
                         {post.shortTitle || post.title}
                       </h3>
-                      <p className="text-slate-500 text-xs sm:text-[13px] leading-relaxed mb-4 line-clamp-2 flex-grow">
+                      <p className="text-slate-500 text-xs sm:text-[13px] leading-relaxed mb-4 line-clamp-3 flex-grow">
                         {post.excerpt}
                       </p>
 

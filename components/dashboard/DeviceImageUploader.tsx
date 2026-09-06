@@ -16,9 +16,16 @@ interface DeviceImageUploaderProps {
 }
 
 /**
- * Client-side WebP compression helper using HTML5 Canvas
+ * Creates a consistent 16:9 WebP cover. Non-landscape uploads keep all of
+ * their content and receive a soft, image-derived backdrop instead of being
+ * stretched or aggressively cropped.
  */
-async function compressToWebPClient(file: File, maxDimension = 1400, quality = 0.82): Promise<Blob> {
+async function prepareCoverImage(
+  file: File,
+  targetWidth = 1280,
+  targetHeight = 720,
+  quality = 0.82,
+): Promise<{ blob: Blob; wasReframed: boolean }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error('فشل قراءة ملف الصورة'));
@@ -26,30 +33,57 @@ async function compressToWebPClient(file: File, maxDimension = 1400, quality = 0
       const img = new Image();
       img.onerror = () => reject(new Error('فشل معالجة الصورة'));
       img.onload = () => {
-        let { width, height } = img;
-        if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = Math.round((height * maxDimension) / width);
-            width = maxDimension;
-          } else {
-            width = Math.round((width * maxDimension) / height);
-            height = maxDimension;
-          }
-        }
-
         const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
           return reject(new Error('تعذر إنشاء سياق المعالجة'));
         }
 
-        // Draw and export as WebP
-        ctx.drawImage(img, 0, 0, width, height);
+        const sourceWidth = img.naturalWidth || img.width;
+        const sourceHeight = img.naturalHeight || img.height;
+        const sourceRatio = sourceWidth / sourceHeight;
+        const targetRatio = targetWidth / targetHeight;
+        const wasReframed = Math.abs(sourceRatio - targetRatio) / targetRatio > 0.025;
+
+        ctx.fillStyle = '#e8eef5';
+        ctx.fillRect(0, 0, targetWidth, targetHeight);
+
+        if (wasReframed) {
+          const coverScale = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight) * 1.08;
+          const backdropWidth = sourceWidth * coverScale;
+          const backdropHeight = sourceHeight * coverScale;
+
+          ctx.save();
+          ctx.filter = 'blur(30px) brightness(0.72) saturate(0.82)';
+          ctx.drawImage(
+            img,
+            (targetWidth - backdropWidth) / 2,
+            (targetHeight - backdropHeight) / 2,
+            backdropWidth,
+            backdropHeight,
+          );
+          ctx.restore();
+
+          ctx.fillStyle = 'rgba(12, 35, 72, 0.12)';
+          ctx.fillRect(0, 0, targetWidth, targetHeight);
+        }
+
+        const containScale = Math.min(targetWidth / sourceWidth, targetHeight / sourceHeight);
+        const renderedWidth = sourceWidth * containScale;
+        const renderedHeight = sourceHeight * containScale;
+        ctx.drawImage(
+          img,
+          (targetWidth - renderedWidth) / 2,
+          (targetHeight - renderedHeight) / 2,
+          renderedWidth,
+          renderedHeight,
+        );
+
         canvas.toBlob(
           (blob) => {
-            if (blob) resolve(blob);
+            if (blob) resolve({ blob, wasReframed });
             else reject(new Error('فشل تحويل الصورة إلى WebP'));
           },
           'image/webp',
@@ -68,7 +102,7 @@ export function DeviceImageUploader({
   folder = 'general',
   slug = '',
   label = 'صورة الغلاف المعتمدة',
-  recommendedSize = 'المقاس الموصى به: 1200 × 800 بكسل',
+  recommendedSize = 'المقاس الموصى به: 1280 × 720 بكسل',
   aspectRatio = 'video',
   className = '',
 }: DeviceImageUploaderProps) {
@@ -76,6 +110,7 @@ export function DeviceImageUploader({
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState('');
   const [errorText, setErrorText] = useState<string | null>(null);
+  const [formatNotice, setFormatNotice] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -88,6 +123,7 @@ export function DeviceImageUploader({
     }
 
     setErrorText(null);
+    setFormatNotice(null);
     setIsUploading(true);
     setProgress(15);
     setStatusText('جاري تجهيز الصورة...');
@@ -97,10 +133,17 @@ export function DeviceImageUploader({
       // 1. Client-side compression to WebP
       let webpBlob: Blob;
       try {
-        webpBlob = await compressToWebPClient(file);
+        const prepared = await prepareCoverImage(file);
+        webpBlob = prepared.blob;
+        setFormatNotice(
+          prepared.wasReframed
+            ? 'تم ضبط الصورة تلقائياً كغلاف أفقي 16:9 مع الحفاظ على محتواها كاملاً.'
+            : 'الصورة مناسبة وتم تحسينها كغلاف أفقي 16:9.',
+        );
       } catch (clientErr) {
         console.warn('Client-side WebP conversion notice:', clientErr);
         webpBlob = file;
+        setFormatNotice('سيتم عرض الصورة داخل الإطار الموحد مع الحفاظ على محتواها كاملاً.');
       }
 
       setProgress(45);
@@ -160,7 +203,7 @@ export function DeviceImageUploader({
   };
 
   const aspectClasses = {
-    video: 'aspect-video sm:aspect-16/10 sm:max-h-[195px]',
+    video: 'aspect-video',
     square: 'aspect-square sm:max-h-[190px]',
     banner: 'aspect-21/9 sm:max-h-[150px]',
     auto: 'min-h-[150px] sm:min-h-[130px] sm:max-h-[195px]',
@@ -231,7 +274,10 @@ export function DeviceImageUploader({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onChange('')}
+                  onClick={() => {
+                    setFormatNotice(null);
+                    onChange('');
+                  }}
                   className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-rose-500/80 p-1 text-white transition-all hover:bg-rose-600 sm:h-auto sm:w-auto"
                   title="حذف الصورة"
                   aria-label="حذف الصورة"
@@ -293,6 +339,13 @@ export function DeviceImageUploader({
           </button>
         )}
       </div>
+
+      {formatNotice && !errorText && (
+        <p className="flex items-start gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50/80 px-2.5 py-2 text-[10px] font-bold leading-relaxed text-emerald-800" role="status">
+          <ImageIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>{formatNotice}</span>
+        </p>
+      )}
 
       {errorText && (
         <div className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">

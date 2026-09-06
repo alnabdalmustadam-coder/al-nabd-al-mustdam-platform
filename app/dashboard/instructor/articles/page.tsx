@@ -672,7 +672,7 @@ export default function InstructorArticlesPage() {
                           folder="articles"
                           slug={editingArticle.slug || 'article'}
                           label="صورة غلاف المقال"
-                          recommendedSize="المقاس: 1200 × 630 بكسل"
+                          recommendedSize="المقاس الموصى به: 1280 × 720 بكسل"
                           aspectRatio="video"
                         />
                       </div>

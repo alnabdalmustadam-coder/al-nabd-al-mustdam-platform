@@ -33,7 +33,7 @@ test('course editor footers sit outside the mobile scrolling content', async () 
   }
 });
 
-test('content cards use natural-ratio images without fixed-height cropping or zoom', async () => {
+test('content cards use the shared responsive image frame without local cropping rules', async () => {
   const paths = [
     'components/ui/CourseCard.tsx',
     'app/dashboard/admin/courses/page.tsx',
@@ -73,24 +73,42 @@ test('content cards use natural-ratio images without fixed-height cropping or zo
   }
 });
 
-test('shared card artwork is full width with automatic height and no hover scaling', async () => {
+test('shared card artwork uses a stable 16:9 frame and preserves the full image', async () => {
   const source = await readSource('components/ui/CardImage.tsx');
-  assert.match(source, /className="block h-auto w-full"/);
-  assert.match(source, /width: '100%', height: 'auto'/);
+  assert.match(source, /aspect-video/);
+  assert.match(source, /className="object-contain"/);
+  assert.match(source, /blur-2xl/);
+  assert.match(source, /sizes="96px"/);
   assert.match(source, /key=\{imageSrc\}/);
-  assert.doesNotMatch(source, /object-cover|object-fill|scale-|\sfill[\s=/>]/);
+  assert.doesNotMatch(source, /object-fill|group-hover:scale/);
 });
 
-test('image preview uses its whole slot and resets when a new cover is selected', async () => {
+test('image uploader normalizes covers to 16:9 and resets when a new cover is selected', async () => {
   const source = await readSource('components/dashboard/DeviceImageUploader.tsx');
   assert.match(source, /absolute inset-0 flex flex-col justify-between/);
   assert.match(source, /key=\{value\}/);
-  assert.match(source, /aspect-video sm:aspect-16\/10/);
+  assert.match(source, /video: 'aspect-video'/);
+  assert.match(source, /prepareCoverImage/);
+  assert.match(source, /targetWidth = 1280/);
+  assert.match(source, /targetHeight = 720/);
+  assert.match(source, /wasReframed/);
+  assert.match(source, /تم ضبط الصورة تلقائياً كغلاف أفقي 16:9/);
   assert.match(source, /className="object-contain"/);
   assert.match(source, /finally \{\s+if \(progressTimer\) clearInterval\(progressTimer\)/);
   const course = await readSource('app/dashboard/admin/courses/page.tsx');
   assert.equal((course.match(/label="صورة غلاف الدورة"/g) || []).length, 1);
   assert.doesNotMatch(course, /Thumbnail/);
+});
+
+test('public course, article and service cards provide three-line summaries', async () => {
+  for (const path of [
+    'components/ui/CourseCard.tsx',
+    'components/sections/LatestBlogSection.tsx',
+    'app/blog/page.tsx',
+    'app/marketplace/page.tsx',
+  ]) {
+    assert.match(await readSource(path), /line-clamp-3/, path);
+  }
 });
 
 test('editor-facing Arabic copy does not expose infrastructure provider names', async () => {

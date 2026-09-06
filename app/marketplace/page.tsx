@@ -838,7 +838,7 @@ export default function MarketplacePage() {
                       </Link>
 
                       {/* Service Description (Clean & Concise) */}
-                      <p className="card-desc-premium text-xs line-clamp-2 flex-1">
+                      <p className="card-desc-premium text-xs line-clamp-3 flex-1">
                         {service.description}
                       </p>
 
