@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { logger } from '@/lib/observability/logger';
+import { findCourseByIdentifier } from '@/lib/public-courses';
 import type { Course, CourseCategory, CourseLevel, CurriculumSection } from '@/types';
 
 type CourseStatus = 'draft' | 'published' | 'archived';
@@ -151,12 +152,8 @@ export async function getCourseBySlugAsync(
   options: { includeUnpublished?: boolean } = {},
 ): Promise<Course | undefined> {
   if (!slugOrId) return undefined;
-  const clean = slugOrId.replace(/^course-/, '').toLowerCase().trim();
   const courses = await getAllCoursesAsync(options);
-  return courses.find((course) => {
-    const ghlId = course.ghlCourseId?.replace(/^course-/, '').toLowerCase().trim();
-    return course.slug.toLowerCase() === clean || String(course.id) === clean || ghlId === clean;
-  });
+  return findCourseByIdentifier(courses, slugOrId);
 }
 
 function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 'id'> {

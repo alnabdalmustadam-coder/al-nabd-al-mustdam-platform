@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import ts from 'typescript';
-import { COURSES_LOAD_ERROR, fetchPublicCourses } from '../lib/public-courses.ts';
+import {
+  COURSES_LOAD_ERROR,
+  fetchPublicCourses,
+  findCourseByIdentifier,
+} from '../lib/public-courses.ts';
 
 const source = await readFile(new URL('../components/sections/CoursesShowcase.tsx', import.meta.url), 'utf8');
 const compiled = ts.transpileModule(source, {
@@ -14,6 +18,20 @@ const course = (image = '/uploads/new-cover.webp') => ({
   id: 8, slug: 'nebosh-course', title: 'دورة النيبوش', category: 'corporate', image,
 });
 const response = (courses) => Response.json({ success: true, courses });
+
+test('new Arabic course slugs and external course IDs resolve to the live catalog record', () => {
+  const liveCourse = {
+    ...course('/uploads/hazmat.webp'),
+    id: 91,
+    slug: 'hazmat-التعامل-مع-المواد-الخطرة',
+    ghlCourseId: 'course-hazmat-2026',
+  };
+
+  assert.equal(findCourseByIdentifier([liveCourse], liveCourse.slug), liveCourse);
+  assert.equal(findCourseByIdentifier([liveCourse], `course-${liveCourse.slug}`), liveCourse);
+  assert.equal(findCourseByIdentifier([liveCourse], '91'), liveCourse);
+  assert.equal(findCourseByIdentifier([liveCourse], 'hazmat-2026'), liveCourse);
+});
 
 // Exercise the component's effects, event handlers and rendered props without
 // a browser or production writes. This is a unit harness, not an E2E browser.

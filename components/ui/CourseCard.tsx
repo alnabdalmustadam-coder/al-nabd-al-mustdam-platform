@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Badge from "@/components/ui/Badge";
-import { Course } from "@/types";
-import { Users, Clock, Play, ShoppingCart, ArrowRight, Heart, Check } from "lucide-react";
+import type { Course } from "@/types";
+import { Users, Clock, Play, ShoppingCart, Heart, Check } from "lucide-react";
 import { CardImage } from '@/components/ui/CardImage';
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
@@ -14,13 +14,16 @@ interface CourseCardProps {
   index?: number;
 }
 
+const BADGE_VARIANTS = ["admin", "data", "languages", "tech", "corporate"] as const;
+
 export default function CourseCard({ course, index = 0 }: CourseCardProps) {
   const imageUrl = typeof course.image === "string" ? course.image : "/logo.webp";
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const { isInCart, addToCart, isCartOpen, setIsCartOpen } = useCart();
+  const { isInCart, addToCart } = useCart();
 
   const isFavorited = isInWishlist(course.id);
   const inCart = isInCart(course.id);
+  const badgeVariant = BADGE_VARIANTS.find((variant) => variant === course.category) || "default";
 
   return (
     <motion.div
@@ -55,7 +58,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
 
           {/* Category Badge (Top Right) */}
           <div className="absolute top-4 right-4 z-30">
-            <Badge label={course.category} variant={course.category as any} className="shadow-sm border border-white/50 backdrop-blur-md" />
+            <Badge label={course.category} variant={badgeVariant} className="shadow-sm border border-white/50 backdrop-blur-md" />
           </div>
 
           {/* Wishlist Heart Icon (Top Left) */}
@@ -88,7 +91,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
               {course.title}
             </h3>
           </Link>
-          <p className="card-desc-premium mb-5 line-clamp-3 leading-relaxed flex-1">
+          <p className="card-desc-premium mb-5 text-[11px] sm:text-xs line-clamp-4 sm:line-clamp-3 leading-[1.75] flex-1">
             {course.description}
           </p>
 
