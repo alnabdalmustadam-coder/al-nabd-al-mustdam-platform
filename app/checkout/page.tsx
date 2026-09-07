@@ -3,7 +3,9 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { getCourseBySlug, courses } from "@/data/courses";
+import { getCourseBySlug } from "@/data/courses";
+import { findCourseByIdentifier, fetchPublicCourses } from "@/lib/public-courses";
+import type { Course } from "@/types";
 import {
   Shield, 
   CheckCircle, 
@@ -23,22 +25,12 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const isCartCheckout = searchParams.get("cart") === "true";
-  const slug = searchParams.get("slug") || "computer-basics-office";
+  const slug = searchParams.get("slug") || "";
   
   const { cart, clearCart } = useCart();
-  const singleCourse = getCourseBySlug(slug) || courses[0];
-
-  const checkoutItems = isCartCheckout && cart.length > 0
-    ? cart
-    : [{
-        id: singleCourse.id,
-        slug: singleCourse.slug,
-        title: singleCourse.title,
-        price: singleCourse.price,
-        image: typeof singleCourse.image === 'string' ? singleCourse.image : '/logo.webp',
-        category: singleCourse.category,
-        duration: singleCourse.duration,
-      }];
+  const [course, setCourse] = useState<Course | null>(null);
+  const [courseLoading, setCourseLoading] = useState(!isCartCheckout);
+  const [courseNotFound, setCourseNotFound] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -51,6 +43,52 @@ function CheckoutContent() {
   const [nationalId, setNationalId] = useState("");
   const [nationalIdInput, setNationalIdInput] = useState("");
   const [authLoading, setAuthLoading] = useState(true);
+
+  // Load single course if not cart checkout
+  useEffect(() => {
+    if (isCartCheckout) {
+      setCourseLoading(false);
+      return;
+    }
+
+    if (!slug) {
+      setCourseNotFound(true);
+      setCourseLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+    async function loadCourse() {
+      try {
+        setCourseLoading(true);
+        setCourseNotFound(false);
+        const catalog = await fetchPublicCourses();
+        if (!isMounted) return;
+        const matched = findCourseByIdentifier(catalog, slug) || getCourseBySlug(slug);
+        if (matched) {
+          setCourse(matched);
+        } else {
+          setCourseNotFound(true);
+        }
+      } catch (err) {
+        console.error("Failed to load course for checkout from live API:", err);
+        if (!isMounted) return;
+        const fallback = getCourseBySlug(slug);
+        if (fallback) {
+          setCourse(fallback);
+        } else {
+          setCourseNotFound(true);
+        }
+      } finally {
+        if (isMounted) setCourseLoading(false);
+      }
+    }
+
+    loadCourse();
+    return () => {
+      isMounted = false;
+    };
+  }, [slug, isCartCheckout]);
 
   // Authenticate user and prefill phone & national_id from profile
   useEffect(() => {
@@ -101,6 +139,24 @@ function CheckoutContent() {
     }
     checkAuth();
   }, [slug, isCartCheckout, router]);
+
+  const singleItem = course
+    ? {
+        id: course.id,
+        slug: course.slug,
+        title: course.title,
+        price: course.price,
+        image: typeof course.image === 'string' ? course.image : '/logo.webp',
+        category: course.category,
+        duration: course.duration,
+      }
+    : null;
+
+  const checkoutItems = isCartCheckout && cart.length > 0
+    ? cart
+    : singleItem
+    ? [singleItem]
+    : [];
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,14 +233,58 @@ function CheckoutContent() {
 
   const originalSubtotal = checkoutItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
 
-  if (authLoading) {
+  if (authLoading || courseLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 font-[family-name:var(--font-cairo)]" dir="rtl">
         <div className="relative flex items-center justify-center">
           <div className="w-20 h-20 border-4 border-[#5CB07C]/20 border-t-[#5CB07C] rounded-full animate-spin" />
           <Shield className="absolute w-8 h-8 text-[#5CB07C] animate-pulse" />
         </div>
-        <p className="mt-6 text-slate-500 font-bold text-lg animate-pulse">جاري التحقق من الحساب والأمان...</p>
+        <p className="mt-6 text-slate-500 font-bold text-lg animate-pulse">جاري تحميل بيانات التسجيل والدورة...</p>
+      </div>
+    );
+  }
+
+  if (!isCartCheckout && (courseNotFound || !course)) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto space-y-5 font-[family-name:var(--font-cairo)]" dir="rtl">
+        <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-sm">
+          <AlertCircle className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-black text-slate-900">الدورة المطلوبة غير متوفرة</h2>
+          <p className="text-xs text-slate-500 font-bold leading-relaxed">
+            لم نتمكن من العثور على الدورة التدريبية المحددة للتسجيل. قد يكون تم تحديث الرابط أو تعديل حالة نشر الدورة.
+          </p>
+        </div>
+        <Link
+          href="/courses"
+          className="px-6 py-3 rounded-xl bg-[#173A7C] text-white text-xs font-black hover:bg-[#122e62] transition-colors shadow-md cursor-pointer"
+        >
+          استعراض دليل الدورات المتاحة
+        </Link>
+      </div>
+    );
+  }
+
+  if (isCartCheckout && cart.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto space-y-5 font-[family-name:var(--font-cairo)]" dir="rtl">
+        <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#173A7C] shadow-sm">
+          <ShoppingBag className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-black text-slate-900">سلة التسجيل فارغة</h2>
+          <p className="text-xs text-slate-500 font-bold leading-relaxed">
+            لا توجد دورات تدريبية حالياً في سلة التسجيل الخاصة بك.
+          </p>
+        </div>
+        <Link
+          href="/courses"
+          className="px-6 py-3 rounded-xl bg-[#173A7C] text-white text-xs font-black hover:bg-[#122e62] transition-colors shadow-md cursor-pointer"
+        >
+          تصفح دليل الدورات التدريبية
+        </Link>
       </div>
     );
   }
@@ -208,7 +308,7 @@ function CheckoutContent() {
             <h1 className="section-main-title-premium text-3xl sm:text-4xl">تفعيل <span className="gradient-text">الدورات المختارة</span></h1>
           </div>
           <Link 
-            href={isCartCheckout ? "/courses" : `/courses/${singleCourse.slug}`} 
+            href={isCartCheckout ? "/courses" : `/courses/${course?.slug || slug}`} 
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-sm font-bold transition-all text-slate-600 hover:text-slate-900 shadow-sm cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />

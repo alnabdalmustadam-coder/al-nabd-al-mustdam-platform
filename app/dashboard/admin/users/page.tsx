@@ -32,6 +32,7 @@ import {
   Trash2,
   AlertTriangle,
   RefreshCw,
+  Pencil,
 } from 'lucide-react';
 
 interface UserRecord {
@@ -40,6 +41,7 @@ interface UserRecord {
   email: string;
   phone: string;
   role: 'طالب' | 'مدرب' | 'أدمن';
+  avatarUrl?: string | null;
   enrolledCourses: number;
   certificatesCount: number;
   status: 'active' | 'suspended';
@@ -81,6 +83,47 @@ function AdminUsersPageContent() {
 
   // Deletion Modal State
   const [userToDelete, setUserToDelete] = useState<UserRecord | null>(null);
+
+  // Edit Student Name Modal State
+  const [userToEditName, setUserToEditName] = useState<UserRecord | null>(null);
+  const [editStudentFullName, setEditStudentFullName] = useState('');
+  const [isSavingStudentName, setIsSavingStudentName] = useState(false);
+
+  const handleSaveStudentName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userToEditName || !editStudentFullName.trim()) return;
+
+    try {
+      setIsSavingStudentName(true);
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userToEditName.id,
+          fullName: editStudentFullName.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message || 'فشل تحديث اسم المتدرب');
+        return;
+      }
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === userToEditName.id ? { ...u, name: editStudentFullName.trim() } : u
+        )
+      );
+
+      setUserToEditName(null);
+    } catch (err) {
+      console.error('Error saving student name:', err);
+      alert('حدث خطأ في الاتصال بالخادم');
+    } finally {
+      setIsSavingStudentName(false);
+    }
+  };
 
   // Created Success Credentials Modal
   const [createdCredentials, setCreatedCredentials] = useState<{
@@ -410,9 +453,17 @@ function AdminUsersPageContent() {
                 <tr key={user.id} className="hover:bg-white/60 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white font-black flex items-center justify-center shrink-0 text-sm shadow-md shadow-[#173A7C]/20 border border-white/20">
-                        {user.name.charAt(0)}
-                      </div>
+                      {user.avatarUrl ? (
+                        <img
+                          src={user.avatarUrl}
+                          alt={user.name}
+                          className="w-10 h-10 rounded-xl object-cover shadow-md border border-white/60 shrink-0 bg-slate-100"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white font-black flex items-center justify-center shrink-0 text-sm shadow-md shadow-[#173A7C]/20 border border-white/20">
+                          {user.name.charAt(0)}
+                        </div>
+                      )}
                       <div className="font-extrabold text-[#152C5B] text-sm student-heading-h3 [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
                         {user.name}
                       </div>
@@ -464,6 +515,16 @@ function AdminUsersPageContent() {
                   <td className="p-4 text-center">
                     <div className="flex items-center justify-center gap-1.5">
                       <button
+                        onClick={() => {
+                          setUserToEditName(user);
+                          setEditStudentFullName(user.name);
+                        }}
+                        className="p-1.5 rounded-xl bg-blue-50 hover:bg-[#173A7C] text-[#173A7C] hover:text-white transition-all cursor-pointer border border-blue-200 shadow-xs"
+                        title="تعديل وتصحيح اسم المتدرب للشهادات"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
                         onClick={() => setSelectedUserForLogs(user)}
                         className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#173A7C] hover:text-white text-[#173A7C] font-bold text-[11px] transition-all cursor-pointer border border-[#173A7C]/20 shadow-xs whitespace-nowrap"
                         title="سجل الأنشطة"
@@ -492,9 +553,17 @@ function AdminUsersPageContent() {
               {/* User Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white font-black flex items-center justify-center shrink-0 text-sm shadow-md shadow-[#173A7C]/20 border border-white/20">
-                    {user.name.charAt(0)}
-                  </div>
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.name}
+                      className="w-10 h-10 rounded-xl object-cover shadow-md border border-white/60 shrink-0 bg-slate-100"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white font-black flex items-center justify-center shrink-0 text-sm shadow-md shadow-[#173A7C]/20 border border-white/20">
+                      {user.name.charAt(0)}
+                    </div>
+                  )}
                   <div>
                     <div className="font-extrabold text-[#152C5B] text-sm student-heading-h3">
                       {user.name}
@@ -549,6 +618,16 @@ function AdminUsersPageContent() {
 
               {/* Actions */}
               <div className="flex gap-2 pt-1">
+                <button
+                  onClick={() => {
+                    setUserToEditName(user);
+                    setEditStudentFullName(user.name);
+                  }}
+                  className="px-3 py-2 rounded-lg bg-blue-50 hover:bg-[#173A7C] text-[#173A7C] hover:text-white transition-all cursor-pointer border border-blue-200 shadow-xs flex items-center justify-center"
+                  title="تعديل وتصحيح اسم المتدرب"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
                 <button
                   onClick={() => setSelectedUserForLogs(user)}
                   className="flex-1 py-2 rounded-lg bg-white hover:bg-[#173A7C] hover:text-white text-[#173A7C] font-bold text-[11px] transition-all cursor-pointer border border-[#173A7C]/20 shadow-xs text-center"
@@ -1132,6 +1211,91 @@ function AdminUsersPageContent() {
                   إغلاق
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* EDIT STUDENT NAME MODAL */}
+      <AnimatePresence>
+        {userToEditName && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 1 }}
+              className="w-full max-w-md bg-white rounded-3xl border border-slate-200 p-6 space-y-5 shadow-2xl relative text-right font-[family-name:var(--font-cairo)]"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2.5 rounded-xl bg-[#173A7C]/10 text-[#173A7C]">
+                    <Pencil className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base text-slate-900">تعديل وتصحيح اسم المتدرب</h3>
+                    <p className="text-[11px] text-slate-500 font-medium">الاسم الرسمي المعتمد لإصدار الشهادات والتقارير</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setUserToEditName(null)}
+                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveStudentName} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-700">الاسم الكامل (المعتمد على الشهادة)</label>
+                  <input
+                    type="text"
+                    required
+                    value={editStudentFullName}
+                    onChange={(e) => setEditStudentFullName(e.target.value)}
+                    placeholder="مثال: عبد العزيز بن فهد المنصور"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                  />
+                  <p className="text-[10.5px] text-emerald-700 font-bold mt-1">
+                    ✓ سيتم اعتماد هذا الاسم فوراً في حسابه وفي أي شهادة جديدة تصدر له.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 space-y-1">
+                  <p className="text-[10px] text-slate-400">البريد الإلكتروني المرتبط (خاص بالمتدرب):</p>
+                  <p className="font-mono text-slate-800" dir="ltr">{userToEditName.email}</p>
+                </div>
+
+                <div className="flex gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setUserToEditName(null)}
+                    className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black cursor-pointer transition-colors"
+                  >
+                    إلغاء
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingStudentName}
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-[#173A7C]/20 transition-all cursor-pointer disabled:opacity-60"
+                  >
+                    {isSavingStudentName ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>جاري الحفظ...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>حفظ وتحديث الاسم</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </motion.div>
         )}

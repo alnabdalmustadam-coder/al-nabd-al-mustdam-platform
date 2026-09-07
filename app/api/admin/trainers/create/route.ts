@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/security/auth";
+import { getAllCoursesAsync, saveCourseAsync } from "@/lib/courses-store";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function POST(req: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin();
 
     const body = await req.json();
-    const { fullName, email, password, specialty, phone } = body;
+    const { fullName, email, password, specialty, phone, avatarUrl, assignedCourseSlugs } = body;
 
     if (!email || !password || !fullName) {
       return NextResponse.json(
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
       email_confirm: true,
       user_metadata: {
         full_name: fullName,
+        avatar_url: avatarUrl || null,
       },
       app_metadata: { role: "INSTRUCTOR" },
     });
@@ -49,6 +51,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "فشل إنشاء معرف المستخدم في النظام" }, { status: 500 });
     }
 
+    const defaultAvatar = /أمال|ميسون|عهود|سارة|نورة|فاطمة|المدربة|دكتورة|محامية/.test(fullName)
+      ? '/trainer-default-female.webp'
+      : '/trainer-default-male.webp';
+    const finalAvatarUrl = avatarUrl || defaultAvatar;
+
     // 2. Upsert profile with role = 'INSTRUCTOR'
     const { error: profileError } = await supabaseAdmin.from("profiles").upsert(
       {
@@ -57,6 +64,9 @@ export async function POST(req: NextRequest) {
         full_name: fullName,
         phone: phone || null,
         bio: specialty || "مدرب ومحاضر معتمد",
+        specialty: specialty || "مدرب ومحاضر معتمد",
+        avatar_url: finalAvatarUrl,
+        status: "active",
         role: "INSTRUCTOR",
         updated_at: new Date().toISOString(),
       },
@@ -67,10 +77,33 @@ export async function POST(req: NextRequest) {
       console.error("Profile upsert error:", profileError);
     }
 
+    // 3. Assign Trainer to Target Courses if requested
+    if (Array.isArray(assignedCourseSlugs) && assignedCourseSlugs.length > 0) {
+      try {
+        const allCourses = await getAllCoursesAsync({ includeUnpublished: true });
+        const targetSlugs = new Set(assignedCourseSlugs.map((s: string) => String(s).toLowerCase().trim()));
+
+        for (const course of allCourses) {
+          if (targetSlugs.has(course.slug.toLowerCase())) {
+            await saveCourseAsync(
+              {
+                ...course,
+                instructor: fullName,
+                trainerId: userId,
+              },
+              userId
+            );
+          }
+        }
+      } catch (assignErr) {
+        console.warn("Notice assigning courses to new trainer:", assignErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: "تم إنشاء حساب المدرب واعتماده بنجاح! يمكنه الآن تسجيل الدخول مباشرة.",
-      trainer: { email: cleanEmail, role: "INSTRUCTOR" },
+      trainer: { id: userId, email: cleanEmail, fullName, role: "INSTRUCTOR", avatarUrl: avatarUrl || null },
     });
   } catch (err: any) {
     console.error("Create trainer error:", err);

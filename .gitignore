@@ -47,3 +47,7 @@ GHL Native Registration Integration.md
 # uploads
 /public/uploads
 
+# temporary scratch and backups
+scratch/
+*.backup.*
+

@@ -22,7 +22,8 @@ import {
 } from 'lucide-react';
 import { ProgressCard } from '@/components/student/progress-card';
 import { createClient } from '@/utils/supabase/client';
-import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
+import { getCourseBySlug } from "@/data/courses";
+import { findCourseByIdentifier, fetchPublicCourses } from "@/lib/public-courses";
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
 import { CardImage } from '@/components/ui/CardImage';
 
@@ -71,6 +72,7 @@ export default function StudentDashboardPage() {
   useEffect(() => {
     async function loadStudentData() {
       try {
+        const liveCatalog = await fetchPublicCourses();
         const supabase = createClient();
         const { data: authData } = await supabase.auth.getUser();
         const user = authData?.user;
@@ -107,15 +109,17 @@ export default function StudentDashboardPage() {
 
             enrollmentsData.forEach((e: any, idx: number) => {
               const cleanSlug = (e.course_id || '').replace(/^course-/, '');
-              const matchedCatalog = getCourseBySlug(cleanSlug) || getCourseBySlug(e.course_id) || catalogCourses.find(c => c.title === e.course_title) || catalogCourses[idx % catalogCourses.length];
+              const matchedCatalog = findCourseByIdentifier(liveCatalog, cleanSlug) ||
+                liveCatalog.find((c: any) => c.title === e.course_title) ||
+                getCourseBySlug(cleanSlug) ||
+                null;
               const canonicalSlug = matchedCatalog?.slug || cleanSlug;
               
               // Calculate lessons count using the exact same logic as player
-              const allCourseLessons = getCourseAllLessons(matchedCatalog);
+              const allCourseLessons = matchedCatalog ? getCourseAllLessons(matchedCatalog) : [];
               const totalLessons = Math.max(1, allCourseLessons.length);
 
-              // Enrollment progress is the authoritative server value. Browser
-              // storage is only a cache and must never grant completion.
+              // Enrollment progress is the authoritative server value.
               const progress = e.progress !== undefined && e.progress !== null
                 ? Math.min(100, Math.max(0, Number(e.progress)))
                 : 0;
@@ -129,7 +133,7 @@ export default function StudentDashboardPage() {
                 courseMap.set(canonicalSlug, {
                   id: e.id || `enr-${idx}`,
                   slug: canonicalSlug,
-                  title: e.course_title || matchedCatalog?.title || 'دورة تدريبية معتمدة',
+                  title: matchedCatalog?.title || e.course_title || 'دورة تدريبية معتمدة',
                   instructor: matchedCatalog?.instructor || 'مدرب معتمد',
                   lessonsCount: totalLessons,
                   progressPercent: progress,

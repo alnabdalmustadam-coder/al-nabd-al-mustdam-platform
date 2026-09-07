@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { CardImage } from '@/components/ui/CardImage';
 import { motion } from "framer-motion";
@@ -28,18 +28,30 @@ const categories = [
 export default function BlogIndexPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [posts, setPosts] = useState<any[]>(blogPosts);
 
-  const filteredPosts = blogPosts.filter((post) => {
+  useEffect(() => {
+    fetch('/api/articles')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.articles) && data.articles.length > 0) {
+          setPosts(data.articles);
+        }
+      })
+      .catch((err) => console.error('Failed to fetch live articles:', err));
+  }, []);
+
+  const filteredPosts = posts.filter((post) => {
     const matchesCategory =
-      selectedCategory === "all" || post.categorySlug === selectedCategory;
+      selectedCategory === "all" || post.categorySlug === selectedCategory || post.category === selectedCategory;
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      (post.excerpt && post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (Array.isArray(post.tags) && post.tags.some((t: string) => t.toLowerCase().includes(searchQuery.toLowerCase())));
     return matchesCategory && matchesSearch;
   });
 
-  const featuredPost = blogPosts[0];
+  const featuredPost = posts.find((p) => p.is_featured) || posts[0] || blogPosts[0];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900 selection:bg-[#173A7C] selection:text-white" dir="rtl">

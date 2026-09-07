@@ -41,45 +41,8 @@ interface ServiceItem {
 }
 
 export default function InstructorServicesPage() {
-  const [services, setServices] = useState<ServiceItem[]>([
-    {
-      id: 'srv-1',
-      title: 'جلسة استشارية فردية: التخطيط الأكاديمي وإعداد الحقائب التدريبية',
-      category: 'استشارات وتوجيه',
-      price: 250,
-      duration: 'جلسة 60 دقيقة',
-      ordersCount: 14,
-      isActive: true,
-      image: '/1.png',
-      description: 'جلسة توجيهية خاصة لمراجعة خطط التدريب وتصميم الحقائب التدريبية المتوافقة مع معايير الجودة والاعتماد.',
-      deliverables: ['خطة عمل تدريبية مخصصة', 'تقرير تقييمي بالنقاط التطويرية', 'تسجيل الجلسة وملحقاتها'],
-    },
-    {
-      id: 'srv-2',
-      title: 'مراجعة وتدقيق البحوث والرسائل الأكاديمية وتدقيق المنهجية',
-      category: 'خدمات أكاديمية',
-      price: 450,
-      duration: '3 أيام عمل',
-      ordersCount: 22,
-      isActive: true,
-      image: '/2.png',
-      description: 'فحص أكاديمي شامل للمنهجية، المراجع، التوثيق، والتأكد من خلو العمل من الانتحال العلمي.',
-      deliverables: ['تقرير فحص الانتحال المعتمد', 'ملاحظات المنهجية والتوثيق', 'ملف مصحح ومراجع'],
-    },
-    {
-      id: 'srv-3',
-      title: 'تصميم وبناء نماذج تقييم الأداء والمؤشرات المؤسسية (KPIs)',
-      category: 'تطوير إداري',
-      price: 600,
-      duration: '5 أيام عمل',
-      ordersCount: 8,
-      isActive: false,
-      image: '/3.webp',
-      description: 'إعداد لوحة مؤشرات قياس أداء متقدمة ونماذج تقييم عملية للمنشآت والمؤسسات التعليمية.',
-      deliverables: ['لوحة تحكم إكسيل تفاعلية', 'دليل استخدام وتفسير المؤشرات', 'دعم فني وتعديلات لمدة أسبوع'],
-    },
-  ]);
-
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -100,6 +63,43 @@ export default function InstructorServicesPage() {
   const [editingService, setEditingService] = useState<Partial<ServiceItem> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [newDeliverableInput, setNewDeliverableInput] = useState('');
+
+  const loadServices = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/admin/services?t=${Date.now()}`, { cache: 'no-store' });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.services)) {
+        const mapped: ServiceItem[] = data.services.map((s: any) => ({
+          id: s.id,
+          title: s.title,
+          category: s.category_name || s.category || 'استشارات وتوجيه',
+          price: Number(s.price || 0),
+          duration: s.delivery_days ? `${s.delivery_days} أيام عمل` : 'جلسة 60 دقيقة',
+          ordersCount: Number(s.orders_count || 0),
+          isActive: s.status === 'active',
+          image: s.image_url || s.thumbnail_url || '/1.png',
+          description: s.description || '',
+          deliverables: Array.isArray(s.deliverables)
+            ? s.deliverables.map((d: any) => (typeof d === 'string' ? d : d.title || ''))
+            : ['تقرير تقييمي مخصص'],
+        }));
+        setServices(mapped);
+        const allCats = Array.from(
+          new Set([...categoriesList, ...mapped.map((m) => m.category).filter(Boolean)])
+        );
+        setCategoriesList(allCats);
+      }
+    } catch (err) {
+      console.error('Error loading instructor services:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadServices();
+  }, []);
 
   const handleAddNewCategory = () => {
     if (!newCatInput.trim()) return;
@@ -153,19 +153,52 @@ export default function InstructorServicesPage() {
     setEditingService({ ...editingService, deliverables: cur });
   };
 
-  const handleToggleActive = (id: string) => {
-    setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, isActive: !s.isActive } : s))
-    );
-  };
+  const handleToggleActive = async (id: string) => {
+    const target = services.find((s) => s.id === id);
+    if (!target) return;
+    const newActive = !target.isActive;
 
-  const handleDeleteService = (id: string) => {
-    if (confirm('هل أنت متأكد من حذف هذه الخدمة من متجرك؟')) {
-      setServices((prev) => prev.filter((s) => s.id !== id));
+    setServices((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, isActive: newActive } : s))
+    );
+
+    try {
+      const res = await fetch('/api/admin/services', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, isActive: newActive }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        alert(data.error || 'تعذر تحديث حالة الخدمة في قاعدة البيانات');
+        await loadServices();
+      }
+    } catch (err) {
+      console.error('Error toggling active:', err);
+      alert('تعذر تحديث حالة الخدمة');
+      await loadServices();
     }
   };
 
-  const handleSaveService = (e: React.FormEvent) => {
+  const handleDeleteService = async (id: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذه الخدمة من متجرك؟')) return;
+    try {
+      const res = await fetch(`/api/admin/services?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        setServices((prev) => prev.filter((s) => s.id !== id));
+      } else {
+        alert(data.error || 'تعذر حذف الخدمة');
+      }
+    } catch (err) {
+      console.error('Error deleting service:', err);
+      alert('حدث خطأ أثناء محاولة حذف الخدمة');
+    }
+  };
+
+  const handleSaveService = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingService || !editingService.title?.trim()) {
       alert('يرجى كتابة عنوان الخدمة');
@@ -173,30 +206,37 @@ export default function InstructorServicesPage() {
     }
 
     setIsSaving(true);
-    setTimeout(() => {
-      if (editingService.id) {
-        setServices((prev) =>
-          prev.map((s) => (s.id === editingService.id ? ({ ...s, ...editingService } as ServiceItem) : s))
-        );
+    try {
+      const durationDays = parseInt(editingService.duration || '3') || 3;
+      const res = await fetch('/api/admin/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...editingService,
+          status: editingService.isActive ? 'active' : 'paused',
+          image_url: editingService.image || '/1.png',
+          category_name: editingService.category,
+          delivery_days: durationDays,
+          deliverables: (editingService.deliverables || []).map((d) => ({
+            title: d,
+            desc: 'تنفيذ احترافي ومطابق للمعايير',
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.service) {
+        await loadServices();
+        setIsModalOpen(false);
+        setEditingService(null);
       } else {
-        const newSrv: ServiceItem = {
-          id: `srv-${Date.now()}`,
-          title: editingService.title || 'خدمة جديدة',
-          category: editingService.category || 'استشارات وتوجيه',
-          price: Number(editingService.price) || 150,
-          duration: editingService.duration || 'جلسة 60 دقيقة',
-          ordersCount: 0,
-          isActive: editingService.isActive ?? true,
-          image: editingService.image || '/1.png',
-          description: editingService.description || '',
-          deliverables: editingService.deliverables || ['مخرجات استشارية معتمدة'],
-        };
-        setServices((prev) => [newSrv, ...prev]);
+        alert(data.error || 'تعذر حفظ الخدمة في قاعدة البيانات');
       }
+    } catch (err) {
+      console.error('Error saving service:', err);
+      alert('حدث خطأ أثناء حفظ الخدمة في قاعدة البيانات');
+    } finally {
       setIsSaving(false);
-      setIsModalOpen(false);
-      setEditingService(null);
-    }, 400);
+    }
   };
 
   const filteredServices = services.filter((s) => {

@@ -34,8 +34,8 @@ export async function POST(req: Request) {
       courseTitle: body.courseTitle.trim(),
       studentEmail: body.studentEmail,
       templateId: body.templateId,
-      grade: body.grade || 'ممتاز مرتفع (%99)',
-      hours: body.hours || '30 ساعة',
+      grade: body.grade?.trim() || 'اجتياز معتمد (ناجح)',
+      hours: body.hours?.trim() || 'دورة تدريبية معتمدة',
       imageUrl: body.imageUrl,
       customData: body.customData,
     });

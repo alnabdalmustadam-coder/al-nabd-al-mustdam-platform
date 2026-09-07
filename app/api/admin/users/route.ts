@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
     const { data: profiles, error: profilesError } = await supabaseAdmin
       .from("profiles")
-      .select("id, email, full_name, phone, role, status, created_at, updated_at")
+      .select("id, email, full_name, phone, role, status, avatar_url, created_at, updated_at")
       .order("created_at", { ascending: false });
 
     if (profilesError) {
@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
         email: p.email || "",
         phone: p.phone || "غير مسجل",
         role: mappedRole,
+        avatarUrl: p.avatar_url || null,
         enrolledCourses: enrollmentMap.get(emailClean) || 0,
         certificatesCount: completedMap.get(emailClean) || 0,
         status: (p.status === "suspended" ? "suspended" : "active") as "active" | "suspended",
@@ -139,37 +140,83 @@ export async function PATCH(req: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin();
 
     const body = await req.json();
-    const { userId, status } = body;
+    const { userId, status, fullName, name } = body;
 
-    if (!userId || !['active', 'suspended'].includes(status)) {
+    if (!userId) {
       return NextResponse.json(
-        { message: 'معرف المستخدم وحالة صالحة مطلوبان' },
+        { message: 'معرف المستخدم مطلوب' },
         { status: 400 }
       );
     }
 
-    // Prevent self-suspension
-    if (userId === auth.user.id) {
-      return NextResponse.json(
-        { message: 'لا يمكنك تعليق حسابك الحالي' },
-        { status: 400 }
-      );
+    const newFullName = (fullName || name || '').trim();
+
+    // 1. Updating User Name (for certificates and profile accuracy)
+    if (newFullName) {
+      // Update profiles table
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .update({
+          full_name: newFullName,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', userId);
+
+      if (profileError) {
+        console.error('Profile full_name update error:', profileError);
+        return NextResponse.json({ message: profileError.message }, { status: 500 });
+      }
+
+      // Sync with Supabase Auth metadata
+      try {
+        await supabaseAdmin.auth.admin.updateUserById(userId, {
+          user_metadata: { full_name: newFullName },
+        });
+      } catch (authErr) {
+        console.warn('Auth user metadata update notice:', authErr);
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'تم تحديث اسم المتدرب بنجاح',
+        user: { id: userId, fullName: newFullName },
+      });
     }
 
-    const { error } = await supabaseAdmin
-      .from('profiles')
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq('id', userId);
+    // 2. Updating Status
+    if (status) {
+      if (!['active', 'suspended'].includes(status)) {
+        return NextResponse.json(
+          { message: 'حالة غير صالحة' },
+          { status: 400 }
+        );
+      }
 
-    if (error) {
-      console.error('Status update error:', error);
-      return NextResponse.json({ message: error.message }, { status: 500 });
+      // Prevent self-suspension
+      if (userId === auth.user.id) {
+        return NextResponse.json(
+          { message: 'لا يمكنك تعليق حسابك الحالي' },
+          { status: 400 }
+        );
+      }
+
+      const { error } = await supabaseAdmin
+        .from('profiles')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Status update error:', error);
+        return NextResponse.json({ message: error.message }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: status === 'suspended' ? 'تم تعليق الحساب بنجاح' : 'تم تفعيل الحساب بنجاح',
+      });
     }
 
-    return NextResponse.json({
-      success: true,
-      message: status === 'suspended' ? 'تم تعليق الحساب بنجاح' : 'تم تفعيل الحساب بنجاح',
-    });
+    return NextResponse.json({ message: 'لا توجد بيانات صالحة للتحديث' }, { status: 400 });
   } catch (err: any) {
     console.error('Patch user error:', err);
     return NextResponse.json(

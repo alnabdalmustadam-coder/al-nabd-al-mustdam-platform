@@ -31,6 +31,8 @@ import {
   ExternalLink,
   Layers,
   FileCheck,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { StudentVideoPlayer } from '@/components/student/student-video-player';
 import {
@@ -40,6 +42,7 @@ import {
   saveQuizAttempt,
 } from '@/lib/actions/student-actions';
 import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
+import { findCourseByIdentifier } from '@/lib/public-courses';
 import { Course, CourseAttachment, QuizData, SubLessonItem } from '@/types';
 import { createClient } from '@/utils/supabase/client';
 
@@ -67,42 +70,55 @@ interface Chapter {
 export default function StudentLessonPage() {
   const params = useParams();
   const router = useRouter();
-  const rawSlug = (params?.courseSlug as string) || 'free-trial-course';
+  const rawSlug = (params?.courseSlug as string) || '';
   const courseSlug = rawSlug.replace(/^course-/, '');
   const lessonId = (params?.lessonId as string) || 'lesson-1';
 
   // Dynamic course state
-  const [courseData, setCourseData] = useState<Course>(() => {
-    return getCourseBySlug(courseSlug) || catalogCourses.find(c => c.slug === courseSlug) || catalogCourses[0];
+  const [courseData, setCourseData] = useState<Course | null>(() => {
+    if (!courseSlug) return null;
+    return getCourseBySlug(courseSlug) || catalogCourses.find(c => c.slug === courseSlug) || null;
   });
+  const [isLoadingCourse, setIsLoadingCourse] = useState(!courseData);
+  const [courseNotFound, setCourseNotFound] = useState(false);
 
   // Fetch live course from server API
   useEffect(() => {
+    let isMounted = true;
     async function loadLiveCourseData() {
+      if (!courseSlug) {
+        setCourseNotFound(true);
+        setIsLoadingCourse(false);
+        return;
+      }
       try {
+        setIsLoadingCourse(true);
         const res = await fetch('/api/courses', { cache: 'no-store' });
         const data = await res.json();
+        if (!isMounted) return;
         if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-          const matched = data.courses.find((c: any) => {
-            const clean = (c.slug || '').replace(/^course-/, '').toLowerCase().trim();
-            const target = courseSlug.replace(/^course-/, '').toLowerCase().trim();
-            return (
-              clean === target ||
-              c.slug === courseSlug ||
-              (c.ghlCourseId && c.ghlCourseId.replace(/^course-/, '').toLowerCase().trim() === target) ||
-              String(c.id) === target
-            );
-          });
+          const matched = findCourseByIdentifier(data.courses, courseSlug) || getCourseBySlug(courseSlug);
           if (matched) {
             setCourseData(matched);
+            setCourseNotFound(false);
+          } else if (!courseData) {
+            setCourseNotFound(true);
           }
+        } else if (!courseData) {
+          setCourseNotFound(true);
         }
       } catch (err) {
         console.error('Error loading live course in lesson player:', err);
+        if (!courseData) setCourseNotFound(true);
+      } finally {
+        if (isMounted) setIsLoadingCourse(false);
       }
     }
 
     loadLiveCourseData();
+    return () => {
+      isMounted = false;
+    };
   }, [courseSlug]);
 
   const [activeTab, setActiveTab] = useState<'notes' | 'attachments' | 'quiz' | 'discussion'>('notes');
@@ -240,16 +256,16 @@ export default function StudentLessonPage() {
   const allLessons = useMemo(() => chapters.flatMap((ch) => ch.lessons), [chapters]);
   
   const currentIndex = useMemo(() => {
-    if (!allLessons || allLessons.length === 0) return 0;
+    if (!allLessons || allLessons.length === 0) return -1;
     const exactMatch = allLessons.findIndex((l) => l.id === lessonId);
     if (exactMatch >= 0) return exactMatch;
     if (lessonId === 'lesson-1' || !lessonId) return 0;
-    return 0;
+    return -1;
   }, [allLessons, lessonId]);
 
-  const currentLesson = allLessons[currentIndex] || allLessons[0];
+  const currentLesson = currentIndex >= 0 ? allLessons[currentIndex] : null;
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
-  const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
+  const nextLesson = (currentIndex >= 0 && currentIndex < allLessons.length - 1) ? allLessons[currentIndex + 1] : null;
 
   const totalLessons = Math.max(1, allLessons.length);
   const completedLessons = allLessons.filter(l => completedSet.has(l.id)).length;
@@ -499,9 +515,13 @@ export default function StudentLessonPage() {
     saveQuizAttempt(lessonId, score);
 
     const passingScore = activeQuiz.passingScore || 70;
+    const isPassed = score >= passingScore;
+    const isFinalExam = activeQuiz === courseData?.finalExam;
+    const isLastLesson = currentIndex >= allLessons.length - 1;
+    const isCourseFinished = isFinalExam || (isLastLesson && completedSet.size + 1 >= allLessons.length);
 
-    // Auto-issue certificate if passed
-    if (score >= passingScore) {
+    // Auto-issue certificate only if passing the final assessment or completing the course
+    if (isPassed && isCourseFinished) {
       try {
         const supabase = createClient();
         const { data: authData } = await supabase.auth.getUser();
@@ -528,12 +548,13 @@ export default function StudentLessonPage() {
             studentEmail,
             courseSlug,
             courseTitle: courseData?.title,
-            grade: `ممتاز (%${score})`,
-            hours: courseData?.duration || '30 ساعة تدريبية معتمدة',
+            score,
+            hours: courseData?.duration,
+            isFinalExam,
           }),
         });
       } catch (err) {
-        console.error('Error auto issuing certificate after quiz:', err);
+        console.error('Error auto issuing certificate after final assessment:', err);
       }
     }
   };
@@ -552,6 +573,69 @@ export default function StudentLessonPage() {
     setDiscussionComments([newC, ...discussionComments]);
     setNewCommentText('');
   };
+
+  if (isLoadingCourse) {
+    return (
+      <div className="w-full min-h-[50vh] flex flex-col items-center justify-center space-y-4 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
+        <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+        <p className="text-sm font-bold text-slate-600">جاري تحميل محتوى الدورة التدريبية...</p>
+      </div>
+    );
+  }
+
+  if (courseNotFound || !courseData) {
+    return (
+      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto space-y-5 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
+        <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-sm">
+          <AlertCircle className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-black text-slate-900">الدورة التدريبية غير موجودة</h2>
+          <p className="text-xs text-slate-500 font-bold leading-relaxed">
+            لم نتمكن من العثور على الدورة التدريبية المطلوبة. يرجى التحقق من صحة الرابط أو الرجوع إلى قائمة دوراتك المسجلة.
+          </p>
+        </div>
+        <Link
+          href="/dashboard/student/courses"
+          className="px-6 py-3 rounded-xl bg-[#173A7C] text-white text-xs font-black hover:bg-[#122e62] transition-colors shadow-md"
+        >
+          العودة إلى دوراتي
+        </Link>
+      </div>
+    );
+  }
+
+  if (!currentLesson) {
+    return (
+      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto space-y-5 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
+        <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#173A7C] shadow-sm">
+          <BookOpen className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-black text-slate-900">الدرس المطلوب غير موجود</h2>
+          <p className="text-xs text-slate-500 font-bold leading-relaxed">
+            لم يتم العثور على الدرس المطلوب في هذه الدورة. قد يكون تم تحديث خطة الدورة التدريبية أو تعديل ترتيب المحتوى.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+          {allLessons.length > 0 && (
+            <Link
+              href={`/dashboard/student/courses/${courseSlug}/lessons/${allLessons[0].id}`}
+              className="px-5 py-2.5 rounded-xl bg-[#173A7C] text-white text-xs font-black hover:bg-[#122e62] transition-colors shadow-md"
+            >
+              الانتقال إلى أول درس متاح
+            </Link>
+          )}
+          <Link
+            href="/dashboard/student/courses"
+            className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+          >
+            العودة إلى قائمة الدورات
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full pt-1.5 sm:pt-2.5 -mt-1 sm:-mt-2 lg:-mt-[3.8vh] -mb-6 sm:-mb-10 font-[family-name:var(--font-cairo)] text-slate-900" dir="rtl">

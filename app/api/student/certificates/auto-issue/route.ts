@@ -4,7 +4,12 @@ import {
   getAllIssuedCertificates,
   getAllTemplates,
   issueCertificate,
+  formatCertificateGrade,
+  formatCertificateHours,
 } from '@/lib/certificates-store';
+import { getAllCoursesAsync } from '@/lib/courses-store';
+import { findCourseByIdentifier } from '@/lib/public-courses';
+import { getCourseBySlug } from '@/data/courses';
 import { requireUser } from '@/lib/security/auth';
 import { supabase } from '@/lib/supabase';
 
@@ -17,6 +22,10 @@ export async function POST(req: NextRequest) {
     const {
       courseTitle,
       courseSlug,
+      score,
+      grade,
+      hours,
+      isFinalExam,
     } = body;
 
     if (!courseTitle && !courseSlug) {
@@ -31,18 +40,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'البريد الإلكتروني غير متاح' }, { status: 400 });
     }
 
-    const enrollmentIds = [courseSlug, courseSlug ? `course-${courseSlug.replace(/^course-/, '')}` : null]
-      .filter(Boolean) as string[];
+    const cleanCourseId = courseSlug ? courseSlug.replace(/^course-/, '') : '';
+    const enrollmentIds = [
+      courseSlug,
+      cleanCourseId,
+      courseSlug ? `course-${cleanCourseId}` : null,
+    ].filter(Boolean) as string[];
+
     let enrollmentQuery = supabase
       .from('enrollments')
-      .select('course_id, course_title, progress, status')
+      .select('*')
       .eq('email', email);
-    if (enrollmentIds.length > 0) enrollmentQuery = enrollmentQuery.in('course_id', enrollmentIds);
-    else enrollmentQuery = enrollmentQuery.eq('course_title', courseTitle);
+
+    if (enrollmentIds.length > 0) {
+      enrollmentQuery = enrollmentQuery.in('course_id', enrollmentIds);
+    } else {
+      enrollmentQuery = enrollmentQuery.eq('course_title', courseTitle);
+    }
     const { data: enrollment } = await enrollmentQuery.maybeSingle();
 
-    if (!enrollment || (Number(enrollment.progress) < 100 && enrollment.status !== 'completed')) {
-      return NextResponse.json({ success: false, error: 'لا يمكن إصدار الشهادة قبل إكمال الدورة' }, { status: 403 });
+    const isCompleted = enrollment && (Number(enrollment.progress) >= 100 || enrollment.status === 'completed');
+    const passedFinalAssessment = Boolean(isFinalExam && typeof score === 'number' && score >= 70);
+
+    if (!enrollment || (!isCompleted && !passedFinalAssessment)) {
+      return NextResponse.json(
+        { success: false, error: 'لا يمكن إصدار الشهادة قبل إكمال متطلبات الدورة واجتياز التقييم' },
+        { status: 403 }
+      );
+    }
+
+    // Mark enrollment completed if passed final exam
+    if (passedFinalAssessment && (!isCompleted || Number(enrollment.progress) < 100)) {
+      await supabase
+        .from('enrollments')
+        .update({
+          progress: 100,
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', enrollment.id);
     }
 
     const { data: profile } = await supabase
@@ -51,7 +87,18 @@ export async function POST(req: NextRequest) {
       .eq('id', auth.user.id)
       .maybeSingle();
     const name = profile?.full_name || auth.user.user_metadata?.full_name || 'المتدرب المتميز';
-    const title = enrollment.course_title || courseTitle || 'الدورة التدريبية المعتمدة';
+
+    // Fetch live courses to accurately resolve duration & canonical title
+    const allCourses = await getAllCoursesAsync();
+    const matchedCourse =
+      (courseSlug ? findCourseByIdentifier(allCourses, courseSlug) : null) ||
+      allCourses.find((c) => c.title === courseTitle || (cleanCourseId && c.slug === cleanCourseId)) ||
+      (courseSlug ? getCourseBySlug(courseSlug) : null) ||
+      null;
+
+    const title = enrollment.course_title || matchedCourse?.title || courseTitle || 'الدورة التدريبية المعتمدة';
+    const finalGrade = formatCertificateGrade(score, grade);
+    const finalHours = formatCertificateHours(matchedCourse?.duration, hours);
 
     const [allIssued, allTemplates] = await Promise.all([
       getAllIssuedCertificates(),
@@ -102,8 +149,8 @@ export async function POST(req: NextRequest) {
       studentEmail: email,
       courseTitle: title,
       templateId: targetTemplateId,
-      grade: 'ممتاز مرتفع (%98)',
-      hours: '30 ساعة تدريبية معتمدة',
+      grade: finalGrade,
+      hours: finalHours,
       imageUrl: matchedTemplate?.imageUrl || '/1.png',
     });
 

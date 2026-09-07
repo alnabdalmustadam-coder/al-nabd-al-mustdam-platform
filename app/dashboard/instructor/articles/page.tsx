@@ -47,25 +47,10 @@ interface ArticleItem {
 }
 
 export default function InstructorArticlesPage() {
-  const [articles, setArticles] = useState<ArticleItem[]>(() =>
-    blogPosts.map((p) => ({
-      id: p.id,
-      title: p.title,
-      shortTitle: p.shortTitle,
-      slug: p.slug,
-      category: p.category,
-      excerpt: p.excerpt,
-      content: p.sections?.map((s) => `### ${s.title}\n${s.paragraphs.join('\n\n')}`).join('\n\n') || '',
-      image: p.image || '/1.png',
-      published_at: p.date || '2026-05-18',
-      read_time: p.readTime || '8 دقائق',
-      views_count: p.viewsCount || 1250,
-      status: 'published',
-      tags: p.tags || ['إدارة', 'جودة'],
-    }))
-  );
-
-  const [loading, setLoading] = useState(false);
+  const [articles, setArticles] = useState<ArticleItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -86,6 +71,65 @@ export default function InstructorArticlesPage() {
   const [editingArticle, setEditingArticle] = useState<Partial<ArticleItem> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [tagInput, setTagInput] = useState('');
+
+  const loadArticles = async () => {
+    try {
+      setLoading(true);
+      setErrorMsg(null);
+      const res = await fetch(`/api/admin/articles?t=${Date.now()}`);
+      const data = await res.json();
+      if (res.ok && data.success && Array.isArray(data.articles)) {
+        const mapped: ArticleItem[] = data.articles.map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          shortTitle: p.shortTitle || p.title,
+          slug: p.slug,
+          category: p.category || 'إدارة ومشاريع',
+          excerpt: p.excerpt || '',
+          content: p.content || '',
+          image: p.image || '/1.png',
+          published_at: p.date || (p.created_at ? new Date(p.created_at).toISOString().split('T')[0] : '2026-05-18'),
+          read_time: p.readTime || '6 دقائق',
+          views_count: Number(p.viewsCount || 0),
+          status: p.status === 'published' ? 'published' : 'draft',
+          tags: Array.isArray(p.tags) && p.tags.length > 0 ? p.tags : ['تطوير مهني'],
+        }));
+        setArticles(mapped);
+
+        const cats = new Set(categoriesList);
+        mapped.forEach((m) => { if (m.category) cats.add(m.category); });
+        setCategoriesList(Array.from(cats));
+      } else {
+        throw new Error(data.error || 'تعذر تحميل المقالات');
+      }
+    } catch (err: any) {
+      console.error('Instructor articles fetch error:', err);
+      setErrorMsg(err.message || 'حدث خطأ أثناء تحميل المقالات');
+      setArticles(
+        blogPosts.map((p) => ({
+          id: p.id,
+          title: p.title,
+          shortTitle: p.shortTitle,
+          slug: p.slug,
+          category: p.category,
+          excerpt: p.excerpt,
+          content: p.sections?.map((s) => `### ${s.title}\n${s.paragraphs.join('\n\n')}`).join('\n\n') || '',
+          image: p.image || '/1.png',
+          published_at: p.date || '2026-05-18',
+          read_time: p.readTime || '8 دقائق',
+          views_count: p.viewsCount || 1250,
+          status: 'published',
+          tags: p.tags || ['إدارة', 'جودة'],
+        }))
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadArticles();
+  }, []);
 
   const handleAddNewCategory = () => {
     if (!newCatInput.trim()) return;
@@ -143,7 +187,7 @@ export default function InstructorArticlesPage() {
     });
   };
 
-  const handleSaveArticle = (e: React.FormEvent) => {
+  const handleSaveArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingArticle || !editingArticle.title?.trim()) {
       alert('يرجى إدخال عنوان المقال');
@@ -151,40 +195,72 @@ export default function InstructorArticlesPage() {
     }
 
     setIsSaving(true);
-    setTimeout(() => {
-      if (editingArticle.id) {
-        // Update existing
-        setArticles((prev) =>
-          prev.map((a) => (a.id === editingArticle.id ? ({ ...a, ...editingArticle } as ArticleItem) : a))
-        );
-      } else {
-        // Create new
-        const newArt: ArticleItem = {
-          id: `art-${Date.now()}`,
-          title: editingArticle.title || 'مقال جديد',
-          shortTitle: editingArticle.shortTitle || editingArticle.title,
-          slug: editingArticle.slug || `article-${Date.now()}`,
-          category: editingArticle.category || 'إدارة ومشاريع',
-          excerpt: editingArticle.excerpt || '',
-          content: editingArticle.content || '',
-          image: editingArticle.image || '/1.png',
-          published_at: new Date().toISOString().split('T')[0],
-          read_time: editingArticle.read_time || '6 دقائق',
-          views_count: 0,
-          status: editingArticle.status || 'published',
-          tags: editingArticle.tags || ['تطوير مهني'],
-        };
-        setArticles((prev) => [newArt, ...prev]);
+    setErrorMsg(null);
+    try {
+      const cleanSlug =
+        editingArticle.slug?.trim() ||
+        editingArticle.title
+          .toLowerCase()
+          .replace(/[^\u0621-\u064A\w\s-]/g, '')
+          .replace(/\s+/g, '-');
+
+      const body = {
+        id: editingArticle.id ? String(editingArticle.id) : undefined,
+        title: editingArticle.title.trim(),
+        shortTitle: editingArticle.shortTitle?.trim() || editingArticle.title.trim().slice(0, 30),
+        slug: cleanSlug,
+        category: editingArticle.category || 'إدارة ومشاريع',
+        excerpt: editingArticle.excerpt?.trim() || '',
+        content: editingArticle.content || '',
+        image: editingArticle.image || '/1.png',
+        status: editingArticle.status || 'published',
+        readTime: editingArticle.read_time || '6 دقائق',
+        tags: editingArticle.tags || ['تطوير مهني'],
+      };
+
+      const res = await fetch('/api/admin/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل حفظ المقال في قاعدة البيانات');
       }
-      setIsSaving(false);
+
+      await loadArticles();
       setIsModalOpen(false);
       setEditingArticle(null);
-    }, 400);
+      setSuccessMsg('تم حفظ المقال بنجاح!');
+      setTimeout(() => setSuccessMsg(null), 3500);
+    } catch (err: any) {
+      console.error('Save article error:', err);
+      alert(err.message || 'تعذر حفظ المقال');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleDeleteArticle = (id: string | number) => {
-    if (confirm('هل أنت متأكد من حذف هذا المقال الأكاديمي نهائياً؟')) {
+  const handleDeleteArticle = async (id: string | number) => {
+    if (!confirm('هل أنت متأكد من حذف هذا المقال الأكاديمي نهائياً من قاعدة البيانات؟')) return;
+    const art = articles.find((a) => a.id === id);
+    if (!art) return;
+    try {
+      const res = await fetch(
+        `/api/admin/articles?id=${encodeURIComponent(String(art.id))}&slug=${encodeURIComponent(art.slug)}`,
+        { method: 'DELETE' }
+      );
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل حذف المقال');
+      }
       setArticles((prev) => prev.filter((a) => a.id !== id));
+      setSuccessMsg('تم حذف المقال بنجاح');
+      setTimeout(() => setSuccessMsg(null), 3500);
+    } catch (err: any) {
+      console.error('Delete article error:', err);
+      alert(err.message || 'تعذر حذف المقال');
     }
   };
 
@@ -356,7 +432,12 @@ export default function InstructorArticlesPage() {
       </div>
 
       {/* ── 4. ARTICLES GRID ── */}
-      {filteredArticles.length === 0 ? (
+      {loading ? (
+        <div className="p-16 text-center rounded-3xl liquid-glass-card border border-slate-200 flex flex-col items-center justify-center space-y-3">
+          <Loader2 className="w-8 h-8 text-[#173A7C] animate-spin" />
+          <p className="text-sm font-bold text-slate-600">جاري تحميل المقالات من قاعدة البيانات...</p>
+        </div>
+      ) : filteredArticles.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
           <Newspaper className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
           <h3 className="text-base font-black text-slate-900">لا توجد مقالات مطابقة للبحث</h3>

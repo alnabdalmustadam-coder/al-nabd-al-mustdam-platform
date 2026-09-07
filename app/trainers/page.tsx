@@ -4,15 +4,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { UserCheck, CheckCircle2, ChevronRight, Award, Star, Users, BookOpen, Sparkles, Medal, PlayCircle, Globe2, MessageSquare, Target, HeartPulse, Building, TrendingUp, Coins, Brain } from "lucide-react";
 import React, { useState } from "react";
 
-// Real Trainer Data from Poster
-const TRAINERS = [
+// Real Trainer Seed Data as Fallback
+const SEED_TRAINERS = [
   {
     id: 1,
     name: "المدرب عبد الرحمن المسعود",
     title: "خبير تطوير الكوادر الطبية والإدارة الإكلينيكية",
     description: "حاصل على بكالوريوس الطب والجراحة والبورد السعودي في طب الباطني. يقدم برامج تدريبية تعتمد على خبرة عملية وتطبيقات واقعية، بمحتوى علمي محدث واحترافي.",
-    image: "/عبد الرحمان.webp", // User uploaded image
-    cover: "https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?auto=format&fit=crop&q=80&w=800",
+    image: "/trainer-abdulrahman.webp",
+    cover: "/trainer-abdulrahman.webp",
     courses: [
       { name: "مهارات التواصل الفعّال", icon: MessageSquare },
       { name: "مهارات اتخاذ القرار", icon: Target },
@@ -27,8 +27,8 @@ const TRAINERS = [
     name: "المدرب عماد الجهني",
     title: "خبير في الإدارة الصحية وتطوير المؤسسات",
     description: "حاصل على ماجستير إدارة المستشفيات والخدمات الصحية، ودكتوراه في إدارة المستشفيات (أكاديمي). يقدم برامج تعتمد على خبرة عملية وتطبيقات واقعية بمحتوى علمي محدث واحترافي.",
-    image: "/عماد الجهني.webp", // Will be uploaded in public/عماد الجهني.webp
-    cover: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800",
+    image: "/trainer-emad.webp",
+    cover: "/trainer-emad.webp",
     courses: [
       { name: "الإدارات العليا", icon: TrendingUp },
       { name: "إدارة المستشفيات", icon: Building },
@@ -43,8 +43,8 @@ const TRAINERS = [
     name: "المدربة عهود ابو عطا الله",
     title: "خبيرة في علم الإجتماع وتطوير المهارات",
     description: "حاصلة على ماجستير علم اجتماع (علاج أسري وأسري)، خبيرة في علم الاجتماع وتطوير المهارات، وتقدم استشارات اجتماعية وأسرية متخصصة.",
-    image: "/عهود.webp", // Will be uploaded in public/عهود.webp
-    cover: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800",
+    image: "/trainer-ohoud.webp",
+    cover: "/trainer-ohoud.webp",
     courses: [
       { name: "الذكاء العاطفي", icon: Brain },
       { name: "تعزيز الصحة في بيئة العمل", icon: HeartPulse },
@@ -86,10 +86,57 @@ const itemVariants: any = {
 
 export default function TrainersPage() {
   const [activeCategory, setActiveCategory] = useState("all");
+  const [trainersList, setTrainersList] = useState<any[]>(SEED_TRAINERS);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    const fetchTrainers = async () => {
+      try {
+        const res = await fetch('/api/trainers');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.trainers) && data.trainers.length > 0) {
+          const courseIcons = [TrendingUp, Building, Award, Target, MessageSquare, HeartPulse, Brain, Coins, BookOpen];
+
+          const mapped = data.trainers.map((t: any) => {
+            const mappedCourses = (t.courses || []).map((c: any, cIdx: number) => ({
+              name: c.name,
+              icon: courseIcons[cIdx % courseIcons.length],
+            }));
+
+            // If image is missing, determine default male/female avatar
+            const isFemale = /أمال|ميسون|عهود|سارة|نورة|فاطمة|المدربة|دكتورة|محامية/.test(t.name);
+            const fallbackAvatar = isFemale ? '/trainer-default-female.webp' : '/trainer-default-male.webp';
+
+            return {
+              id: t.id,
+              name: t.name,
+              title: t.title,
+              description: t.description,
+              image: t.image || fallbackAvatar,
+              courses: mappedCourses.length > 0 ? mappedCourses : [
+                { name: "برامج تدريبية معتمدة", icon: Award },
+                { name: "تطوير مهني احترافي", icon: Target }
+              ],
+              features: t.features || ["أون لاين & حضوري", "شهادات معتمدة"],
+              category: t.category || "management",
+            };
+          });
+
+          setTrainersList(mapped);
+        }
+      } catch (err) {
+        console.error('Failed to load public trainers from API:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrainers();
+  }, []);
 
   const filteredTrainers = activeCategory === "all"
-    ? TRAINERS
-    : TRAINERS.filter(trainer => trainer.category === activeCategory);
+    ? trainersList
+    : trainersList.filter(trainer => trainer.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#F1F6FA] to-white pb-24 font-sans selection:bg-[#173A7C] selection:text-white" dir="rtl">
@@ -270,8 +317,8 @@ export default function TrainersPage() {
 
                 {/* Premium Courses Tags */}
                 <div className="absolute top-16 right-5 z-10 flex flex-col gap-2">
-                  {trainer.courses?.map((course, idx) => {
-                    const Icon = course.icon;
+                  {trainer.courses?.map((course: any, idx: number) => {
+                    const Icon = course.icon || BookOpen;
                     return (
                       <div key={idx} className="w-40 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-md text-white text-[10.5px] font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center gap-2 hover:bg-white/25 transition-all duration-300 cursor-default group/tag">
                         <div className="w-5 h-5 rounded-full bg-white/30 flex items-center justify-center shrink-0">
@@ -302,7 +349,7 @@ export default function TrainersPage() {
 
                   {/* Features */}
                   <div className="flex flex-wrap gap-3.5 w-full mb-5">
-                    {trainer.features?.map((feature, idx) => (
+                    {trainer.features?.map((feature: any, idx: number) => (
                       <div key={idx} className="flex items-center gap-1.5 text-xs font-semibold text-white/95">
                         <CheckCircle2 className="w-3.5 h-3.5 text-[#5CB07C]" />
                         <span>{feature}</span>

@@ -4,7 +4,12 @@ import {
   getAllIssuedCertificates,
   getAllTemplates,
   issueCertificate,
+  formatCertificateGrade,
+  formatCertificateHours,
 } from '@/lib/certificates-store';
+import { getAllCoursesAsync } from '@/lib/courses-store';
+import { findCourseByIdentifier } from '@/lib/public-courses';
+import { getCourseBySlug } from '@/data/courses';
 import { supabase as adminSupabase } from '@/lib/supabase';
 import { requireUser } from '@/lib/security/auth';
 
@@ -31,55 +36,40 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    let studentName = auth.user.user_metadata?.full_name || '';
-    const { data: profile } = await auth.supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('id', auth.user.id)
-      .maybeSingle();
-
-    if (profile?.full_name) {
-      studentName = profile.full_name;
-    }
-
-    if (!studentName) {
-      studentName = 'المتدرب';
-    }
-
-    const [allTemplates, allIssued] = await Promise.all([
+    // 1. Fetch templates & issued certificates
+    const [allTemplates, initialIssued] = await Promise.all([
       getAllTemplates(),
       getAllIssuedCertificates(),
     ]);
 
-    // 2. Check for completed enrollments to auto-issue any pending certificates
-    try {
-      const [enrollmentsByUser, enrollmentsByEmail] = await Promise.all([
-        adminSupabase
-          .from('enrollments')
-          .select('*')
-          .eq('user_id', auth.user.id),
-        adminSupabase
-          .from('enrollments')
-          .select('*')
-          .eq('email', studentEmail),
-      ]);
+    let studentName = auth.user.user_metadata?.full_name || '';
 
-      if (enrollmentsByUser.error || enrollmentsByEmail.error) {
-        throw enrollmentsByUser.error || enrollmentsByEmail.error;
+    // 2. Check if the user has completed enrollments in Supabase
+    // If completed and no certificate exists, auto-issue one!
+    try {
+      const { data: profile } = await adminSupabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', auth.user.id)
+        .maybeSingle();
+
+      if (profile?.full_name) {
+        studentName = profile.full_name;
       }
 
-      const enrollments = [...new Map(
-        [...(enrollmentsByUser.data || []), ...(enrollmentsByEmail.data || [])]
-          .map((enrollment) => [enrollment.id, enrollment]),
-      ).values()];
+      const { data: enrollments } = await adminSupabase
+        .from('enrollments')
+        .select('*')
+        .eq('email', studentEmail);
 
       const issuedCourseTitles = new Set(
-        allIssued
-          .filter((certificate) => normalizeEmail(certificate.studentEmail) === studentEmail)
-          .map((certificate) => normalizeCourseTitle(certificate.courseTitle)),
+        initialIssued
+          .filter((c) => normalizeEmail(c.studentEmail) === studentEmail)
+          .map((c) => normalizeCourseTitle(c.courseTitle)),
       );
 
-      if (enrollments.length > 0) {
+      if (enrollments && enrollments.length > 0) {
+        const allCourses = await getAllCoursesAsync();
         for (const enroll of enrollments) {
           const isFinished = (enroll.progress && Number(enroll.progress) >= 100) || enroll.status === 'completed';
           if (isFinished) {
@@ -88,6 +78,11 @@ export async function GET(req: NextRequest) {
             const alreadyIssued = issuedCourseTitles.has(normalizedCourseTitle);
 
             if (!alreadyIssued) {
+              const matchedCourse =
+                findCourseByIdentifier(allCourses, enroll.course_id) ||
+                allCourses.find((c) => c.title === courseTitle) ||
+                getCourseBySlug(enroll.course_id);
+
               // Find best matching template
               const matchedTemplate =
                 allTemplates.find(
@@ -104,8 +99,8 @@ export async function GET(req: NextRequest) {
                 studentEmail,
                 courseTitle,
                 templateId: matchedTemplate ? matchedTemplate.id : 'tpl-1',
-                grade: 'ممتاز مرتفع (%98)',
-                hours: '30 ساعة تدريبية',
+                grade: formatCertificateGrade(null, enroll.grade),
+                hours: formatCertificateHours(matchedCourse?.duration, enroll.hours),
                 imageUrl: matchedTemplate?.imageUrl || '/1.png',
               });
               issuedCourseTitles.add(normalizeCourseTitle(issuedCertificate.courseTitle));

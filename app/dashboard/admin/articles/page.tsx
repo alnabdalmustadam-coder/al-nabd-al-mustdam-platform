@@ -52,25 +52,10 @@ interface AdminArticleItem {
 }
 
 export default function AdminArticlesPage() {
-  const [articles, setArticles] = useState<AdminArticleItem[]>(() =>
-    blogPosts.map((p, idx) => ({
-      id: p.id,
-      title: p.title,
-      shortTitle: p.shortTitle,
-      slug: p.slug,
-      category: p.category,
-      authorName: typeof p.author === 'object' && p.author ? p.author.name : (typeof (p as any).author === 'string' ? (p as any).author : 'فريق التحرير الأكاديمي'),
-      excerpt: p.excerpt,
-      content: p.sections?.map((s) => `### ${s.title}\n${s.paragraphs.join('\n\n')}`).join('\n\n') || '',
-      image: p.image || '/1.png',
-      published_at: p.date || '2026-05-18',
-      read_time: p.readTime || '8 دقائق',
-      views_count: p.viewsCount || 1250,
-      status: 'published',
-      isFeatured: idx < 2,
-      tags: p.tags || ['إدارة', 'جودة', 'حوكمة'],
-    }))
-  );
+  const [articles, setArticles] = useState<AdminArticleItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -98,6 +83,70 @@ export default function AdminArticlesPage() {
   // Delete Confirmation Modal
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | number | null>(null);
 
+  const loadArticles = async () => {
+    try {
+      setLoading(true);
+      setErrorMsg(null);
+      const res = await fetch(`/api/admin/articles?t=${Date.now()}`);
+      const data = await res.json();
+      if (res.ok && data.success && Array.isArray(data.articles)) {
+        const mapped: AdminArticleItem[] = data.articles.map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          shortTitle: p.shortTitle || p.title,
+          slug: p.slug,
+          category: p.category || 'إدارة ومشاريع',
+          authorName: p.author?.name || 'فريق التحرير الأكاديمي',
+          excerpt: p.excerpt || '',
+          content: p.content || '',
+          image: p.image || '/1.png',
+          published_at: p.date || (p.created_at ? new Date(p.created_at).toISOString().split('T')[0] : '2026-05-18'),
+          read_time: p.readTime || '5 دقائق',
+          views_count: Number(p.viewsCount || 0),
+          status: p.status === 'published' ? 'published' : 'draft',
+          isFeatured: Boolean(p.is_featured),
+          tags: Array.isArray(p.tags) && p.tags.length > 0 ? p.tags : ['إدارة', 'جودة'],
+        }));
+        setArticles(mapped);
+
+        const cats = new Set(categoriesList);
+        mapped.forEach((m) => { if (m.category) cats.add(m.category); });
+        setCategoriesList(Array.from(cats));
+      } else {
+        throw new Error(data.error || 'تعذر تحميل المقالات');
+      }
+    } catch (err: any) {
+      console.error('Error fetching articles:', err);
+      setErrorMsg(err.message || 'حدث خطأ أثناء تحميل المقالات');
+      // Graceful fallback to static posts so page never crashes
+      setArticles(
+        blogPosts.map((p, idx) => ({
+          id: p.id,
+          title: p.title,
+          shortTitle: p.shortTitle,
+          slug: p.slug,
+          category: p.category,
+          authorName: typeof p.author === 'object' && p.author ? p.author.name : 'فريق التحرير الأكاديمي',
+          excerpt: p.excerpt,
+          content: p.sections?.map((s) => `### ${s.title}\n${s.paragraphs.join('\n\n')}`).join('\n\n') || '',
+          image: p.image || '/1.png',
+          published_at: p.date || '2026-05-18',
+          read_time: p.readTime || '8 دقائق',
+          views_count: p.viewsCount || 1250,
+          status: 'published',
+          isFeatured: idx < 2,
+          tags: p.tags || ['إدارة', 'جودة', 'حوكمة'],
+        }))
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadArticles();
+  }, []);
+
   const handleAddNewCategory = () => {
     if (!newCatInput.trim()) return;
     const cat = newCatInput.trim();
@@ -117,7 +166,7 @@ export default function AdminArticlesPage() {
       id: nextId,
       title: '',
       shortTitle: '',
-      slug: `article-${nextId}`,
+      slug: '',
       category: categoriesList[0] || 'إدارة ومشاريع',
       authorName: 'هيئة التحرير الأكاديمية',
       excerpt: '',
@@ -160,63 +209,138 @@ export default function AdminArticlesPage() {
     });
   };
 
-  const handleToggleStatus = (id: string | number, e: React.MouseEvent) => {
+  const handleToggleStatus = async (id: string | number, e: React.MouseEvent) => {
     e.stopPropagation();
+    const art = articles.find((a) => a.id === id);
+    if (!art) return;
+    const newStatus = art.status === 'published' ? 'draft' : 'published';
     setArticles((prev) =>
-      prev.map((a) =>
-        a.id === id
-          ? { ...a, status: a.status === 'published' ? 'draft' : 'published' }
-          : a
-      )
+      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
     );
+    try {
+      const res = await fetch('/api/admin/articles', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: String(art.id), slug: art.slug, status: newStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل تحديث الحالة');
+      }
+    } catch (err: any) {
+      console.error('Toggle status error:', err);
+      setArticles((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: art.status } : a))
+      );
+      setErrorMsg(err.message || 'فشل حفظ الحالة في قاعدة البيانات');
+    }
   };
 
-  const handleToggleFeatured = (id: string | number, e: React.MouseEvent) => {
+  const handleToggleFeatured = async (id: string | number, e: React.MouseEvent) => {
     e.stopPropagation();
+    const art = articles.find((a) => a.id === id);
+    if (!art) return;
+    const newFeatured = !art.isFeatured;
     setArticles((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, isFeatured: !a.isFeatured } : a))
+      prev.map((a) => (a.id === id ? { ...a, isFeatured: newFeatured } : a))
     );
+    try {
+      const res = await fetch('/api/admin/articles', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: String(art.id), slug: art.slug, isFeatured: newFeatured }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل تحديث التمييز');
+      }
+    } catch (err: any) {
+      console.error('Toggle featured error:', err);
+      setArticles((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, isFeatured: art.isFeatured } : a))
+      );
+      setErrorMsg(err.message || 'فشل تعديل التمييز في قاعدة البيانات');
+    }
   };
 
-  const handleDeleteArticle = (id: string | number) => {
-    setArticles((prev) => prev.filter((a) => a.id !== id));
-    setDeleteConfirmId(null);
+  const handleDeleteArticle = async (id: string | number) => {
+    const art = articles.find((a) => a.id === id);
+    if (!art) return;
+    try {
+      const res = await fetch(
+        `/api/admin/articles?id=${encodeURIComponent(String(art.id))}&slug=${encodeURIComponent(art.slug)}`,
+        { method: 'DELETE' }
+      );
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل حذف المقال من قاعدة البيانات');
+      }
+      setArticles((prev) => prev.filter((a) => a.id !== id));
+      setDeleteConfirmId(null);
+      setSuccessMsg('تم حذف المقال من قاعدة البيانات بنجاح');
+      setTimeout(() => setSuccessMsg(null), 3500);
+    } catch (err: any) {
+      console.error('Delete article error:', err);
+      setErrorMsg(err.message || 'تعذر حذف المقال');
+    }
   };
 
   const handleSaveArticle = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingArticle || !editingArticle.title) return;
+    if (!editingArticle || !editingArticle.title?.trim()) {
+      setErrorMsg('يرجى كتابة عنوان المقال');
+      return;
+    }
 
     setIsSaving(true);
+    setErrorMsg(null);
     try {
-      await new Promise((r) => setTimeout(r, 400)); // simulated instant feedback
-
       const cleanSlug =
-        editingArticle.slug ||
+        editingArticle.slug?.trim() ||
         editingArticle.title
           .toLowerCase()
           .replace(/[^\u0621-\u064A\w\s-]/g, '')
           .replace(/\s+/g, '-');
 
-      const resolvedArticle: AdminArticleItem = {
-        ...(editingArticle as AdminArticleItem),
+      const body = {
+        id: editingArticle.id ? String(editingArticle.id) : undefined,
+        title: editingArticle.title.trim(),
+        shortTitle: editingArticle.shortTitle?.trim() || editingArticle.title.trim().slice(0, 30),
         slug: cleanSlug,
-        shortTitle: editingArticle.shortTitle || editingArticle.title?.slice(0, 30),
+        category: editingArticle.category || 'إدارة ومشاريع',
+        excerpt: editingArticle.excerpt?.trim() || '',
+        content: editingArticle.content || '',
+        image: editingArticle.image || '/1.png',
+        status: editingArticle.status || 'published',
+        is_featured: Boolean(editingArticle.isFeatured),
+        readTime: editingArticle.read_time || '5 دقائق',
+        tags: editingArticle.tags || ['تطوير', 'تعليم'],
+        author: {
+          name: editingArticle.authorName || 'هيئة التحرير الأكاديمية',
+          role: 'مستشار المحتوى الأكاديمي',
+          avatar: '/logo.webp',
+        },
       };
 
-      const exists = articles.some((a) => a.id === resolvedArticle.id);
-      if (exists) {
-        setArticles((prev) =>
-          prev.map((a) => (a.id === resolvedArticle.id ? resolvedArticle : a))
-        );
-      } else {
-        setArticles((prev) => [resolvedArticle, ...prev]);
+      const res = await fetch('/api/admin/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل حفظ المقال في قاعدة البيانات');
       }
 
+      await loadArticles();
       setIsModalOpen(false);
       setEditingArticle(null);
-    } catch (err) {
+      setSuccessMsg('تم حفظ المقال في قاعدة البيانات بنجاح!');
+      setTimeout(() => setSuccessMsg(null), 3500);
+    } catch (err: any) {
       console.error('Error saving article:', err);
+      setErrorMsg(err.message || 'تعذر حفظ المقال في قاعدة البيانات');
     } finally {
       setIsSaving(false);
     }
@@ -290,6 +414,38 @@ export default function AdminArticlesPage() {
           </div>
         </div>
       </motion.div>
+
+      {/* Notifications */}
+      <AnimatePresence>
+        {errorMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-bold flex items-center justify-between shadow-sm"
+          >
+            <div className="flex items-center gap-2">
+              <X className="w-5 h-5 text-rose-600 shrink-0 cursor-pointer" onClick={() => setErrorMsg(null)} />
+              <span>{errorMsg}</span>
+            </div>
+            <button onClick={() => setErrorMsg(null)} className="text-xs text-rose-600 hover:underline">إغلاق</button>
+          </motion.div>
+        )}
+        {successMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold flex items-center justify-between shadow-sm"
+          >
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+            <button onClick={() => setSuccessMsg(null)} className="text-xs text-emerald-600 hover:underline">إغلاق</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── 2. METRICS CARDS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -457,7 +613,12 @@ export default function AdminArticlesPage() {
       </div>
 
       {/* ── 4. ARTICLES GRID ── */}
-      {filteredArticles.length === 0 ? (
+      {loading ? (
+        <div className="p-16 text-center rounded-3xl liquid-glass-card border border-slate-200 flex flex-col items-center justify-center space-y-3">
+          <Loader2 className="w-8 h-8 text-[#173A7C] animate-spin" />
+          <p className="text-sm font-bold text-slate-600">جاري تحميل المقالات من قاعدة البيانات...</p>
+        </div>
+      ) : filteredArticles.length === 0 ? (
         <div className="p-12 text-center rounded-3xl liquid-glass-card border border-slate-200 space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#173A7C] flex items-center justify-center mx-auto border border-blue-100">
             <Newspaper className="w-8 h-8" />

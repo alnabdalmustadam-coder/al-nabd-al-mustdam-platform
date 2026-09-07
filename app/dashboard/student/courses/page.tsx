@@ -18,7 +18,8 @@ import {
   BookCheck,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
-import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
+import { getCourseBySlug } from '@/data/courses';
+import { findCourseByIdentifier, fetchPublicCourses } from '@/lib/public-courses';
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
 import { CardImage } from '@/components/ui/CardImage';
 
@@ -89,17 +90,8 @@ function StudentCoursesContent() {
   useEffect(() => {
     async function loadCourses() {
       try {
-        // 1. Fetch live courses catalog from API
-        let liveList: any[] = catalogCourses;
-        try {
-          const res = await fetch('/api/courses', { cache: 'no-store' });
-          const data = await res.json();
-          if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-            liveList = data.courses;
-          }
-        } catch (e) {
-          console.warn('Could not fetch live courses, falling back to catalog:', e);
-        }
+        // 1. Fetch live courses catalog
+        const liveList = await fetchPublicCourses();
 
         const supabase = createClient();
         const { data: authData } = await supabase.auth.getUser();
@@ -119,16 +111,13 @@ function StudentCoursesContent() {
             enrollmentsData.forEach((e: any, idx: number) => {
               const cleanSlug = (e.course_id || '').replace(/^course-/, '').toLowerCase().trim();
               const matchedCatalog =
-                liveList.find((c) => (c.slug || '').toLowerCase().trim() === cleanSlug) ||
-                liveList.find((c) => String(c.id) === cleanSlug) ||
-                liveList.find((c) => (c.ghlCourseId || '').replace(/^course-/, '').toLowerCase().trim() === cleanSlug) ||
-                liveList.find((c) => c.title === e.course_title) ||
+                findCourseByIdentifier(liveList, cleanSlug) ||
+                liveList.find((c: any) => c.title === e.course_title) ||
                 getCourseBySlug(cleanSlug) ||
-                catalogCourses.find((c) => c.title === e.course_title) ||
-                liveList[idx % liveList.length];
+                null;
 
               const canonicalSlug = matchedCatalog?.slug || cleanSlug;
-              const allCourseLessons = getCourseAllLessons(matchedCatalog);
+              const allCourseLessons = matchedCatalog ? getCourseAllLessons(matchedCatalog) : [];
               const totalLessons = Math.max(1, allCourseLessons.length);
 
               const progress = e.progress !== undefined && e.progress !== null

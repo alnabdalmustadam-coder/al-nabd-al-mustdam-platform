@@ -58,19 +58,19 @@ export default function Footer() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 max-w-5xl mx-auto">
             {[
               {
-                src: "/logo1_المركز_الوطني.webp",
+                src: "/logo1-national-elearning.webp",
                 alt: "المركز الوطني للتعليم الإلكتروني",
                 name: "المركز الوطني للتعليم الإلكتروني",
                 badge: "ترخيص رسمي معتمد",
               },
               {
-                src: "/logo2_جمعية_القلب_السعودية.webp",
+                src: "/logo2-saudi-heart-assoc.webp",
                 alt: "جمعية القلب السعودية",
                 name: "جمعية القلب السعودية",
                 badge: "اعتماد التدريب الصحي",
               },
               {
-                src: "/logo3_المؤسسة_العامة_للتدريب.webp",
+                src: "/logo3-tvtc.webp",
                 alt: "المؤسسة العامة للتدريب التقني والمهني",
                 name: "المؤسسة العامة للتدريب التقني والمهني",
                 badge: "إشراف مهني معتمد",
@@ -80,9 +80,14 @@ export default function Footer() {
                 key={idx}
                 className="group relative rounded-3xl p-6 sm:p-7 bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 hover:border-emerald-400/40 backdrop-blur-md transition-all duration-300 flex flex-col items-center text-center shadow-xl hover:shadow-2xl hover:-translate-y-1.5"
               >
-                {/* Direct Large Logo Display without nested black/small box */}
-                <div className="w-full h-24 sm:h-28 flex items-center justify-center mb-4 bg-white/95 rounded-2xl p-4 shadow-md group-hover:scale-105 transition-transform duration-300">
-                  <img src={partner.src} alt={partner.alt} className="max-h-full max-w-full object-contain" />
+                {/* Direct Large Logo Display with clear, bold presentation */}
+                <div className="w-full h-28 sm:h-36 flex items-center justify-center mb-4 bg-white rounded-2xl p-3 sm:p-4 shadow-md group-hover:shadow-lg transition-all duration-300">
+                  <img
+                    src={partner.src}
+                    alt={partner.alt}
+                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 filter contrast-[1.02]"
+                    loading="lazy"
+                  />
                 </div>
                 <h4 className="text-sm sm:text-base font-black text-white leading-snug group-hover:text-emerald-300 transition-colors mb-2">
                   {partner.name}

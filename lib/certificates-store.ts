@@ -373,6 +373,32 @@ async function incrementTemplateIssuedCount(template: CertificateTemplate): Prom
   if (error) logger.warn('certificates.template_count_update_failed', { error, templateId: template.id });
 }
 
+export function formatCertificateGrade(score?: number | null, customGrade?: string | null): string {
+  if (customGrade && customGrade.trim()) return customGrade.trim();
+  if (typeof score === 'number' && !isNaN(score)) {
+    const s = Math.round(score);
+    if (s >= 95) return `ممتاز مرتفع (%${s})`;
+    if (s >= 90) return `ممتاز (%${s})`;
+    if (s >= 80) return `جيد جداً (%${s})`;
+    if (s >= 70) return `جيد (%${s})`;
+    if (s >= 60) return `مقبول (%${s})`;
+    return `اجتياز (%${s})`;
+  }
+  return 'اجتياز معتمد (ناجح)';
+}
+
+export function formatCertificateHours(courseDuration?: string | null, customHours?: string | null): string {
+  if (customHours && customHours.trim()) return customHours.trim();
+  if (courseDuration && courseDuration.trim()) {
+    const d = courseDuration.trim();
+    if (d.includes('ساعة') || d.includes('اسبوع') || d.includes('أسبوع') || d.includes('يوم') || d.includes('أيام')) {
+      return `${d} معتمدة`;
+    }
+    return `${d} تدريبية معتمدة`;
+  }
+  return 'دورة تدريبية معتمدة';
+}
+
 export async function issueCertificate(certData: CertificateInput): Promise<IssuedCertificate> {
   await ensureLegacyDataSeeded();
   const now = new Date();
@@ -383,8 +409,8 @@ export async function issueCertificate(certData: CertificateInput): Promise<Issu
     studentEmail: certData.studentEmail?.trim().toLowerCase() || '',
     courseTitle: certData.courseTitle.trim(),
     issueDate: formatArabicDate(now),
-    grade: certData.grade || 'ممتاز مرتفع (%99)',
-    hours: certData.hours || '30 ساعة',
+    grade: certData.grade?.trim() || formatCertificateGrade(),
+    hours: certData.hours?.trim() || formatCertificateHours(),
     imageUrl,
     customData: certData.customData || {},
   };

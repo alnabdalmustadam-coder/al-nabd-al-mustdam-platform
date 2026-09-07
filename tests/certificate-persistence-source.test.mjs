@@ -55,3 +55,33 @@ test('certificate persistence migration is idempotent and secured', async () => 
   assert.match(migration, /ENABLE ROW LEVEL SECURITY/);
   assert.match(migration, /REVOKE ALL ON public\.certificate_templates, public\.certificates FROM anon/);
 });
+
+test('certificate auto-issuance and store derive authentic grades and hours without hardcoded defaults', async () => {
+  const [storeSource, autoIssueSource, studentRouteSource, adminIssueSource, lessonPlayerSource] = await Promise.all([
+    readFile(storeUrl, 'utf8'),
+    readFile(autoIssueRouteUrl, 'utf8'),
+    readFile(studentRouteUrl, 'utf8'),
+    readFile(adminIssueRouteUrl, 'utf8'),
+    readFile(new URL('../app/dashboard/student/courses/[courseSlug]/lessons/[lessonId]/page.tsx', import.meta.url), 'utf8'),
+  ]);
+
+  // Store defines dynamic formatting helpers
+  assert.match(storeSource, /export function formatCertificateGrade/);
+  assert.match(storeSource, /export function formatCertificateHours/);
+  assert.doesNotMatch(storeSource, /'ممتاز مرتفع \(%99\)'/);
+
+  // Auto-issue route verifies course completion / final assessment and dynamically calculates grade and hours
+  assert.match(autoIssueSource, /formatCertificateGrade/);
+  assert.match(autoIssueSource, /formatCertificateHours/);
+  assert.match(autoIssueSource, /passedFinalAssessment/);
+  assert.doesNotMatch(autoIssueSource, /'ممتاز مرتفع \(%98\)'/);
+  assert.doesNotMatch(autoIssueSource, /'30 ساعة تدريبية معتمدة'/);
+
+  // Student and Admin certificates routes use authentic grade & duration
+  assert.doesNotMatch(studentRouteSource, /'ممتاز مرتفع \(%98\)'/);
+  assert.doesNotMatch(adminIssueSource, /'ممتاز مرتفع \(%99\)'/);
+
+  // Lesson player only triggers auto-issuance on course finish / final exam
+  assert.match(lessonPlayerSource, /isCourseFinished/);
+  assert.match(lessonPlayerSource, /isPassed && isCourseFinished/);
+});
