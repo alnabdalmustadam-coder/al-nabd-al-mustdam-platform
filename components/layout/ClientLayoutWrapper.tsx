@@ -19,10 +19,14 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
   if (isAuth) {
     return (
       <>
-        <Navbar />
+        <div className="hidden sm:block">
+          <Navbar />
+        </div>
         <main className="flex-1 w-full max-w-full overflow-x-clip flex flex-col justify-center">{children}</main>
-        <WhatsAppFloat />
-        <MarketplaceFloat />
+        <div className="hidden sm:block">
+          <WhatsAppFloat />
+          <MarketplaceFloat />
+        </div>
       </>
     );
   }

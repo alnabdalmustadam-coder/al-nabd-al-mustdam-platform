@@ -50,7 +50,7 @@ function ResetPasswordForm() {
       } else {
         setIsEmailSent(true);
       }
-    } catch (err) {
+    } catch {
       setError('حدث خطأ أثناء محاولة إرسال رابط الاسترجاع');
     } finally {
       setLoading(false);
@@ -82,7 +82,7 @@ function ResetPasswordForm() {
       } else {
         setIsPasswordUpdated(true);
       }
-    } catch (err) {
+    } catch {
       setError('تعذر تحديث كلمة المرور، يرجى المحاولة لاحقاً');
     } finally {
       setLoading(false);
@@ -90,7 +90,7 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-hidden font-[family-name:var(--font-cairo)]" dir="rtl">
+    <div className="auth-page-shell relative min-h-[calc(100vh-80px)] flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-hidden font-[family-name:var(--font-cairo)]" dir="rtl">
       {/* Background /bg.webp texture & gentle ambient orbs */}
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22] pointer-events-none -z-10"
@@ -103,10 +103,10 @@ function ResetPasswordForm() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-lg my-auto"
+        className="auth-page-container w-full max-w-lg my-auto"
       >
         {/* Main Luxurious Glass Card */}
-        <div className="relative rounded-[2.5rem] bg-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_25px_60px_-15px_rgba(23,58,124,0.12),0_0_0_1px_rgba(23,58,124,0.05)] p-6 sm:p-9 md:p-10">
+        <div className="auth-page-card relative rounded-[2.5rem] bg-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_25px_60px_-15px_rgba(23,58,124,0.12),0_0_0_1px_rgba(23,58,124,0.05)] p-6 sm:p-9 md:p-10">
           
           {/* Header with Pure Logo */}
           <div className="flex items-center justify-between gap-4 pb-6 border-b border-slate-100/90 mb-6">
