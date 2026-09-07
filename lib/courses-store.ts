@@ -253,17 +253,25 @@ export async function deleteCourseAsync(slugOrId: string | number): Promise<bool
   try {
     let query = getSupabaseAdmin().from('course_catalog').delete();
     query = /^\d+$/.test(value) ? query.eq('id', Number(value)) : query.eq('slug', value.replace(/^course-/, ''));
-    await query;
+    const { error } = await query;
+    if (error) {
+      logger.error('courses.supabase_delete_failed', { error, slugOrId });
+      throw new CoursePersistenceError('فشل حذف الدورة من قاعدة البيانات');
+    }
   } catch (err) {
-    logger.warn('courses.supabase_delete_fallback', { err });
+    if (err instanceof CoursePersistenceError) throw err;
+    logger.error('courses.supabase_delete_fallback', { err, slugOrId });
+    throw new CoursePersistenceError('فشل حذف الدورة من قاعدة البيانات');
   }
 
-  try {
-    const list = readLocalCourses();
-    const filtered = list.filter((c) => String(c.id) !== value && c.slug !== value.replace(/^course-/, ''));
-    writeLocalCourses(filtered);
-  } catch (err) {
-    logger.error('courses.local_delete_failed', { err });
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      const list = readLocalCourses();
+      const filtered = list.filter((c) => String(c.id) !== value && c.slug !== value.replace(/^course-/, ''));
+      writeLocalCourses(filtered);
+    } catch (err) {
+      logger.error('courses.local_delete_failed', { err });
+    }
   }
 
   return true;
