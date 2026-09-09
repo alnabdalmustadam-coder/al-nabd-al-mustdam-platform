@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { CoursePersistenceError, getAllCoursesAsync, saveCourseAsync, deleteCourseAsync } from '@/lib/courses-store';
+import { CourseAccessError, CoursePersistenceError, getAllCoursesAsync, saveCourseAsync, deleteCourseAsync } from '@/lib/courses-store';
 import { requireAdmin } from '@/lib/security/auth';
 import { recordAdminAudit } from '@/lib/admin/audit';
 import { cleanNumber, cleanString, readJsonObject, safeErrorMessage, ValidationError } from '@/lib/security/validation';
@@ -91,11 +91,11 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
-        error: err instanceof CoursePersistenceError
+        error: err instanceof CoursePersistenceError || err instanceof CourseAccessError
           ? err.message
           : safeErrorMessage(err, 'تعذر حفظ الدورة'),
       },
-      { status: err instanceof ValidationError ? 400 : err instanceof CoursePersistenceError ? 503 : 500 },
+      { status: err instanceof CourseAccessError ? err.status : err instanceof ValidationError ? 400 : err instanceof CoursePersistenceError ? 503 : 500 },
     );
   }
 }
@@ -118,6 +118,9 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ success: deleted });
   } catch (err: unknown) {
     console.error('Admin DELETE course error:', err);
-    return NextResponse.json({ success: false, error: 'تعذر حذف الدورة' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err instanceof CourseAccessError || err instanceof CoursePersistenceError ? err.message : 'تعذر حذف الدورة' },
+      { status: err instanceof CourseAccessError ? err.status : err instanceof CoursePersistenceError ? 503 : 500 },
+    );
   }
 }

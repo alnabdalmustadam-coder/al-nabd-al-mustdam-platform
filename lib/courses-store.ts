@@ -9,6 +9,8 @@ import type { Course, CourseCategory, CourseLevel, CurriculumSection } from '@/t
 
 type CourseStatus = 'draft' | 'published' | 'archived';
 type CourseInput = Partial<Course> & { title: string; status?: CourseStatus };
+type CourseReadOptions = { includeUnpublished?: boolean; requireDatabase?: boolean };
+type CourseWriteOptions = { instructorId?: string };
 type CourseRow = {
   id: number;
   slug: string;
@@ -38,6 +40,17 @@ export class CoursePersistenceError extends Error {
     super(message);
     this.name = 'CoursePersistenceError';
   }
+}
+
+export class CourseAccessError extends Error {
+  constructor(message = 'يمكنك إدارة الدورات المسندة إلى حسابك فقط', public readonly status = 403) {
+    super(message);
+    this.name = 'CourseAccessError';
+  }
+}
+
+function assertCourseOwner(course: Course, instructorId?: string) {
+  if (instructorId && course.trainerId !== instructorId) throw new CourseAccessError();
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -115,7 +128,7 @@ function writeLocalCourses(list: Course[]) {
   }
 }
 
-async function fetchRows(includeUnpublished: boolean): Promise<CourseRow[]> {
+async function fetchRows(includeUnpublished: boolean, requireDatabase = false): Promise<CourseRow[]> {
   try {
     let query = getSupabaseAdmin()
       .from('course_catalog')
@@ -123,10 +136,14 @@ async function fetchRows(includeUnpublished: boolean): Promise<CourseRow[]> {
       .order('created_at', { ascending: false });
     if (!includeUnpublished) query = query.eq('status', 'published');
     const { data, error } = await query;
-    if (!error && data && data.length > 0) {
+    if (!error && data && (requireDatabase || data.length > 0)) {
       return data as CourseRow[];
     }
+    if (requireDatabase) throw new CoursePersistenceError('تعذر التحقق من بيانات الدورة. حاول مرة أخرى.');
   } catch (err) {
+    if (requireDatabase) {
+      throw err instanceof CoursePersistenceError ? err : new CoursePersistenceError('تعذر التحقق من بيانات الدورة. حاول مرة أخرى.');
+    }
     logger.warn('courses.read_supabase_fallback_to_local', { err });
   }
 
@@ -143,17 +160,24 @@ async function fetchRows(includeUnpublished: boolean): Promise<CourseRow[]> {
   }));
 }
 
-export async function getAllCoursesAsync(options: { includeUnpublished?: boolean } = {}): Promise<Course[]> {
-  return (await fetchRows(options.includeUnpublished === true)).map(toCourse);
+export async function getAllCoursesAsync(options: CourseReadOptions = {}): Promise<Course[]> {
+  return (await fetchRows(options.includeUnpublished === true, options.requireDatabase === true)).map(toCourse);
 }
 
 export async function getCourseBySlugAsync(
   slugOrId?: string,
-  options: { includeUnpublished?: boolean } = {},
+  options: CourseReadOptions = {},
 ): Promise<Course | undefined> {
   if (!slugOrId) return undefined;
   const courses = await getAllCoursesAsync(options);
   return findCourseByIdentifier(courses, slugOrId);
+}
+
+export async function getCourseForManagementAsync(identifier: string, instructorId?: string): Promise<Course> {
+  const course = await getCourseBySlugAsync(identifier, { includeUnpublished: true, requireDatabase: true });
+  if (!course) throw new CourseAccessError('الدورة غير موجودة', 404);
+  assertCourseOwner(course, instructorId);
+  return course;
 }
 
 function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 'id'> {
@@ -192,13 +216,32 @@ function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 
   };
 }
 
-export async function saveCourseAsync(courseData: CourseInput, actorId?: string): Promise<Course> {
+export async function saveCourseAsync(courseData: CourseInput, actorId?: string, options: CourseWriteOptions = {}): Promise<Course> {
+  // Resolve the actual write target once using live rows, including drafts.
+  // Local fallback data must never authorize a mutation.
+  const courses = await getAllCoursesAsync({ includeUnpublished: true, requireDatabase: true });
   const requestedSlug = normalizeSlug(courseData.title, courseData.slug);
   const existing = courseData.id
-    ? (await getAllCoursesAsync({ includeUnpublished: true })).find((course) => String(course.id) === String(courseData.id))
-    : await getCourseBySlugAsync(requestedSlug, { includeUnpublished: true });
-  const payload = buildCoursePayload({ ...courseData, slug: requestedSlug }, existing);
-  const status = courseData.status || 'published';
+    ? courses.find((course) => String(course.id) === String(courseData.id))
+    : courses.find((course) => course.slug === requestedSlug);
+  if (existing) assertCourseOwner(existing, options.instructorId);
+
+  const slugOwner = courses.find((course) => course.slug === requestedSlug);
+  if (slugOwner && slugOwner.id !== existing?.id) {
+    assertCourseOwner(slugOwner, options.instructorId);
+    throw new CourseAccessError('رابط الدورة مستخدم بالفعل. اختر رابطاً آخر.', 409);
+  }
+  if (courseData.id && !existing) throw new CourseAccessError('الدورة غير موجودة', 404);
+  if (options.instructorId && courseData.trainerId !== undefined && courseData.trainerId !== options.instructorId) {
+    throw new CourseAccessError('إسناد الدورات إلى مدرب آخر متاح للإدارة فقط');
+  }
+
+  const payload = buildCoursePayload({
+    ...courseData,
+    slug: requestedSlug,
+    ...(options.instructorId ? { trainerId: options.instructorId } : {}),
+  }, existing);
+  const status = payload.status || 'published';
   const values = {
     slug: payload.slug,
     title: payload.title,
@@ -211,15 +254,20 @@ export async function saveCourseAsync(courseData: CourseInput, actorId?: string)
   };
 
   try {
-    const query = existing
+    let query = existing
       ? getSupabaseAdmin().from('course_catalog').update(values).eq('id', existing.id)
-      : getSupabaseAdmin().from('course_catalog').upsert(values, { onConflict: 'slug' });
+      : getSupabaseAdmin().from('course_catalog').insert(values);
+    // Recheck ownership in the write itself in case an admin reassigned the
+    // course after the lookup. Inserts never overwrite a concurrent slug owner.
+    if (existing && options.instructorId) query = query.eq('payload->>trainerId', options.instructorId);
     const { data, error } = await query.select('id, slug, title, price, status, payload').single();
+    if (error?.code === '23505') throw new CourseAccessError('رابط الدورة مستخدم بالفعل. اختر رابطاً آخر.', 409);
+    if (existing && options.instructorId && error?.code === 'PGRST116') throw new CourseAccessError();
     if (error || !data) {
       logger.error('courses.supabase_write_failed', {
         error,
         courseSlug: payload.slug,
-        operation: existing ? 'update' : 'upsert',
+        operation: existing ? 'update' : 'insert',
       });
       throw new CoursePersistenceError();
     }
@@ -242,24 +290,28 @@ export async function saveCourseAsync(courseData: CourseInput, actorId?: string)
 
     return savedCourse;
   } catch (err) {
-    if (err instanceof CoursePersistenceError) throw err;
+    if (err instanceof CoursePersistenceError || err instanceof CourseAccessError) throw err;
     logger.error('courses.supabase_write_failed', { err, courseSlug: payload.slug });
     throw new CoursePersistenceError();
   }
 }
 
-export async function deleteCourseAsync(slugOrId: string | number): Promise<boolean> {
-  const value = String(slugOrId).trim();
+export async function deleteCourseAsync(slugOrId: string | number, options: CourseWriteOptions = {}): Promise<boolean> {
+  const course = await getCourseForManagementAsync(String(slugOrId).trim(), options.instructorId);
   try {
-    let query = getSupabaseAdmin().from('course_catalog').delete();
-    query = /^\d+$/.test(value) ? query.eq('id', Number(value)) : query.eq('slug', value.replace(/^course-/, ''));
-    const { error } = await query;
+    let query = getSupabaseAdmin().from('course_catalog').delete().eq('id', course.id);
+    if (options.instructorId) query = query.eq('payload->>trainerId', options.instructorId);
+    const { data, error } = await query.select('id');
     if (error) {
       logger.error('courses.supabase_delete_failed', { error, slugOrId });
       throw new CoursePersistenceError('فشل حذف الدورة من قاعدة البيانات');
     }
+    if (!data?.length) {
+      if (options.instructorId) throw new CourseAccessError();
+      return false;
+    }
   } catch (err) {
-    if (err instanceof CoursePersistenceError) throw err;
+    if (err instanceof CoursePersistenceError || err instanceof CourseAccessError) throw err;
     logger.error('courses.supabase_delete_fallback', { err, slugOrId });
     throw new CoursePersistenceError('فشل حذف الدورة من قاعدة البيانات');
   }
@@ -267,7 +319,7 @@ export async function deleteCourseAsync(slugOrId: string | number): Promise<bool
   if (process.env.NODE_ENV !== 'production') {
     try {
       const list = readLocalCourses();
-      const filtered = list.filter((c) => String(c.id) !== value && c.slug !== value.replace(/^course-/, ''));
+      const filtered = list.filter((c) => c.id !== course.id && c.slug !== course.slug);
       writeLocalCourses(filtered);
     } catch (err) {
       logger.error('courses.local_delete_failed', { err });
@@ -281,9 +333,9 @@ export async function addOrUpdateLessonAsync(
   courseSlug: string,
   lessonData: LessonInput,
   actorId?: string,
+  options: CourseWriteOptions = {},
 ): Promise<Course | null> {
-  const course = await getCourseBySlugAsync(courseSlug, { includeUnpublished: true });
-  if (!course) return null;
+  const course = await getCourseForManagementAsync(courseSlug, options.instructorId);
   const lessonId = lessonData.id || crypto.randomUUID();
   const curriculum = [...course.curriculum];
   const lesson: CurriculumSection = {
@@ -303,17 +355,17 @@ export async function addOrUpdateLessonAsync(
   const index = curriculum.findIndex((item) => item.id === lessonId);
   if (index >= 0) curriculum[index] = { ...curriculum[index], ...lesson };
   else curriculum.push(lesson);
-  return saveCourseAsync({ ...course, curriculum, title: course.title }, actorId);
+  return saveCourseAsync({ ...course, curriculum, title: course.title }, actorId, options);
 }
 
 export async function deleteLessonAsync(
   courseSlug: string,
   lessonId: string,
   actorId?: string,
+  options: CourseWriteOptions = {},
 ): Promise<Course | null> {
-  const course = await getCourseBySlugAsync(courseSlug, { includeUnpublished: true });
-  if (!course) return null;
+  const course = await getCourseForManagementAsync(courseSlug, options.instructorId);
   const curriculum = course.curriculum.filter((lesson) => lesson.id !== lessonId);
   if (curriculum.length === course.curriculum.length) return null;
-  return saveCourseAsync({ ...course, curriculum, title: course.title }, actorId);
+  return saveCourseAsync({ ...course, curriculum, title: course.title }, actorId, options);
 }

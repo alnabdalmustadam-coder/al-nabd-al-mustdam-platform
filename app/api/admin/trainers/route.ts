@@ -163,9 +163,7 @@ export async function PATCH(req: NextRequest) {
 
       for (const course of allCourses) {
         const isSelected = targetSlugs.has(course.slug.toLowerCase());
-        const isCurrentlyAssigned =
-          String(course.trainerId) === String(trainerId) ||
-          (course.instructor && course.instructor.trim() === updatedName);
+        const isCurrentlyAssigned = String(course.trainerId) === String(trainerId);
 
         if (isSelected && !isCurrentlyAssigned) {
           // Assign course to this trainer
@@ -182,7 +180,7 @@ export async function PATCH(req: NextRequest) {
           await saveCourseAsync(
             {
               ...course,
-              trainerId: undefined,
+              trainerId: '',
             },
             trainerId
           );

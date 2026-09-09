@@ -302,13 +302,12 @@ export default function InstructorCoursesPage() {
         }
       }
 
-      const res = await fetch(`/api/courses?t=${Date.now()}`, {
+      const res = await fetch(`/api/courses?mine=1&t=${Date.now()}`, {
         cache: 'no-store',
       });
       const data = await res.json();
-      if (data.success && Array.isArray(data.courses)) {
-        setCourses(data.courses);
-      }
+      if (!res.ok || !data.success || !Array.isArray(data.courses)) throw new Error(data.error || 'تعذر تحميل الدورات');
+      setCourses(data.courses);
     } catch (err) {
       console.error('Error fetching instructor courses:', err);
       showToast('تعذر تحميل الدورات من الخادم', 'error');

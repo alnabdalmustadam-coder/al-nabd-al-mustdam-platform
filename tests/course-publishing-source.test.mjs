@@ -11,7 +11,8 @@ test('course publishing fails visibly when Supabase does not persist the row', a
 
   assert.match(source, /if \(error \|\| !data\)/);
   assert.match(source, /throw new CoursePersistenceError/);
-  assert.match(source, /upsert\(values, \{ onConflict: 'slug' \}\)/);
+  assert.match(source, /insert\(values\)/);
+  assert.doesNotMatch(source, /upsert\(values/);
   assert.doesNotMatch(source, /savedCourse \|\| \{/);
   assert.match(source, /process\.env\.NODE_ENV !== 'production'/);
 });

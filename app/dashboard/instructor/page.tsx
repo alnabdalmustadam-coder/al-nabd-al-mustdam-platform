@@ -113,9 +113,9 @@ export default function InstructorDashboardPage() {
         // 1. Fetch courses
         let coursesList: Course[] = [];
         try {
-          const res = await fetch('/api/courses');
+          const res = await fetch('/api/courses?mine=1', { cache: 'no-store' });
           const data = await res.json();
-          if (data.success && Array.isArray(data.courses)) {
+          if (res.ok && data.success && Array.isArray(data.courses)) {
             coursesList = data.courses;
             setCourses(coursesList);
           }

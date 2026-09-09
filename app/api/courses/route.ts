@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import {
   CoursePersistenceError,
+  CourseAccessError,
   getAllCoursesAsync,
-  getCourseBySlugAsync,
   saveCourseAsync,
   deleteCourseAsync,
 } from '@/lib/courses-store';
@@ -13,20 +13,29 @@ import type { Course } from '@/types';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const courses = await getAllCoursesAsync();
+    const mine = new URL(req.url).searchParams.get('mine') === '1';
+    let courses: Course[];
+    if (mine) {
+      const auth = await requireInstructorOrAdmin(req);
+      if (!auth.ok) return auth.response;
+      const catalog = await getAllCoursesAsync({ includeUnpublished: true, requireDatabase: true });
+      courses = isAdminRole(auth.role) ? catalog : catalog.filter(course => course.trainerId === auth.user.id);
+    } else {
+      courses = await getAllCoursesAsync();
+    }
     return NextResponse.json(
       { success: true, courses },
       {
         headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Cache-Control': 'private, no-store, no-cache, must-revalidate',
         },
       }
     );
   } catch (err: unknown) {
     console.error('API /api/courses error:', err);
-    return NextResponse.json({ success: false, error: 'تعذر تحميل الدورات' }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'تعذر تحميل الدورات' }, { status: err instanceof CoursePersistenceError ? 503 : 500 });
   }
 }
 
@@ -37,27 +46,14 @@ export async function POST(req: Request) {
     const body = await readJsonObject(req);
     const title = cleanString(body.title, 'عنوان الدورة', { max: 200 })!;
 
-    // Enforce ownership: instructors cannot edit other instructors' or admin courses
-    if (!isAdminRole(auth.role)) {
-      const courseIdOrSlug = body.slug || body.id;
-      if (courseIdOrSlug) {
-        const existing = await getCourseBySlugAsync(String(courseIdOrSlug), { includeUnpublished: true });
-        if (existing && existing.trainerId && existing.trainerId !== auth.user.id) {
-          return NextResponse.json(
-            { success: false, error: 'غير مصرح لك بتعديل دورة خاصة بمدرب آخر' },
-            { status: 403 }
-          );
-        }
-      }
-    }
-
     const coursePayload = {
       ...body,
       title,
-      ...(!isAdminRole(auth.role) && !body.trainerId ? { trainerId: auth.user.id } : {}),
     };
 
-    const saved = await saveCourseAsync(coursePayload as Partial<Course> & { title: string }, auth.user.id);
+    const saved = await saveCourseAsync(coursePayload as Partial<Course> & { title: string }, auth.user.id, {
+      instructorId: isAdminRole(auth.role) ? undefined : auth.user.id,
+    });
     return NextResponse.json(
       { success: true, course: saved },
       {
@@ -71,11 +67,11 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
-        error: err instanceof CoursePersistenceError
+        error: err instanceof CoursePersistenceError || err instanceof CourseAccessError
           ? err.message
           : safeErrorMessage(err, 'تعذر حفظ الدورة'),
       },
-      { status: err instanceof ValidationError ? 400 : err instanceof CoursePersistenceError ? 503 : 500 },
+      { status: err instanceof CourseAccessError ? err.status : err instanceof ValidationError ? 400 : err instanceof CoursePersistenceError ? 503 : 500 },
     );
   }
 }
@@ -91,21 +87,15 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ success: false, error: 'معرّف الدورة مطلوب' }, { status: 400 });
     }
 
-    // Enforce ownership: instructors cannot delete other instructors' courses
-    if (!isAdminRole(auth.role)) {
-      const existing = await getCourseBySlugAsync(slug, { includeUnpublished: true });
-      if (existing && existing.trainerId && existing.trainerId !== auth.user.id) {
-        return NextResponse.json(
-          { success: false, error: 'غير مصرح لك بحذف دورة خاصة بمدرب آخر' },
-          { status: 403 }
-        );
-      }
-    }
-
-    const deleted = await deleteCourseAsync(slug);
+    const deleted = await deleteCourseAsync(slug, {
+      instructorId: isAdminRole(auth.role) ? undefined : auth.user.id,
+    });
     return NextResponse.json({ success: deleted });
   } catch (err: unknown) {
     console.error('API /api/courses DELETE error:', err);
-    return NextResponse.json({ success: false, error: 'تعذر حذف الدورة' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err instanceof CourseAccessError || err instanceof CoursePersistenceError ? err.message : 'تعذر حذف الدورة' },
+      { status: err instanceof CourseAccessError ? err.status : err instanceof CoursePersistenceError ? 503 : 500 },
+    );
   }
 }

@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server';
-import { addOrUpdateLessonAsync, deleteLessonAsync, getCourseBySlugAsync } from '@/lib/courses-store';
-import { requireInstructorOrAdmin } from '@/lib/security/auth';
+import { addOrUpdateLessonAsync, deleteLessonAsync, getCourseForManagementAsync, CourseAccessError, CoursePersistenceError } from '@/lib/courses-store';
+import { requireInstructorOrAdmin, isAdminRole } from '@/lib/security/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+function courseErrorResponse(error: unknown) {
+  return NextResponse.json(
+    { success: false, error: error instanceof CourseAccessError || error instanceof CoursePersistenceError ? error.message : 'تعذر إدارة دروس الدورة' },
+    { status: error instanceof CourseAccessError ? error.status : error instanceof CoursePersistenceError ? 503 : 500 },
+  );
+}
 
 export async function GET(
   req: Request,
@@ -13,10 +20,7 @@ export async function GET(
     const auth = await requireInstructorOrAdmin(req);
     if (!auth.ok) return auth.response;
     const { slug } = await params;
-    const course = await getCourseBySlugAsync(slug);
-    if (!course) {
-      return NextResponse.json({ success: false, error: 'الدورة غير موجودة' }, { status: 404 });
-    }
+    const course = await getCourseForManagementAsync(slug, isAdminRole(auth.role) ? undefined : auth.user.id);
 
     return NextResponse.json(
       {
@@ -30,9 +34,9 @@ export async function GET(
         },
       }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error fetching lessons:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return courseErrorResponse(err);
   }
 }
 
@@ -63,7 +67,7 @@ export async function POST(
       quizData: body.quizData,
       items: body.items,
       subLessons: body.subLessons,
-    });
+    }, auth.user.id, { instructorId: isAdminRole(auth.role) ? undefined : auth.user.id });
 
     if (!updatedCourse) {
       return NextResponse.json({ success: false, error: 'تعذر تحديث دروس الدورة' }, { status: 400 });
@@ -81,9 +85,9 @@ export async function POST(
         },
       }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error saving lesson:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return courseErrorResponse(err);
   }
 }
 
@@ -102,7 +106,9 @@ export async function DELETE(
       return NextResponse.json({ success: false, error: 'معرّف الدرس مطلوب' }, { status: 400 });
     }
 
-    const updatedCourse = await deleteLessonAsync(slug, lessonId);
+    const updatedCourse = await deleteLessonAsync(slug, lessonId, auth.user.id, {
+      instructorId: isAdminRole(auth.role) ? undefined : auth.user.id,
+    });
     if (!updatedCourse) {
       return NextResponse.json({ success: false, error: 'تعذر حذف الدرس' }, { status: 400 });
     }
@@ -119,8 +125,8 @@ export async function DELETE(
         },
       }
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error deleting lesson:', err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return courseErrorResponse(err);
   }
 }
