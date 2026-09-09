@@ -12,6 +12,7 @@ import { findCourseByIdentifier } from '@/lib/public-courses';
 import { getCourseBySlug } from '@/data/courses';
 import { requireUser } from '@/lib/security/auth';
 import { supabase } from '@/lib/supabase';
+import { isCertificateEnrollmentEligible } from '@/lib/certificates/eligibility';
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,14 +20,8 @@ export async function POST(req: NextRequest) {
     if (!auth.ok) return auth.response;
 
     const body = await req.json();
-    const {
-      courseTitle,
-      courseSlug,
-      score,
-      grade,
-      hours,
-      isFinalExam,
-    } = body;
+    const courseSlug = typeof body?.courseSlug === 'string' ? body.courseSlug.trim() : '';
+    const courseTitle = typeof body?.courseTitle === 'string' ? body.courseTitle.trim() : '';
 
     if (!courseTitle && !courseSlug) {
       return NextResponse.json(
@@ -57,28 +52,16 @@ export async function POST(req: NextRequest) {
     } else {
       enrollmentQuery = enrollmentQuery.eq('course_title', courseTitle);
     }
-    const { data: enrollment } = await enrollmentQuery.maybeSingle();
-
-    const isCompleted = enrollment && (Number(enrollment.progress) >= 100 || enrollment.status === 'completed');
-    const passedFinalAssessment = Boolean(isFinalExam && typeof score === 'number' && score >= 70);
-
-    if (!enrollment || (!isCompleted && !passedFinalAssessment)) {
-      return NextResponse.json(
-        { success: false, error: 'لا يمكن إصدار الشهادة قبل إكمال متطلبات الدورة واجتياز التقييم' },
-        { status: 403 }
-      );
+    const { data: enrollment, error: enrollmentError } = await enrollmentQuery.maybeSingle();
+    if (enrollmentError) {
+      throw new CertificatePersistenceError('تعذر التحقق من استحقاق الشهادة. حاول مرة أخرى.');
     }
 
-    // Mark enrollment completed if passed final exam
-    if (passedFinalAssessment && (!isCompleted || Number(enrollment.progress) < 100)) {
-      await supabase
-        .from('enrollments')
-        .update({
-          progress: 100,
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-        })
-        .eq('id', enrollment.id);
+    if (!isCertificateEnrollmentEligible(enrollment, auth.user)) {
+      return NextResponse.json(
+        { success: false, error: 'لا يمكن إصدار الشهادة قبل اعتماد إكمال متطلبات الدورة في سجل اشتراكك' },
+        { status: 403 }
+      );
     }
 
     const { data: profile } = await supabase
@@ -91,27 +74,28 @@ export async function POST(req: NextRequest) {
     // Fetch live courses to accurately resolve duration & canonical title
     const allCourses = await getAllCoursesAsync();
     const matchedCourse =
-      (courseSlug ? findCourseByIdentifier(allCourses, courseSlug) : null) ||
-      allCourses.find((c) => c.title === courseTitle || (cleanCourseId && c.slug === cleanCourseId)) ||
-      (courseSlug ? getCourseBySlug(courseSlug) : null) ||
+      findCourseByIdentifier(allCourses, enrollment.course_id) ||
+      allCourses.find((c) => c.title === enrollment.course_title) ||
+      getCourseBySlug(enrollment.course_id) ||
       null;
 
-    const title = enrollment.course_title || matchedCourse?.title || courseTitle || 'الدورة التدريبية المعتمدة';
-    const finalGrade = formatCertificateGrade(score, grade);
-    const finalHours = formatCertificateHours(matchedCourse?.duration, hours);
+    const title = matchedCourse?.title || enrollment.course_title || enrollment.course_id || 'الدورة التدريبية المعتمدة';
+    const finalGrade = formatCertificateGrade(null, typeof enrollment.grade === 'string' ? enrollment.grade : null);
+    const finalHours = formatCertificateHours(matchedCourse?.duration, typeof enrollment.hours === 'string' ? enrollment.hours : null);
 
     const [allIssued, allTemplates] = await Promise.all([
       getAllIssuedCertificates(),
       getAllTemplates(),
     ]);
 
-    // Check if certificate already exists
+    // Match exact trusted titles; a similarly named course is a different award.
+    const courseTitles = new Set(
+      [title, enrollment.course_title].filter(Boolean).map((value: string) => value.toLowerCase().trim()),
+    );
     const existing = allIssued.find(
       (c) =>
-        (email ? c.studentEmail?.toLowerCase().trim() === email : c.studentName === name) &&
-        (c.courseTitle.toLowerCase().trim() === title.toLowerCase().trim() ||
-         c.courseTitle.includes(title) ||
-         title.includes(c.courseTitle))
+        c.studentEmail?.toLowerCase().trim() === email &&
+        courseTitles.has(c.courseTitle.toLowerCase().trim())
     );
 
     if (existing) {

@@ -70,10 +70,11 @@ test('certificate auto-issuance and store derive authentic grades and hours with
   assert.match(storeSource, /export function formatCertificateHours/);
   assert.doesNotMatch(storeSource, /'ممتاز مرتفع \(%99\)'/);
 
-  // Auto-issue route verifies course completion / final assessment and dynamically calculates grade and hours
+  // Automatic issuance uses stored completion and server-owned award metadata.
   assert.match(autoIssueSource, /formatCertificateGrade/);
   assert.match(autoIssueSource, /formatCertificateHours/);
-  assert.match(autoIssueSource, /passedFinalAssessment/);
+  assert.match(autoIssueSource, /isCertificateEnrollmentEligible/);
+  assert.doesNotMatch(autoIssueSource, /passedFinalAssessment/);
   assert.doesNotMatch(autoIssueSource, /'ممتاز مرتفع \(%98\)'/);
   assert.doesNotMatch(autoIssueSource, /'30 ساعة تدريبية معتمدة'/);
 

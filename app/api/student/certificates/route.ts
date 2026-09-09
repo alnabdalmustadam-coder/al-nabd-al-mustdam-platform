@@ -12,6 +12,7 @@ import { findCourseByIdentifier } from '@/lib/public-courses';
 import { getCourseBySlug } from '@/data/courses';
 import { supabase as adminSupabase } from '@/lib/supabase';
 import { requireUser } from '@/lib/security/auth';
+import { isCertificateEnrollmentEligible } from '@/lib/certificates/eligibility';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,72 +45,70 @@ export async function GET(req: NextRequest) {
 
     let studentName = auth.user.user_metadata?.full_name || '';
 
-    // 2. Check if the user has completed enrollments in Supabase
-    // If completed and no certificate exists, auto-issue one!
-    try {
-      const { data: profile } = await adminSupabase
-        .from('profiles')
-        .select('full_name')
-        .eq('id', auth.user.id)
-        .maybeSingle();
+    // 2. Apply the same entitlement check as the explicit issuance endpoint.
+    const { data: profile } = await adminSupabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', auth.user.id)
+      .maybeSingle();
 
-      if (profile?.full_name) {
-        studentName = profile.full_name;
+    if (profile?.full_name) {
+      studentName = profile.full_name;
+    }
+
+    const { data: enrollments, error: enrollmentError } = await adminSupabase
+      .from('enrollments')
+      .select('*')
+      .eq('email', studentEmail);
+
+    if (enrollmentError) {
+      throw new CertificatePersistenceError('تعذر التحقق من استحقاق الشهادات. حاول مرة أخرى.');
+    }
+
+    const issuedCourseTitles = new Set(
+      initialIssued
+        .filter((c) => normalizeEmail(c.studentEmail) === studentEmail)
+        .map((c) => normalizeCourseTitle(c.courseTitle)),
+    );
+
+    const eligibleEnrollments = (enrollments || []).filter((enroll) =>
+      isCertificateEnrollmentEligible(enroll, auth.user),
+    );
+
+    if (eligibleEnrollments.length > 0) {
+      const allCourses = await getAllCoursesAsync();
+      for (const enroll of eligibleEnrollments) {
+        const matchedCourse =
+          findCourseByIdentifier(allCourses, enroll.course_id) ||
+          allCourses.find((c) => c.title === enroll.course_title) ||
+          getCourseBySlug(enroll.course_id);
+        const courseTitle = matchedCourse?.title || enroll.course_title || enroll.course_id || 'دورة تدريبية معتمدة';
+        const alreadyIssued = issuedCourseTitles.has(normalizeCourseTitle(courseTitle)) ||
+          (enroll.course_title && issuedCourseTitles.has(normalizeCourseTitle(enroll.course_title)));
+
+        if (alreadyIssued) continue;
+
+        const matchedTemplate =
+          allTemplates.find(
+            (t) =>
+              t.courseTitle.toLowerCase().trim() === courseTitle.toLowerCase().trim() ||
+              courseTitle.toLowerCase().includes(t.courseTitle.toLowerCase()) ||
+              t.courseTitle.toLowerCase().includes(courseTitle.toLowerCase())
+          ) ||
+          allTemplates.find((t) => t.autoIssue) ||
+          allTemplates[0];
+
+        const issuedCertificate = await issueCertificate({
+          studentName: studentName || 'المتدرب المتميز',
+          studentEmail,
+          courseTitle,
+          templateId: matchedTemplate ? matchedTemplate.id : 'tpl-1',
+          grade: formatCertificateGrade(null, typeof enroll.grade === 'string' ? enroll.grade : null),
+          hours: formatCertificateHours(matchedCourse?.duration, typeof enroll.hours === 'string' ? enroll.hours : null),
+          imageUrl: matchedTemplate?.imageUrl || '/1.png',
+        });
+        issuedCourseTitles.add(normalizeCourseTitle(issuedCertificate.courseTitle));
       }
-
-      const { data: enrollments } = await adminSupabase
-        .from('enrollments')
-        .select('*')
-        .eq('email', studentEmail);
-
-      const issuedCourseTitles = new Set(
-        initialIssued
-          .filter((c) => normalizeEmail(c.studentEmail) === studentEmail)
-          .map((c) => normalizeCourseTitle(c.courseTitle)),
-      );
-
-      if (enrollments && enrollments.length > 0) {
-        const allCourses = await getAllCoursesAsync();
-        for (const enroll of enrollments) {
-          const isFinished = (enroll.progress && Number(enroll.progress) >= 100) || enroll.status === 'completed';
-          if (isFinished) {
-            const courseTitle = enroll.course_title || enroll.course_id || 'دورة تدريبية معتمدة';
-            const normalizedCourseTitle = normalizeCourseTitle(courseTitle);
-            const alreadyIssued = issuedCourseTitles.has(normalizedCourseTitle);
-
-            if (!alreadyIssued) {
-              const matchedCourse =
-                findCourseByIdentifier(allCourses, enroll.course_id) ||
-                allCourses.find((c) => c.title === courseTitle) ||
-                getCourseBySlug(enroll.course_id);
-
-              // Find best matching template
-              const matchedTemplate =
-                allTemplates.find(
-                  (t) =>
-                    t.courseTitle.toLowerCase().trim() === courseTitle.toLowerCase().trim() ||
-                    courseTitle.toLowerCase().includes(t.courseTitle.toLowerCase()) ||
-                    t.courseTitle.toLowerCase().includes(courseTitle.toLowerCase())
-                ) ||
-                allTemplates.find((t) => t.autoIssue) ||
-                allTemplates[0];
-
-              const issuedCertificate = await issueCertificate({
-                studentName: studentName || 'المتدرب المتميز',
-                studentEmail,
-                courseTitle,
-                templateId: matchedTemplate ? matchedTemplate.id : 'tpl-1',
-                grade: formatCertificateGrade(null, enroll.grade),
-                hours: formatCertificateHours(matchedCourse?.duration, enroll.hours),
-                imageUrl: matchedTemplate?.imageUrl || '/1.png',
-              });
-              issuedCourseTitles.add(normalizeCourseTitle(issuedCertificate.courseTitle));
-            }
-          }
-        }
-      }
-    } catch (enrollErr) {
-      console.error('Error checking enrollments for auto certificate issuance:', enrollErr);
     }
 
     // 3. Refresh issued list from store after potential auto-issue

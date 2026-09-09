@@ -44,7 +44,6 @@ import {
 import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
 import { findCourseByIdentifier } from '@/lib/public-courses';
 import { Course, CourseAttachment, QuizData, SubLessonItem } from '@/types';
-import { createClient } from '@/utils/supabase/client';
 
 /* ── Types ── */
 interface Lesson {
@@ -520,41 +519,22 @@ export default function StudentLessonPage() {
     const isLastLesson = currentIndex >= allLessons.length - 1;
     const isCourseFinished = isFinalExam || (isLastLesson && completedSet.size + 1 >= allLessons.length);
 
-    // Auto-issue certificate only if passing the final assessment or completing the course
+    // Request issuance; the server independently checks the completion record.
     if (isPassed && isCourseFinished) {
+      setCompletionError(null);
       try {
-        const supabase = createClient();
-        const { data: authData } = await supabase.auth.getUser();
-        const user = authData?.user;
-        const studentEmail = user?.email?.toLowerCase().trim();
-        let studentName = user?.user_metadata?.full_name || 'المتدرب المتميز';
-
-        if (user?.id) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('full_name')
-            .eq('id', user.id)
-            .maybeSingle();
-          if (profile?.full_name) {
-            studentName = profile.full_name;
-          }
-        }
-
-        await fetch('/api/student/certificates/auto-issue', {
+        const response = await fetch('/api/student/certificates/auto-issue', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            studentName,
-            studentEmail,
-            courseSlug,
-            courseTitle: courseData?.title,
-            score,
-            hours: courseData?.duration,
-            isFinalExam,
-          }),
+          body: JSON.stringify({ courseSlug }),
         });
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'تعذر إصدار الشهادة. حاول مرة أخرى.');
+        }
       } catch (err) {
         console.error('Error auto issuing certificate after final assessment:', err);
+        setCompletionError(err instanceof Error ? err.message : 'تعذر إصدار الشهادة. حاول مرة أخرى.');
       }
     }
   };
@@ -870,7 +850,7 @@ export default function StudentLessonPage() {
 
           {completionPendingAssessment && !completionError && (
             <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-bold text-amber-800" role="status">
-              اكتملت جميع الدروس. يلزم اجتياز التقييم النهائي لاعتماد نسبة 100% وإصدار الشهادة.
+              اكتملت جميع الدروس. تتاح الشهادة بعد اعتماد إكمال متطلبات الدورة في سجل اشتراكك.
             </div>
           )}
 
