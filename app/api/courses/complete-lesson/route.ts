@@ -4,6 +4,7 @@ import { requireUser } from '@/lib/security/auth';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { buildActor, buildStatement, stmtProgressed, storeStatement } from '@/lib/xapi';
 import { getCourseAllLessons } from '@/lib/course-lessons';
+import { getCourseEnrollmentIdentifiers, parseCourseIdentifier } from '@/lib/public-courses';
 
 type EnrollmentRow = { id: string; status: string | null };
 
@@ -12,27 +13,19 @@ export async function GET(request: Request) {
   if (!auth.ok) return auth.response;
 
   try {
-    const courseId = new URL(request.url).searchParams.get('courseId')?.trim() || '';
+    const courseId = parseCourseIdentifier(new URL(request.url).searchParams.get('courseId'));
     const email = auth.user.email?.trim().toLowerCase();
 
-    if (!email || !/^[a-zA-Z0-9_-]{1,120}$/.test(courseId)) {
+    if (!email || !courseId) {
       return NextResponse.json({ success: false, message: 'معرف الدورة غير صالح' }, { status: 400 });
     }
 
-    const course = await getCourseBySlugAsync(courseId.replace(/^course-/, ''));
+    const course = await getCourseBySlugAsync(courseId);
     if (!course) {
       return NextResponse.json({ success: false, message: 'الدورة غير موجودة' }, { status: 404 });
     }
 
-    const identifiers = [...new Set([
-      courseId,
-      courseId.replace(/^course-/, ''),
-      course.slug,
-      `course-${course.slug}`,
-      course.ghlCourseId,
-      course.ghlCourseId?.replace(/^course-/, ''),
-      String(course.id),
-    ].filter((value): value is string => Boolean(value)))];
+    const identifiers = getCourseEnrollmentIdentifiers(course, courseId);
     const admin = getSupabaseAdmin();
     const [byUser, byEmail] = await Promise.all([
       admin
@@ -105,15 +98,15 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
-    const lessonId = typeof body.lessonId === 'string' ? body.lessonId.trim() : '';
+    const courseId = parseCourseIdentifier(body?.courseId);
+    const lessonId = typeof body?.lessonId === 'string' ? body.lessonId.trim() : '';
     const email = auth.user.email?.trim().toLowerCase();
 
-    if (!email || !/^[a-zA-Z0-9_-]{1,120}$/.test(courseId) || lessonId.length < 1 || lessonId.length > 160) {
+    if (!email || !courseId || lessonId.length < 1 || lessonId.length > 160) {
       return NextResponse.json({ success: false, message: 'بيانات الدرس غير صالحة' }, { status: 400 });
     }
 
-    const course = await getCourseBySlugAsync(courseId.replace(/^course-/, ''));
+    const course = await getCourseBySlugAsync(courseId);
     if (!course) {
       return NextResponse.json({ success: false, message: 'الدورة غير موجودة' }, { status: 404 });
     }
@@ -124,15 +117,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'الدرس لا ينتمي إلى هذه الدورة' }, { status: 400 });
     }
 
-    const identifiers = [...new Set([
-      courseId,
-      courseId.replace(/^course-/, ''),
-      course.slug,
-      `course-${course.slug}`,
-      course.ghlCourseId,
-      course.ghlCourseId?.replace(/^course-/, ''),
-      String(course.id),
-    ].filter((value): value is string => Boolean(value)))];
+    const identifiers = getCourseEnrollmentIdentifiers(course, courseId);
     const admin = getSupabaseAdmin();
     const [byUser, byEmail] = await Promise.all([
       admin

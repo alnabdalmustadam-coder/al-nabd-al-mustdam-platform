@@ -110,7 +110,9 @@ export async function POST(request: Request) {
 
     const total = Math.max(totalResult.count || 0, 1);
     const completed = completedResult.count || 0;
-    const percent = Math.min(100, Math.round((completed / total) * 100));
+    // Keep this legacy telemetry route under the same certificate boundary as
+    // the course progress routes: only trusted completion may reach 100%.
+    const percent = Math.min(99, Math.round((completed / total) * 100));
     const enrollmentIds = activeEnrollments.map((row) => row.id);
     const { error: enrollmentError } = await admin
       .from('enrollments')

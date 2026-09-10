@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/security/auth';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getCourseBySlugAsync } from '@/lib/courses-store';
+import { getCourseEnrollmentIdentifiers, parseCourseIdentifier } from '@/lib/public-courses';
 
 type EnrollmentRow = {
   id: string;
@@ -19,11 +20,9 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const courseSlug = typeof body.courseSlug === 'string'
-      ? body.courseSlug.replace(/^course-/, '').trim()
-      : '';
+    const courseSlug = parseCourseIdentifier(body?.courseSlug);
 
-    if (!/^[a-zA-Z0-9_-]{1,120}$/.test(courseSlug)) {
+    if (!courseSlug) {
       return NextResponse.json({ success: false, error: 'معرف الدورة غير صالح' }, { status: 400 });
     }
 
@@ -42,15 +41,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'الحساب لا يحتوي على بريد إلكتروني' }, { status: 400 });
     }
 
-    const identifiers = [...new Set([
-      courseSlug,
-      course.slug,
-      `course-${courseSlug}`,
-      `course-${course.slug}`,
-      course.ghlCourseId,
-      course.ghlCourseId?.replace(/^course-/, ''),
-      String(course.id),
-    ].filter((value): value is string => Boolean(value)))];
+    const identifiers = getCourseEnrollmentIdentifiers(course, courseSlug);
 
     const admin = getSupabaseAdmin();
     const [byUser, byEmail] = await Promise.all([

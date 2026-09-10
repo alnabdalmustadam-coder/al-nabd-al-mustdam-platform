@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { stmtRegistered, storeStatement } from "@/lib/xapi";
 import { requireUser } from "@/lib/security/auth";
 import { getCourseBySlugAsync } from "@/lib/courses-store";
+import { getCourseEnrollmentIdentifiers, parseCourseIdentifier } from "@/lib/public-courses";
 
 const CORS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -23,19 +24,19 @@ export async function POST(req: NextRequest) {
     const auth = await requireUser(req);
     if (!auth.ok) return auth.response;
 
-    const { courseId } = await req.json();
+    const body = await req.json();
+    const courseId = parseCourseIdentifier(body?.courseId);
     const email = auth.user.email;
 
-    if (!email || typeof courseId !== 'string' || !/^[a-zA-Z0-9_-]{1,120}$/.test(courseId)) {
+    if (!email || !courseId) {
       return NextResponse.json(
-        { success: false, message: "البريد الإلكتروني ومعرف الدورة وعنوان الدورة مطلوبة" },
+        { success: false, message: "معرّف الدورة أو البريد الإلكتروني غير صالح" },
         { status: 400, headers: CORS }
       );
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const cleanSlug = courseId.replace(/^course-/, "").trim();
-    const course = await getCourseBySlugAsync(cleanSlug);
+    const course = await getCourseBySlugAsync(courseId);
     if (!course) {
       return NextResponse.json({ success: false, message: 'الدورة غير موجودة' }, { status: 404 });
     }
@@ -53,20 +54,15 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Check if user is already enrolled in this course to prevent duplicates & protect progress
-    const { data: existingEnroll } = await supabase
+    const { data: existingEnroll, error: lookupError } = await supabase
       .from("enrollments")
       .select("id, progress, status")
       .eq("email", normalizedEmail)
-      .in('course_id', [
-        courseId,
-        `course-${cleanSlug}`,
-        cleanSlug,
-        course.slug,
-        String(course.id),
-        ...(course.ghlCourseId ? [course.ghlCourseId, course.ghlCourseId.replace(/^course-/, '')] : []),
-      ])
+      .in('course_id', getCourseEnrollmentIdentifiers(course, courseId))
       .limit(1)
       .maybeSingle();
+
+    if (lookupError) throw lookupError;
 
     if (existingEnroll) {
       return NextResponse.json(
@@ -130,7 +126,7 @@ export async function POST(req: NextRequest) {
         email: normalizedEmail,
         name,
         nationalId,
-        courseId,
+        courseId: course.slug,
         courseName: courseTitle,
         courseNameAr: courseTitle,
         registrationId,

@@ -18,8 +18,38 @@ export function normalizeCourseIdentifier(value?: string | number): string {
     .replace(/^course-/, '');
 }
 
+/** Validate one decoded URL segment, including Arabic slugs and legacy IDs. */
+export function parseCourseIdentifier(value: unknown): string | null {
+  if (typeof value !== 'string' || value.length > 2400) return null;
+  try {
+    const identifier = decodeURIComponent(value).normalize('NFKC').trim();
+    if (
+      identifier.length < 1 || identifier.length > 200
+      || !/^[\p{L}\p{N}\p{M}_-]+$/u.test(identifier)
+      || !normalizeCourseIdentifier(identifier)
+    ) return null;
+    return identifier;
+  } catch {
+    return null;
+  }
+}
+
+/** Match historical enrollment keys while storing new records by catalog slug. */
+export function getCourseEnrollmentIdentifiers(
+  course: Pick<Course, 'id' | 'slug' | 'ghlCourseId'>,
+  requestedIdentifier?: string,
+): string[] {
+  const identifiers = [requestedIdentifier, course.slug, String(course.id), course.ghlCourseId]
+    .filter((value): value is string => Boolean(value));
+  return [...new Set(identifiers.flatMap((identifier) => {
+    const normalized = normalizeCourseIdentifier(identifier);
+    return normalized ? [identifier, normalized, `course-${normalized}`] : [];
+  }))];
+}
+
 export function findCourseByIdentifier(catalog: Course[], identifier: string): Course | undefined {
   const target = normalizeCourseIdentifier(identifier);
+  if (!target) return undefined;
   return catalog.find((course) =>
     [course.slug, course.id, course.ghlCourseId]
       .some((value) => normalizeCourseIdentifier(value) === target),
