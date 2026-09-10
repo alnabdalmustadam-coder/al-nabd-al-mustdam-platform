@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     if (mine) {
       const auth = await requireInstructorOrAdmin(req);
       if (!auth.ok) return auth.response;
-      const catalog = await getAllCoursesAsync({ includeUnpublished: true, requireDatabase: true });
+      const catalog = await getAllCoursesAsync({ includeUnpublished: true });
       courses = isAdminRole(auth.role) ? catalog : catalog.filter(course => course.trainerId === auth.user.id);
     } else {
       courses = await getAllCoursesAsync();

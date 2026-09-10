@@ -131,7 +131,7 @@ export default function PremiumCourseHighlights() {
                 transition={{ duration: 0.5, delay: idx * 0.08 }}
                 className="group relative"
               >
-                <Link href={`/courses/${course.slug}`} className="block h-full">
+                <Link href="/corporate#courses-section" className="block h-full">
                   {/* Outer glow on hover */}
                   <div className={`absolute -inset-[1px] rounded-[2rem] bg-gradient-to-br ${course.accent} opacity-[0.08] group-hover:opacity-[0.15] blur-sm transition-opacity duration-500 z-0`}></div>
                   

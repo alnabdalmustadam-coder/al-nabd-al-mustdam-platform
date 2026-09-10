@@ -41,9 +41,9 @@ import {
   saveLessonNote,
   saveQuizAttempt,
 } from '@/lib/actions/student-actions';
-import { getCourseBySlug, courses as catalogCourses } from '@/data/courses';
+import { usePublicCourses } from '@/lib/hooks/use-public-courses';
 import { findCourseByIdentifier } from '@/lib/public-courses';
-import { Course, CourseAttachment, QuizData, SubLessonItem } from '@/types';
+import { CourseAttachment, QuizData, SubLessonItem } from '@/types';
 
 /* ── Types ── */
 interface Lesson {
@@ -73,52 +73,8 @@ export default function StudentLessonPage() {
   const courseSlug = rawSlug.replace(/^course-/, '');
   const lessonId = (params?.lessonId as string) || 'lesson-1';
 
-  // Dynamic course state
-  const [courseData, setCourseData] = useState<Course | null>(() => {
-    if (!courseSlug) return null;
-    return getCourseBySlug(courseSlug) || catalogCourses.find(c => c.slug === courseSlug) || null;
-  });
-  const [isLoadingCourse, setIsLoadingCourse] = useState(!courseData);
-  const [courseNotFound, setCourseNotFound] = useState(false);
-
-  // Fetch live course from server API
-  useEffect(() => {
-    let isMounted = true;
-    async function loadLiveCourseData() {
-      if (!courseSlug) {
-        setCourseNotFound(true);
-        setIsLoadingCourse(false);
-        return;
-      }
-      try {
-        setIsLoadingCourse(true);
-        const res = await fetch('/api/courses', { cache: 'no-store' });
-        const data = await res.json();
-        if (!isMounted) return;
-        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-          const matched = findCourseByIdentifier(data.courses, courseSlug) || getCourseBySlug(courseSlug);
-          if (matched) {
-            setCourseData(matched);
-            setCourseNotFound(false);
-          } else if (!courseData) {
-            setCourseNotFound(true);
-          }
-        } else if (!courseData) {
-          setCourseNotFound(true);
-        }
-      } catch (err) {
-        console.error('Error loading live course in lesson player:', err);
-        if (!courseData) setCourseNotFound(true);
-      } finally {
-        if (isMounted) setIsLoadingCourse(false);
-      }
-    }
-
-    loadLiveCourseData();
-    return () => {
-      isMounted = false;
-    };
-  }, [courseSlug]);
+  const { courses: catalog, loading: isLoadingCourse, error: courseError, reload } = usePublicCourses();
+  const courseData = findCourseByIdentifier(catalog, courseSlug) || null;
 
   const [activeTab, setActiveTab] = useState<'notes' | 'attachments' | 'quiz' | 'discussion'>('notes');
   const [userNote, setUserNote] = useState('');
@@ -563,16 +519,16 @@ export default function StudentLessonPage() {
     );
   }
 
-  if (courseNotFound || !courseData) {
+  if (courseError || !courseData) {
     return (
       <div className="w-full min-h-[60vh] flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto space-y-5 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
         <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-sm">
           <AlertCircle className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-black text-slate-900">الدورة التدريبية غير موجودة</h2>
+          <h2 className="text-xl font-black text-slate-900">{courseError ? 'تعذر تحميل الدورة' : 'الدورة التدريبية غير متاحة'}</h2>
           <p className="text-xs text-slate-500 font-bold leading-relaxed">
-            لم نتمكن من العثور على الدورة التدريبية المطلوبة. يرجى التحقق من صحة الرابط أو الرجوع إلى قائمة دوراتك المسجلة.
+            {courseError || 'لم نتمكن من العثور على الدورة التدريبية المطلوبة. يرجى التحقق من صحة الرابط أو الرجوع إلى قائمة دوراتك المسجلة.'}
           </p>
         </div>
         <Link
@@ -581,6 +537,7 @@ export default function StudentLessonPage() {
         >
           العودة إلى دوراتي
         </Link>
+        {courseError && <button type="button" onClick={reload} className="font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
       </div>
     );
   }

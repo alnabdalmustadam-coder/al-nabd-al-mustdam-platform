@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CourseCard from "@/components/ui/CourseCard";
 import { CourseCardSkeleton } from "@/components/ui/CardSkeleton";
-import { courses, courseCategories } from "@/data/courses";
+import { courseCategories } from "@/data/courses";
 import { Search, SlidersHorizontal, Grid3X3, List, X, Headphones, ArrowLeft } from "lucide-react";
+import { usePublicCourses } from "@/lib/hooks/use-public-courses";
 
 const levels = [
   { key: "all", label: "الكل" },
@@ -22,35 +23,13 @@ const sortOptions = [
 ];
 
 export default function CoursesPage() {
-  const [courseList, setCourseList] = useState(courses);
-  const [coursesLoading, setCoursesLoading] = useState(false);
+  const { courses: courseList, loading: coursesLoading, error: coursesError, reload } = usePublicCourses();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [level, setLevel] = useState("all");
   const [sort, setSort] = useState("newest");
   const [view, setView] = useState<"grid" | "list">("grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
-
-  const fetchLiveCourses = () => {
-    setCoursesLoading(true);
-    fetch(`/api/courses?t=${Date.now()}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-          setCourseList(data.courses);
-        }
-      })
-      .catch((err) => console.error('Error fetching live courses:', err))
-      .finally(() => setCoursesLoading(false));
-  };
-
-  useEffect(() => {
-    fetchLiveCourses();
-
-    const handleUpdate = () => fetchLiveCourses();
-    window.addEventListener('nabd_courses_updated', handleUpdate);
-    return () => window.removeEventListener('nabd_courses_updated', handleUpdate);
-  }, []);
 
   let filtered = courseList.filter((c) => {
     const matchSearch = !search || c.title.includes(search) || c.description.includes(search);
@@ -357,9 +336,14 @@ export default function CoursesPage() {
                   <CourseCardSkeleton key={i} />
                 ))}
               </div>
+            ) : coursesError ? (
+              <div role="alert" className="rounded-3xl border border-amber-200 bg-amber-50 p-10 text-center text-slate-700">
+                <p>{coursesError}</p>
+                <button type="button" onClick={reload} className="mt-4 font-bold text-[#173A7C] underline">إعادة المحاولة</button>
+              </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-24 bg-white rounded-3xl border border-slate-200 shadow-sm">
-                <p className="section-desc-premium text-lg">لا توجد دورات مطابقة للبحث أو الفلتر المختار.</p>
+                <p className="section-desc-premium text-lg">{courseList.length === 0 ? 'لا توجد دورات متاحة حاليًا.' : 'لا توجد دورات مطابقة للبحث أو الفلتر المختار.'}</p>
                 <button 
                   onClick={() => { setSearch(""); setCategory("all"); setLevel("all"); }}
                   className="mt-4 text-[#173A7C] font-bold hover:underline"

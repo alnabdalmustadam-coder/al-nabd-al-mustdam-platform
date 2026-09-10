@@ -9,7 +9,7 @@ import type { Course, CourseCategory, CourseLevel, CurriculumSection } from '@/t
 
 type CourseStatus = 'draft' | 'published' | 'archived';
 type CourseInput = Partial<Course> & { title: string; status?: CourseStatus };
-type CourseReadOptions = { includeUnpublished?: boolean; requireDatabase?: boolean };
+type CourseReadOptions = { includeUnpublished?: boolean };
 type CourseWriteOptions = { instructorId?: string };
 type CourseRow = {
   id: number;
@@ -128,7 +128,7 @@ function writeLocalCourses(list: Course[]) {
   }
 }
 
-async function fetchRows(includeUnpublished: boolean, requireDatabase = false): Promise<CourseRow[]> {
+async function fetchRows(includeUnpublished: boolean): Promise<CourseRow[]> {
   try {
     let query = getSupabaseAdmin()
       .from('course_catalog')
@@ -136,32 +136,18 @@ async function fetchRows(includeUnpublished: boolean, requireDatabase = false): 
       .order('created_at', { ascending: false });
     if (!includeUnpublished) query = query.eq('status', 'published');
     const { data, error } = await query;
-    if (!error && data && (requireDatabase || data.length > 0)) {
-      return data as CourseRow[];
-    }
-    if (requireDatabase) throw new CoursePersistenceError('تعذر التحقق من بيانات الدورة. حاول مرة أخرى.');
+    if (error || !Array.isArray(data)) throw new CoursePersistenceError('تعذر تحميل الدورات. حاول مرة أخرى.');
+    // An empty result is authoritative, including after deleting or unpublishing
+    // the last course. Bundled JSON must never restore public or management rows.
+    return data as CourseRow[];
   } catch (err) {
-    if (requireDatabase) {
-      throw err instanceof CoursePersistenceError ? err : new CoursePersistenceError('تعذر التحقق من بيانات الدورة. حاول مرة أخرى.');
-    }
-    logger.warn('courses.read_supabase_fallback_to_local', { err });
+    logger.error('courses.read_supabase_failed', { err });
+    throw err instanceof CoursePersistenceError ? err : new CoursePersistenceError('تعذر تحميل الدورات. حاول مرة أخرى.');
   }
-
-  // Fallback to resilient local JSON database
-  const local = readLocalCourses();
-  const filtered = includeUnpublished ? local : local.filter(c => c.status !== 'draft');
-  return filtered.map(c => ({
-    id: c.id,
-    slug: c.slug,
-    title: c.title,
-    price: c.price,
-    status: (c.status || 'published') as CourseStatus,
-    payload: c,
-  }));
 }
 
 export async function getAllCoursesAsync(options: CourseReadOptions = {}): Promise<Course[]> {
-  return (await fetchRows(options.includeUnpublished === true, options.requireDatabase === true)).map(toCourse);
+  return (await fetchRows(options.includeUnpublished === true)).map(toCourse);
 }
 
 export async function getCourseBySlugAsync(
@@ -174,7 +160,7 @@ export async function getCourseBySlugAsync(
 }
 
 export async function getCourseForManagementAsync(identifier: string, instructorId?: string): Promise<Course> {
-  const course = await getCourseBySlugAsync(identifier, { includeUnpublished: true, requireDatabase: true });
+  const course = await getCourseBySlugAsync(identifier, { includeUnpublished: true });
   if (!course) throw new CourseAccessError('الدورة غير موجودة', 404);
   assertCourseOwner(course, instructorId);
   return course;
@@ -219,7 +205,7 @@ function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 
 export async function saveCourseAsync(courseData: CourseInput, actorId?: string, options: CourseWriteOptions = {}): Promise<Course> {
   // Resolve the actual write target once using live rows, including drafts.
   // Local fallback data must never authorize a mutation.
-  const courses = await getAllCoursesAsync({ includeUnpublished: true, requireDatabase: true });
+  const courses = await getAllCoursesAsync({ includeUnpublished: true });
   const requestedSlug = normalizeSlug(courseData.title, courseData.slug);
   const existing = courseData.id
     ? courses.find((course) => String(course.id) === String(courseData.id))

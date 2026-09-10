@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, Variants, AnimatePresence } from 'framer-motion';
 import {
@@ -19,7 +19,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { CardImage } from '@/components/ui/CardImage';
-import { courses as allCatalogCourses } from '@/data/courses';
+import { usePublicCourses } from '@/lib/hooks/use-public-courses';
 import { Course } from '@/types';
 import { createClient } from '@/utils/supabase/client';
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
@@ -169,30 +169,13 @@ export default function StudentPathwaysPage() {
   const [userEnrollments, setUserEnrollments] = useState<Map<string, number>>(new Map());
   const [selectedBookPreview, setSelectedBookPreview] = useState<typeof digitalBooks[0] | null>(null);
 
-  const [accreditedCourses, setAccreditedCourses] = useState<Course[]>(
-    allCatalogCourses.filter(c => c.slug !== 'free-trial-course')
-  );
-
-  // Function to load live courses from API and update enrollments
-  const loadPlatformCourses = async () => {
-    try {
-      const res = await fetch(`/api/courses?t=${Date.now()}`, { cache: 'no-store' });
-      const data = await res.json();
-      if (data.success && Array.isArray(data.courses) && data.courses.length > 0) {
-        const liveFiltered = data.courses.filter((c: any) => c.slug !== 'free-trial-course');
-        setAccreditedCourses(liveFiltered);
-        return liveFiltered;
-      }
-    } catch (err) {
-      console.error('Error fetching live courses in pathways:', err);
-    }
-    return accreditedCourses;
-  };
+  const { courses: catalog, loading: coursesLoading, error: coursesError, reload } = usePublicCourses();
+  const accreditedCourses = useMemo(() => catalog.filter(c => c.slug !== 'free-trial-course'), [catalog]);
 
   // Load student enrollments to reflect real progress
   useEffect(() => {
     async function loadData() {
-      const currentCourses = await loadPlatformCourses();
+      const currentCourses = accreditedCourses;
 
       try {
         const supabase = createClient();
@@ -211,7 +194,7 @@ export default function StudentPathwaysPage() {
           if (enrollmentsData && enrollmentsData.length > 0) {
             enrollmentsData.forEach((e: any) => {
               const cleanSlug = (e.course_id || '').replace(/^course-/, '').toLowerCase().trim();
-              const matchedCatalog = (currentCourses || accreditedCourses).find((c: Course) =>
+              const matchedCatalog = currentCourses.find((c: Course) =>
                 (c.slug || '').toLowerCase().trim() === cleanSlug ||
                 String(c.id) === cleanSlug ||
                 (c.ghlCourseId || '').replace(/^course-/, '').toLowerCase().trim() === cleanSlug ||
@@ -259,7 +242,7 @@ export default function StudentPathwaysPage() {
         window.removeEventListener('nabd_courses_updated', handleStorage);
       }
     };
-  }, []);
+  }, [accreditedCourses]);
 
   const filteredCourses = accreditedCourses.filter(c =>
     c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -365,6 +348,12 @@ export default function StudentPathwaysPage() {
         </div>
       </div>
 
+      {activeSection === 'courses' && (coursesLoading || coursesError || accreditedCourses.length === 0) && (
+        <div role={coursesError ? 'alert' : 'status'} className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-600">
+          <p>{coursesLoading ? 'جارٍ تحميل الدورات…' : coursesError || 'لا توجد دورات متاحة حاليًا.'}</p>
+          {coursesError && !coursesLoading && <button type="button" onClick={reload} className="mt-3 font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
+        </div>
+      )}
       {/* ── SECTION 1: COURSES CONTENT ── */}
       {activeSection === 'courses' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -18,7 +18,6 @@ import {
   BookCheck,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
-import { getCourseBySlug } from '@/data/courses';
 import { findCourseByIdentifier, fetchPublicCourses } from '@/lib/public-courses';
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
 import { CardImage } from '@/components/ui/CardImage';
@@ -88,7 +87,10 @@ function StudentCoursesContent() {
   }, [searchParams]);
 
   useEffect(() => {
+    let active = true;
+    let requestVersion = 0;
     async function loadCourses() {
+      const version = ++requestVersion;
       try {
         // 1. Fetch live courses catalog
         const liveList = await fetchPublicCourses();
@@ -104,6 +106,7 @@ function StudentCoursesContent() {
             .select('*')
             .eq('email', userEmail)
             .order('enrolled_at', { ascending: false });
+          if (!active || version !== requestVersion) return;
 
           if (enrollmentsData && enrollmentsData.length > 0) {
             const courseMap = new Map<string, EnrolledCourseItem>();
@@ -113,10 +116,11 @@ function StudentCoursesContent() {
               const matchedCatalog =
                 findCourseByIdentifier(liveList, cleanSlug) ||
                 liveList.find((c: any) => c.title === e.course_title) ||
-                getCourseBySlug(cleanSlug) ||
                 null;
 
-              const canonicalSlug = matchedCatalog?.slug || cleanSlug;
+              // Keep enrollment records in storage; only offer currently published courses.
+              if (!matchedCatalog) return;
+              const canonicalSlug = matchedCatalog.slug;
               const allCourseLessons = matchedCatalog ? getCourseAllLessons(matchedCatalog) : [];
               const totalLessons = Math.max(1, allCourseLessons.length);
 
@@ -146,12 +150,16 @@ function StudentCoursesContent() {
             });
 
             setMyCourses(Array.from(courseMap.values()));
+          } else {
+            setMyCourses([]);
           }
         }
       } catch (err) {
+        if (!active || version !== requestVersion) return;
+        setMyCourses([]);
         console.error('Error fetching enrolled courses:', err);
       } finally {
-        setLoading(false);
+        if (active && version === requestVersion) setLoading(false);
       }
     }
 
@@ -165,13 +173,16 @@ function StudentCoursesContent() {
       window.addEventListener('storage', handleStorage);
       window.addEventListener('nabd_progress_updated', handleStorage);
       window.addEventListener('nabd_courses_updated', handleStorage);
+      window.addEventListener('focus', handleStorage);
     }
 
     return () => {
+      active = false;
       if (typeof window !== 'undefined') {
         window.removeEventListener('storage', handleStorage);
         window.removeEventListener('nabd_progress_updated', handleStorage);
         window.removeEventListener('nabd_courses_updated', handleStorage);
+        window.removeEventListener('focus', handleStorage);
       }
     };
   }, []);

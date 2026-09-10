@@ -3,9 +3,8 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { getCourseBySlug } from "@/data/courses";
-import { findCourseByIdentifier, fetchPublicCourses } from "@/lib/public-courses";
-import type { Course } from "@/types";
+import { findCourseByIdentifier } from "@/lib/public-courses";
+import { usePublicCourses } from "@/lib/hooks/use-public-courses";
 import {
   Shield, 
   CheckCircle, 
@@ -28,9 +27,9 @@ function CheckoutContent() {
   const slug = searchParams.get("slug") || "";
   
   const { cart, clearCart } = useCart();
-  const [course, setCourse] = useState<Course | null>(null);
-  const [courseLoading, setCourseLoading] = useState(!isCartCheckout);
-  const [courseNotFound, setCourseNotFound] = useState(false);
+  const { courses: catalog, loading, error: courseError, reload } = usePublicCourses();
+  const course = findCourseByIdentifier(catalog, slug) || null;
+  const courseLoading = !isCartCheckout && loading;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -43,52 +42,6 @@ function CheckoutContent() {
   const [nationalId, setNationalId] = useState("");
   const [nationalIdInput, setNationalIdInput] = useState("");
   const [authLoading, setAuthLoading] = useState(true);
-
-  // Load single course if not cart checkout
-  useEffect(() => {
-    if (isCartCheckout) {
-      setCourseLoading(false);
-      return;
-    }
-
-    if (!slug) {
-      setCourseNotFound(true);
-      setCourseLoading(false);
-      return;
-    }
-
-    let isMounted = true;
-    async function loadCourse() {
-      try {
-        setCourseLoading(true);
-        setCourseNotFound(false);
-        const catalog = await fetchPublicCourses();
-        if (!isMounted) return;
-        const matched = findCourseByIdentifier(catalog, slug) || getCourseBySlug(slug);
-        if (matched) {
-          setCourse(matched);
-        } else {
-          setCourseNotFound(true);
-        }
-      } catch (err) {
-        console.error("Failed to load course for checkout from live API:", err);
-        if (!isMounted) return;
-        const fallback = getCourseBySlug(slug);
-        if (fallback) {
-          setCourse(fallback);
-        } else {
-          setCourseNotFound(true);
-        }
-      } finally {
-        if (isMounted) setCourseLoading(false);
-      }
-    }
-
-    loadCourse();
-    return () => {
-      isMounted = false;
-    };
-  }, [slug, isCartCheckout]);
 
   // Authenticate user and prefill phone & national_id from profile
   useEffect(() => {
@@ -245,16 +198,16 @@ function CheckoutContent() {
     );
   }
 
-  if (!isCartCheckout && (courseNotFound || !course)) {
+  if (!isCartCheckout && (courseError || !course)) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto space-y-5 font-[family-name:var(--font-cairo)]" dir="rtl">
         <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-sm">
           <AlertCircle className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-black text-slate-900">الدورة المطلوبة غير متوفرة</h2>
+          <h2 className="text-xl font-black text-slate-900">{courseError ? 'تعذر تحميل الدورة' : 'الدورة المطلوبة غير متوفرة'}</h2>
           <p className="text-xs text-slate-500 font-bold leading-relaxed">
-            لم نتمكن من العثور على الدورة التدريبية المحددة للتسجيل. قد يكون تم تحديث الرابط أو تعديل حالة نشر الدورة.
+            {courseError || 'لم نتمكن من العثور على الدورة التدريبية المحددة للتسجيل. قد يكون تم تحديث الرابط أو تعديل حالة نشر الدورة.'}
           </p>
         </div>
         <Link
@@ -263,6 +216,7 @@ function CheckoutContent() {
         >
           استعراض دليل الدورات المتاحة
         </Link>
+        {courseError && <button type="button" onClick={reload} className="font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
       </div>
     );
   }

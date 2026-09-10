@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { ProgressCard } from '@/components/student/progress-card';
 import { createClient } from '@/utils/supabase/client';
-import { getCourseBySlug } from "@/data/courses";
 import { findCourseByIdentifier, fetchPublicCourses } from "@/lib/public-courses";
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
 import { CardImage } from '@/components/ui/CardImage';
@@ -70,7 +69,10 @@ export default function StudentDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
+    let requestVersion = 0;
     async function loadStudentData() {
+      const version = ++requestVersion;
       try {
         const liveCatalog = await fetchPublicCourses();
         const supabase = createClient();
@@ -98,6 +100,7 @@ export default function StudentDashboardPage() {
             .select('*')
             .eq('email', userEmail)
             .order('enrolled_at', { ascending: false });
+          if (!active || version !== requestVersion) return;
 
           if (enrollError) {
             console.error('Enrollment query error:', enrollError);
@@ -111,9 +114,10 @@ export default function StudentDashboardPage() {
               const cleanSlug = (e.course_id || '').replace(/^course-/, '');
               const matchedCatalog = findCourseByIdentifier(liveCatalog, cleanSlug) ||
                 liveCatalog.find((c: any) => c.title === e.course_title) ||
-                getCourseBySlug(cleanSlug) ||
                 null;
-              const canonicalSlug = matchedCatalog?.slug || cleanSlug;
+              // Keep enrollment records in storage; only offer currently published courses.
+              if (!matchedCatalog) return;
+              const canonicalSlug = matchedCatalog.slug;
               
               // Calculate lessons count using the exact same logic as player
               const allCourseLessons = matchedCatalog ? getCourseAllLessons(matchedCatalog) : [];
@@ -143,12 +147,16 @@ export default function StudentDashboardPage() {
             });
 
             setEnrolledCourses(Array.from(courseMap.values()));
+          } else {
+            setEnrolledCourses([]);
           }
         }
       } catch (err) {
+        if (!active || version !== requestVersion) return;
+        setEnrolledCourses([]);
         console.error('Error fetching student dashboard data:', err);
       } finally {
-        setLoading(false);
+        if (active && version === requestVersion) setLoading(false);
       }
     }
 
@@ -161,27 +169,23 @@ export default function StudentDashboardPage() {
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', handleStorage);
       window.addEventListener('nabd_progress_updated', handleStorage);
+      window.addEventListener('nabd_courses_updated', handleStorage);
+      window.addEventListener('focus', handleStorage);
     }
 
     return () => {
+      active = false;
       if (typeof window !== 'undefined') {
         window.removeEventListener('storage', handleStorage);
         window.removeEventListener('nabd_progress_updated', handleStorage);
+        window.removeEventListener('nabd_courses_updated', handleStorage);
+        window.removeEventListener('focus', handleStorage);
       }
     };
   }, []);
 
-  const topCourse = enrolledCourses.length > 0
-    ? (enrolledCourses.find(c => c.progressPercent > 0 && c.progressPercent < 100) || enrolledCourses.find(c => c.progressPercent === 0) || enrolledCourses[0])
-    : {
-        id: 'default',
-        slug: 'diploma-tolerance-citizenship',
-        title: 'دبلوم التسامح والسلام والمواطنة الصالحة',
-        instructor: 'د. محمد القحطاني',
-        lessonsCount: 18,
-        progressPercent: 0,
-        thumbnailUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80',
-      };
+  const topCourse = enrolledCourses.find(c => c.progressPercent > 0 && c.progressPercent < 100)
+    || enrolledCourses.find(c => c.progressPercent === 0) || enrolledCourses[0];
 
   const completedCoursesCount = enrolledCourses.filter(c => c.progressPercent >= 100).length;
   const overallProgress = enrolledCourses.length > 0
@@ -250,7 +254,7 @@ export default function StudentDashboardPage() {
       </motion.div>
 
       {/* Continue Learning Highlighted Card */}
-      {enrolledCourses.length > 0 && (
+      {topCourse && (
         <motion.section
           variants={sectionFadeVariants}
           initial="hidden"

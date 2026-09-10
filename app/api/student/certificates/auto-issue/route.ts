@@ -9,7 +9,6 @@ import {
 } from '@/lib/certificates-store';
 import { getAllCoursesAsync } from '@/lib/courses-store';
 import { findCourseByIdentifier } from '@/lib/public-courses';
-import { getCourseBySlug } from '@/data/courses';
 import { requireUser } from '@/lib/security/auth';
 import { supabase } from '@/lib/supabase';
 import { isCertificateEnrollmentEligible } from '@/lib/certificates/eligibility';
@@ -76,7 +75,6 @@ export async function POST(req: NextRequest) {
     const matchedCourse =
       findCourseByIdentifier(allCourses, enrollment.course_id) ||
       allCourses.find((c) => c.title === enrollment.course_title) ||
-      getCourseBySlug(enrollment.course_id) ||
       null;
 
     const title = matchedCourse?.title || enrollment.course_title || enrollment.course_id || 'الدورة التدريبية المعتمدة';

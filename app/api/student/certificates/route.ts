@@ -9,7 +9,6 @@ import {
 } from '@/lib/certificates-store';
 import { getAllCoursesAsync } from '@/lib/courses-store';
 import { findCourseByIdentifier } from '@/lib/public-courses';
-import { getCourseBySlug } from '@/data/courses';
 import { supabase as adminSupabase } from '@/lib/supabase';
 import { requireUser } from '@/lib/security/auth';
 import { isCertificateEnrollmentEligible } from '@/lib/certificates/eligibility';
@@ -80,8 +79,7 @@ export async function GET(req: NextRequest) {
       for (const enroll of eligibleEnrollments) {
         const matchedCourse =
           findCourseByIdentifier(allCourses, enroll.course_id) ||
-          allCourses.find((c) => c.title === enroll.course_title) ||
-          getCourseBySlug(enroll.course_id);
+          allCourses.find((c) => c.title === enroll.course_title);
         const courseTitle = matchedCourse?.title || enroll.course_title || enroll.course_id || 'دورة تدريبية معتمدة';
         const alreadyIssued = issuedCourseTitles.has(normalizeCourseTitle(courseTitle)) ||
           (enroll.course_title && issuedCourseTitles.has(normalizeCourseTitle(enroll.course_title)));

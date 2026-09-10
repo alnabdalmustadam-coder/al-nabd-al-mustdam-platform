@@ -4,18 +4,22 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import { courses } from "@/data/courses";
+import { usePublicCourses } from "@/lib/hooks/use-public-courses";
 
 const typewriterWords = ["التقني", "الإداري", "الرقمي", "اللغوي", "القيادي"];
-const heroCourses = courses.slice(0, 3).map((c, i) => ({ ...c, image: `/${i + 1}.webp` }));
 
 export default function HeroSection() {
+  const { courses, loading, error, reload } = usePublicCourses();
+  const heroCourses = courses.slice(0, 3);
   const [wordIndex, setWordIndex] = useState(0);
   const [displayed, setDisplayed] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
+
+  const slideIndex = currentSlide % Math.max(heroCourses.length, 1);
+  const heroCourse = heroCourses[slideIndex];
 
   // Optimized Typewriter effect
   useEffect(() => {
@@ -42,20 +46,20 @@ export default function HeroSection() {
   }, [displayed, isDeleting, wordIndex]);
 
   useEffect(() => {
-    if (!autoPlayEnabled || isPaused) return;
+    if (!autoPlayEnabled || isPaused || heroCourses.length < 2) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroCourses.length);
+      setCurrentSlide((prev) => (prev + 1) % Math.max(heroCourses.length, 1));
     }, 6000);
     return () => clearInterval(timer);
-  }, [autoPlayEnabled, isPaused]);
+  }, [autoPlayEnabled, isPaused, heroCourses.length]);
 
   const nextSlide = () => {
     setAutoPlayEnabled(false);
-    setCurrentSlide((prev) => (prev + 1) % heroCourses.length);
+    setCurrentSlide((prev) => (prev + 1) % Math.max(heroCourses.length, 1));
   };
   const prevSlide = () => {
     setAutoPlayEnabled(false);
-    setCurrentSlide((prev) => (prev === 0 ? heroCourses.length - 1 : prev - 1));
+    setCurrentSlide((prev) => ((prev + heroCourses.length - 1) % Math.max(heroCourses.length, 1)));
   };
 
   return (
@@ -81,7 +85,7 @@ export default function HeroSection() {
         <div className="w-full max-w-[500px] lg:max-w-none lg:w-[30.5%] xl:w-[30%] 2xl:w-[29.5%] order-3 lg:order-1 flex items-stretch justify-center pointer-events-none mb-0 lg:mb-0">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentSlide}
+              key={heroCourse?.slug || "catalog-status"}
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
@@ -91,18 +95,19 @@ export default function HeroSection() {
               className="hero-fixed-side-card w-full h-full text-right pointer-events-auto bg-white/40 backdrop-blur-md p-6 sm:p-10 lg:p-6 xl:p-8 2xl:p-10 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl grid grid-rows-[auto_1fr_auto] gap-4 sm:gap-6 lg:gap-4 xl:gap-5 cursor-pointer"
             >
               <h2 className="hero-course-title-premium">
-                {heroCourses[currentSlide].title}
+                {heroCourse?.title || "استكشف مسارك التدريبي"}
               </h2>
 
               <div className="flex items-center border-y border-[#173A7C]/8 py-3 sm:py-4 lg:py-3 xl:py-4">
                 <p className="hero-course-description-premium">
-                  {heroCourses[currentSlide].description}
+                  {heroCourse?.description || (loading ? "جارٍ تحميل الدورات…" : error || "تابع دليل الدورات للاطلاع على البرامج المتاحة.")}
                 </p>
               </div>
 
-              <Button href={`/courses/${heroCourses[currentSlide].slug}`} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
-                اشترك الآن وادفع بالتقسيط
+              <Button href={heroCourse ? `/courses/${heroCourse.slug}` : "/courses"} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
+                {heroCourse ? "اشترك الآن وادفع بالتقسيط" : "استعرض الدورات"}
               </Button>
+              {error && <button type="button" onClick={reload} className="font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -197,7 +202,7 @@ export default function HeroSection() {
         <div className="w-full max-w-[500px] lg:max-w-none lg:w-[30.5%] xl:w-[30%] 2xl:w-[29.5%] order-2 lg:order-3 flex items-stretch justify-center pointer-events-none">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentSlide}
+              key={heroCourse?.slug || "catalog-status"}
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 30 }}
@@ -207,7 +212,7 @@ export default function HeroSection() {
               className="hero-fixed-side-card relative w-full h-full flex items-center justify-center pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
             >
               <div className="w-full h-full relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem]">
-                <img src={heroCourses[currentSlide].image} alt={heroCourses[currentSlide].title} className="w-full h-full object-cover sm:object-cover transition-transform duration-[1.5s] ease-out hover:scale-[1.08]" />
+                <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="w-full h-full object-cover sm:object-cover transition-transform duration-[1.5s] ease-out hover:scale-[1.08]" />
               </div>
 
               {/* Badges positioned cleanly on all screen sizes */}
@@ -225,7 +230,7 @@ export default function HeroSection() {
 
       {/* Carousel Controls Container */}
       <div className="relative mt-8 mb-16 lg:mt-0 lg:mb-0 lg:absolute lg:bottom-4 xl:bottom-8 left-0 right-0 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 flex items-center justify-center gap-4 sm:gap-6 lg:gap-3 xl:gap-6 z-30 pointer-events-auto mx-auto w-fit bg-white/80 lg:bg-white/40 backdrop-blur-md px-6 sm:px-8 py-2.5 sm:py-3 lg:px-4 lg:py-1.5 xl:px-6 xl:py-2 rounded-full border border-white/70 shadow-lg">
-        <button aria-label="الشريحة السابقة" onClick={prevSlide} className="w-10 h-10 sm:w-12 sm:h-12 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-full bg-white/95 hover:bg-[#173A7C] hover:text-white backdrop-blur-xl flex items-center justify-center text-[#173A7C] transition-all shadow-md group/btn ring-2 ring-white/50">
+        <button aria-label="الشريحة السابقة" onClick={prevSlide} disabled={heroCourses.length < 2} className="w-10 h-10 sm:w-12 sm:h-12 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-full bg-white/95 hover:bg-[#173A7C] hover:text-white backdrop-blur-xl flex items-center justify-center text-[#173A7C] transition-all shadow-md group/btn ring-2 ring-white/50">
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 lg:w-4 lg:h-4 xl:w-5 xl:h-5 group-hover/btn:scale-110 transition-transform" />
         </button>
         <div className="flex gap-2 sm:gap-3 lg:gap-1.5 xl:gap-2 mx-1 sm:mx-2">
@@ -234,12 +239,12 @@ export default function HeroSection() {
               key={idx}
               aria-label={`انتقل إلى شريحة ${idx + 1}`}
               onClick={() => setCurrentSlide(idx)}
-              className={`h-2.5 sm:h-3 lg:h-1.5 xl:h-2 rounded-full transition-all duration-500 shadow-inner ${currentSlide === idx ? "bg-[#173A7C] w-8 sm:w-10 lg:w-5 xl:w-8" : "bg-slate-300/80 w-2.5 sm:w-3 lg:w-1.5 xl:w-2 hover:bg-[#173A7C]/40"
+              className={`h-2.5 sm:h-3 lg:h-1.5 xl:h-2 rounded-full transition-all duration-500 shadow-inner ${slideIndex === idx ? "bg-[#173A7C] w-8 sm:w-10 lg:w-5 xl:w-8" : "bg-slate-300/80 w-2.5 sm:w-3 lg:w-1.5 xl:w-2 hover:bg-[#173A7C]/40"
                 }`}
             />
           ))}
         </div>
-        <button aria-label="الشريحة التالية" onClick={nextSlide} className="w-10 h-10 sm:w-12 sm:h-12 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-full bg-white/95 hover:bg-[#173A7C] hover:text-white backdrop-blur-xl flex items-center justify-center text-[#173A7C] transition-all shadow-md group/btn ring-2 ring-white/50">
+        <button aria-label="الشريحة التالية" onClick={nextSlide} disabled={heroCourses.length < 2} className="w-10 h-10 sm:w-12 sm:h-12 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded-full bg-white/95 hover:bg-[#173A7C] hover:text-white backdrop-blur-xl flex items-center justify-center text-[#173A7C] transition-all shadow-md group/btn ring-2 ring-white/50">
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 lg:w-4 lg:h-4 xl:w-5 xl:h-5 group-hover/btn:scale-110 transition-transform" />
         </button>
       </div>
