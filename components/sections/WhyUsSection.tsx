@@ -10,45 +10,19 @@ import {
   ArrowUpLeft,
 } from "lucide-react";
 
-function SustainPulseMark() {
+function SectionAccent() {
   return (
-    <svg
-      viewBox="0 0 64 64"
+    <div
       aria-hidden="true"
-      className="h-12 w-12 drop-shadow-[0_8px_14px_rgba(23,58,124,0.12)]"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      className="pointer-events-none mx-auto mt-6 flex h-10 w-44 select-none items-center justify-center gap-4 sm:w-52"
     >
-      <defs>
-        <linearGradient id="sustain-pulse-ring" x1="10" y1="8" x2="55" y2="57" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#173A7C" />
-          <stop offset="1" stopColor="#5CB07C" />
-        </linearGradient>
-        <linearGradient id="sustain-pulse-line" x1="12" y1="34" x2="53" y2="34" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#173A7C" />
-          <stop offset="0.55" stopColor="#25589A" />
-          <stop offset="1" stopColor="#5CB07C" />
-        </linearGradient>
-      </defs>
-
-      <circle cx="32" cy="32" r="27" fill="white" stroke="url(#sustain-pulse-ring)" strokeWidth="2.6" />
-      <path
-        d="M12 35h10l4-12 7 24 6-19 5 9h8"
-        stroke="url(#sustain-pulse-line)"
-        strokeWidth="3.3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M39 13c7 .3 11.2 3.8 12.5 10.4-7 .8-11.8-1.7-14.4-7.4.2-1.1.7-2.1 1.9-3Z"
-        fill="#F1FAF5"
-        stroke="#5CB07C"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="m38.6 22.2 8-5" stroke="#5CB07C" strokeWidth="2.1" strokeLinecap="round" />
-    </svg>
+      <span className="h-px flex-1 bg-gradient-to-r from-[#173A7C]/35 to-transparent" />
+      <span className="relative grid h-8 w-8 shrink-0 place-items-center">
+        <span className="absolute inset-1 rotate-45 rounded-[4px] border border-[#173A7C]/15 bg-gradient-to-br from-white to-[#5CB07C]/10" />
+        <span className="relative h-2.5 w-2.5 rotate-45 rounded-[2px] bg-gradient-to-br from-[#173A7C] to-[#5CB07C]" />
+      </span>
+      <span className="h-px flex-1 bg-gradient-to-l from-[#5CB07C]/45 to-transparent" />
+    </div>
   );
 }
 
@@ -128,11 +102,7 @@ export default function WhyUsSection() {
             النجاح المهني بأحدث الأساليب والمعايير العالمية.
           </p>
 
-          <div className="mx-auto mt-6 flex w-52 items-center justify-center gap-3" aria-hidden="true">
-            <span className="h-px flex-1 bg-gradient-to-l from-[#173A7C]/55 to-transparent" />
-            <SustainPulseMark />
-            <span className="h-px flex-1 bg-gradient-to-r from-[#5CB07C]/65 to-transparent" />
-          </div>
+          <SectionAccent />
         </motion.div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-6">
