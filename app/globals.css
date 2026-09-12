@@ -318,6 +318,13 @@ p, .subtext, .desc {
   font-size: clamp(0.875rem, 0.79rem + 0.3vw, 1.1rem);
   font-weight: 500;
   line-height: 1.78;
+  /* Keep catalog descriptions as a preview; the course page shows the full text. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  max-height: 5.34em;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .hero-fixed-side-card {
@@ -325,7 +332,16 @@ p, .subtext, .desc {
   min-height: 420px;
 }
 
+.hero-course-copy-card {
+  min-height: 0;
+}
+
 @media (min-width: 1024px) {
+  .hero-course-description-premium {
+    -webkit-line-clamp: 4;
+    max-height: 7.12em;
+  }
+
   .hero-fixed-side-card {
     height: clamp(430px, 54vh, 570px);
     min-height: 0;

@@ -92,13 +92,13 @@ export default function HeroSection() {
               transition={{ delay: 0.3, duration: 0.7 }}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
-              className="hero-fixed-side-card w-full h-full text-right pointer-events-auto bg-white/40 backdrop-blur-md p-6 sm:p-10 lg:p-6 xl:p-8 2xl:p-10 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl grid grid-rows-[auto_1fr_auto] gap-4 sm:gap-6 lg:gap-4 xl:gap-5 cursor-pointer"
+              className="hero-fixed-side-card hero-course-copy-card w-full h-full text-right pointer-events-auto bg-white/40 backdrop-blur-md p-6 sm:p-10 lg:p-6 xl:p-8 2xl:p-10 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl grid grid-rows-[auto_minmax(0,1fr)_auto] gap-4 sm:gap-6 lg:gap-4 xl:gap-5 cursor-pointer"
             >
               <h2 className="hero-course-title-premium">
                 {heroCourse?.title || "استكشف مسارك التدريبي"}
               </h2>
 
-              <div className="flex items-center border-y border-[#173A7C]/8 py-3 sm:py-4 lg:py-3 xl:py-4">
+              <div className="min-h-0 min-w-0 overflow-hidden flex items-center border-y border-[#173A7C]/8 py-3 sm:py-4 lg:py-3 xl:py-4">
                 <p className="hero-course-description-premium">
                   {heroCourse?.description || (loading ? "جارٍ تحميل الدورات…" : error || "تابع دليل الدورات للاطلاع على البرامج المتاحة.")}
                 </p>
