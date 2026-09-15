@@ -20,6 +20,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 
 export default function AdminSettingsPage() {
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -34,6 +35,7 @@ export default function AdminSettingsPage() {
     xapiEndpoint: 'https://xapi.sustainpulse.org/v1/statements',
     autoCertificates: true,
     watermarkEnabled: true,
+    platformLogo: '/logo.webp',
   });
 
   useEffect(() => {
@@ -163,6 +165,16 @@ export default function AdminSettingsPage() {
           </div>
 
           <div className="space-y-3">
+            <DeviceImageUploader
+              value={platformSettings.platformLogo}
+              onChange={(url) => setPlatformSettings({ ...platformSettings, platformLogo: url || '/logo.webp' })}
+              folder="general"
+              slug="platform-logo"
+              label="شعار المنصة"
+              recommendedSize="يُستخدم تلقائياً كصورة افتراضية للدورات التي لا تحتوي على صورة"
+              aspectRatio="auto"
+            />
+
             <div className="space-y-1">
               <label className="text-xs font-black text-slate-700">اسم المنصة الرسمي</label>
               <input
