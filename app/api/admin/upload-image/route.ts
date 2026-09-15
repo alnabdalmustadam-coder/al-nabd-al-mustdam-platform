@@ -53,10 +53,14 @@ export async function POST(req: Request) {
 
     // 2. Deterministic naming to guarantee in-place updates and prevent storage accumulation
     const cleanFolder = folder.replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'general';
+    // Keep Supabase Storage keys URL-safe. Arabic/entity titles must never
+    // be written directly into an object key (Storage returns "Invalid key").
     const cleanSlug = slug
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9\u0600-\u06ff_-]/gu, '_')
+      .normalize('NFKD')
+      .replace(/[^a-z0-9_-]+/g, '_')
+      .replace(/^_+|_+$/g, '')
       .slice(0, 50);
 
     const fileName = cleanSlug
