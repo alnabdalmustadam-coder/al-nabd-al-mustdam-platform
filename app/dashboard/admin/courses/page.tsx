@@ -1628,7 +1628,7 @@ export default function AdminCoursesPage() {
                       {/* Presets */}
                       <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] font-bold text-slate-500">
                         <span>أو اختر من النماذج الجاهزة:</span>
-                        {['/logo.webp', '/1.png', '/2.png'].map((preset) => (
+                        {[platformLogo, '/1.png', '/2.png'].map((preset) => (
                           <button
                             key={preset}
                             type="button"
@@ -1639,7 +1639,7 @@ export default function AdminCoursesPage() {
                                 : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-600'
                             }`}
                           >
-                            {preset === '/logo.webp' ? 'شعار المعهد' : preset === '/1.png' ? 'نموذج 1' : 'نموذج 2'}
+                            {preset === platformLogo ? 'شعار المعهد' : preset === '/1.png' ? 'نموذج 1' : 'نموذج 2'}
                           </button>
                         ))}
                       </div>
