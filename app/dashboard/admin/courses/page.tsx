@@ -227,7 +227,21 @@ export default function AdminCoursesPage() {
   const [formPrice, setFormPrice] = useState('500');
   const [formHours, setFormHours] = useState('30');
   const [formDescription, setFormDescription] = useState('');
-  const [formImage, setFormImage] = useState('/logo.webp');
+  const [formImage, setFormImage] = useState('');
+  const [platformLogo, setPlatformLogo] = useState('/logo.webp');
+
+  useEffect(() => {
+    const loadPlatformLogo = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.from('platform_settings').select('value').eq('key', 'platformLogo').maybeSingle();
+        if (data?.value) setPlatformLogo(data.value);
+      } catch (error) {
+        console.warn('Could not load platform logo fallback:', error);
+      }
+    };
+    void loadPlatformLogo();
+  }, []);
 
   // Dynamic Categories & Instructors State
   const [categoriesList, setCategoriesList] = useState<{ id: string; label: string }[]>([
@@ -417,7 +431,7 @@ export default function AdminCoursesPage() {
     setFormPrice('500');
     setFormHours('30');
     setFormDescription('');
-    setFormImage('/logo.webp');
+    setFormImage('');
     setFormAttachments([]);
     setHasFinalExam(false);
     setIsAddingNewCategory(false);
@@ -459,7 +473,7 @@ export default function AdminCoursesPage() {
     setFormPrice(String(course.rawPrice ?? 500));
     setFormHours(String(course.hours ?? 30));
     setFormDescription(course.description || '');
-    setFormImage(course.image || '/logo.webp');
+    setFormImage(course.image || '');
     setIsAddingNewCategory(false);
     setIsAddingNewInstructor(false);
     setNewCategoryName('');
@@ -960,7 +974,7 @@ export default function AdminCoursesPage() {
         price: priceNum,
         duration: `${hoursNum} ساعة تدريبية معتمدة`,
         description: formDescription.trim(),
-        image: formImage.trim() || '/logo.webp',
+        image: formImage.trim(),
         curriculum: formattedCurriculum,
         attachments: formAttachments,
         finalExam: hasFinalExam ? formFinalExam : undefined,
@@ -1404,7 +1418,7 @@ export default function AdminCoursesPage() {
                 <div className="relative rounded-2xl bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 overflow-hidden border border-slate-100/90 group-hover:border-blue-100 transition-colors mb-4">
                   <div className="relative w-full">
                     <CardImage
-                      src={course.image || '/logo.webp'}
+                      src={course.image || platformLogo}
                       alt={course.title}
                       sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                     />
