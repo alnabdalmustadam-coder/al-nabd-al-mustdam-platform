@@ -53,6 +53,7 @@ import { QuizData, QuizQuestion, CourseAttachment, SubLessonItem } from '@/types
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 import { CardImage } from '@/components/ui/CardImage';
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
+import { createClient } from '@/utils/supabase/client';
 
 interface CourseItem {
   id: string;
