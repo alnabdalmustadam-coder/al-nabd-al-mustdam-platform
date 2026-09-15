@@ -48,10 +48,14 @@ export async function POST(req: Request) {
     }
 
     // 2. Deterministic naming based on course slug if available to prevent storage accumulation
+    // Supabase Storage object keys must stay URL-safe. Transliterate any
+    // non-ASCII title to deterministic ASCII instead of putting Arabic in the key.
     const cleanSlug = courseSlug
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9\u0600-\u06ff_-]/gu, '_')
+      .normalize('NFKD')
+      .replace(/[^a-z0-9_-]+/g, '_')
+      .replace(/^_+|_+$/g, '')
       .slice(0, 60);
 
     const fileName = cleanSlug
