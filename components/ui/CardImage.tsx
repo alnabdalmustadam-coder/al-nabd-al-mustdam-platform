@@ -38,9 +38,9 @@ export function CardImage({
           quality={25}
           fallbackSrc={fallbackSrc}
           wrapperClassName="h-full w-full"
-          className="object-cover scale-110 opacity-35 blur-2xl saturate-75"
+          className="scale-[1.18] object-cover opacity-45 blur-2xl saturate-75"
         />
-        <div className="absolute inset-0 bg-white/20" />
+        <div className="absolute inset-0 bg-white/10" />
       </div>
 
       <div className="absolute inset-0 z-10">
@@ -53,7 +53,7 @@ export function CardImage({
           preload={preload}
           fallbackSrc={fallbackSrc}
           wrapperClassName="h-full w-full"
-          className="object-contain"
+          className="object-contain p-0"
         />
       </div>
 
