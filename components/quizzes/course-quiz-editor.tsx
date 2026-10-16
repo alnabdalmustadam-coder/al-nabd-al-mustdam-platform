@@ -1,8 +1,26 @@
 'use client';
 
 import { Plus, Trash2 } from 'lucide-react';
-import { useId } from 'react';
+import { useId, useMemo, useState } from 'react';
 import type { QuizData, QuizQuestion } from '@/types';
+import type { StudentQuizAnswer, StudentQuizQuestion } from '@/lib/quizzes/model';
+import { MatchingQuestion } from '@/components/quizzes/matching-question';
+
+function MatchingPreview({ question }: { question: QuizQuestion }) {
+  const [answer, setAnswer] = useState<StudentQuizAnswer>();
+  const pairs = question.pairs || [];
+  const valid = pairs.length >= 2 && pairs.every((pair) => pair.prompt.trim() && pair.answer.trim())
+    && new Set(pairs.map((pair) => pair.answer.trim())).size === pairs.length;
+  const preview = useMemo<StudentQuizQuestion>(() => ({ id: question.id, text: question.question, type: 'matching',
+    prompts: (question.pairs || []).map((pair) => pair.prompt.trim()),
+    options: (question.pairs || []).map((pair) => pair.answer.trim()).sort((a, b) => a.localeCompare(b, 'ar')) }), [question]);
+  return <details className="rounded-xl border border-blue-200 bg-white p-3">
+    <summary className="cursor-pointer text-xs font-black text-blue-900">معاينة شكل السؤال للطالب</summary>
+    <div className="mt-3">{valid
+      ? <MatchingQuestion question={preview} answer={answer} onChange={setAnswer} />
+      : <p className="text-xs leading-6 text-slate-500">أكمل عبارتين وإجابتيهما على الأقل لعرض المعاينة، مع إجابات مختلفة لكل عبارة.</p>}</div>
+  </details>;
+}
 
 export function CourseQuizEditor({ value, onChange }: { value: QuizData; onChange: (quiz: QuizData) => void }) {
   const editorId = useId();
@@ -49,6 +67,7 @@ export function CourseQuizEditor({ value, onChange }: { value: QuizData; onChang
         </div>)}
         {(question.pairs?.length || 0) < 10 && <button type="button" className="rounded-lg px-3 py-2 text-xs font-bold text-blue-800 hover:bg-blue-50"
           onClick={() => update(index, { pairs: [...(question.pairs || []), { id: crypto.randomUUID(), prompt: '', answer: '' }] })}>+ إضافة زوج</button>}
+        <MatchingPreview key={JSON.stringify(question.pairs)} question={question} />
       </div> : <div className="space-y-2">
         <p className="text-xs font-normal text-slate-500">أضف الاختيارات، وحدّد الإجابة الصحيحة من الدائرة بجانبها.</p>
         <div className="grid gap-2 sm:grid-cols-2">
