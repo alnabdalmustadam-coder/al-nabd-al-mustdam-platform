@@ -1,5 +1,6 @@
 'use client';
 
+import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
 import React, { useState, useEffect, useRef } from 'react';
 import * as tus from 'tus-js-client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -49,7 +50,7 @@ import {
   FileCode,
   FolderOpen,
 } from 'lucide-react';
-import { QuizData, QuizQuestion, CourseAttachment, SubLessonItem } from '@/types';
+import { QuizData, CourseAttachment, SubLessonItem } from '@/types';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 import { CardImage } from '@/components/ui/CardImage';
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
@@ -2164,75 +2165,7 @@ export default function AdminCoursesPage() {
                                     </div>
                                   )}
 
-                                  {sub.type === 'quiz' && (
-                                    <div className="p-3 bg-amber-50/70 rounded-lg border border-amber-200/80 space-y-2">
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                                          <HelpCircle className="w-4 h-4 text-amber-600" />
-                                          <span>أسئلة كويز الوحدة ({sub.quizData?.questions?.length || 0} أسئلة)</span>
-                                        </span>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            const currentQuestions = sub.quizData?.questions || [];
-                                            const nextQ: QuizQuestion = {
-                                              id: `q-${Date.now()}-${currentQuestions.length + 1}`,
-                                              question: `السؤال ${currentQuestions.length + 1}: `,
-                                              options: ['الخيار 1 (الصحيح)', 'الخيار 2', 'الخيار 3', 'الخيار 4'],
-                                              correctIndex: 0,
-                                              explanation: 'شرح الإجابة الصحيحة.',
-                                            };
-                                            handleUpdateSubItem(secIdx, subIdx, 'quizData', {
-                                              title: `اختبار ${sub.title}`,
-                                              passingScore: 70,
-                                              questions: [...currentQuestions, nextQ],
-                                            });
-                                          }}
-                                          className="text-[11px] font-bold text-[#173A7C] hover:underline cursor-pointer flex items-center gap-1"
-                                        >
-                                          <Plus className="w-3 h-3" />
-                                          <span>إضافة سؤال للكويز</span>
-                                        </button>
-                                      </div>
-
-                                      {sub.quizData?.questions?.map((q, qIdx) => (
-                                        <div key={q.id || qIdx} className="p-2.5 bg-white rounded border border-amber-100 space-y-1.5 text-xs">
-                                          <div className="flex items-center justify-between">
-                                            <span className="font-bold text-slate-800">السؤال #{qIdx + 1}</span>
-                                            {sub.quizData!.questions.length > 1 && (
-                                              <button
-                                                type="button"
-                                                onClick={() => {
-                                                  const filtered = sub.quizData!.questions.filter((_, idx) => idx !== qIdx);
-                                                  handleUpdateSubItem(secIdx, subIdx, 'quizData', {
-                                                    ...sub.quizData,
-                                                    questions: filtered,
-                                                  });
-                                                }}
-                                                className="text-rose-500 hover:text-rose-700 text-[10px] font-bold"
-                                              >
-                                                حذف
-                                              </button>
-                                            )}
-                                          </div>
-                                          <input
-                                            type="text"
-                                            value={q.question}
-                                            onChange={(e) => {
-                                              const updated = [...sub.quizData!.questions];
-                                              updated[qIdx].question = e.target.value;
-                                              handleUpdateSubItem(secIdx, subIdx, 'quizData', {
-                                                ...sub.quizData,
-                                                questions: updated,
-                                              });
-                                            }}
-                                            placeholder="نص السؤال..."
-                                            className="w-full px-2 py-1 text-xs font-bold bg-slate-50 border border-slate-200 rounded"
-                                          />
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
+                                  {sub.type === 'quiz' && (<CourseQuizEditor value={sub.quizData || { title: `اختبار ${sub.title}`, passingScore: 70, questions: [] }} onChange={(quiz) => handleUpdateSubItem(secIdx, subIdx, 'quizData', quiz)} />)}
                                 </div>
                               ))}
                             </div>
@@ -2411,151 +2344,7 @@ export default function AdminCoursesPage() {
                         </label>
                       </div>
 
-                      {hasFinalExam && (
-                        <div className="space-y-5">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-xs font-black text-slate-700 mb-1">عنوان الاختبار</label>
-                              <input
-                                type="text"
-                                value={formFinalExam.title}
-                                onChange={(e) => setFormFinalExam({ ...formFinalExam, title: e.target.value })}
-                                placeholder="مثال: الاختبار النهائي للبرنامج التدريبي"
-                                className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-xs font-black text-slate-700 mb-1">نسبة النجاح المطلوبة (%)</label>
-                              <input
-                                type="number"
-                                min={50}
-                                max={100}
-                                value={formFinalExam.passingScore || 70}
-                                onChange={(e) => setFormFinalExam({ ...formFinalExam, passingScore: parseInt(e.target.value, 10) || 70 })}
-                                placeholder="70"
-                                className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Questions List */}
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <h5 className="text-xs font-black text-slate-800">
-                                بنك أسئلة الاختبار ({formFinalExam.questions?.length || 0} أسئلة)
-                              </h5>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const nextQNum = (formFinalExam.questions?.length || 0) + 1;
-                                  setFormFinalExam({
-                                    ...formFinalExam,
-                                    questions: [
-                                      ...(formFinalExam.questions || []),
-                                      {
-                                        id: `q-${Date.now()}-${nextQNum}`,
-                                        question: `السؤال ${nextQNum}: `,
-                                        options: ['الخيار أ (الصحيح)', 'الخيار ب', 'الخيار ج', 'الخيار د'],
-                                        correctIndex: 0,
-                                        explanation: 'توضيح الإجابة الصحيحة.',
-                                      },
-                                    ],
-                                  });
-                                }}
-                                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs flex items-center gap-1 cursor-pointer"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>إضافة سؤال جديد</span>
-                              </button>
-                            </div>
-
-                            {formFinalExam.questions?.map((q, qIdx) => (
-                              <div
-                                key={q.id || qIdx}
-                                className="p-4 rounded-xl bg-white border border-slate-200 space-y-3 shadow-2xs"
-                              >
-                                <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
-                                  <span className="text-xs font-black text-[#173A7C]">السؤال #{qIdx + 1}</span>
-                                  {formFinalExam.questions.length > 1 && (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setFormFinalExam({
-                                          ...formFinalExam,
-                                          questions: formFinalExam.questions.filter((_, idx) => idx !== qIdx),
-                                        });
-                                      }}
-                                      className="p-1 text-slate-400 hover:text-rose-600 rounded cursor-pointer"
-                                      title="حذف هذا السؤال"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                  )}
-                                </div>
-
-                                <div>
-                                  <label className="block text-[11px] font-black text-slate-600 mb-1">نص السؤال *</label>
-                                  <input
-                                    type="text"
-                                    required
-                                    value={q.question}
-                                    onChange={(e) => {
-                                      const updated = [...formFinalExam.questions];
-                                      updated[qIdx].question = e.target.value;
-                                      setFormFinalExam({ ...formFinalExam, questions: updated });
-                                    }}
-                                    placeholder="اكتب نص السؤال هنا..."
-                                    className="w-full px-3 py-2 text-xs font-bold text-slate-800 bg-slate-50 rounded-lg border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                                  />
-                                </div>
-
-                                <div className="space-y-2">
-                                  <label className="block text-[11px] font-black text-slate-600">
-                                    خيارات الإجابة (حدد الدائرة بجانب الإجابة الصحيحة):
-                                  </label>
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {q.options.map((opt, optIdx) => (
-                                      <div
-                                        key={optIdx}
-                                        className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
-                                          q.correctIndex === optIdx
-                                            ? 'bg-emerald-50/70 border-emerald-300'
-                                            : 'bg-slate-50 border-slate-200'
-                                        }`}
-                                      >
-                                        <input
-                                          type="radio"
-                                          name={`q-${qIdx}-correct`}
-                                          checked={q.correctIndex === optIdx}
-                                          onChange={() => {
-                                            const updated = [...formFinalExam.questions];
-                                            updated[qIdx].correctIndex = optIdx;
-                                            setFormFinalExam({ ...formFinalExam, questions: updated });
-                                          }}
-                                          className="w-4 h-4 text-emerald-600 cursor-pointer"
-                                        />
-                                        <input
-                                          type="text"
-                                          value={opt}
-                                          onChange={(e) => {
-                                            const updated = [...formFinalExam.questions];
-                                            updated[qIdx].options[optIdx] = e.target.value;
-                                            setFormFinalExam({ ...formFinalExam, questions: updated });
-                                          }}
-                                          placeholder={`الخيار ${optIdx + 1}`}
-                                          className="flex-1 px-2 py-1 text-xs font-bold text-slate-800 bg-white rounded border border-slate-200"
-                                        />
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      {hasFinalExam && (<CourseQuizEditor value={formFinalExam} onChange={setFormFinalExam} />)}
                     </div>
                   </div>
                 )}

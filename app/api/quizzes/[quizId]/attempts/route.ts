@@ -96,6 +96,20 @@ function safeStoredResults(value: unknown): GradedQuizQuestion[] {
   return value.slice(0, 200).flatMap((raw): GradedQuizQuestion[] => {
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return [];
     const result = raw as Record<string, unknown>;
+    if (result.type === 'matching') {
+      const options = Array.isArray(result.options) ? result.options : [];
+      const prompts = Array.isArray(result.prompts) ? result.prompts : [];
+      const correctIndices = Array.isArray(result.correctIndices) ? result.correctIndices : [];
+      if (typeof result.id !== 'string' || typeof result.text !== 'string'
+        || options.length < 2 || options.length > 10 || options.some((value) => typeof value !== 'string')
+        || prompts.length !== options.length || prompts.some((value) => typeof value !== 'string')
+        || correctIndices.length !== prompts.length || new Set(correctIndices).size !== correctIndices.length
+        || correctIndices.some((value) => !Number.isInteger(value) || value < 0 || value >= options.length)) return [];
+      const definition = { id: result.id, text: result.text, type: 'matching' as const,
+        options: options as string[], prompts: prompts as string[], correctIndex: -1, correctIndices: correctIndices as number[],
+        ...(typeof result.explanation === 'string' ? { explanation: result.explanation.slice(0, 3000) } : {}) };
+      return gradeQuizAnswers([definition], [{ questionId: result.id, selectedIndices: result.selectedIndices }]).results;
+    }
     const id = typeof result.id === 'string' ? result.id.slice(0, 120) : '';
     const text = typeof result.text === 'string' ? result.text.slice(0, 2000) : '';
     const options = Array.isArray(result.options)

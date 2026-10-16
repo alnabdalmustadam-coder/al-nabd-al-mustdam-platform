@@ -172,6 +172,7 @@ function mountPage(filename, initialCourses = []) {
     '@/components/ui/CardSkeleton': { CourseCardSkeleton: 'CourseCardSkeleton' },
     '@/components/ui/CardImage': { CardImage: 'CardImage' },
     '@/components/student/student-video-player': { StudentVideoPlayer: 'StudentVideoPlayer' },
+    '@/components/student/internal-quiz-panel': { InternalQuizPanel: 'InternalQuizPanel' },
     '@/components/student/progress-card': { ProgressCard: 'ProgressCard' },
     '@/utils/supabase/client': { createClient: () => db },
     '@/context/CartContext': { useCart: () => ({ cart: [], clearCart() {} }) },

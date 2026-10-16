@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getAllCoursesAsync } from "@/lib/courses-store";
 import { findCourseByIdentifier } from "@/lib/public-courses";
 import type { Course } from "@/types";
+import { toPublicCourse } from "@/lib/quizzes/course-quiz";
 import CourseDetailClient from "./CourseDetailClient";
 
 export const dynamic = "force-dynamic";
@@ -22,8 +23,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
   return (
     <CourseDetailClient
-      course={course}
-      relatedCourses={buildRelatedCourses(course, liveCatalog)}
+      course={toPublicCourse(course)}
+      relatedCourses={buildRelatedCourses(course, liveCatalog).map(toPublicCourse)}
     />
   );
 }

@@ -9,6 +9,7 @@ import {
 import { requireInstructorOrAdmin, isAdminRole } from '@/lib/security/auth';
 import { cleanString, readJsonObject, safeErrorMessage, ValidationError } from '@/lib/security/validation';
 import type { Course } from '@/types';
+import { toPublicCourse } from '@/lib/quizzes/course-quiz';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -26,7 +27,7 @@ export async function GET(req: Request) {
       courses = await getAllCoursesAsync();
     }
     return NextResponse.json(
-      { success: true, courses },
+      { success: true, courses: mine ? courses : courses.map(toPublicCourse) },
       {
         headers: {
           'Cache-Control': 'private, no-store, no-cache, must-revalidate',

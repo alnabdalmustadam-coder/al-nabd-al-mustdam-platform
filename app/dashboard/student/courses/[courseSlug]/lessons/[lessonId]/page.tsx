@@ -14,7 +14,6 @@ import {
   Send,
   Download,
   Bookmark,
-  Award,
   ChevronLeft,
   BookOpen,
   Clock,
@@ -34,12 +33,12 @@ import {
   Loader2,
   AlertCircle,
 } from 'lucide-react';
+import { InternalQuizPanel } from '@/components/student/internal-quiz-panel';
 import { StudentVideoPlayer } from '@/components/student/student-video-player';
 import {
   saveCompletedLessons,
   getLessonNotes,
   saveLessonNote,
-  saveQuizAttempt,
 } from '@/lib/actions/student-actions';
 import { usePublicCourses } from '@/lib/hooks/use-public-courses';
 import { findCourseByIdentifier } from '@/lib/public-courses';
@@ -82,9 +81,6 @@ export default function StudentLessonPage() {
     { id: '1', text: '[02:15] ملاحظة هامة: تم استيعاب المفهوم الأساسي للدرس بنجاح.', date: 'اليوم، 10:15 ص' },
   ]);
 
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [quizScore, setQuizScore] = useState<number | null>(null);
 
   /* ── Playlist Search Filter State ── */
   const [searchQuery, setSearchQuery] = useState('');
@@ -298,49 +294,7 @@ export default function StudentLessonPage() {
     return list;
   }, [courseData]);
 
-  /* ── Dynamic Active Quiz Compilation ── */
-  const activeQuiz: QuizData = useMemo(() => {
-    // 1. Check if current lesson has specific quizData
-    if (currentLesson?.quizData && Array.isArray(currentLesson.quizData.questions) && currentLesson.quizData.questions.length > 0) {
-      return currentLesson.quizData;
-    }
 
-    // 2. Check if parent section has quizData
-    const parentChap = chapters.find((ch) => ch.lessons.some((l) => l.id === currentLesson?.id));
-    const rawSec = courseData?.curriculum?.find((s: any) => s.title === parentChap?.title || s.id === parentChap?.id);
-    if (rawSec?.quizData && Array.isArray(rawSec.quizData.questions) && rawSec.quizData.questions.length > 0) {
-      return rawSec.quizData;
-    }
-
-    // 3. Check if course has finalExam
-    if (courseData?.finalExam && Array.isArray(courseData.finalExam.questions) && courseData.finalExam.questions.length > 0) {
-      return courseData.finalExam;
-    }
-
-    // 4. Default high-quality quiz fallback
-    return {
-      title: `اختبار تقييمي لمخرجات ${courseData?.title || 'الدورة التدريبية'}`,
-      passingScore: 70,
-      questions: [
-        {
-          id: 'q-default-1',
-          question: 'ما هي الركيزة الأساسية لتحقيق أعلى استفادة من هذا المساق التدريبي؟',
-          options: ['التطبيق العملي المستمر ومراجعة المخرجات', 'المشاهدة السريعة بدون تدوين', 'تجاوز الاختبارات التقييمية', 'تجنب المشاركة في المناقشات'],
-          correctIndex: 0,
-          explanation: 'التطبيق العملي المستمر يساعد على ترسيخ المعارف واكتساب المهارة الفعلية.',
-        },
-        {
-          id: 'q-default-2',
-          question: 'كيف يتم التحقق من استحقاق الشهادة الرقمية المعتمدة؟',
-          options: ['إتمام كافة متطلبات الدروس ورصد التقدم واجتياز التقييم', 'التسجيل في الدورة فقط دون الحضور', 'عدم إكمال الواجبات', 'تخطي الوحدات الأساسية'],
-          correctIndex: 0,
-          explanation: 'يتم إصدار الشهادة آلياً وتوثيقها فور إكمال المحاضرات والاختبار.',
-        },
-      ],
-    };
-  }, [currentLesson, courseData, chapters]);
-
-  /* ── Persistent State ── */
   useEffect(() => {
     async function initProgress() {
       setNotesList(getLessonNotes(lessonId));
@@ -455,44 +409,6 @@ export default function StudentLessonPage() {
         noteArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, 100);
-  };
-
-  const handleQuizSubmit = async () => {
-    let correctCount = 0;
-    const questions = activeQuiz.questions || [];
-    questions.forEach((q, idx) => {
-      if (selectedAnswers[idx] === q.correctIndex) correctCount += 1;
-    });
-
-    const score = Math.round((correctCount / Math.max(1, questions.length)) * 100);
-    setQuizScore(score);
-    setQuizSubmitted(true);
-    saveQuizAttempt(lessonId, score);
-
-    const passingScore = activeQuiz.passingScore || 70;
-    const isPassed = score >= passingScore;
-    const isFinalExam = activeQuiz === courseData?.finalExam;
-    const isLastLesson = currentIndex >= allLessons.length - 1;
-    const isCourseFinished = isFinalExam || (isLastLesson && completedSet.size + 1 >= allLessons.length);
-
-    // Request issuance; the server independently checks the completion record.
-    if (isPassed && isCourseFinished) {
-      setCompletionError(null);
-      try {
-        const response = await fetch('/api/student/certificates/auto-issue', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ courseSlug }),
-        });
-        const result = await response.json();
-        if (!response.ok || !result.success) {
-          throw new Error(result.error || 'تعذر إصدار الشهادة. حاول مرة أخرى.');
-        }
-      } catch (err) {
-        console.error('Error auto issuing certificate after final assessment:', err);
-        setCompletionError(err instanceof Error ? err.message : 'تعذر إصدار الشهادة. حاول مرة أخرى.');
-      }
-    }
   };
 
   const handlePostComment = () => {
@@ -752,7 +668,15 @@ export default function StudentLessonPage() {
 
           {/* Video Player or Content Pane */}
           <div className="col-span-1 lg:col-span-8 xl:col-span-8 flex flex-col justify-between w-full">
-            {currentLesson?.type === 'pdf' && currentLesson?.fileUrl ? (
+            {currentLesson?.type === 'quiz' ? (
+              <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900 via-[#173A7C] to-slate-900 p-6 text-center text-white shadow-xl">
+                <HelpCircle className="h-12 w-12 text-amber-300" />
+                <h3 className="text-lg font-black">{currentLesson.title}</h3>
+                <p className="text-xs leading-6 text-blue-100">أجب عن أسئلة الدرس وراجع نتيجتك بعد التسليم.</p>
+                <button type="button" className="min-h-11 rounded-xl bg-white px-6 py-3 text-xs font-black text-blue-900"
+                  onClick={() => { setActiveTab('quiz'); requestAnimationFrame(() => document.getElementById('internal-assessment')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); }}>فتح الاختبار</button>
+              </div>
+            ) : currentLesson?.type === 'pdf' && currentLesson?.fileUrl ? (
               <div className="aspect-video w-full rounded-2xl bg-gradient-to-br from-slate-900 via-[#173A7C] to-slate-900 flex flex-col items-center justify-center p-6 text-white text-center space-y-4 shadow-xl border border-white/10">
                 <div className="w-16 h-16 rounded-3xl bg-white/10 flex items-center justify-center border border-white/20 shadow-lg">
                   <FileText className="w-8 h-8 text-emerald-300" />
@@ -970,103 +894,8 @@ export default function StudentLessonPage() {
           </div>
         )}
 
-        {/* Tab 3: Interactive Quiz */}
-        {activeTab === 'quiz' && (
-          <div className="space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div>
-                <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-amber-500" />
-                  <span>{activeQuiz.title || 'اختبار تقييمي لمخرجات الدورة'}</span>
-                </h4>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                  نسبة الاجتياز المطلوبة: %{activeQuiz.passingScore || 70}
-                </p>
-              </div>
-
-              {quizSubmitted && (
-                <span className={`text-xs font-black px-3 py-1 rounded-lg ${
-                  (quizScore ?? 0) >= (activeQuiz.passingScore || 70)
-                    ? 'text-emerald-800 bg-emerald-100'
-                    : 'text-amber-800 bg-amber-100'
-                }`}>
-                  {(quizScore ?? 0) >= (activeQuiz.passingScore || 70) ? 'ناجح ✓' : 'حاول مجدداً'} (%{quizScore})
-                </span>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              {activeQuiz.questions?.map((q, qIdx) => (
-                <div key={q.id || qIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
-                  <h5 className="student-heading-h3 !text-xs sm:!text-sm">
-                    السؤال {qIdx + 1}: {q.question}
-                  </h5>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {q.options?.map((opt, optIdx) => {
-                      const isSelected = selectedAnswers[qIdx] === optIdx;
-                      const isCorrect = q.correctIndex === optIdx;
-
-                      let btnStyle = 'bg-white text-slate-700 border-slate-200 hover:border-slate-300';
-                      if (quizSubmitted) {
-                        if (isCorrect) btnStyle = 'bg-emerald-50 border-emerald-400 text-emerald-800 font-bold';
-                        else if (isSelected && !isCorrect) btnStyle = 'bg-rose-50 border-rose-300 text-rose-700';
-                      } else if (isSelected) {
-                        btnStyle = 'bg-[#173A7C] text-white border-[#173A7C]';
-                      }
-
-                      return (
-                        <button
-                          key={optIdx}
-                          onClick={() => setSelectedAnswers({ ...selectedAnswers, [qIdx]: optIdx })}
-                          className={`p-2.5 rounded-lg text-right text-xs font-bold transition-all cursor-pointer border ${btnStyle}`}
-                        >
-                          {opt}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {quizSubmitted && q.explanation && (
-                    <p className="text-[11px] text-slate-500 bg-white p-2 rounded-lg border border-slate-200 font-medium">
-                      💡 {q.explanation}
-                    </p>
-                  )}
-                </div>
-              ))}
-
-              {quizSubmitted && quizScore !== null && quizScore >= (activeQuiz.passingScore || 70) && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-500/30 text-slate-900 space-y-3 shadow-xs">
-                  <div className="flex items-center gap-2.5 text-emerald-800 font-black text-xs sm:text-sm">
-                    <Award className="w-5 h-5 text-emerald-600 shrink-0" />
-                    <span>تهانينا! لقد اجتزت الاختبار بنجاح وتم توثيق نتيجتك فوراً 📜</span>
-                  </div>
-                  <p className="text-xs text-slate-600 font-bold leading-relaxed">
-                    تم توثيق إنجازك الأكاديمي وإصدار شهادة معتمدة بالمركز الوطني بالتصميم والقالب الرسمي المخصص.
-                  </p>
-                  <div className="pt-1">
-                    <Link
-                      href="/dashboard/student/certificates"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-teal-600 hover:to-emerald-600 text-white text-xs font-black shadow-md shadow-emerald-600/20 transition-all hover:-translate-y-0.5"
-                    >
-                      <Award className="w-4 h-4" />
-                      <span>معاينة وتحميل شهادتي المعتمدة الآن ⚡</span>
-                    </Link>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-end">
-                <button
-                  onClick={handleQuizSubmit}
-                  disabled={Object.keys(selectedAnswers).length < (activeQuiz.questions?.length || 1)}
-                  className="px-5 py-2.5 bg-[#173A7C] text-white rounded-xl text-xs font-bold hover:bg-[#1E4D9D] transition-all disabled:opacity-50 cursor-pointer"
-                >
-                  {quizSubmitted ? 'إعادة اعتماد الإجابات' : 'اعتماد إجابات الاختبار'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Tab 3: Authenticated, server-graded internal quiz */}
+        {activeTab === 'quiz' && <div id="internal-assessment"><InternalQuizPanel key={`${courseSlug}:${currentLesson?.id || lessonId}`} courseId={courseSlug} lessonId={currentLesson?.id || lessonId} /></div>}
 
         {/* Tab 4: Discussion */}
         {activeTab === 'discussion' && (

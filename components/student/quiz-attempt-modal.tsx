@@ -10,6 +10,8 @@ import {
   Send,
   X,
 } from 'lucide-react';
+import { QuizQuestionInput, QuizQuestionReview } from '@/components/quizzes/quiz-question';
+import { isQuizAnswerComplete } from '@/lib/quizzes/model';
 import type {
   GradedQuizQuestion,
   StudentQuizAnswer,
@@ -56,7 +58,7 @@ function formatRemaining(totalSeconds: number): string {
 }
 
 export function QuizAttemptModal({ session, initialResult, onClose, onCompleted }: Props) {
-  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [answers, setAnswers] = useState<Record<string, StudentQuizAnswer>>({});
   const [result, setResult] = useState<QuizAttemptResult | null>(initialResult);
   const [remainingSeconds, setRemainingSeconds] = useState(session?.remainingSeconds || 0);
   const [submitting, setSubmitting] = useState(false);
@@ -67,7 +69,7 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
 
   useEffect(() => {
     setAnswers(Object.fromEntries(
-      (session?.savedAnswers || []).map((answer) => [answer.questionId, answer.selectedIndex]),
+      (session?.savedAnswers || []).map((answer) => [answer.questionId, answer]),
     ));
     setResult(initialResult);
     setRemainingSeconds(session?.remainingSeconds || 0);
@@ -91,7 +93,7 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
     return () => window.clearInterval(interval);
   }, [result, session]);
 
-  const answeredCount = useMemo(() => Object.keys(answers).length, [answers]);
+  const answeredCount = useMemo(() => session?.questions.filter((question) => isQuizAnswerComplete(question, answers[question.id])).length || 0, [answers, session]);
 
   const saveDraft = useCallback(async (silent = false) => {
     if (!session || result || submitting || !draftTouched.current) return;
@@ -104,10 +106,7 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           attemptId: session.id,
-          answers: session.questions.map((question) => ({
-            questionId: question.id,
-            selectedIndex: answers[question.id] ?? -1,
-          })),
+          answers: session.questions.map((question) => answers[question.id] || { questionId: question.id, selectedIndex: -1 }),
         }),
       });
       const payload = await response.json();
@@ -159,10 +158,7 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           attemptId: session.id,
-          answers: session.questions.map((question) => ({
-            questionId: question.id,
-            selectedIndex: answers[question.id] ?? -1,
-          })),
+          answers: session.questions.map((question) => answers[question.id] || { questionId: question.id, selectedIndex: -1 }),
         }),
       });
       const payload = await response.json();
@@ -258,54 +254,7 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
                 </p>
               </div>
 
-              {result.results.length > 0 ? result.results.map((question, index) => (
-                <section
-                  key={question.id}
-                  className={`rounded-2xl border p-4 sm:p-5 ${
-                    question.isCorrect
-                      ? 'bg-white border-emerald-200'
-                      : 'bg-white border-rose-200'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-xs font-black ${
-                      question.isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
-                    }`}>
-                      {index + 1}
-                    </span>
-                    <div className="space-y-3 flex-1 min-w-0">
-                      <h3 className="text-sm font-black text-slate-900 leading-7">{question.text}</h3>
-                      <div className="space-y-2">
-                        {question.options.map((option, optionIndex) => {
-                          const isCorrectOption = optionIndex === question.correctIndex;
-                          const isSelected = optionIndex === question.selectedIndex;
-                          return (
-                            <div
-                              key={`${question.id}-${optionIndex}`}
-                              className={`px-3 py-2.5 rounded-xl text-xs font-bold border ${
-                                isCorrectOption
-                                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
-                                  : isSelected
-                                    ? 'bg-rose-50 border-rose-300 text-rose-800'
-                                    : 'bg-slate-50 border-slate-200 text-slate-500'
-                              }`}
-                            >
-                              {option}
-                              {isCorrectOption && <span className="mr-2">✓ الإجابة الصحيحة</span>}
-                              {isSelected && !isCorrectOption && <span className="mr-2">— إجابتك</span>}
-                            </div>
-                          );
-                        })}
-                      </div>
-                      {question.explanation && (
-                        <p className="text-xs font-bold leading-6 text-slate-600 bg-blue-50/70 border border-blue-100 rounded-xl px-3 py-2">
-                          {question.explanation}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </section>
-              )) : (
+              {result.results.length > 0 ? result.results.map((question) => (<QuizQuestionReview key={question.id} question={question} />)) : (
                 <p className="text-center text-xs font-bold text-slate-500 py-5">
                   تفاصيل الأسئلة غير متاحة للمحاولات القديمة، والنتيجة المعتمدة محفوظة.
                 </p>
@@ -313,46 +262,7 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
             </div>
           ) : (
             <div className="space-y-4">
-              {session?.questions.map((question, index) => (
-                <section key={question.id} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
-                  <div className="flex items-start gap-3">
-                    <span className="w-8 h-8 rounded-xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center shrink-0 text-xs font-black">
-                      {index + 1}
-                    </span>
-                    <div className="flex-1 min-w-0 space-y-3">
-                      <h3 className="text-sm font-black text-slate-900 leading-7">{question.text}</h3>
-                      <div className="grid gap-2">
-                        {question.options.map((option, optionIndex) => {
-                          const selected = answers[question.id] === optionIndex;
-                          return (
-                            <label
-                              key={`${question.id}-${optionIndex}`}
-                              className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-xs sm:text-sm font-bold cursor-pointer transition-all ${
-                                selected
-                                  ? 'border-[#173A7C] bg-blue-50 text-[#173A7C] shadow-sm'
-                                  : 'border-slate-200 bg-slate-50/70 text-slate-700 hover:border-blue-200 hover:bg-white'
-                              }`}
-                            >
-                              <input
-                                type="radio"
-                                name={`question-${question.id}`}
-                                checked={selected}
-                                onChange={() => {
-                                  draftTouched.current = true;
-                                  setAnswers((current) => ({ ...current, [question.id]: optionIndex }));
-                                  setError(null);
-                                }}
-                                className="accent-[#173A7C]"
-                              />
-                              <span>{option}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              ))}
+              {session?.questions.map((question, index) => (<section key={question.id} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"><h3 className="text-sm font-black leading-7 text-slate-900">{index + 1}. {question.text}</h3><QuizQuestionInput question={question} answer={answers[question.id]} onChange={(answer) => { draftTouched.current = true; setAnswers((current) => ({ ...current, [question.id]: answer })); setError(null); }} /></section>))}
             </div>
           )}
         </main>

@@ -82,7 +82,7 @@ test('certificate auto-issuance and store derive authentic grades and hours with
   assert.doesNotMatch(studentRouteSource, /'ممتاز مرتفع \(%98\)'/);
   assert.doesNotMatch(adminIssueSource, /'ممتاز مرتفع \(%99\)'/);
 
-  // Lesson player only triggers auto-issuance on course finish / final exam
-  assert.match(lessonPlayerSource, /isCourseFinished/);
-  assert.match(lessonPlayerSource, /isPassed && isCourseFinished/);
+  // Internal practice results cannot claim to issue an academic certificate.
+  assert.match(lessonPlayerSource, /InternalQuizPanel/);
+  assert.doesNotMatch(lessonPlayerSource, /fetch\(['"]\/api\/student\/certificates\/auto-issue/);
 });

@@ -1,8 +1,10 @@
 export interface QuizQuestion {
   id: string;
+  type?: 'multiple_choice' | 'matching';
   question: string;
   options: string[];
   correctIndex: number;
+  pairs?: { id: string; prompt: string; answer: string }[];
   explanation?: string;
 }
 

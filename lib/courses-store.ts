@@ -5,6 +5,7 @@ import path from 'path';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { logger } from '@/lib/observability/logger';
 import { findCourseByIdentifier } from '@/lib/public-courses';
+import { parseQuizQuestions } from '@/lib/quizzes/model';
 import type { Course, CourseCategory, CourseLevel, CurriculumSection } from '@/types';
 
 type CourseStatus = 'draft' | 'published' | 'archived';
@@ -203,6 +204,13 @@ function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 
 }
 
 export async function saveCourseAsync(courseData: CourseInput, actorId?: string, options: CourseWriteOptions = {}): Promise<Course> {
+  const quizSets = [courseData.finalExam, ...(courseData.curriculum || []).flatMap((section) => [section.quizData,
+    ...(section.items || []).map((item) => item.quizData),
+    ...(section.lessons || []).flatMap((item) => typeof item === 'object' ? [item.quizData] : []),
+  ])];
+  if (quizSets.some((quiz) => quiz?.questions?.some((question) => question?.type === 'matching' && parseQuizQuestions([question]).length !== 1))) {
+    throw new CourseAccessError('أكمل نص سؤال التوصيل وأزواجه، مع إجابات مختلفة لكل زوج (من زوجين إلى عشرة).', 400);
+  }
   // Resolve the actual write target once using live rows, including drafts.
   // Local fallback data must never authorize a mutation.
   const courses = await getAllCoursesAsync({ includeUnpublished: true });

@@ -1,5 +1,6 @@
 'use client';
 
+import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
 import React, { useState, useEffect, useRef } from 'react';
 import * as tus from 'tus-js-client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -1503,6 +1504,7 @@ export default function InstructorCoursesPage() {
                                   </div>
 
                                   <div className="flex items-center gap-2">
+                                    <select aria-label="نوع الدرس" value={sub.type || 'video'} onChange={(event) => handleUpdateSubItem(secIdx, subIdx, 'type', event.target.value)} className="rounded-xl border border-slate-200 p-2 text-xs font-bold"><option value="video">فيديو</option><option value="pdf">ملف PDF / وورد</option><option value="quiz">اختبار / كويز</option></select>
                                     <input
                                       type="text"
                                       value={sub.duration}
@@ -1521,7 +1523,8 @@ export default function InstructorCoursesPage() {
                                   </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs font-bold">
+                                {sub.type === 'quiz' && <CourseQuizEditor value={sub.quizData || { title: `اختبار ${sub.title}`, passingScore: 70, questions: [] }} onChange={(quiz) => handleUpdateSubItem(secIdx, subIdx, 'quizData', quiz)} />}
+                                {sub.type !== 'quiz' && (<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs font-bold">
                                   <div className="space-y-1">
                                     <div className="flex items-center justify-between">
                                       <span className="text-slate-600">فيديو الدرس (بث آمن)</span>
@@ -1563,7 +1566,7 @@ export default function InstructorCoursesPage() {
                                       className="w-full p-2 rounded-xl border border-slate-200 text-xs"
                                     />
                                   </div>
-                                </div>
+                                </div>)}
                               </div>
                             ))}
                           </div>
@@ -1671,38 +1674,7 @@ export default function InstructorCoursesPage() {
                       />
                     </div>
 
-                    {hasFinalExam && (
-                      <div className="space-y-4 p-4 rounded-2xl bg-blue-50/50 border border-blue-200 text-xs font-bold">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <label className="text-slate-700 block">عنوان الاختبار النهائي</label>
-                            <input
-                              type="text"
-                              value={formFinalExam.title}
-                              onChange={(e) => setFormFinalExam({ ...formFinalExam, title: e.target.value })}
-                              className="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-slate-700 block">نسبة درجة الاجتياز (%)</label>
-                            <input
-                              type="number"
-                              min="50"
-                              max="100"
-                              value={formFinalExam.passingScore || 70}
-                              onChange={(e) => setFormFinalExam({ ...formFinalExam, passingScore: Number(e.target.value) })}
-                              className="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-2">
-                          <span className="text-slate-700 font-black">
-                            عدد الأسئلة المسجلة في بنك الاختبار: {formFinalExam.questions?.length || 0}
-                          </span>
-                        </div>
-                      </div>
-                    )}
+                    {hasFinalExam && (<CourseQuizEditor value={formFinalExam} onChange={setFormFinalExam} />)}
                   </div>
                 )}
 

@@ -76,7 +76,7 @@ test('content cards use the shared responsive image frame without local cropping
 test('shared card artwork uses a stable 16:9 frame and preserves the full image', async () => {
   const source = await readSource('components/ui/CardImage.tsx');
   assert.match(source, /aspect-video/);
-  assert.match(source, /className="object-contain"/);
+  assert.match(source, /className="object-contain(?:\s[^\"]*)?"/);
   assert.match(source, /blur-2xl/);
   assert.match(source, /sizes="96px"/);
   assert.match(source, /key=\{imageSrc\}/);
