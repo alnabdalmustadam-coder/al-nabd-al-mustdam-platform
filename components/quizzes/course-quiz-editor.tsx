@@ -13,11 +13,11 @@ export function CourseQuizEditor({ value, onChange }: { value: QuizData; onChang
     options: matching ? [] : ['', '', '', ''], correctIndex: matching ? -1 : 0,
     ...(matching ? { pairs: [0, 1].map(() => ({ id: crypto.randomUUID(), prompt: '', answer: '' })) } : {}),
   }] }); };
-  const field = 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-800 focus:border-blue-600 focus:outline-none';
+  const field = 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-800 placeholder:font-normal placeholder:text-slate-400 placeholder:opacity-100 focus:border-blue-600 focus:outline-none';
   return <div className="space-y-4" dir="rtl">
     <div className="grid gap-3 sm:grid-cols-2">
       <label className="space-y-1 text-xs font-bold text-slate-700">عنوان الاختبار
-        <input className={field} value={value.title} maxLength={200} onChange={(event) => onChange({ ...value, title: event.target.value })} />
+        <input className={field} value={value.title} maxLength={200} placeholder="مثال: اختبار المفاهيم الأساسية" onChange={(event) => onChange({ ...value, title: event.target.value })} />
       </label>
       <label className="space-y-1 text-xs font-bold text-slate-700">نسبة الاجتياز (%)
         <input type="number" min={0} max={100} className={field} value={value.passingScore ?? 70}
@@ -31,7 +31,9 @@ export function CourseQuizEditor({ value, onChange }: { value: QuizData; onChang
           onClick={() => onChange({ ...value, questions: value.questions.filter((_, i) => i !== index) })}><Trash2 className="h-4 w-4" /></button>
       </div>
       <label className="block space-y-1 text-xs font-bold text-slate-700">نص السؤال
-        <input required maxLength={2000} className={field} value={question.question} onChange={(event) => update(index, { question: event.target.value })} />
+        <input required maxLength={2000} className={field} value={question.question}
+          placeholder={question.type === 'matching' ? 'اكتب المطلوب توصيله، مثل: صِل كل مصطلح بتعريفه' : 'اكتب سؤالاً واضحاً، ثم أضف الاختيارات أدناه'}
+          onChange={(event) => update(index, { question: event.target.value })} />
       </label>
       {question.type === 'matching' ? <div className="space-y-2">
         <p className="text-xs text-slate-600">اكتب كل عبارة وبجانبها الإجابة الصحيحة. ستظهر الإجابات للطالب بترتيب مستقل.</p>
@@ -39,7 +41,7 @@ export function CourseQuizEditor({ value, onChange }: { value: QuizData; onChang
           <div className="grid flex-1 gap-2 sm:grid-cols-2">
             {(['prompt', 'answer'] as const).map((side) => <input key={side} required maxLength={500}
               aria-label={`${side === 'prompt' ? 'العبارة' : 'الإجابة'} ${pairIndex + 1} للسؤال ${index + 1}`}
-              placeholder={side === 'prompt' ? 'العبارة / السؤال' : 'الإجابة المطابقة'} className={field} value={pair[side]}
+              placeholder={side === 'prompt' ? `العبارة أو المصطلح ${pairIndex + 1}` : `الإجابة المطابقة للعبارة ${pairIndex + 1}`} className={field} value={pair[side]}
               onChange={(event) => update(index, { pairs: question.pairs?.map((item, i) => i === pairIndex ? { ...item, [side]: event.target.value } : item) })} />)}
           </div>
           {(question.pairs?.length || 0) > 2 && <button type="button" className="p-2 text-rose-600" aria-label={`حذف الزوج ${pairIndex + 1}`}
@@ -47,16 +49,19 @@ export function CourseQuizEditor({ value, onChange }: { value: QuizData; onChang
         </div>)}
         {(question.pairs?.length || 0) < 10 && <button type="button" className="rounded-lg px-3 py-2 text-xs font-bold text-blue-800 hover:bg-blue-50"
           onClick={() => update(index, { pairs: [...(question.pairs || []), { id: crypto.randomUUID(), prompt: '', answer: '' }] })}>+ إضافة زوج</button>}
-      </div> : <div className="grid gap-2 sm:grid-cols-2">
+      </div> : <div className="space-y-2">
+        <p className="text-xs font-normal text-slate-500">أضف الاختيارات، وحدّد الإجابة الصحيحة من الدائرة بجانبها.</p>
+        <div className="grid gap-2 sm:grid-cols-2">
         {question.options.map((option, optionIndex) => <label key={optionIndex} className="flex items-center gap-2">
           <input type="radio" aria-label={`الإجابة الصحيحة: الخيار ${optionIndex + 1} للسؤال ${index + 1}`} name={`${editorId}-correct-${question.id}`}
             checked={question.correctIndex === optionIndex} onChange={() => update(index, { correctIndex: optionIndex })} />
-          <input required maxLength={500} aria-label={`الخيار ${optionIndex + 1} للسؤال ${index + 1}`} className={field} value={option}
+          <input required maxLength={500} aria-label={`الخيار ${optionIndex + 1} للسؤال ${index + 1}`} className={field} value={option} placeholder={`اكتب الاختيار ${optionIndex + 1}`}
             onChange={(event) => update(index, { options: question.options.map((item, i) => i === optionIndex ? event.target.value : item) })} />
         </label>)}
+        </div>
       </div>}
       <label className="block space-y-1 text-xs font-bold text-slate-700">شرح الإجابة (اختياري)
-        <textarea className={field} maxLength={3000} rows={2} value={question.explanation || ''} onChange={(event) => update(index, { explanation: event.target.value })} />
+        <textarea className={field} maxLength={3000} rows={2} value={question.explanation || ''} placeholder="وضّح سبب صحة الإجابة؛ يظهر الشرح للطالب بعد تسليم الاختبار" onChange={(event) => update(index, { explanation: event.target.value })} />
       </label>
     </section>)}
     <div className="flex flex-wrap gap-2">

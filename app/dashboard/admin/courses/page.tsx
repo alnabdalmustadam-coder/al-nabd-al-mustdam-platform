@@ -1,6 +1,7 @@
 'use client';
 
 import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
+import { createCourseQuizDraft, prepareCourseQuizForEditing } from '@/lib/quizzes/course-quiz-draft';
 import React, { useState, useEffect, useRef } from 'react';
 import * as tus from 'tus-js-client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -279,24 +280,7 @@ export default function AdminCoursesPage() {
 
   // Final Course Exam State
   const [hasFinalExam, setHasFinalExam] = useState(false);
-  const [formFinalExam, setFormFinalExam] = useState<QuizData>({
-    title: 'الاختبار النهائي للبرنامج التدريبي',
-    passingScore: 70,
-    questions: [
-      {
-        id: 'q-1',
-        question: 'ما هو الهدف الأساسي من تطبيق معايير الاستدامة والحوكمة في المؤسسات؟',
-        options: [
-          'تحقيق الكفاءة التشغيلية والامتثال للمعايير الدولية',
-          'زيادة التكاليف الإدارية والتشغيلية فقط',
-          'إلغاء اللوائح التنظيمية والبيئية',
-          'تقليص حجم الموارد البشرية بالمؤسسة',
-        ],
-        correctIndex: 0,
-        explanation: 'تساعد معايير الاستدامة على رفع كفاءة العمليات التشغيلية وضمان الامتثال النظامي.',
-      },
-    ],
-  });
+  const [formFinalExam, setFormFinalExam] = useState<QuizData>(createCourseQuizDraft);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -436,6 +420,7 @@ export default function AdminCoursesPage() {
     setFormImage('');
     setFormAttachments([]);
     setHasFinalExam(false);
+    setFormFinalExam(createCourseQuizDraft());
     setIsAddingNewCategory(false);
     setIsAddingNewInstructor(false);
     setNewCategoryName('');
@@ -509,9 +494,10 @@ export default function AdminCoursesPage() {
     // Final Exam
     if (course.finalExam && Array.isArray(course.finalExam.questions) && course.finalExam.questions.length > 0) {
       setHasFinalExam(true);
-      setFormFinalExam(course.finalExam);
+      setFormFinalExam(prepareCourseQuizForEditing(course.finalExam) || createCourseQuizDraft());
     } else {
       setHasFinalExam(false);
+      setFormFinalExam(createCourseQuizDraft());
     }
 
     if (Array.isArray(course.curriculum) && course.curriculum.length > 0) {
@@ -530,7 +516,7 @@ export default function AdminCoursesPage() {
               fileName: it.fileName,
               fileSize: it.fileSize,
               isLocked: it.isLocked ?? false,
-              quizData: it.quizData,
+              quizData: prepareCourseQuizForEditing(it.quizData),
             }));
           } else if (Array.isArray(sec.lessons) && sec.lessons.length > 1) {
             parsedSubItems = sec.lessons.map((lesName: string, subIdx: number) => ({
@@ -553,7 +539,7 @@ export default function AdminCoursesPage() {
                 fileName: sec.fileName,
                 fileSize: sec.fileSize,
                 isLocked: sec.isLocked ?? false,
-                quizData: sec.quizData,
+                quizData: prepareCourseQuizForEditing(sec.quizData),
               },
             ];
           }
@@ -569,7 +555,7 @@ export default function AdminCoursesPage() {
             fileSize: sec.fileSize,
             isLocked: sec.isLocked ?? false,
             subItems: parsedSubItems,
-            quizData: sec.quizData,
+            quizData: prepareCourseQuizForEditing(sec.quizData),
           };
         })
       );
@@ -663,19 +649,7 @@ export default function AdminCoursesPage() {
           videoUrl: '',
           type: defaultType,
           isLocked: false,
-          quizData: defaultType === 'quiz' ? {
-            title: `اختبار ${sec.title || 'الوحدة'}`,
-            passingScore: 70,
-            questions: [
-              {
-                id: `q-${Date.now()}-1`,
-                question: 'اكتب السؤال التقييمي هنا...',
-                options: ['الخيار الأول (الصحيح)', 'الخيار الثاني', 'الخيار الثالث', 'الخيار الرابع'],
-                correctIndex: 0,
-                explanation: 'شرح وتوضيح الإجابة النموذجية.',
-              },
-            ],
-          } : undefined,
+          quizData: defaultType === 'quiz' ? createCourseQuizDraft() : undefined,
         };
         sec.subItems = [...(sec.subItems || []), newSub];
       }
@@ -1287,10 +1261,12 @@ export default function AdminCoursesPage() {
       <AnimatePresence>
         {toastMessage && (
           <motion.div
+            role={toastMessage.type === 'error' ? 'alert' : 'status'}
+            aria-atomic="true"
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-black border backdrop-blur-md ${
+            className={`fixed top-6 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[calc(100%-2rem)] px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-black border backdrop-blur-md ${
               toastMessage.type === 'success'
                 ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/40 shadow-emerald-950/40'
                 : 'bg-rose-950/90 text-rose-200 border-rose-500/40 shadow-rose-950/40'
@@ -1607,7 +1583,7 @@ export default function AdminCoursesPage() {
               </div>
 
               {/* Form Content */}
-              <form onSubmit={handleSaveCourse} className="flex min-h-0 flex-1 flex-col overflow-hidden sm:block sm:space-y-6 sm:overflow-y-auto sm:p-6">
+              <form onSubmit={handleSaveCourse} onInvalidCapture={() => showToast('يرجى إكمال الحقول المطلوبة قبل حفظ الدورة', 'error')} className="flex min-h-0 flex-1 flex-col overflow-hidden sm:block sm:space-y-6 sm:overflow-y-auto sm:p-6">
                 <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain p-4 sm:contents">
                 {/* ═══════════════════════════════════════════════════════════ */}
                 {/* TAB 1: BASIC INFO & COVER */}
@@ -2165,7 +2141,7 @@ export default function AdminCoursesPage() {
                                     </div>
                                   )}
 
-                                  {sub.type === 'quiz' && (<CourseQuizEditor value={sub.quizData || { title: `اختبار ${sub.title}`, passingScore: 70, questions: [] }} onChange={(quiz) => handleUpdateSubItem(secIdx, subIdx, 'quizData', quiz)} />)}
+                                  {sub.type === 'quiz' && (<CourseQuizEditor value={sub.quizData || { title: '', passingScore: 70, questions: [] }} onChange={(quiz) => handleUpdateSubItem(secIdx, subIdx, 'quizData', quiz)} />)}
                                 </div>
                               ))}
                             </div>

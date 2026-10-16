@@ -1,6 +1,7 @@
 'use client';
 
 import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
+import { createCourseQuizDraft, prepareCourseQuizForEditing } from '@/lib/quizzes/course-quiz-draft';
 import React, { useState, useEffect, useRef } from 'react';
 import * as tus from 'tus-js-client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -250,24 +251,7 @@ export default function InstructorCoursesPage() {
   const attachmentFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [hasFinalExam, setHasFinalExam] = useState(false);
-  const [formFinalExam, setFormFinalExam] = useState<QuizData>({
-    title: 'الاختبار النهائي للبرنامج التدريبي',
-    passingScore: 70,
-    questions: [
-      {
-        id: 'q-1',
-        question: 'ما هو المبدأ الأساسي في تطبيق معايير الجودة والتحسين المستمر؟',
-        options: [
-          'التقييم المستمر وقياس مؤشرات الأداء',
-          'زيادة الإجراءات الروتينية غير الضرورية',
-          'إلغاء التوثيق المؤسسي',
-          'تقليل تدريب الكوادر البشرية',
-        ],
-        correctIndex: 0,
-        explanation: 'التحسين المستمر يقوم على المتابعة الدورية وقياس مؤشرات الأداء.',
-      },
-    ],
-  });
+  const [formFinalExam, setFormFinalExam] = useState<QuizData>(createCourseQuizDraft);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -347,6 +331,7 @@ export default function InstructorCoursesPage() {
     setFormImage('/1.png');
     setFormAttachments([]);
     setHasFinalExam(false);
+    setFormFinalExam(createCourseQuizDraft());
     setIsAddingNewCategory(false);
     setNewCategoryName('');
 
@@ -403,9 +388,10 @@ export default function InstructorCoursesPage() {
 
     if (course.finalExam && Array.isArray(course.finalExam.questions) && course.finalExam.questions.length > 0) {
       setHasFinalExam(true);
-      setFormFinalExam(course.finalExam);
+      setFormFinalExam(prepareCourseQuizForEditing(course.finalExam) || createCourseQuizDraft());
     } else {
       setHasFinalExam(false);
+      setFormFinalExam(createCourseQuizDraft());
     }
 
     if (Array.isArray(course.curriculum) && course.curriculum.length > 0) {
@@ -424,7 +410,7 @@ export default function InstructorCoursesPage() {
               fileName: it.fileName,
               fileSize: it.fileSize,
               isLocked: it.isLocked ?? false,
-              quizData: it.quizData,
+              quizData: prepareCourseQuizForEditing(it.quizData),
             }));
           } else {
             parsedSubItems = [
@@ -438,7 +424,7 @@ export default function InstructorCoursesPage() {
                 fileName: sec.fileName,
                 fileSize: sec.fileSize,
                 isLocked: sec.isLocked ?? false,
-                quizData: sec.quizData,
+                quizData: prepareCourseQuizForEditing(sec.quizData),
               },
             ];
           }
@@ -454,7 +440,7 @@ export default function InstructorCoursesPage() {
             fileSize: sec.fileSize,
             isLocked: sec.isLocked ?? false,
             subItems: parsedSubItems,
-            quizData: sec.quizData,
+            quizData: prepareCourseQuizForEditing(sec.quizData),
           };
         })
       );
@@ -895,10 +881,12 @@ export default function InstructorCoursesPage() {
       <AnimatePresence>
         {toastMessage && (
           <motion.div
+            role={toastMessage.type === 'error' ? 'alert' : 'status'}
+            aria-atomic="true"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border text-xs font-black backdrop-blur-md ${
+            className={`fixed top-5 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[calc(100%-2rem)] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border text-xs font-black backdrop-blur-md ${
               toastMessage.type === 'success'
                 ? 'bg-emerald-600/95 text-white border-emerald-400 shadow-emerald-600/20'
                 : 'bg-rose-600/95 text-white border-rose-400 shadow-rose-600/20'
@@ -1260,7 +1248,7 @@ export default function InstructorCoursesPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleSaveCourse} className="flex min-h-0 flex-1 flex-col overflow-hidden sm:block sm:space-y-6 sm:overflow-y-auto sm:p-6">
+              <form onSubmit={handleSaveCourse} onInvalidCapture={() => showToast('يرجى إكمال الحقول المطلوبة قبل حفظ الدورة', 'error')} className="flex min-h-0 flex-1 flex-col overflow-hidden sm:block sm:space-y-6 sm:overflow-y-auto sm:p-6">
                 <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain p-4 sm:contents">
                 {modalActiveTab === 'basic' && (
                   <div className="space-y-4 text-xs font-bold">
@@ -1523,7 +1511,7 @@ export default function InstructorCoursesPage() {
                                   </div>
                                 </div>
 
-                                {sub.type === 'quiz' && <CourseQuizEditor value={sub.quizData || { title: `اختبار ${sub.title}`, passingScore: 70, questions: [] }} onChange={(quiz) => handleUpdateSubItem(secIdx, subIdx, 'quizData', quiz)} />}
+                                {sub.type === 'quiz' && <CourseQuizEditor value={sub.quizData || { title: '', passingScore: 70, questions: [] }} onChange={(quiz) => handleUpdateSubItem(secIdx, subIdx, 'quizData', quiz)} />}
                                 {sub.type !== 'quiz' && (<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs font-bold">
                                   <div className="space-y-1">
                                     <div className="flex items-center justify-between">
