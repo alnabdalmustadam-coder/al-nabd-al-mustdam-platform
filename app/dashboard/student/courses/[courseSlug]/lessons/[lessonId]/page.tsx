@@ -1,42 +1,16 @@
 'use client';
 
+import { getLessonResourceGroups } from '@/lib/courses/curriculum-files';
+import { CourseResourcesPanel } from '@/components/student/course-resources-panel';
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  FileText,
-  HelpCircle,
-  MessageSquare,
-  Paperclip,
-  Play,
-  ArrowRight,
-  Send,
-  Download,
-  Bookmark,
-  ChevronLeft,
-  BookOpen,
-  Clock,
-  Circle,
-  CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-  X,
-  Search,
-  Trash2,
-  ThumbsUp,
-  Sparkles,
-  Video as VideoIcon,
-  ExternalLink,
-  Layers,
-  FileCheck,
-  Loader2,
-  AlertCircle,
-  Lock,
-} from 'lucide-react';
+
+import { FileText, HelpCircle, MessageSquare, Paperclip, ArrowRight, Send, Bookmark, ChevronLeft, BookOpen, Circle, CheckCircle2, ChevronDown, ChevronUp, X, Search, Trash2, ThumbsUp, Video as VideoIcon, Loader2, AlertCircle, Lock } from 'lucide-react';
 import { InternalQuizPanel } from '@/components/student/internal-quiz-panel';
 import { StudentVideoPlayer } from '@/components/student/student-video-player';
-import { CourseDocumentViewer, AttachmentPreview } from '@/components/student/course-document-viewer';
+import { CourseDocumentViewer } from '@/components/student/course-document-viewer';
 import { SatisfactionHeart } from '@/components/student/satisfaction-heart';
 import { getCourseContent, isLessonUnlocked } from '@/lib/learning/course-content';
 import {
@@ -46,7 +20,7 @@ import {
 } from '@/lib/actions/student-actions';
 import { usePublicCourses } from '@/lib/hooks/use-public-courses';
 import { findCourseByIdentifier } from '@/lib/public-courses';
-import { CourseAttachment, QuizData, SubLessonItem } from '@/types';
+import { QuizData, SubLessonItem } from '@/types';
 
 /* ── Types ── */
 interface Lesson {
@@ -262,48 +236,8 @@ export default function StudentLessonPage() {
     }
   }, [chapters, lessonId, currentLesson?.id]);
 
-  /* ── Dynamic Attachments Compilation ── */
-  const allAttachments = useMemo(() => {
-    const list: Array<{ id: string; title: string; fileUrl: string; fileSize?: string; fileType?: string }> = [];
-
-    // 1. Course Level Attachments
-    if (Array.isArray(courseData?.attachments)) {
-      courseData.attachments.forEach((att) => {
-        if (att.fileUrl) list.push(att);
-      });
-    }
-
-    // 2. Section & Sub-lesson Attachments
-    if (Array.isArray(courseData?.curriculum)) {
-      courseData.curriculum.forEach((sec: any) => {
-        const sectionLessons = getCourseContent(courseData).filter((item) => item.sectionId === (sec.id || `sec-${courseData.curriculum.indexOf(sec) + 1}`));
-        if (sec.fileUrl && (!cpd || sectionLessons.every((item) => completedSet.has(item.id))) && !list.some((l) => l.fileUrl === sec.fileUrl)) {
-          list.push({
-            id: `sec-${sec.id || sec.title}`,
-            title: sec.fileName || `${sec.title} - ملخص الوحدة`,
-            fileUrl: sec.fileUrl,
-            fileSize: sec.fileSize || 'PDF',
-            fileType: sec.type || 'pdf',
-          });
-        }
-        if (Array.isArray(sec.items)) {
-          sec.items.forEach((it: any) => {
-            if (it.fileUrl && (!cpd || (progressLoaded && isLessonUnlocked(allLessons.map((item) => item.id), completedSet, it.id))) && !list.some((l) => l.fileUrl === it.fileUrl)) {
-              list.push({
-                id: `item-${it.id || it.title}`,
-                title: it.fileName || `${it.title} - المرفق`,
-                fileUrl: it.fileUrl,
-                fileSize: it.fileSize || 'PDF',
-                fileType: it.type || 'pdf',
-              });
-            }
-          });
-        }
-      });
-    }
-
-    return list;
-  }, [courseData, cpd, completedSet, progressLoaded, allLessons]);
+  const attachmentGroups = useMemo(() => courseData ? getLessonResourceGroups(courseData, currentLesson?.id || lessonId, currentAllowed) : [], [courseData, currentLesson?.id, lessonId, currentAllowed]);
+  const attachmentCount = attachmentGroups.reduce((total, group) => total + group.files.length, 0);
 
 
   useEffect(() => {
@@ -769,7 +703,7 @@ export default function StudentLessonPage() {
             }`}
           >
             <Paperclip className="w-4 h-4 shrink-0" />
-            <span className="premium-tab-label truncate">المرفقات ({allAttachments.length})</span>
+            <span className="premium-tab-label truncate">المرفقات ({attachmentCount})</span>
           </button>
 
           <button
@@ -851,56 +785,7 @@ export default function StudentLessonPage() {
         )}
 
         {/* Tab 2: Attachments (PDF / Word / Resources) */}
-        {activeTab === 'attachments' && (
-          <div className="space-y-4">
-            <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
-              <Paperclip className="w-4 h-4 text-[#173A7C]" />
-              الملفات والمكتسبات المرفقة بالبرنامج التدريبي
-            </h4>
-
-            {allAttachments.length === 0 ? (
-              <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
-                <FileText className="w-8 h-8 text-slate-300 mx-auto" />
-                <div className="text-xs font-bold text-slate-700">لا توجد ملفات مرفقة إضافية لهذا المساق حالياً</div>
-                <p className="text-[11px] text-slate-400">كافة المكتسبات العلمية مشمولة ضمن المحاضرات التفاعلية</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {allAttachments.map((att, idx) => (
-                  <div
-                    key={att.id || idx}
-                    className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3 hover:border-blue-300 transition-all"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="p-2.5 rounded-lg bg-blue-100 text-[#173A7C] shrink-0">
-                        <FileText className="w-5 h-5" />
-                      </div>
-                      <div className="min-w-0">
-                        <h5 className="font-bold text-slate-800 text-xs sm:text-sm truncate" title={att.title}>
-                          {att.title}
-                        </h5>
-                        <p className="text-[11px] text-slate-500">
-                          {att.fileSize || 'ملف رقمي'} · {att.fileType?.toUpperCase() || 'PDF'}
-                        </p>
-                      </div>
-                    </div>
-                    <a
-                      href={att.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download
-                      className="p-2 rounded-lg bg-[#173A7C] text-white hover:bg-[#1E4D9D] transition-colors cursor-pointer shrink-0"
-                      title="تحميل الملف"
-                    >
-                      <Download className="w-4 h-4" />
-                    </a>
-                    <AttachmentPreview fileUrl={att.fileUrl} title={att.title} type={att.fileType} />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        {activeTab === 'attachments' && <CourseResourcesPanel groups={attachmentGroups} />}
 
         {/* Tab 3: Authenticated, server-graded internal quiz */}
         {activeTab === 'quiz' && currentAllowed && <div id="internal-assessment"><InternalQuizPanel key={`${courseSlug}:${currentLesson?.id || lessonId}`} courseId={courseSlug} lessonId={currentLesson?.id || lessonId} /></div>}

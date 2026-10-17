@@ -10,7 +10,7 @@ import { getCourseContent, extractBunnyVideoId } from '@/lib/learning/course-con
 import type { Course, CourseCategory, CourseLevel, CurriculumSection } from '@/types';
 
 type CourseStatus = 'draft' | 'published' | 'archived';
-type CourseInput = Partial<Course> & { title: string; status?: CourseStatus };
+type CourseInput = Omit<Partial<Course>, 'finalExam'> & { title: string; status?: CourseStatus; finalExam?: Course['finalExam'] | null };
 type CourseReadOptions = { includeUnpublished?: boolean };
 type CourseWriteOptions = { instructorId?: string };
 type CourseRow = {
@@ -33,6 +33,7 @@ type LessonInput = {
   fileName?: string;
   fileSize?: string;
   quizData?: CurriculumSection['quizData'];
+  attachments?: CurriculumSection['attachments'];
   items?: CurriculumSection['items'];
   subLessons?: string[];
 };
@@ -195,7 +196,7 @@ function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 
     outcomes: input.outcomes ?? current?.outcomes ?? [],
     curriculum,
     attachments: input.attachments ?? current?.attachments ?? [],
-    finalExam: input.finalExam ?? current?.finalExam,
+    finalExam: input.finalExam === null ? undefined : input.finalExam ?? current?.finalExam,
     whyThisCourse: input.whyThisCourse ?? current?.whyThisCourse ?? [],
     requirements: input.requirements ?? current?.requirements,
     trainerId: input.trainerId ?? current?.trainerId,
@@ -369,6 +370,7 @@ export async function addOrUpdateLessonAsync(
     fileName: lessonData.fileName,
     fileSize: lessonData.fileSize,
     quizData: lessonData.quizData,
+    ...(lessonData.attachments !== undefined ? { attachments: lessonData.attachments } : {}),
     items: lessonData.items,
     lessons: lessonData.subLessons?.length ? lessonData.subLessons : [lessonData.title.trim()],
   };

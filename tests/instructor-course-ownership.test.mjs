@@ -259,3 +259,33 @@ test('students and unauthenticated visitors cannot manage courses or lessons', a
     assert.equal(f.writes.length, 0);
   }
 });
+
+test('nested unit and lesson documents persist independently from general course downloads', async () => {
+  const f = fixture();
+  const file = (id, type) => ({ id, title: id, fileUrl: `https://files.invalid/${id}`, fileType: type });
+  const curriculum = [{ id: 'unit', title: 'Unit', duration: '', attachments: [file('unit-doc', 'word')], items: [{ id: 'lesson', title: 'Video', type: 'video', videoUrl: 'video-1', attachments: [file('lesson-slides', 'ppt'), file('worksheet', 'pdf')] }] }];
+  const response = await f.post({ id: own.id, slug: own.slug, title: own.title, curriculum, attachments: [file('course-bag', 'zip')] });
+  assert.equal(response.status, 200); const saved = (await response.json()).course;
+  assert.deepEqual(saved.curriculum, curriculum); assert.equal(saved.attachments[0].id, 'course-bag');
+  const reopened = await f.list(); const listed = (await reopened.json()).courses.find(course => course.id === own.id);
+  assert.deepEqual(listed.curriculum, curriculum); assert.equal(listed.curriculum[0].items[0].type, 'video');
+});
+
+test('turning the final exam off clears it while omitted exam fields preserve a saved exam', async () => {
+  const f = fixture();
+  const finalExam = { title: 'Exam', passingScore: 70, questions: [{ id: 'q', question: 'Choose', options: ['A', 'B'], correctIndex: 0 }] };
+  assert.equal((await f.post({ id: own.id, slug: own.slug, title: own.title, finalExam })).status, 200);
+  const omitted = await f.post({ id: own.id, slug: own.slug, title: own.title, description: 'Update' });
+  assert.deepEqual((await omitted.json()).course.finalExam, finalExam);
+  const cleared = await f.post({ id: own.id, slug: own.slug, title: own.title, finalExam: null });
+  assert.equal((await cleared.json()).course.finalExam, undefined);
+  assert.equal(f.records.find(row => row.id === own.id).payload.finalExam, undefined);
+});
+
+test('standalone lesson edits preserve unit document attachments when the field is omitted', async () => {
+  const attachments = [{ id: 'doc', title: 'Unit reference', fileUrl: 'https://files.invalid/ref.pdf', fileType: 'pdf' }];
+  const row = structuredClone(own); row.payload.curriculum[0].attachments = attachments;
+  const f = fixture({ rows: [row] });
+  assert.equal((await f.lesson('POST', own.slug)).status, 200);
+  assert.deepEqual(f.records[0].payload.curriculum[0].attachments, attachments);
+});

@@ -35,6 +35,7 @@ export interface SubLessonItem {
   fileSize?: string;
   isLocked?: boolean;
   quizData?: QuizData;
+  attachments?: CourseAttachment[];
 }
 
 export interface CurriculumSection {
@@ -48,6 +49,7 @@ export interface CurriculumSection {
   fileName?: string;
   fileSize?: string;
   quizData?: QuizData;
+  attachments?: CourseAttachment[];
   items?: SubLessonItem[];
   lessons?: (string | SubLessonItem)[];
 }

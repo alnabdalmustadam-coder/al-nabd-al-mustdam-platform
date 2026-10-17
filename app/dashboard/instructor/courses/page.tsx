@@ -1,59 +1,21 @@
 'use client';
 
+import { CourseEditorFrame } from '@/components/courses/editor/course-editor-frame';
+import { CourseBasicSettings, type BasicSettings } from '@/components/courses/editor/course-basic-settings';
+import { CourseCurriculumEditor } from '@/components/courses/editor/course-curriculum-editor';
+import { CourseFilesEditor } from '@/components/courses/editor/course-files-editor';
+import { EditorSectionHeading, EditorToggle } from '@/components/courses/editor/editor-ui';
+import { curriculumToEditor, editorToCurriculum, type EditorLesson, type EditorSection } from '@/lib/courses/editor-model';
 import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
 import { createCourseQuizDraft, prepareCourseQuizForEditing } from '@/lib/quizzes/course-quiz-draft';
 import React, { useState, useEffect, useRef } from 'react';
 import * as tus from 'tus-js-client';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import {
-  BookOpen,
-  Plus,
-  Search,
-  Users,
-  Clock,
-  DollarSign,
-  Edit3,
-  Trash2,
-  CheckCircle2,
-  Sparkles,
-  X,
-  Layers,
-  Video,
-  Radio,
-  FileText,
-  PlayCircle,
-  Settings,
-  GraduationCap,
-  ChevronLeft,
-  Lock,
-  Unlock,
-  ExternalLink,
-  UploadCloud,
-  ShieldCheck,
-  AlertCircle,
-  Loader2,
-  Eye,
-  RefreshCw,
-  Image as ImageIcon,
-  Play,
-  Check,
-  Paperclip,
-  HelpCircle,
-  ChevronDown,
-  ChevronUp,
-  Download,
-  Award,
-  FilePlus,
-  FileCheck,
-  ListOrdered,
-  PlusCircle,
-  FileCode,
-  FolderOpen,
-} from 'lucide-react';
-import { QuizData, QuizQuestion, CourseAttachment, SubLessonItem, Course } from '@/types';
+import { BookOpen, Plus, Search, Users, Clock, Trash2, CheckCircle2, Video, Settings, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
+import { QuizData, CourseAttachment, type Course } from '@/types';
 import { createClient } from '@/utils/supabase/client';
-import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
+
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
 import { CardImage } from '@/components/ui/CardImage';
 
@@ -63,6 +25,7 @@ interface CourseItem {
   title: string;
   category: string;
   rawCategory?: string;
+  level?: string;
   type?: string;
   trainer: string;
   price: string;
@@ -79,42 +42,9 @@ interface CourseItem {
   professionalDevelopment?: boolean;
 }
 
-interface FormSubLessonItem {
-  id: string;
-  title: string;
-  duration: string;
-  videoUrl: string;
-  type: 'video' | 'pdf' | 'doc' | 'ppt' | 'quiz';
-  fileUrl?: string;
-  fileName?: string;
-  fileSize?: string;
-  isLocked: boolean;
-  quizData?: QuizData;
-}
-
-interface FormSectionItem {
-  id: string;
-  title: string;
-  duration: string;
-  videoUrl: string;
-  type: string;
-  fileUrl?: string;
-  fileName?: string;
-  fileSize?: string;
-  isLocked: boolean;
-  subItems: FormSubLessonItem[];
-  quizData?: QuizData;
-  showAttachmentUploader?: boolean;
-  showQuizEditor?: boolean;
-}
-
-interface FormAttachmentItem {
-  id: string;
-  title: string;
-  fileUrl: string;
-  fileType: 'pdf' | 'word' | 'ppt' | 'zip' | 'other';
-  fileSize: string;
-}
+type FormSubLessonItem = EditorLesson;
+type FormSectionItem = EditorSection;
+type FormAttachmentItem = CourseAttachment;
 
 function formatVideoDuration(seconds: number): string {
   if (!seconds || isNaN(seconds)) return '15 دقيقة';
@@ -242,29 +172,33 @@ export default function InstructorCoursesPage() {
     { id: 'cyber', label: 'أمن سيبراني وشبكات' },
     { id: 'design', label: 'تصميم ومونتاج' },
   ]);
-  const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
 
   const [formSections, setFormSections] = useState<FormSectionItem[]>([]);
 
   const [formAttachments, setFormAttachments] = useState<FormAttachmentItem[]>([]);
-  const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
-  const [attachmentUploadProgress, setAttachmentUploadProgress] = useState(0);
-  const attachmentFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [hasFinalExam, setHasFinalExam] = useState(false);
   const [formFinalExam, setFormFinalExam] = useState<QuizData>(createCourseQuizDraft);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const courseImageInputRef = useRef<HTMLInputElement | null>(null);
+  const [resourceUploads, setResourceUploads] = useState(0);
+  const onResourceBusy = (busy: boolean) => setResourceUploads((count) => Math.max(0, count + (busy ? 1 : -1)));
+  const changeBasicSettings = (patch: Partial<BasicSettings>) => {
+    if (patch.title !== undefined) setFormTitle(patch.title);
+    if (patch.slug !== undefined) setFormSlug(patch.slug);
+    if (patch.category !== undefined) setFormCategory(patch.category);
+    if (patch.level !== undefined) setFormLevel(patch.level);
+    if (patch.trainer !== undefined) setFormTrainer(patch.trainer);
+    if (patch.price !== undefined) setFormPrice(patch.price);
+    if (patch.hours !== undefined) setFormHours(patch.hours);
+    if (patch.description !== undefined) setFormDescription(patch.description);
+    if (patch.image !== undefined) setFormImage(patch.image);
+    if (patch.professionalDevelopment !== undefined) setFormProfessionalDevelopment(patch.professionalDevelopment);
+  };
 
   const [uploadingTarget, setUploadingTarget] = useState<{ secIdx: number; subIdx?: number } | null>(null);
   const [lessonUploadProgress, setLessonUploadProgress] = useState<number>(0);
   const formLessonVideoInputRef = useRef<HTMLInputElement | null>(null);
-
-  const [uploadingAttachmentTarget, setUploadingAttachmentTarget] = useState<{ secIdx: number; subIdx?: number } | null>(null);
-  const sectionAttachmentInputRef = useRef<HTMLInputElement | null>(null);
 
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -294,7 +228,15 @@ export default function InstructorCoursesPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success || !Array.isArray(data.courses)) throw new Error(data.error || 'تعذر تحميل الدورات');
-      setCourses(data.courses);
+      setCourses(data.courses.map((course: Course) => ({
+        ...course, id: String(course.id), rawCategory: course.category, level: course.level,
+        type: 'online', trainer: course.instructor || instructorName,
+        rawPrice: course.price, price: course.price > 0 ? `${course.price.toLocaleString('en-US')} ر.س` : 'مجانية',
+        hours: Number.parseInt(course.duration?.match(/\d+/)?.[0] || '30', 10),
+        students: course.enrollees ?? course.studentsCount ?? 0,
+        lessonsCount: course.curriculum?.reduce((count, section) => count + (section.items?.length || section.lessons?.length || 1), 0) || course.lessonsCount || 0,
+        status: course.status === 'published' ? 'published' : 'draft',
+      })));
     } catch (err) {
       console.error('Error fetching instructor courses:', err);
       showToast('تعذر تحميل الدورات من الخادم', 'error');
@@ -306,18 +248,6 @@ export default function InstructorCoursesPage() {
   useEffect(() => {
     loadCourses();
   }, []);
-
-  const handleAddNewCategory = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
-    const trimmed = newCategoryName.trim();
-    if (!trimmed) return;
-    if (!categoriesList.some((c) => c.id === trimmed || c.label === trimmed)) {
-      setCategoriesList((prev) => [...prev, { id: trimmed, label: trimmed }]);
-    }
-    setFormCategory(trimmed);
-    setNewCategoryName('');
-    setIsAddingNewCategory(false);
-  };
 
   const openCreateModal = () => {
     setEditingCourse(null);
@@ -335,8 +265,6 @@ export default function InstructorCoursesPage() {
     setFormAttachments([]);
     setHasFinalExam(false);
     setFormFinalExam(createCourseQuizDraft());
-    setIsAddingNewCategory(false);
-    setNewCategoryName('');
 
     setFormSections([
       {
@@ -366,6 +294,7 @@ export default function InstructorCoursesPage() {
     setModalActiveTab('basic');
     setFormTitle(course.title);
     setFormSlug(course.slug);
+    setFormLevel(course.level || 'all');
     setFormCategory(course.rawCategory || course.category || 'tech');
     setFormTrainer(course.trainer || instructorName);
     setFormPrice(String(course.rawPrice ?? 500));
@@ -373,8 +302,6 @@ export default function InstructorCoursesPage() {
     setFormDescription(course.description || '');
     setFormProfessionalDevelopment(course.professionalDevelopment === true);
     setFormImage(course.image || '/1.png');
-    setIsAddingNewCategory(false);
-    setNewCategoryName('');
 
     if (Array.isArray(course.attachments) && course.attachments.length > 0) {
       setFormAttachments(
@@ -399,55 +326,7 @@ export default function InstructorCoursesPage() {
     }
 
     if (Array.isArray(course.curriculum) && course.curriculum.length > 0) {
-      setFormSections(
-        course.curriculum.map((sec: any, idx: number) => {
-          let parsedSubItems: FormSubLessonItem[] = [];
-
-          if (Array.isArray(sec.items) && sec.items.length > 0) {
-            parsedSubItems = sec.items.map((it: any, subIdx: number) => ({
-              id: it.id || `sub-${Date.now()}-${idx + 1}-${subIdx + 1}`,
-              title: it.title || `مقطع ${subIdx + 1}`,
-              duration: it.duration || '15 دقيقة',
-              videoUrl: it.videoUrl || '',
-              type: it.type || 'video',
-              fileUrl: it.fileUrl,
-              fileName: it.fileName,
-              fileSize: it.fileSize,
-              isLocked: it.isLocked ?? false,
-              quizData: prepareCourseQuizForEditing(it.quizData),
-            }));
-          } else {
-            parsedSubItems = [
-              {
-                id: `sub-${Date.now()}-${idx + 1}-1`,
-                title: sec.title || `المقطع 1`,
-                duration: sec.duration || '20 دقيقة',
-                videoUrl: sec.videoUrl || '',
-                type: (sec.type as any) || 'video',
-                fileUrl: sec.fileUrl,
-                fileName: sec.fileName,
-                fileSize: sec.fileSize,
-                isLocked: sec.isLocked ?? false,
-                quizData: prepareCourseQuizForEditing(sec.quizData),
-              },
-            ];
-          }
-
-          return {
-            id: sec.id || `sec-${Date.now()}-${idx + 1}`,
-            title: sec.title || `الوحدة ${idx + 1}`,
-            duration: sec.duration || '30 دقيقة',
-            videoUrl: sec.videoUrl || '',
-            type: sec.type || 'video',
-            fileUrl: sec.fileUrl,
-            fileName: sec.fileName,
-            fileSize: sec.fileSize,
-            isLocked: sec.isLocked ?? false,
-            subItems: parsedSubItems,
-            quizData: prepareCourseQuizForEditing(sec.quizData),
-          };
-        })
-      );
+      setFormSections(curriculumToEditor(course.curriculum));
     } else {
       setFormSections([
         {
@@ -473,72 +352,10 @@ export default function InstructorCoursesPage() {
     setIsModalOpen(true);
   };
 
-  const handleAddSection = () => {
-    const nextNum = formSections.length + 1;
-    setFormSections((prev) => [
-      ...prev,
-      {
-        id: `sec-${Date.now()}-${nextNum}`,
-        title: `الوحدة ${nextNum}: `,
-        duration: '40 دقيقة',
-        videoUrl: '',
-        type: 'video',
-        isLocked: false,
-        subItems: [
-          {
-            id: `sub-${Date.now()}-${nextNum}-1`,
-            title: `المقطع 1: شرح المفاهيم الأساسية`,
-            duration: '20 دقيقة',
-            videoUrl: '',
-            type: 'video',
-            isLocked: false,
-          },
-        ],
-      },
-    ]);
-  };
-
-  const handleRemoveSection = (secIdx: number) => {
-    if (formSections.length <= 1) {
-      showToast('يجب أن تحتوي الدورة على وحدة تدريبية واحدة على الأقل', 'error');
-      return;
-    }
-    setFormSections((prev) => prev.filter((_, idx) => idx !== secIdx));
-  };
-
   const handleUpdateSection = (secIdx: number, field: keyof FormSectionItem, value: any) => {
     setFormSections((prev) => {
       const copy = [...prev];
       copy[secIdx] = { ...copy[secIdx], [field]: value };
-      return copy;
-    });
-  };
-
-  const handleAddSubItem = (secIdx: number) => {
-    setFormSections((prev) => {
-      const copy = [...prev];
-      const nextSubNum = (copy[secIdx].subItems?.length || 0) + 1;
-      const newSub: FormSubLessonItem = {
-        id: `sub-${Date.now()}-${secIdx + 1}-${nextSubNum}`,
-        title: `الدرس ${nextSubNum}: `,
-        duration: '15 دقيقة',
-        videoUrl: '',
-        type: 'video',
-        isLocked: false,
-      };
-      copy[secIdx].subItems = [...(copy[secIdx].subItems || []), newSub];
-      return copy;
-    });
-  };
-
-  const handleRemoveSubItem = (secIdx: number, subIdx: number) => {
-    setFormSections((prev) => {
-      const copy = [...prev];
-      if (copy[secIdx].subItems.length <= 1) {
-        showToast('يجب أن تحتوي الوحدة على درس واحد على الأقل', 'error');
-        return copy;
-      }
-      copy[secIdx].subItems = copy[secIdx].subItems.filter((_, idx) => idx !== subIdx);
       return copy;
     });
   };
@@ -597,148 +414,9 @@ export default function InstructorCoursesPage() {
     }
   };
 
-  const triggerAttachmentUploadForTarget = (secIdx: number, subIdx?: number) => {
-    setUploadingAttachmentTarget({ secIdx, subIdx });
-    if (sectionAttachmentInputRef.current) {
-      sectionAttachmentInputRef.current.value = '';
-      sectionAttachmentInputRef.current.click();
-    }
-  };
-
-  const handleAttachmentFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || uploadingAttachmentTarget === null) return;
-
-    const { secIdx, subIdx } = uploadingAttachmentTarget;
-    setIsUploadingAttachment(true);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', file.name);
-
-      const res = await fetch('/api/admin/courses/upload-attachment', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'فشل رفع الملف المرفق');
-      }
-
-      if (subIdx !== undefined) {
-        handleUpdateSubItem(secIdx, subIdx, 'fileUrl', data.fileUrl);
-        if (['ppt', 'pdf', 'word'].includes(data.fileType)) handleUpdateSubItem(secIdx, subIdx, 'type', data.fileType === 'word' ? 'doc' : data.fileType);
-        handleUpdateSubItem(secIdx, subIdx, 'fileName', data.fileName);
-        handleUpdateSubItem(secIdx, subIdx, 'fileSize', data.fileSize);
-      } else {
-        handleUpdateSection(secIdx, 'fileUrl', data.fileUrl);
-        handleUpdateSection(secIdx, 'fileName', data.fileName);
-        handleUpdateSection(secIdx, 'fileSize', data.fileSize);
-      }
-
-      showToast(`تم رفع الملف المرفق (${data.fileName}) بنجاح!`);
-    } catch (err: any) {
-      console.error('Attachment upload failed:', err);
-      showToast(err.message || 'فشل رفع الملف', 'error');
-    } finally {
-      setIsUploadingAttachment(false);
-      setUploadingAttachmentTarget(null);
-    }
-  };
-
-  const handleCourseBagAttachmentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploadingAttachment(true);
-    setAttachmentUploadProgress(15);
-
-    const progressTimer = setInterval(() => {
-      setAttachmentUploadProgress((prev) => (prev < 90 ? prev + 12 : prev));
-    }, 140);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', file.name);
-
-      const res = await fetch('/api/admin/courses/upload-attachment', {
-        method: 'POST',
-        body: formData,
-      });
-
-      clearInterval(progressTimer);
-      setAttachmentUploadProgress(100);
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'فشل رفع الملف المرفق');
-      }
-
-      const newAtt: FormAttachmentItem = {
-        id: `att-${Date.now()}`,
-        title: data.fileName || file.name,
-        fileUrl: data.fileUrl,
-        fileType: (data.fileType as any) || 'pdf',
-        fileSize: data.fileSize || 'ملف رقمي',
-      };
-
-      setFormAttachments((prev) => [...prev, newAtt]);
-      showToast(`تمت إضافة الملف المرفق (${data.fileName}) لحقيبة الدورة بنجاح!`);
-    } catch (err: any) {
-      clearInterval(progressTimer);
-      console.error('Attachment bag upload failed:', err);
-      showToast(err.message || 'فشل رفع الملف', 'error');
-    } finally {
-      setTimeout(() => {
-        setIsUploadingAttachment(false);
-        setAttachmentUploadProgress(0);
-        if (attachmentFileInputRef.current) {
-          attachmentFileInputRef.current.value = '';
-        }
-      }, 500);
-    }
-  };
-
-  const handleRemoveAttachmentFromBag = (attId: string) => {
-    setFormAttachments((prev) => prev.filter((a) => a.id !== attId));
-  };
-
-  const handleCourseImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploadingImage(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      if (formSlug) formData.append('courseSlug', formSlug);
-      if (formImage) formData.append('existingImageUrl', formImage);
-
-      const res = await fetch('/api/admin/courses/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (res.ok && data.success && data.imageUrl) {
-        setFormImage(data.imageUrl);
-        showToast('تم رفع وتحديث صورة غلاف الدورة بنجاح');
-      } else {
-        throw new Error(data.error || 'فشل رفع الصورة');
-      }
-    } catch (err: any) {
-      console.error('Upload image error:', err);
-      showToast(err.message || 'حدث خطأ أثناء رفع الصورة', 'error');
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
-
   const handleSaveCourse = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting || resourceUploads > 0 || lessonUploadProgress > 0) return;
     if (!formTitle.trim()) {
       showToast('يرجى كتابة عنوان الدورة التدريبية', 'error');
       return;
@@ -749,30 +427,7 @@ export default function InstructorCoursesPage() {
       const priceNum = parseFloat(formPrice.replace(/[^\d.]/g, '')) || 0;
       const hoursNum = parseInt(formHours.replace(/[^\d]/g, ''), 10) || 20;
 
-      const formattedCurriculum = formSections.map((sec, idx) => ({
-        id: sec.id || `sec-${idx + 1}`,
-        title: sec.title.trim() || `الوحدة ${idx + 1}`,
-        duration: sec.duration || '30 دقيقة',
-        videoUrl: sec.videoUrl || '',
-        type: sec.type || 'video',
-        fileUrl: sec.fileUrl,
-        fileName: sec.fileName,
-        fileSize: sec.fileSize,
-        isLocked: sec.isLocked ?? false,
-        quizData: sec.quizData,
-        items: (sec.subItems || []).map((sub, subIdx) => ({
-          id: sub.id || `sub-${idx + 1}-${subIdx + 1}`,
-          title: sub.title.trim() || `الدرس ${subIdx + 1}`,
-          duration: sub.duration || '15 دقيقة',
-          videoUrl: sub.videoUrl || '',
-          type: sub.type || 'video',
-          fileUrl: sub.fileUrl,
-          fileName: sub.fileName,
-          fileSize: sub.fileSize,
-          isLocked: sub.isLocked ?? false,
-          quizData: sub.quizData,
-        })),
-      }));
+      const formattedCurriculum = editorToCurriculum(formSections);
 
       const totalLessons = formattedCurriculum.reduce(
         (acc, sec) => acc + (sec.items && sec.items.length > 0 ? sec.items.length : 1),
@@ -793,7 +448,7 @@ export default function InstructorCoursesPage() {
         image: formImage || '/1.png',
         curriculum: formattedCurriculum,
         attachments: formAttachments,
-        finalExam: hasFinalExam ? formFinalExam : undefined,
+        finalExam: hasFinalExam ? formFinalExam : null,
       };
 
       if (editingCourse?.id) {
@@ -860,27 +515,6 @@ export default function InstructorCoursesPage() {
         ref={formLessonVideoInputRef}
         onChange={handleVideoFileSelected}
         accept="video/*"
-        className="hidden"
-      />
-      <input
-        type="file"
-        ref={sectionAttachmentInputRef}
-        onChange={handleAttachmentFileSelected}
-        accept=".pdf,.doc,.docx,.ppt,.pptx,.zip"
-        className="hidden"
-      />
-      <input
-        type="file"
-        ref={attachmentFileInputRef}
-        onChange={handleCourseBagAttachmentUpload}
-        accept=".pdf,.doc,.docx,.ppt,.pptx,.zip"
-        className="hidden"
-      />
-      <input
-        type="file"
-        ref={courseImageInputRef}
-        onChange={handleCourseImageUpload}
-        accept="image/*"
         className="hidden"
       />
 
@@ -1161,554 +795,26 @@ export default function InstructorCoursesPage() {
       )}
 
       <AnimatePresence>
-        {isModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-stretch justify-stretch bg-slate-950/80 backdrop-blur-md sm:items-center sm:justify-center sm:p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-white shadow-2xl sm:h-auto sm:max-h-[92vh] sm:max-w-5xl sm:rounded-3xl sm:border sm:border-slate-200/80"
-            >
-              <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] px-4 py-3 text-white sm:p-5">
-                <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-                  <div className="shrink-0 rounded-xl border border-white/20 bg-white/10 p-2 backdrop-blur-md sm:rounded-2xl sm:p-2.5">
-                    <BookOpen className="w-5 h-5 text-amber-300" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="truncate text-sm font-black sm:text-lg">
-                      {editingCourse ? `إدارة وتعديل: ${editingCourse.title}` : 'إنشاء دورة تدريبية جديدة'}
-                    </h3>
-                    <p className="hidden text-xs font-bold text-blue-100 sm:block">بوابة المحاضر لإدارة المناهج والوسائط والاختبارات</p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="grid shrink-0 grid-cols-4 gap-1 border-b border-slate-200 bg-slate-50 p-2 sm:flex sm:items-center sm:gap-2 sm:overflow-x-auto sm:p-3">
-                <button
-                  type="button"
-                  onClick={() => setModalActiveTab('basic')}
-                  className={`flex cursor-pointer items-center justify-center gap-1 rounded-xl px-1 py-2 text-[10px] font-black transition-all sm:gap-2 sm:px-4 sm:text-xs ${
-                    modalActiveTab === 'basic'
-                      ? 'bg-[#173A7C] text-white shadow-sm'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  <span className="sm:hidden">البيانات</span>
-                  <span className="hidden sm:inline">1. البيانات الأساسية والغلاف</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setModalActiveTab('curriculum')}
-                  className={`flex cursor-pointer items-center justify-center gap-1 rounded-xl px-1 py-2 text-[10px] font-black transition-all sm:gap-2 sm:px-4 sm:text-xs ${
-                    modalActiveTab === 'curriculum'
-                      ? 'bg-[#173A7C] text-white shadow-sm'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  <Layers className="w-4 h-4" />
-                  <span className="sm:hidden">المنهج</span>
-                  <span className="hidden sm:inline">2. المناهج والدروس والفيديوهات ({formSections.length})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setModalActiveTab('attachments')}
-                  className={`flex cursor-pointer items-center justify-center gap-1 rounded-xl px-1 py-2 text-[10px] font-black transition-all sm:gap-2 sm:px-4 sm:text-xs ${
-                    modalActiveTab === 'attachments'
-                      ? 'bg-[#173A7C] text-white shadow-sm'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  <Paperclip className="w-4 h-4" />
-                  <span className="sm:hidden">المرفقات</span>
-                  <span className="hidden sm:inline">3. الحقيبة والمرفقات ({formAttachments.length})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setModalActiveTab('exam')}
-                  className={`flex cursor-pointer items-center justify-center gap-1 rounded-xl px-1 py-2 text-[10px] font-black transition-all sm:gap-2 sm:px-4 sm:text-xs ${
-                    modalActiveTab === 'exam'
-                      ? 'bg-[#173A7C] text-white shadow-sm'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  <Award className="w-4 h-4" />
-                  <span className="sm:hidden">الاختبار</span>
-                  <span className="hidden sm:inline">4. الاختبار النهائي {hasFinalExam && '✓'}</span>
-                </button>
-              </div>
-
-              <form onSubmit={handleSaveCourse} onInvalidCapture={() => showToast('يرجى إكمال الحقول المطلوبة قبل حفظ الدورة', 'error')} className="flex min-h-0 flex-1 flex-col overflow-hidden sm:block sm:space-y-6 sm:overflow-y-auto sm:p-6">
-                <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain p-4 sm:contents">
-                {modalActiveTab === 'basic' && (
-                  <div className="space-y-4 text-xs font-bold">
-                    <div className="space-y-1">
-                      <label className="text-slate-700 block">عنوان الدورة التدريبية *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formTitle}
-                        onChange={(e) => setFormTitle(e.target.value)}
-                        placeholder="مثال: دبلوم التسامح والسلام والمواطنة الصالحة..."
-                        className="w-full p-3 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs font-bold"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between">
-                          <label className="text-slate-700 block">التصنيف والمسار *</label>
-                          <button
-                            type="button"
-                            onClick={() => setIsAddingNewCategory(!isAddingNewCategory)}
-                            className="text-[#173A7C] text-[10px] hover:underline font-black cursor-pointer"
-                          >
-                            {isAddingNewCategory ? 'إلغاء' : '+ تصنيف جديد'}
-                          </button>
-                        </div>
-
-                        {isAddingNewCategory ? (
-                          <div className="flex items-center gap-1">
-                            <input
-                              type="text"
-                              value={newCategoryName}
-                              onChange={(e) => setNewCategoryName(e.target.value)}
-                              placeholder="اسم التصنيف الجديد..."
-                              className="w-full p-2 rounded-xl border border-blue-300 outline-none text-xs"
-                            />
-                            <button
-                              type="button"
-                              onClick={handleAddNewCategory}
-                              className="px-2.5 py-2 rounded-xl bg-[#173A7C] text-white text-xs cursor-pointer"
-                            >
-                              +
-                            </button>
-                          </div>
-                        ) : (
-                          <select
-                            value={formCategory}
-                            onChange={(e) => setFormCategory(e.target.value)}
-                            className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none bg-white text-xs font-bold"
-                          >
-                            {categoriesList.map((cat) => (
-                              <option key={cat.id} value={cat.id}>
-                                {cat.label}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-slate-700 block">المحاضر المعتمد</label>
-                        <input
-                          type="text"
-                          value={formTrainer}
-                          onChange={(e) => setFormTrainer(e.target.value)}
-                          className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none bg-slate-50 text-xs"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-slate-700 block">المستوى الأكاديمي</label>
-                        <select
-                          value={formLevel}
-                          onChange={(e) => setFormLevel(e.target.value)}
-                          className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none bg-white text-xs font-bold"
-                        >
-                          <option value="all">كافة المستويات</option>
-                          <option value="beginner">مبتدئ</option>
-                          <option value="intermediate">متوسط</option>
-                          <option value="advanced">متقدم</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="text-slate-700 block">السعر (ر.س) *</label>
-                        <input
-                          type="text"
-                          required
-                          value={formPrice}
-                          onChange={(e) => setFormPrice(e.target.value)}
-                          placeholder="500"
-                          className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs font-black text-[#173A7C]"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-slate-700 block">عدد الساعات المعتمدة *</label>
-                        <input
-                          type="text"
-                          required
-                          value={formHours}
-                          onChange={(e) => setFormHours(e.target.value)}
-                          placeholder="30"
-                          className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none text-xs"
-                        />
-                      </div>
-                    </div>
-
-                    <DeviceImageUploader
-                      value={formImage}
-                      onChange={(url) => setFormImage(url)}
-                      folder="courses"
-                      slug={formSlug || 'course'}
-                      label="صورة غلاف الدورة"
-                      recommendedSize="المقاس الموصى به: 1280 × 720 بكسل"
-                      aspectRatio="video"
-                    />
-
-                    <div className="space-y-1">
-                      <label className="mb-5 flex cursor-pointer items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
-                        <input type="checkbox" checked={formProfessionalDevelopment} onChange={(e) => setFormProfessionalDevelopment(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-blue-900" />
-                        <span><span className="block text-sm font-black text-blue-900">وضع التطوير المهني — إكمال بالترتيب</span><span className="mt-1 block text-xs leading-6 text-slate-600">يتطلب مشاهدة الفيديوهات المرفوعة كاملة واجتياز الاختبارات المرتبطة قبل فتح الدرس التالي. التقدم السابق غير المتحقق بالمشاهدة يحتاج إكمالاً عند تفعيل هذا الوضع.</span></span>
-                      </label>
-                      <label className="text-slate-700 block">وصف البرنامج التدريبي ومخرجات التعلم *</label>
-                      <textarea
-                        rows={4}
-                        required
-                        value={formDescription}
-                        onChange={(e) => setFormDescription(e.target.value)}
-                        placeholder="اشرح أهداف البرنامج والمحاور الرئيسية والفئة المستهدفة..."
-                        className="w-full p-3 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none resize-none text-xs font-medium leading-relaxed"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {modalActiveTab === 'curriculum' && (
-                  <div className="space-y-5">
-                    {lessonUploadProgress > 0 && (
-                      <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-950 text-xs font-black space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-2">
-                            <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
-                            <span>جاري رفع الفيديو وتجهيزه للمشاهدة الآمنة...</span>
-                          </span>
-                          <span className="font-mono">{lessonUploadProgress}%</span>
-                        </div>
-                        <div className="w-full h-2 bg-indigo-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-indigo-600 transition-all duration-300"
-                            style={{ width: `${lessonUploadProgress}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-sm font-black text-slate-900">هيكلية المناهج والوحدات والدروس</h4>
-                        <p className="text-[11px] text-slate-500 font-bold">يمكنك تقسيم المقرر لوحدات، وداخل كل وحدة مقاطع ودروس تفاعلية</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleAddSection}
-                        className="px-3.5 py-2 rounded-xl bg-indigo-50 text-indigo-900 hover:bg-indigo-100 font-black text-xs flex items-center gap-1.5 cursor-pointer border border-indigo-200"
-                      >
-                        <PlusCircle className="w-4 h-4 text-indigo-600" />
-                        <span>+ إضافة وحدة تدريبية</span>
-                      </button>
-                    </div>
-
-                    <div className="space-y-4">
-                      {formSections.map((sec, secIdx) => (
-                        <div
-                          key={sec.id || secIdx}
-                          className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4"
-                        >
-                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-                            <div className="flex-1 flex items-center gap-2">
-                              <span className="w-6 h-6 rounded-lg bg-[#173A7C] text-white flex items-center justify-center text-xs font-black shrink-0">
-                                {secIdx + 1}
-                              </span>
-                              <input
-                                type="text"
-                                value={sec.title}
-                                onChange={(e) => handleUpdateSection(secIdx, 'title', e.target.value)}
-                                placeholder="عنوان الوحدة التدريبية..."
-                                className="flex-1 p-2 rounded-xl border border-slate-300 bg-white text-xs font-black outline-none focus:border-[#173A7C]"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                value={sec.duration}
-                                onChange={(e) => handleUpdateSection(secIdx, 'duration', e.target.value)}
-                                placeholder="المدة (مثال: 45 دقيقة)"
-                                className="w-28 p-2 rounded-xl border border-slate-300 bg-white text-xs font-bold outline-none text-center"
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveSection(secIdx)}
-                                className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 cursor-pointer"
-                                title="حذف الوحدة"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="space-y-3 pr-2 sm:pr-4 border-r-2 border-indigo-200">
-                            <div className="flex items-center justify-between text-xs font-black text-slate-700">
-                              <span>الدروس والمقاطع داخل الوحدة ({sec.subItems?.length || 0})</span>
-                              <button
-                                type="button"
-                                onClick={() => handleAddSubItem(secIdx)}
-                                className="text-[#173A7C] hover:underline flex items-center gap-1 cursor-pointer text-xs"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>إضافة درس للمقطع</span>
-                              </button>
-                            </div>
-
-                            {(sec.subItems || []).map((sub, subIdx) => (
-                              <div
-                                key={sub.id || subIdx}
-                                className="p-3 sm:p-4 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-3"
-                              >
-                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
-                                  <div className="flex-1 flex items-center gap-2">
-                                    <span className="text-slate-400 text-xs font-black shrink-0">
-                                      {secIdx + 1}.{subIdx + 1}
-                                    </span>
-                                    <input
-                                      type="text"
-                                      value={sub.title}
-                                      onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'title', e.target.value)}
-                                      placeholder="عنوان الدرس أو المقطع..."
-                                      className="flex-1 p-2 rounded-xl border border-slate-200 text-xs font-bold outline-none focus:border-[#173A7C]"
-                                    />
-                                  </div>
-
-                                  <div className="flex items-center gap-2">
-                                    <select aria-label="نوع الدرس" value={sub.type || 'video'} onChange={(event) => handleUpdateSubItem(secIdx, subIdx, 'type', event.target.value)} className="rounded-xl border border-slate-200 p-2 text-xs font-bold"><option value="video">فيديو</option><option value="pdf">ملف PDF / وورد</option><option value="ppt">عرض بوربوينت</option><option value="quiz">اختبار / كويز</option></select>
-                                    <input
-                                      type="text"
-                                      value={sub.duration}
-                                      onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'duration', e.target.value)}
-                                      placeholder="المدة"
-                                      className="w-24 p-2 rounded-xl border border-slate-200 text-xs font-bold text-center"
-                                    />
-
-                                    <button
-                                      type="button"
-                                      onClick={() => handleRemoveSubItem(secIdx, subIdx)}
-                                      className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg cursor-pointer"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {sub.type === 'quiz' && <CourseQuizEditor value={sub.quizData || { title: '', passingScore: 70, questions: [] }} onChange={(quiz) => handleUpdateSubItem(secIdx, subIdx, 'quizData', quiz)} />}
-                                {sub.type !== 'quiz' && (<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs font-bold">
-                                  <div className="space-y-1">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-slate-600">فيديو الدرس (بث آمن)</span>
-                                      <button
-                                        type="button"
-                                        onClick={() => triggerVideoUploadForTarget(secIdx, subIdx)}
-                                        className="text-indigo-600 hover:underline flex items-center gap-1 cursor-pointer text-[11px]"
-                                      >
-                                        <UploadCloud className="w-3.5 h-3.5" />
-                                        <span>رفع فيديو من الجهاز</span>
-                                      </button>
-                                    </div>
-                                    <input
-                                      type="text"
-                                      value={sub.videoUrl}
-                                      onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'videoUrl', e.target.value)}
-                                      placeholder="معرف الفيديو أو الرابط..."
-                                      className="w-full p-2 rounded-xl border border-slate-200 text-xs font-mono"
-                                    />
-                                  </div>
-
-                                  <div className="space-y-1">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-slate-600">مرفق الدرس (PDF / كود)</span>
-                                      <button
-                                        type="button"
-                                        onClick={() => triggerAttachmentUploadForTarget(secIdx, subIdx)}
-                                        className="text-emerald-600 hover:underline flex items-center gap-1 cursor-pointer text-[11px]"
-                                      >
-                                        <Paperclip className="w-3.5 h-3.5" />
-                                        <span>رفع ملف مرفق</span>
-                                      </button>
-                                    </div>
-                                    <input
-                                      type="text"
-                                      value={sub.fileUrl || ''}
-                                      onChange={(e) => handleUpdateSubItem(secIdx, subIdx, 'fileUrl', e.target.value)}
-                                      placeholder="رابط الملف المرفق..."
-                                      className="w-full p-2 rounded-xl border border-slate-200 text-xs"
-                                    />
-                                  </div>
-                                </div>)}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {modalActiveTab === 'attachments' && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-sm font-black text-slate-900">حقيبة الدورة والمرفقات العامة</h4>
-                        <p className="text-[11px] text-slate-500 font-bold">الملفات الدراسية، الكتب الإلكترونية، والمراجع القابلة للتحميل</p>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => attachmentFileInputRef.current?.click()}
-                        disabled={isUploadingAttachment}
-                        className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                      >
-                        {isUploadingAttachment ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>جاري الرفع {attachmentUploadProgress}%</span>
-                          </>
-                        ) : (
-                          <>
-                            <Paperclip className="w-4 h-4" />
-                            <span>رفع ملف جديد للحقيبة</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    {/* Visual Progress Bar for Attachment Bag */}
-                    {isUploadingAttachment && (
-                      <div className="w-full space-y-1.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200">
-                        <div className="flex items-center justify-between text-xs font-black text-emerald-900">
-                          <span className="flex items-center gap-1.5">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
-                            <span>جاري رفع ومعالجة المستند (PDF / Word)...</span>
-                          </span>
-                          <span className="font-mono text-emerald-700">{attachmentUploadProgress}%</span>
-                        </div>
-                        <div className="w-full h-2 bg-emerald-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-emerald-500 to-teal-600 transition-all duration-300 rounded-full"
-                            style={{ width: `${attachmentUploadProgress}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {formAttachments.length === 0 ? (
-                      <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2 text-xs font-bold text-slate-500">
-                        <FolderOpen className="w-8 h-8 text-slate-400 mx-auto" />
-                        <p>لا توجد ملفات مرفقة بالحقيبة حتى الآن</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {formAttachments.map((att) => (
-                          <div
-                            key={att.id}
-                            className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs font-bold"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-800">
-                                <FileText className="w-4 h-4" />
-                              </div>
-                              <div>
-                                <span className="font-black text-slate-900 block">{att.title}</span>
-                                <span className="text-[10px] text-slate-400 font-normal">{att.fileSize}</span>
-                              </div>
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveAttachmentFromBag(att.id)}
-                              className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {modalActiveTab === 'exam' && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                      <div>
-                        <h4 className="text-sm font-black text-slate-900">تفعيل الاختبار النهائي للدورة</h4>
-                        <p className="text-[11px] text-slate-500 font-bold">إلزام المتدرب باجتياز الاختبار للحصول على الشهادة</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={hasFinalExam}
-                        onChange={(e) => setHasFinalExam(e.target.checked)}
-                        className="w-5 h-5 accent-[#173A7C] cursor-pointer"
-                      />
-                    </div>
-
-                    {hasFinalExam && (<CourseQuizEditor value={formFinalExam} onChange={setFormFinalExam} />)}
-                  </div>
-                )}
-
-                </div>
-                <div className="flex shrink-0 items-center justify-between gap-2 border-t border-slate-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:mt-6 sm:rounded-2xl sm:bg-slate-50 sm:p-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-1 cursor-pointer rounded-xl bg-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-300 sm:flex-none"
-                  >
-                    إلغاء
-                  </button>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-emerald-600 px-6 py-2.5 text-xs font-black text-white shadow-md hover:opacity-95 disabled:opacity-50 sm:flex-none"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>جاري حفظ المناهج والدورة...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Check className="w-4 h-4" />
-                        <span className="sm:hidden">حفظ الدورة</span>
-                        <span className="hidden sm:inline">حفظ واعتماد التعديلات بالكامل</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
+        {isModalOpen && <CourseEditorFrame title={formTitle} editing={Boolean(editingCourse)} tab={modalActiveTab} onTabChange={setModalActiveTab}
+          onClose={() => setIsModalOpen(false)} onSubmit={handleSaveCourse} onInvalid={() => showToast('يرجى إكمال الحقول المطلوبة قبل حفظ الدورة', 'error')}
+          busy={isSubmitting} uploading={resourceUploads > 0 || lessonUploadProgress > 0}>
+          {modalActiveTab === 'basic' && <CourseBasicSettings value={{ title: formTitle, slug: formSlug, category: formCategory, level: formLevel,
+            trainer: formTrainer, price: formPrice, hours: formHours, description: formDescription, image: formImage, professionalDevelopment: formProfessionalDevelopment }}
+            onChange={changeBasicSettings} categories={categoriesList} onAddCategory={(name) => setCategoriesList((list) => list.some((item) => item.id === name) ? list : [...list, { id: name, label: name }])}
+             onImageBusyChange={onResourceBusy} />}
+          {modalActiveTab === 'curriculum' && <CourseCurriculumEditor value={formSections} onChange={setFormSections} onUploadVideo={triggerVideoUploadForTarget}
+            videoUpload={lessonUploadProgress > 0 ? uploadingTarget : null} videoProgress={lessonUploadProgress} onFileBusyChange={onResourceBusy} disabled={isSubmitting || resourceUploads > 0} />}
+          {modalActiveTab === 'attachments' && <div className="space-y-7">
+            <EditorSectionHeading eyebrow="مرفقات الدورة" title="ملفات تدعم الدورة بالكامل" description="أضف الحقيبة التدريبية أو الملفات العامة التي يحتاجها الطالب طوال الدورة. لملفات درس أو وحدة بعينها، استخدم قسم المنهج والدروس." />
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"><CourseFilesEditor title="ملفات عامة للتحميل" description="يمكن إضافة أكثر من مستند أو ملف مضغوط، وتعديل الاسم الذي يظهر للطالب." files={formAttachments} onChange={(update) => setFormAttachments(update)} onBusyChange={onResourceBusy} documentsOnly={false} /></div>
+          </div>}
+          {modalActiveTab === 'exam' && <div className="space-y-7">
+            <EditorSectionHeading eyebrow="تقييم التعلّم" title="الاختبار النهائي للدورة" description="فعّل الاختبار، ثم أضف أسئلة الاختيار من متعدد أو التوصيل وحدّد نسبة الاجتياز." />
+            <EditorToggle title="تفعيل الاختبار النهائي" description="عند تفعيله يظهر الاختبار للطالب ضمن الدورة، وتُحفظ أسئلته مع بياناتها." enabled={hasFinalExam} onChange={setHasFinalExam} />
+            {hasFinalExam ? <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"><CourseQuizEditor value={formFinalExam} onChange={setFormFinalExam} /></div>
+              : <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm leading-7 text-slate-500">الاختبار النهائي غير مفعّل لهذه الدورة. يمكنك تفعيله والبدء بإضافة الأسئلة من هنا.</p>}
+          </div>}
+        </CourseEditorFrame>}
       </AnimatePresence>
     </div>
   );

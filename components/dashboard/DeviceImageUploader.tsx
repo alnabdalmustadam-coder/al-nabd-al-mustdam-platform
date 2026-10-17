@@ -7,6 +7,7 @@ import { ShimmerImage } from '@/components/ui/ShimmerImage';
 interface DeviceImageUploaderProps {
   value?: string;
   onChange: (url: string) => void;
+  onBusyChange?: (busy: boolean) => void;
   folder?: 'articles' | 'services' | 'courses' | 'general';
   slug?: string;
   label?: string;
@@ -99,6 +100,7 @@ async function prepareCoverImage(
 export function DeviceImageUploader({
   value,
   onChange,
+  onBusyChange,
   folder = 'general',
   slug = '',
   label = 'صورة الغلاف المعتمدة',
@@ -115,7 +117,7 @@ export function DeviceImageUploader({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFile = async (file: File) => {
-    if (!file) return;
+    if (!file || isUploading) return;
 
     if (!file.type.startsWith('image/')) {
       setErrorText('يرجى اختيار ملف صورة صالح (PNG, JPG, JPEG, WebP)');
@@ -125,6 +127,7 @@ export function DeviceImageUploader({
     setErrorText(null);
     setFormatNotice(null);
     setIsUploading(true);
+    onBusyChange?.(true);
     setProgress(15);
     setStatusText('جاري تجهيز الصورة...');
 
@@ -191,6 +194,7 @@ export function DeviceImageUploader({
       setStatusText('');
     } finally {
       if (progressTimer) clearInterval(progressTimer);
+      onBusyChange?.(false);
     }
   };
 

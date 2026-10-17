@@ -13,23 +13,26 @@ const readSource = async path => new TextDecoder('utf-8', { fatal: true }).decod
 
 test('content editors fill mobile viewports while retaining desktop dialog bounds', async () => {
   for (const path of editorPaths) {
-    const source = await readSource(path);
+    const page = await readSource(path);
+    const source = path.includes('/courses/') ? await readSource('components/courses/editor/course-editor-frame.tsx') : page;
     assert.match(source, /h-\[100dvh\]/, path);
-    assert.match(source, /sm:h-auto/, path);
+    assert.match(source, /sm:h-(?:auto|\[90dvh\])/, path);
     assert.match(source, /sm:max-h-\[9[24]vh\]/, path);
     assert.match(source, /rounded-none/, path);
     assert.match(source, /sm:rounded-3xl/, path);
-    assert.match(source, /useMobileDialogScrollLock\(isModalOpen/, path);
+    assert.match(page, /useMobileDialogScrollLock\(isModalOpen/, path);
   }
 });
 
 test('course editor footers sit outside the mobile scrolling content', async () => {
   for (const role of ['admin', 'instructor']) {
-    const source = await readSource(`app/dashboard/${role}/courses/page.tsx`);
-    assert.match(source, /flex min-h-0 flex-1 flex-col overflow-hidden sm:block/);
-    assert.match(source, /overflow-y-auto overscroll-contain p-4 sm:contents/);
+    const page = await readSource(`app/dashboard/${role}/courses/page.tsx`);
+    assert.match(page, /<CourseEditorFrame/);
+    const source = await readSource('components/courses/editor/course-editor-frame.tsx');
+    assert.match(source, /flex min-h-0 flex-1 flex-col overflow-hidden/);
+    assert.match(source, /overflow-y-auto overscroll-contain/);
     assert.match(source, /env\(safe-area-inset-bottom\)/);
-    assert.doesNotMatch(source, /sticky bottom-0 z-20 -mx-4 -mb-4/);
+    assert.match(source, /\{children\}<\/fieldset><\/div>[\s\S]*<\/div>\s*<footer/);
   }
 });
 
@@ -95,7 +98,7 @@ test('image uploader normalizes covers to 16:9 and resets when a new cover is se
   assert.match(source, /تم ضبط الصورة تلقائياً كغلاف أفقي 16:9/);
   assert.match(source, /className="object-contain"/);
   assert.match(source, /finally \{\s+if \(progressTimer\) clearInterval\(progressTimer\)/);
-  const course = await readSource('app/dashboard/admin/courses/page.tsx');
+  const course = await readSource('components/courses/editor/course-basic-settings.tsx');
   assert.equal((course.match(/label="صورة غلاف الدورة"/g) || []).length, 1);
   assert.doesNotMatch(course, /Thumbnail/);
 });

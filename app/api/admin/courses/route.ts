@@ -36,6 +36,7 @@ export async function GET(req: Request) {
         title: c.title,
         category: categoryLabel,
         rawCategory: c.category,
+        level: c.level,
         type: 'online',
         trainer: c.instructor || 'مدرب معتمد',
         price: c.price > 0 ? `${c.price.toLocaleString('en-US')} ر.س` : 'مجانية',

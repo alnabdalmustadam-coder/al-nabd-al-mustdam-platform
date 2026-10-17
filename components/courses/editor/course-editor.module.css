@@ -1,0 +1,23 @@
+.dialog {
+  font-family: var(--font-body), sans-serif;
+}
+
+.dialog :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
+  font-family: inherit;
+  letter-spacing: normal;
+  text-shadow: none;
+}
+
+.dialog :is(h1, h2) {
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.dialog :is(h3, h4, h5, h6) {
+  font-weight: 600;
+  line-height: 1.75;
+}
+
+.dialog p {
+  line-height: 1.8;
+}
