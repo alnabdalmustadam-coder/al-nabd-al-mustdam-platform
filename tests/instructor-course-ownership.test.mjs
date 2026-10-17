@@ -69,8 +69,12 @@ function fixture({ role = 'INSTRUCTOR', authenticated = true, rows = [own, forei
     'next/server': { NextResponse: { json: (body, init) => Response.json(body, init) } },
     '@/lib/supabase': { getSupabaseAdmin: () => db },
     '@/lib/observability/logger': { logger: { error() {}, warn() {} } },
+    '@/lib/admin/audit': { recordAdminAudit: async () => {} },
     '@/lib/security/auth': {
       isAdminRole,
+      requireAdmin: async () => !authenticated || !isAdminRole(role)
+        ? { ok: false, response: Response.json({ success: false }, { status: authenticated ? 403 : 401 }) }
+        : { ok: true, user: { id: instructorId }, role },
       requireInstructorOrAdmin: async () => !authenticated
         ? { ok: false, response: Response.json({ success: false }, { status: 401 }) }
         : !isAdminRole(role) && !['INSTRUCTOR', 'TRAINER', 'TEACHER'].includes(role)
@@ -99,6 +103,7 @@ function fixture({ role = 'INSTRUCTOR', authenticated = true, rows = [own, forei
   return {
     records, writes,
     post: body => load('app/api/courses/route').POST(request('/api/courses', 'POST', body)),
+    adminPost: body => load('app/api/admin/courses/route').POST(request('/api/admin/courses', 'POST', body)),
     delete: identifier => load('app/api/courses/route').DELETE(request(`/api/courses?slug=${encodeURIComponent(identifier)}`, 'DELETE')),
     list: () => load('app/api/courses/route').GET(request('/api/courses?mine=1')),
     lesson: (method, slug) => load('app/api/admin/courses/[slug]/lessons/route')[method](
@@ -107,6 +112,29 @@ function fixture({ role = 'INSTRUCTOR', authenticated = true, rows = [own, forei
     ),
   };
 }
+
+test('admin content-only saves preserve course settings and accept videos, documents, quizzes and scoped resources together', async () => {
+  const row = { ...structuredClone(own), price: 199.5, status: 'published', payload: {
+    ...own.payload, professionalDevelopment: true, duration: '1 ساعة و35 دقيقة', category: 'management', level: 'advanced',
+    instructor: 'مدرب الدورة', image: '/cover.webp', description: 'وصف الدورة الأصلي',
+    curriculum: [{ id: 'existing-video', title: 'الفيديو الأصلي', type: 'video', videoUrl: '11111111-1111-4111-8111-111111111111' }],
+    finalExam: { title: 'اختبار قديم', questions: [{ id: 'q', question: 'سؤال', options: ['أ', 'ب'], correctIndex: 0 }] },
+  } };
+  const f = fixture({ role: 'ADMIN', rows: [row] });
+  const file = { id: 'resource', title: 'مرجع', fileUrl: 'https://files.invalid/ref.pdf', fileType: 'pdf' };
+  const quizData = { title: 'اختبار قصير', questions: [{ id: 'q', question: 'اختر', options: ['أ', 'ب'], correctIndex: 1 }] };
+  const curriculum = [{ id: 'existing-video', title: 'وحدة موسعة', attachments: [file], items: [
+    { id: 'existing-video', title: 'الفيديو الأصلي', type: 'video', videoUrl: '11111111-1111-4111-8111-111111111111', attachments: [file] },
+    ...['pdf', 'ppt', 'doc'].map(type => ({ id: type, title: `ملف ${type}`, type, fileUrl: `https://files.invalid/content.${type}` })),
+    { id: 'quiz', title: 'اختبار', type: 'quiz', quizData },
+  ] }];
+  const response = await f.adminPost({ id: row.id, slug: row.slug, title: row.title, curriculum, attachments: [file], finalExam: null });
+  const saved = (await response.json()).course;
+  assert.equal(response.status, 200); assert.equal(saved.price, 199.5); assert.equal(saved.status, 'published');
+  for (const key of ['duration', 'category', 'level', 'instructor', 'image', 'description', 'professionalDevelopment', 'trainerId']) assert.equal(saved[key], row.payload[key]);
+  assert.deepEqual(saved.curriculum, curriculum); assert.deepEqual(saved.attachments, [file]); assert.equal(saved.finalExam, undefined);
+  assert.equal(f.records.length, 1); assert.equal(f.records[0].id, row.id); assert.equal(f.records[0].slug, row.slug);
+});
 
 test('CPD setting persists through saves, defaults off, and can be disabled without losing the curriculum', async () => {
   const f = fixture();

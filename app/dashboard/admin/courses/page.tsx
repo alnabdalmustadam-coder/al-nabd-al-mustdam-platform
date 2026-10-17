@@ -12,7 +12,7 @@ import { createCourseQuizDraft, prepareCourseQuizForEditing } from '@/lib/quizze
 import React, { useState, useEffect, useRef } from 'react';
 import * as tus from 'tus-js-client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Plus, Search, Clock, Edit3, Trash2, CheckCircle2, X, Video, PlayCircle, GraduationCap, UploadCloud, ShieldCheck, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import { BookOpen, Plus, Search, Clock, Edit3, Trash2, CheckCircle2, Video, GraduationCap, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { QuizData, CourseAttachment } from '@/types';
 
 import { CardImage } from '@/components/ui/CardImage';
@@ -152,6 +152,7 @@ export default function AdminCoursesPage() {
 
   // Create / Edit Course Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [contentMode, setContentMode] = useState(false);
   const [editingCourse, setEditingCourse] = useState<CourseItem | null>(null);
   const [formTitle, setFormTitle] = useState('');
   const [formSlug, setFormSlug] = useState('');
@@ -228,30 +229,7 @@ export default function AdminCoursesPage() {
   const [lessonUploadProgress, setLessonUploadProgress] = useState<number>(0);
   const formLessonVideoInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Attachment Uploading State per Section or Sub-Lesson
-
-  // Standalone Studio Modal State
-  const [selectedCourseForLessons, setSelectedCourseForLessons] = useState<CourseItem | null>(null);
-  useMobileDialogScrollLock(isModalOpen || selectedCourseForLessons !== null);
-  const [courseLessons, setCourseLessons] = useState<any[]>([]);
-  const [lessonsLoading, setLessonsLoading] = useState(false);
-
-  // Video Player Preview Modal & Token Generation
-  const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
-  const [previewSignedIframeUrl, setPreviewSignedIframeUrl] = useState<string | null>(null);
-  const [previewLoading, setPreviewLoading] = useState<boolean>(false);
-  const [previewError, setPreviewError] = useState<string | null>(null);
-
-  // Standalone Lesson Upload State
-  const [newLessonTitle, setNewLessonTitle] = useState('');
-  const [newLessonDuration, setNewLessonDuration] = useState('20 دقيقة');
-  const [newLessonUrl, setNewLessonUrl] = useState('');
-  const [uploadMethod, setUploadMethod] = useState<'file' | 'url'>('file');
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
-  const standaloneFileInputRef = useRef<HTMLInputElement | null>(null);
+  useMobileDialogScrollLock(isModalOpen);
 
   // Toast feedback
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -318,6 +296,7 @@ export default function AdminCoursesPage() {
   // ═════════════════════════════════════════════════════════════════════════════
 
   const openCreateModal = () => {
+    setContentMode(false);
     setEditingCourse(null);
     setModalActiveTab('basic');
     setFormTitle('');
@@ -358,9 +337,10 @@ export default function AdminCoursesPage() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (course: CourseItem) => {
+  const openEditModal = (course: CourseItem, contentOnly = false) => {
     setEditingCourse(course);
-    setModalActiveTab('basic');
+    setContentMode(contentOnly);
+    setModalActiveTab(contentOnly ? 'curriculum' : 'basic');
     setFormTitle(course.title);
     setFormSlug(course.slug);
     setFormLevel(course.level || 'all');
@@ -408,6 +388,8 @@ export default function AdminCoursesPage() {
 
     if (Array.isArray(course.curriculum) && course.curriculum.length > 0) {
       setFormSections(curriculumToEditor(course.curriculum));
+    } else if (contentOnly) {
+      setFormSections([]);
     } else {
       setFormSections([
         {
@@ -516,14 +498,6 @@ export default function AdminCoursesPage() {
     }
   };
 
-  // ═════════════════════════════════════════════════════════════════════════════
-  // ATTACHMENT UPLOAD HANDLERS (SUPABASE STORAGE)
-  // ═════════════════════════════════════════════════════════════════════════════
-
-  // Course-level Attachment Bag Upload
-
-  // Handle Upload Course Image
-
   // Handle Save Course
   const handleSaveCourse = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -547,7 +521,11 @@ export default function AdminCoursesPage() {
         0
       );
 
-      const payload: any = {
+      const payload: Record<string, unknown> = contentMode && editingCourse ? {
+        id: editingCourse.id, slug: editingCourse.slug, title: editingCourse.title,
+        curriculum: formattedCurriculum, attachments: formAttachments,
+        finalExam: hasFinalExam ? formFinalExam : null,
+      } : {
         title: formTitle.trim(),
         slug: formSlug.trim() || undefined,
         category: formCategory,
@@ -575,7 +553,7 @@ export default function AdminCoursesPage() {
 
       const data = await res.json();
       if (res.ok && data.success && data.course) {
-        showToast(editingCourse ? 'تم تحديث بيانات ومنهج ومرفقات الدورة بنجاح' : 'تم إضافة الدورة الجديدة مع كامل المنهج والمرفقات بنجاح');
+        showToast(contentMode ? 'تم حفظ محتوى الدورة وملفاتها بنجاح' : editingCourse ? 'تم تحديث بيانات ومنهج ومرفقات الدورة بنجاح' : 'تم إضافة الدورة الجديدة مع كامل المنهج والمرفقات بنجاح');
         setIsModalOpen(false);
 
         // Optimistic UI state update
@@ -604,7 +582,7 @@ export default function AdminCoursesPage() {
           students: savedC.enrollees || 0,
           lessonsCount: totalLessonsCount,
           hours: hoursNum,
-          status: 'published',
+          status: savedC.status === 'published' ? 'published' : 'draft',
           description: savedC.description || formDescription,
           curriculum: savedC.curriculum || formattedCurriculum,
           attachments: savedC.attachments || formAttachments,
@@ -660,177 +638,7 @@ export default function AdminCoursesPage() {
   // STANDALONE LESSONS STUDIO MODAL METHODS
   // ═════════════════════════════════════════════════════════════════════════════
 
-  const openLessonsManager = async (course: CourseItem) => {
-    setSelectedCourseForLessons(course);
-    setLessonsLoading(true);
-    setUploadError(null);
-    setUploadSuccess(null);
-    setNewLessonTitle('');
-    setNewLessonUrl('');
-    setPreviewVideoUrl(null);
-    setPreviewSignedIframeUrl(null);
-    setPreviewError(null);
-
-    try {
-      const res = await fetch(`/api/admin/courses/${course.slug}/lessons?t=${Date.now()}`, { cache: 'no-store' });
-      const data = await res.json();
-      if (data.success && Array.isArray(data.curriculum)) {
-        setCourseLessons(data.curriculum);
-      } else {
-        setCourseLessons([]);
-      }
-    } catch (err) {
-      console.error('Error loading lessons:', err);
-      showToast('تعذر تحميل دروس الدورة', 'error');
-    } finally {
-      setLessonsLoading(false);
-    }
-  };
-
-  const handleSaveLesson = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedCourseForLessons) return;
-    if (!newLessonTitle.trim()) {
-      setUploadError('يرجى كتابة عنوان المحاضرة');
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/admin/courses/${selectedCourseForLessons.slug}/lessons`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: newLessonTitle.trim(),
-          duration: newLessonDuration.trim() || '20 دقيقة',
-          videoUrl: newLessonUrl.trim(),
-          type: 'video',
-          isLocked: false,
-        }),
-      });
-
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showToast('تمت إضافة المحاضرة بنجاح');
-        setNewLessonTitle('');
-        setNewLessonUrl('');
-        setUploadSuccess('تم حفظ المحاضرة في المنهج بنجاح!');
-        if (data.curriculum) {
-          setCourseLessons(data.curriculum);
-        }
-        loadCourses();
-      } else {
-        setUploadError(data.error || 'تعذر حفظ المحاضرة');
-      }
-    } catch (err: any) {
-      setUploadError(err.message || 'حدث خطأ في الاتصال بالخادم');
-    }
-  };
-
-  const handleDeleteLesson = async (lessonId: string) => {
-    if (!selectedCourseForLessons) return;
-    if (!confirm('هل أنت متأكد من حذف هذا الدرس؟')) return;
-
-    try {
-      const res = await fetch(`/api/admin/courses/${selectedCourseForLessons.slug}/lessons?lessonId=${lessonId}`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showToast('تم حذف الدرس بنجاح');
-        if (data.curriculum) {
-          setCourseLessons(data.curriculum);
-        } else {
-          setCourseLessons((prev) => prev.filter((l: any) => l.id !== lessonId));
-        }
-        loadCourses();
-      } else {
-        showToast(data.error || 'فشل حذف الدرس', 'error');
-      }
-    } catch (err) {
-      showToast('تعذر إتمام عملية الحذف', 'error');
-    }
-  };
-
-  // Standalone Direct Video Upload (with auto duration calculation)
-  const handleDirectVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !selectedCourseForLessons) return;
-
-    // Automatically calculate video duration from file
-    const calculatedDuration = await extractVideoDuration(file);
-    setNewLessonDuration(calculatedDuration);
-
-    setIsUploading(true);
-    setUploadProgress(5);
-    setUploadError(null);
-    setUploadSuccess(null);
-
-    try {
-      const videoId = await uploadVideoSecurely(
-        file,
-        `${selectedCourseForLessons.title} - ${newLessonTitle || file.name}`,
-        setUploadProgress,
-      );
-
-      setNewLessonUrl(videoId);
-      setUploadSuccess(`تم رفع الفيديو وتشفيره بنجاح! كود الفيديو: ${videoId} (المدة: ${calculatedDuration})`);
-      showToast(`تم رفع ومعالجة الفيديو بنجاح (المدة: ${calculatedDuration})`);
-    } catch (err: any) {
-      console.error('Direct video upload failed:', err);
-      setUploadError(err.message || 'حدث خطأ أثناء رفع الفيديو');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  // Safe Preview with DRM Token Authentication
-  const handlePreviewVideo = async (rawUrl: string) => {
-    if (!rawUrl) return;
-    const trimmed = rawUrl.trim();
-    setPreviewVideoUrl(trimmed);
-    setPreviewLoading(true);
-    setPreviewError(null);
-    setPreviewSignedIframeUrl(null);
-
-    try {
-      if (!trimmed) {
-        setPreviewError('لا يوجد فيديو مرفق لهذا الدرس بعد.');
-        setPreviewLoading(false);
-        return;
-      }
-
-      // 1. Secure video GUID extraction (36-character UUID)
-      const guidMatch = trimmed.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-      const videoGuid = guidMatch ? guidMatch[0] : (trimmed.length === 36 ? trimmed : null);
-
-      if (videoGuid) {
-        const res = await fetch('/api/videos/playback-token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            videoId: videoGuid,
-            courseSlug: selectedCourseForLessons?.slug || 'admin-preview',
-          }),
-        });
-        const data = await res.json();
-        if (res.ok && data.success && data.iframeUrl) {
-          setPreviewSignedIframeUrl(data.iframeUrl);
-        } else {
-          // Fallback to direct embed
-          setPreviewSignedIframeUrl(`https://iframe.mediadelivery.net/embed/729792/${videoGuid}?autoplay=true&preload=true`);
-        }
-      } else if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-        setPreviewSignedIframeUrl(trimmed);
-      } else {
-        setPreviewError('معرّف الفيديو غير صالح. يرجى إدخال معرّف الفيديو أو رابط مباشر.');
-      }
-    } catch (err: any) {
-      console.error('Error fetching preview token:', err);
-      setPreviewError('تعذر تجهيز مشغل الفيديو للمعاينة');
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
+  const openLessonsManager = (course: CourseItem) => openEditModal(course, true);
 
   // Filtered courses list
   const filteredCourses = courses.filter((c) => {
@@ -1061,7 +869,7 @@ export default function AdminCoursesPage() {
                     className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#2A65C7] text-white font-black text-xs shadow-sm hover:shadow transition-all cursor-pointer active:scale-95"
                   >
                     <Video className="w-4 h-4 text-emerald-300" />
-                    <span>إدارة الدروس والميديا ({course.lessonsCount})</span>
+                    <span>إدارة المحتوى والميديا ({course.lessonsCount})</span>
                   </button>
 
                   <button
@@ -1089,14 +897,14 @@ export default function AdminCoursesPage() {
       {/* 1. ADVANCED CREATE / EDIT COURSE MODAL WITH TABS & SUB-LESSONS STUDIO */}
       {/* ═════════════════════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
-        {isModalOpen && <CourseEditorFrame title={formTitle} editing={Boolean(editingCourse)} tab={modalActiveTab} onTabChange={setModalActiveTab}
+        {isModalOpen && <CourseEditorFrame mode={contentMode ? 'content' : 'course'} title={formTitle} editing={Boolean(editingCourse)} tab={modalActiveTab} onTabChange={setModalActiveTab}
           onClose={() => setIsModalOpen(false)} onSubmit={handleSaveCourse} onInvalid={() => showToast('يرجى إكمال الحقول المطلوبة قبل حفظ الدورة', 'error')}
           busy={isSubmitting} uploading={resourceUploads > 0 || lessonUploadProgress > 0}>
           {modalActiveTab === 'basic' && <CourseBasicSettings value={{ title: formTitle, slug: formSlug, category: formCategory, level: formLevel,
             trainer: formTrainer, price: formPrice, hours: formHours, description: formDescription, image: formImage, professionalDevelopment: formProfessionalDevelopment }}
             onChange={changeBasicSettings} categories={categoriesList} onAddCategory={(name) => setCategoriesList((list) => list.some((item) => item.id === name) ? list : [...list, { id: name, label: name }])}
             trainers={instructorsList} onAddTrainer={(name) => setInstructorsList((list) => list.includes(name) ? list : [...list, name])} onImageBusyChange={onResourceBusy} />}
-          {modalActiveTab === 'curriculum' && <CourseCurriculumEditor value={formSections} onChange={setFormSections} onUploadVideo={triggerVideoUpload}
+          {modalActiveTab === 'curriculum' && <CourseCurriculumEditor courseSlug={editingCourse?.slug || formSlug || undefined} value={formSections} onChange={setFormSections} onUploadVideo={triggerVideoUpload}
             videoUpload={lessonUploadProgress > 0 ? uploadingTarget : null} videoProgress={lessonUploadProgress} onFileBusyChange={onResourceBusy} disabled={isSubmitting || resourceUploads > 0} />}
           {modalActiveTab === 'attachments' && <div className="space-y-7">
             <EditorSectionHeading kind="files" eyebrow="مرفقات الدورة" title="ملفات تدعم الدورة بالكامل" description="أضف الحقيبة التدريبية أو الملفات العامة التي يحتاجها الطالب طوال الدورة. لملفات درس أو وحدة بعينها، استخدم قسم المنهج والدروس." />
@@ -1111,390 +919,7 @@ export default function AdminCoursesPage() {
         </CourseEditorFrame>}
       </AnimatePresence>
 
-      {/* ═════════════════════════════════════════════════════════════════════════════ */}
-      {/* 2. STANDALONE MEDIA & LESSONS STUDIO MODAL */}
-      {/* ═════════════════════════════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {selectedCourseForLessons && (
-          <div className="fixed inset-0 z-[100] flex items-stretch justify-stretch bg-slate-900/70 backdrop-blur-sm sm:items-center sm:justify-center sm:p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 bg-white shadow-2xl sm:h-auto sm:max-h-[92vh] sm:max-w-5xl sm:rounded-3xl sm:border sm:border-slate-100"
-            >
-              {/* Modal Header */}
-              <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0c234b] px-4 py-3 text-white sm:p-6">
-                <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-500/20 sm:h-11 sm:w-11 sm:rounded-2xl">
-                    <Video className="w-5 h-5 text-emerald-300" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="hidden items-center gap-2 sm:flex">
-                      <span className="px-2 py-0.5 rounded-md bg-white/20 text-[10px] font-black">
-                        بث فيديو آمن
-                      </span>
-                      <span className="text-xs text-emerald-300 font-bold">محتوى محمي</span>
-                    </div>
-                    <h3 className="mt-0.5 truncate text-sm font-black sm:text-lg">{selectedCourseForLessons.title}</h3>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setSelectedCourseForLessons(null);
-                    setPreviewVideoUrl(null);
-                    setPreviewSignedIframeUrl(null);
-                    setPreviewError(null);
-                  }}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
 
-              {/* Modal Body */}
-              <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6">
-                {/* 1. Add New Lesson & Upload Section */}
-                <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
-                  <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <h4 className="text-xs font-black text-slate-800 flex items-center gap-2">
-                      <Plus className="w-4 h-4 text-[#173A7C]" />
-                      <span>إضافة محاضرة أو درس جديد للدورة</span>
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
-                      <button
-                        type="button"
-                        onClick={() => setUploadMethod('file')}
-                        className={`px-3 py-1 rounded-lg text-xs font-black transition-colors cursor-pointer ${
-                          uploadMethod === 'file'
-                            ? 'bg-[#173A7C] text-white'
-                            : 'bg-white text-slate-600 border border-slate-200'
-                        }`}
-                      >
-                        رفع فيديو مباشر
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setUploadMethod('url')}
-                        className={`px-3 py-1 rounded-lg text-xs font-black transition-colors cursor-pointer ${
-                          uploadMethod === 'url'
-                            ? 'bg-[#173A7C] text-white'
-                            : 'bg-white text-slate-600 border border-slate-200'
-                        }`}
-                      >
-                        إدخال كود الفيديو / رابط
-                      </button>
-                    </div>
-                  </div>
-
-                  <form onSubmit={handleSaveLesson} className="space-y-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="sm:col-span-2">
-                        <label className="block text-[11px] font-black text-slate-700 mb-1">
-                          عنوان المحاضرة أو الدرس *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={newLessonTitle}
-                          onChange={(e) => setNewLessonTitle(e.target.value)}
-                          placeholder="مثال: الدرس الأول: التأسيس والمفاهيم الجوهرية"
-                          className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-black text-slate-700 mb-1">
-                          المدة (تُحسب تلقائياً)
-                        </label>
-                        <input
-                          type="text"
-                          value={newLessonDuration}
-                          onChange={(e) => setNewLessonDuration(e.target.value)}
-                          placeholder="تُحسب تلقائياً عند رفع الفيديو"
-                          className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                        />
-                      </div>
-                    </div>
-
-                    {uploadMethod === 'file' ? (
-                      <div className="p-4 rounded-xl bg-white border-2 border-dashed border-slate-200 text-center space-y-2">
-                        <UploadCloud className="w-8 h-8 text-[#173A7C] mx-auto" />
-                        <div className="text-xs font-black text-slate-700">
-                          اختر ملف الفيديو لرفعه إلى مكتبة الدورة
-                        </div>
-                        <p className="text-[11px] text-slate-400 font-medium">
-                          يتم احتساب وتعبئة مدة الفيديو تلقائياً فور اختياره
-                        </p>
-
-                        <div className="pt-2">
-                          <input
-                            ref={standaloneFileInputRef}
-                            type="file"
-                            accept="video/*"
-                            onChange={handleDirectVideoUpload}
-                            disabled={isUploading}
-                            className="hidden"
-                            id="standalone-video-upload-input"
-                          />
-                          <label
-                            htmlFor="standalone-video-upload-input"
-                            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs font-black cursor-pointer transition-all shadow-xs ${
-                              isUploading ? 'opacity-50 pointer-events-none' : ''
-                            }`}
-                          >
-                            {isUploading ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>جاري الرفع والمعالجة ({uploadProgress}%)...</span>
-                              </>
-                            ) : (
-                              <>
-                                <UploadCloud className="w-4 h-4" />
-                                <span>اختيار ملف فيديو من جهازك</span>
-                              </>
-                            )}
-                          </label>
-                        </div>
-
-                        {isUploading && (
-                          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-3">
-                            <div
-                              className="bg-emerald-500 h-full transition-all duration-300"
-                              style={{ width: `${uploadProgress}%` }}
-                            />
-                          </div>
-                        )}
-
-                        {uploadSuccess && (
-                          <div className="p-3 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 text-right flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                              <span>{uploadSuccess}</span>
-                            </div>
-                            {newLessonUrl && (
-                              <button
-                                type="button"
-                                onClick={() => handlePreviewVideo(newLessonUrl)}
-                                className="px-3 py-1.5 rounded-lg bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-[11px] font-black transition-all cursor-pointer shrink-0 shadow-xs flex items-center gap-1.5 self-start sm:self-auto"
-                              >
-                                <PlayCircle className="w-3.5 h-3.5 text-emerald-300" />
-                                <span>معاينة الفيديو الآن</span>
-                              </button>
-                            )}
-                          </div>
-                        )}
-
-                        {uploadError && (
-                          <div className="p-2.5 rounded-lg bg-rose-50 text-rose-800 text-xs font-bold border border-rose-200 text-right flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                            <span>{uploadError}</span>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-[11px] font-black text-slate-700">
-                            معرّف الفيديو أو الرابط أو كود التضمين
-                          </label>
-                          {newLessonUrl && (
-                            <button
-                              type="button"
-                              onClick={() => handlePreviewVideo(newLessonUrl)}
-                              className="text-[11px] text-[#173A7C] hover:underline font-bold flex items-center gap-1 cursor-pointer"
-                            >
-                              <PlayCircle className="w-3.5 h-3.5 text-blue-600" />
-                              <span>معاينة الرابط المكتوب</span>
-                            </button>
-                          )}
-                        </div>
-                        <input
-                          type="text"
-                          required
-                          value={newLessonUrl}
-                          onChange={(e) => setNewLessonUrl(e.target.value)}
-                          placeholder="مثال: 425e04f2-2081-48a4-bf1f-53042736aba4 أو معرف يوتيوب"
-                          className="w-full px-3.5 py-2 text-xs font-bold text-slate-800 bg-white rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C]"
-                        />
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-end pt-2">
-                      <button
-                        type="submit"
-                        disabled={isUploading}
-                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>إضافة المحاضرة للمنهج</span>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-
-                {/* 2. Video Preview Player (If Selected) */}
-                {previewVideoUrl && (
-                  <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-3 shadow-xl border border-slate-800 animate-fade-in-up">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs font-black text-emerald-400">
-                        <PlayCircle className="w-4 h-4" />
-                        <span>معاينة مشغل الفيديو الآمن</span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setPreviewVideoUrl(null);
-                          setPreviewSignedIframeUrl(null);
-                          setPreviewError(null);
-                        }}
-                        className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-                      >
-                        ✕ إغلاق المشغل
-                      </button>
-                    </div>
-
-                    <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black flex items-center justify-center border border-slate-800 shadow-inner">
-                      {previewLoading ? (
-                        <div className="flex flex-col items-center justify-center gap-3 text-slate-300 text-xs font-bold p-8">
-                          <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
-                          <span>جاري إعداد مشغل الفيديو وتوليد تصريح المشاهدة الآمن...</span>
-                        </div>
-                      ) : previewError ? (
-                        <div className="flex flex-col items-center justify-center gap-2 text-rose-400 text-xs font-bold p-8 text-center">
-                          <AlertCircle className="w-7 h-7 text-rose-500" />
-                          <span>{previewError}</span>
-                          <button
-                            onClick={() => handlePreviewVideo(previewVideoUrl)}
-                            className="mt-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-white text-xs font-black transition-colors cursor-pointer"
-                          >
-                            إعادة المحاولة
-                          </button>
-                        </div>
-                      ) : previewSignedIframeUrl ? (
-                        <iframe
-                          src={previewSignedIframeUrl}
-                          loading="lazy"
-                          className="border-0 absolute top-0 left-0 h-full w-full"
-                          allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
-                          allowFullScreen={true}
-                        />
-                      ) : (
-                        <div className="text-slate-400 text-xs font-bold">لا يوجد رابط فيديو متاح للمعاينة</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. Existing Lessons List */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-black text-slate-800">
-                      قائمة دروس ومحاضرات الدورة ({courseLessons.length} درس)
-                    </h4>
-                    <span className="text-[11px] text-slate-500 font-bold">
-                      يتم حفظ الترتيب والمشاهدات تلقائياً
-                    </span>
-                  </div>
-
-                  {lessonsLoading ? (
-                    <div className="p-8 text-center text-slate-500 text-xs font-bold flex items-center justify-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin text-[#173A7C]" />
-                      <span>جاري تحميل الدروس...</span>
-                    </div>
-                  ) : courseLessons.length === 0 ? (
-                    <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
-                      <Video className="w-8 h-8 text-slate-400 mx-auto" />
-                      <div className="text-xs font-black text-slate-700">لم يتم إضافة دروس بعد</div>
-                      <p className="text-[11px] text-slate-400">
-                        استخدم النموذج أعلاه لرفع أول فيديو أو درس لهذه الدورة
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2.5">
-                      {courseLessons.map((lesson: any, idx: number) => (
-                        <div
-                          key={lesson.id || idx}
-                          className="p-3.5 rounded-2xl bg-white border border-slate-200 flex items-center justify-between gap-3 hover:border-slate-300 transition-all"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-7 h-7 rounded-xl bg-slate-100 text-slate-700 text-xs font-black flex items-center justify-center shrink-0">
-                              {idx + 1}
-                            </span>
-                            <div>
-                              <h5 className="text-xs font-black text-slate-900">{lesson.title}</h5>
-                              <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium mt-0.5">
-                                <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-slate-400" />
-                                  <span>{lesson.duration}</span>
-                                </span>
-                                <span>•</span>
-                                  <span className="text-blue-600 font-mono">
-                                    {lesson.videoUrl
-                                      ? lesson.videoUrl.includes('-') && lesson.videoUrl.length > 20
-                                        ? `فيديو محمي: ${lesson.videoUrl.substring(0, 10)}...`
-                                        : `فيديو: ${lesson.videoUrl.substring(0, 15)}...`
-                                      : 'بدون فيديو'}
-                                  </span>
-                                {lesson.items && lesson.items.length > 0 && (
-                                  <>
-                                    <span>•</span>
-                                    <span className="text-emerald-700 font-bold">
-                                      {lesson.items.length} مقاطع فرعية
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {lesson.videoUrl && (
-                              <button
-                                onClick={() => handlePreviewVideo(lesson.videoUrl)}
-                                className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#173A7C] text-[11px] font-black transition-colors flex items-center gap-1 cursor-pointer"
-                              >
-                                <PlayCircle className="w-3.5 h-3.5 text-blue-600" />
-                                <span>معاينة</span>
-                              </button>
-                            )}
-
-                            <button
-                              onClick={() => handleDeleteLesson(lesson.id)}
-                              className="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-                              title="حذف الدرس"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="flex shrink-0 items-center justify-between border-t border-slate-100 bg-slate-50 p-3 text-xs font-bold text-slate-500 sm:p-4">
-                <div className="hidden items-center gap-2 sm:flex">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>جميع الفيديوهات مشفرة تلقائياً وتعمل مع تقنية الحماية من القرصنة وتوثيق الطالب</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCourseForLessons(null);
-                    setPreviewVideoUrl(null);
-                    setPreviewSignedIframeUrl(null);
-                    setPreviewError(null);
-                  }}
-                  className="w-full cursor-pointer rounded-xl bg-slate-200 px-5 py-2.5 font-black text-slate-800 transition-colors hover:bg-slate-300 sm:w-auto sm:py-2"
-                >
-                  إغلاق
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

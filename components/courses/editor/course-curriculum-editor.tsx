@@ -7,13 +7,15 @@ import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
 import { CourseFilesEditor, primaryDocumentFiles, type FilesUpdate } from './course-files-editor';
 import { EditorField, EditorSectionHeading, editorButton, editorInput, editorPrimary } from './editor-ui';
 import { EditorSelect } from './editor-select';
+import { CourseVideoPreview } from './course-video-preview';
 
 type Props = { value: EditorSection[]; onChange: Dispatch<SetStateAction<EditorSection[]>>;
   onUploadVideo: (section: number, lesson?: number) => void;
   videoUpload: { secIdx: number; subIdx?: number } | null; videoProgress: number;
   onFileBusyChange: (busy: boolean) => void; disabled?: boolean;
+  courseSlug?: string;
 };
-export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUpload, videoProgress, onFileBusyChange, disabled = false }: Props) {
+export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUpload, videoProgress, onFileBusyChange, disabled = false, courseSlug }: Props) {
   const [collapsed, setCollapsed] = useState(() => new Set(value.slice(1).map((section) => section.id)));
   const patchSection = (id: string, patch: Partial<EditorSection>) => onChange((current) => current.map((section) => section.id === id ? { ...section, ...patch } : section));
   const patchLesson = (id: string, lessonId: string, patch: Partial<EditorLesson>) => onChange((current) => current.map((section) => section.id === id
@@ -31,7 +33,7 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
   };
   const busy = disabled || Boolean(videoUpload);
   return <div className="space-y-7">
-    <EditorSectionHeading kind="curriculum" eyebrow="المحتوى التعليمي" title="الوحدات والدروس" description="قسّم الدورة إلى وحدات، ثم أضف الدروس وملفاتها. ملفات الوحدة متاحة داخل وحدتها، وملفات الدرس تظهر مع الدرس نفسه."
+    <EditorSectionHeading kind="curriculum" eyebrow="المحتوى التعليمي" title="الوحدات والدروس" description="أضف فيديو أو مستندًا أو اختبارًا داخل أي وحدة، وأرفق ملفاتها ومراجعها. اضغط على زر الحفظ عند الانتهاء."
       action={<button type="button" onClick={addSection} disabled={busy} className={editorPrimary}><Plus className="h-4 w-4" />إضافة وحدة</button>} />
     <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600"><span className="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-white px-3 py-2.5 shadow-sm"><Layers aria-hidden="true" className="h-4 w-4 text-blue-700" /><strong className="font-semibold text-blue-950">{value.length}</strong> وحدات</span>
       <span className="inline-flex items-center gap-2 rounded-xl border border-emerald-100 bg-white px-3 py-2.5 shadow-sm"><BookOpen aria-hidden="true" className="h-4 w-4 text-emerald-700" /><strong className="font-semibold text-slate-900">{value.reduce((total, section) => total + section.subItems.length, 0)}</strong> دروس</span></div>
@@ -75,6 +77,7 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
                 {lesson.type === 'video' && <div className="space-y-4"><div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]"><EditorField icon={Video} label="فيديو الدرس"><input value={lesson.videoUrl} dir="ltr" onChange={(event) => patchLesson(section.id, lesson.id, { videoUrl: event.target.value })} placeholder="رابط الفيديو أو معرّفه" className={`${editorInput} text-right`} /></EditorField>
                   <button type="button" disabled={busy} onClick={() => onUploadVideo(sectionIndex, lessonIndex)} className={`${editorButton} min-h-12`}>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}{uploading ? `جاري الرفع ${videoProgress}%` : 'رفع فيديو'}</button></div>
                   {uploading && <div role="progressbar" aria-label="رفع فيديو الدرس" aria-valuenow={videoProgress} aria-valuemin={0} aria-valuemax={100} className="h-2 overflow-hidden rounded-full bg-blue-100"><div className="h-full rounded-full bg-blue-700 transition-all" style={{ width: `${videoProgress}%` }} /></div>}
+                  {lesson.videoUrl.trim() && !uploading && <CourseVideoPreview videoUrl={lesson.videoUrl} title={lesson.title} courseSlug={courseSlug} />}
                 </div>}
                 {['pdf', 'doc', 'ppt'].includes(lesson.type) && <CourseFilesEditor title="مستند الدرس الرئيسي" description="يظهر هذا الملف كمحتوى الدرس، ويمكن للطالب عرضه وتحميله." single files={primaryDocumentFiles(lesson)} onBusyChange={onFileBusyChange}
                   onChange={(update) => { onChange((current) => current.map((entry) => entry.id !== section.id ? entry : { ...entry, subItems: entry.subItems.map((item) => { if (item.id !== lesson.id) return item; const file = update(primaryDocumentFiles(item))[0]; return { ...item, fileUrl: file?.fileUrl, fileName: file?.title, fileSize: file?.fileSize, ...(file ? { type: file.fileType === 'ppt' ? 'ppt' as const : ['word', 'doc'].includes(file.fileType || '') ? 'doc' as const : 'pdf' as const } : {}) }; }) })); }} />}

@@ -33,7 +33,7 @@ function fixture(overrides = {}) {
     vm.runInNewContext(compiled, { exports, require: child => load(child, resolved), crypto: globalThis.crypto, AbortController, FormData, File, ...overrides.globals });
     return exports;
   }
-  return { load, render(Component, props) { cursor = 0; const tree = Component(props); while (effects.length) effects.shift()(); return tree; }, cleanup() { for (const slot of slots) slot?.cleanup?.(); } };
+  return { load, render(Component, props) { cursor = 0; const tree = Component(props); while (effects.length) effects.shift()(); return tree; }, cleanup() { for (const slot of slots) slot?.cleanup?.(); }, remount() { for (const slot of slots) slot?.cleanup?.(); slots.length = 0; } };
 }
 function findAll(tree, predicate) { const nodes = []; function visit(node) { if (!node || typeof node !== 'object') return; if (Array.isArray(node)) return node.forEach(visit); if (predicate(node)) nodes.push(node); visit(node.props?.children); } visit(tree); return nodes; }
 const text = node => typeof node === 'string' ? node : Array.isArray(node) ? node.map(text).join('') : text(node?.props?.children || '');
@@ -132,4 +132,88 @@ test('an unmounted uploader aborts without attaching a late response to a differ
   findAll(tree, node => node.type === 'input')[0].props.onChange({ target: { files: [new File(['test'], 'ref.pdf')], value: '' } });
   f.cleanup(); release(Response.json({ success: true, fileUrl: 'https://files.invalid/ref.pdf' })); await new Promise(resolve => setImmediate(resolve));
   assert.equal(updates, 0); assert.deepEqual(busy, [true, false]);
+});
+
+const tickPreview = async () => { for (let i = 0; i < 5; i++) await new Promise(resolve => setImmediate(resolve)); };
+function openPreview(f, props) {
+  const { CourseVideoPreview } = f.load('@/components/courses/editor/course-video-preview');
+  let tree = f.render(CourseVideoPreview, props);
+  assert.equal(findAll(tree, node => node.type === 'iframe').length, 0);
+  tree.props.onToggle({ currentTarget: { open: true } });
+  tree = f.render(CourseVideoPreview, props);
+  const player = findAll(tree, node => node.type?.name === 'PreviewPlayer')[0];
+  f.remount(); // The nested player has its own React hook state.
+  return player;
+}
+
+test('editor video previews load lazily and request authenticated manager playback with the course context', async () => {
+  const calls = []; const props = { videoUrl: '11111111-1111-4111-8111-111111111111', title: 'فيديو', courseSlug: 'course' };
+  const f = fixture({ globals: { URL, fetch: async (url, options) => { calls.push([url, JSON.parse(options.body)]); return Response.json({ success: true, iframeUrl: 'https://iframe.mediadelivery.net/embed/signed' }); } } });
+  const { CourseVideoPreview } = f.load('@/components/courses/editor/course-video-preview');
+  f.render(CourseVideoPreview, props); assert.equal(calls.length, 0);
+  const player = openPreview(f, props);
+  const initial = f.render(player.type, player.props); assert.equal(findAll(initial, node => node.type === 'iframe').length, 0);
+  await tickPreview(); const result = f.render(player.type, player.props);
+  assert.deepEqual(calls, [['/api/videos/playback-token', { videoId: props.videoUrl, courseSlug: 'course' }]]);
+  assert.equal(findAll(result, node => node.type === 'iframe')[0].props.src, 'https://iframe.mediadelivery.net/embed/signed');
+});
+
+test('failed signed previews show an error without falling back to an unsigned video', async () => {
+  const props = { videoUrl: '11111111-1111-4111-8111-111111111111', title: 'فيديو' };
+  const f = fixture({ globals: { URL, fetch: async () => Response.json({ success: false, error: 'غير مسموح' }, { status: 403 }) } });
+  const player = openPreview(f, props); f.render(player.type, player.props); await tickPreview();
+  const result = f.render(player.type, player.props);
+  assert.equal(findAll(result, node => node.type === 'iframe').length, 0);
+  assert.match(text(findAll(result, node => node.props?.role === 'alert')[0]), /غير مسموح/);
+});
+
+test('closing a preview aborts its token request and ignores late responses', async () => {
+  let release, signal;
+  const f = fixture({ globals: { URL, fetch: (_url, options) => { signal = options.signal; return new Promise(resolve => { release = resolve; }); } } });
+  const player = openPreview(f, { videoUrl: '11111111-1111-4111-8111-111111111111', title: 'فيديو' });
+  f.render(player.type, player.props); f.cleanup(); assert.equal(signal.aborted, true);
+  release(Response.json({ success: true, iframeUrl: 'https://iframe.mediadelivery.net/embed/late' })); await tickPreview();
+  assert.equal(findAll(f.render(player.type, player.props), node => node.type === 'iframe').length, 0);
+});
+
+function managerFixture(curriculum) {
+  const requests = [];
+  const course = { id: '7', slug: 'existing', title: 'دورة موجودة', category: 'إدارة وأعمال', rawCategory: 'management', level: 'advanced', trainer: 'المحاضر', price: '199.5 ر.س', rawPrice: 199.5, students: 3, lessonsCount: curriculum.length, hours: 12, status: 'draft', curriculum, attachments: [file('general')], professionalDevelopment: false };
+  const f = fixture({
+    '@/components/courses/editor/course-editor-frame': { CourseEditorFrame: 'CourseEditorFrame' },
+    '@/components/courses/editor/course-basic-settings': { CourseBasicSettings: 'CourseBasicSettings' },
+    '@/components/courses/editor/course-curriculum-editor': { CourseCurriculumEditor: 'CourseCurriculumEditor' },
+    '@/components/courses/editor/course-files-editor': { CourseFilesEditor: 'CourseFilesEditor' },
+    '@/components/ui/CardImage': { CardImage: 'CardImage' },
+    '@/components/dashboard/useMobileDialogScrollLock': { useMobileDialogScrollLock() {} },
+    '@/utils/supabase/client': { createClient: () => { const query = { select: () => query, eq: () => query, maybeSingle: async () => ({ data: null }) }; return { from: () => query }; } },
+    'framer-motion': { motion: new Proxy({}, { get: (_, name) => `motion.${name}` }), AnimatePresence: 'AnimatePresence' },
+    'tus-js-client': {},
+    globals: { URL, setTimeout() {}, console: { warn() {}, error() {} }, fetch: async (url, options = {}) => {
+      if (options.method === 'POST') { requests.push(JSON.parse(options.body)); return Response.json({ success: true, course: { ...course, ...requests.at(-1), price: 199.5 } }); }
+      return Response.json(url.startsWith('/api/admin/courses') ? { success: true, courses: [course] } : { users: [] });
+    } },
+  });
+  return { ...f, requests };
+}
+
+for (const curriculum of [[], [{ id: 'old', title: 'درس سابق', type: 'video', videoUrl: 'video-1' }]]) test(`admin media action opens the shared content editor and submits only content fields (${curriculum.length} existing units)`, async () => {
+  const f = managerFixture(curriculum), { default: Page } = f.load('@/app/dashboard/admin/courses/page');
+  f.render(Page); await tickPreview();
+  let tree = f.render(Page);
+  findAll(tree, node => node.type === 'button' && text(node).includes('إدارة المحتوى والميديا'))[0].props.onClick();
+  tree = f.render(Page);
+  const frame = findAll(tree, node => node.type === 'CourseEditorFrame')[0];
+  assert.equal(frame.props.mode, 'content'); assert.equal(frame.props.tab, 'curriculum');
+  const editor = findAll(tree, node => node.type === 'CourseCurriculumEditor')[0];
+  assert.equal(editor.props.courseSlug, 'existing'); assert.equal(editor.props.value.length, curriculum.length);
+  const resource = file('added', 'pptx');
+  editor.props.onChange(current => current.length ? current.map(section => ({ ...section, attachments: [...section.attachments, resource] })) : current);
+  tree = f.render(Page);
+  await findAll(tree, node => node.type === 'CourseEditorFrame')[0].props.onSubmit({ preventDefault() {} });
+  assert.equal(f.requests.length, 1);
+  assert.deepEqual(Object.keys(f.requests[0]).sort(), ['id', 'slug', 'title', 'curriculum', 'attachments', 'finalExam'].sort());
+  assert.deepEqual(f.requests[0].attachments.map(item => item.id), ['general']);
+  if (curriculum.length) { assert.equal(f.requests[0].curriculum[0].items[0].id, 'old'); assert.equal(f.requests[0].curriculum[0].attachments[0].fileType, 'ppt'); }
+  else assert.deepEqual(f.requests[0].curriculum, []);
 });

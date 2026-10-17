@@ -803,7 +803,7 @@ export default function InstructorCoursesPage() {
             trainer: formTrainer, price: formPrice, hours: formHours, description: formDescription, image: formImage, professionalDevelopment: formProfessionalDevelopment }}
             onChange={changeBasicSettings} categories={categoriesList} onAddCategory={(name) => setCategoriesList((list) => list.some((item) => item.id === name) ? list : [...list, { id: name, label: name }])}
              onImageBusyChange={onResourceBusy} />}
-          {modalActiveTab === 'curriculum' && <CourseCurriculumEditor value={formSections} onChange={setFormSections} onUploadVideo={triggerVideoUploadForTarget}
+          {modalActiveTab === 'curriculum' && <CourseCurriculumEditor courseSlug={editingCourse?.slug || formSlug || undefined} value={formSections} onChange={setFormSections} onUploadVideo={triggerVideoUploadForTarget}
             videoUpload={lessonUploadProgress > 0 ? uploadingTarget : null} videoProgress={lessonUploadProgress} onFileBusyChange={onResourceBusy} disabled={isSubmitting || resourceUploads > 0} />}
           {modalActiveTab === 'attachments' && <div className="space-y-7">
             <EditorSectionHeading kind="files" eyebrow="مرفقات الدورة" title="ملفات تدعم الدورة بالكامل" description="أضف الحقيبة التدريبية أو الملفات العامة التي يحتاجها الطالب طوال الدورة. لملفات درس أو وحدة بعينها، استخدم قسم المنهج والدروس." />
