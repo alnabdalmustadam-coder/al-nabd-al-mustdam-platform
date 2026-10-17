@@ -45,20 +45,20 @@ export default function SatisfactionPage() {
     <header className={`${styles.hero} rounded-2xl sm:rounded-3xl`}>
       <div className="p-4 sm:p-7">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3 sm:gap-4"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-emerald-200 sm:h-14 sm:w-14 sm:rounded-2xl"><HeartHandshake aria-hidden="true" className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.6} /></span>
-            <div><p className="mb-1 hidden text-xs font-semibold text-emerald-200 sm:block">تجربة التعلّم</p><h1 className="text-xl font-bold leading-8 text-white sm:text-3xl sm:leading-9">رضا الطلاب</h1></div>
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-700 sm:h-14 sm:w-14 sm:rounded-2xl"><HeartHandshake aria-hidden="true" className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.6} /></span>
+            <div><p className="mb-1 hidden text-xs font-semibold text-emerald-700 sm:block">تجربة التعلّم</p><h1 className="text-xl font-bold leading-8 text-[#173A7C] sm:text-3xl sm:leading-9">رضا الطلاب</h1></div>
           </div>
           <div className="flex shrink-0 items-center gap-3"><span className="hidden xl:block"><SatisfactionArtwork /></span><button type="button" disabled={loading} onClick={refresh} aria-label={loading ? 'جاري تحديث بيانات الرضا' : 'تحديث بيانات الرضا'} className={`${action} ${styles.heroRefresh} w-11 px-0! sm:w-auto sm:px-4!`}><RefreshCw aria-hidden="true" className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /><span className="hidden sm:inline">{loading ? 'جاري التحديث' : 'تحديث البيانات'}</span></button></div>
         </div>
-        <p className="mt-3 max-w-xl text-xs leading-6 text-blue-100 sm:mt-4 sm:text-sm sm:leading-7">تابع رضا الطلاب عن دروس الدورات واختباراتها.</p>
+        <p className="mt-3 max-w-xl text-xs leading-6 text-slate-500 sm:mt-4 sm:text-sm sm:leading-7">تابع رضا الطلاب عن دروس الدورات واختباراتها.</p>
       </div>
-      <dl aria-label="إحصاءات رضا الطلاب" className="grid grid-cols-3 border-t border-white/10 bg-slate-950/10 px-2 py-3 sm:px-7 sm:py-5">
-        {[{ label: 'قلوب الرضا', value: courses.reduce((sum, course) => sum + course.hearts, 0), hint: 'عن الدروس والاختبارات', Icon: Heart, color: 'bg-white/10 text-rose-200' },
-          { label: 'طلاب شاركوا', value: data?.learners || 0, hint: 'كل طالب يُحسب مرة واحدة', Icon: Users, color: 'bg-white/10 text-blue-200' },
-          { label: 'دورات مقيّمة', value: rated, hint: data ? `من أصل ${number(courses.length)} دورة` : 'عبر جميع الدورات', Icon: BookOpen, color: 'bg-white/10 text-emerald-200' }].map(({ label, value, hint, Icon, color }, index) => <div key={label} className={`relative flex min-w-0 flex-col px-1 text-center sm:px-3 sm:pr-16 sm:text-right ${index ? 'border-r border-white/15 sm:pr-20' : ''}`}>
-            <dt className="order-2 mt-1 truncate text-[10px] font-medium leading-5 text-blue-100 sm:text-xs">{label}</dt>
-            <dd className="order-1 flex items-center justify-center gap-1.5 text-xl font-bold leading-7 tabular-nums text-white sm:justify-start sm:text-2xl"><span aria-hidden="true" className={`absolute top-1 right-3 hidden h-11 w-11 items-center justify-center rounded-2xl sm:flex ${index ? 'sm:right-5' : ''} ${color}`}><Icon className="h-5 w-5" strokeWidth={1.7} /></span><Icon aria-hidden="true" className={`h-3.5 w-3.5 shrink-0 sm:hidden ${color.split(' ').at(-1)}`} /><bdi>{data ? number(value) : '—'}</bdi></dd>
-            <dd className="order-3 mt-0.5 hidden text-[11px] leading-5 text-blue-200/70 sm:block">{hint}</dd>
+      <dl aria-label="إحصاءات رضا الطلاب" className="grid grid-cols-3 border-t border-slate-200/70 bg-white/60 px-2 py-3 sm:px-7 sm:py-5">
+        {[{ label: 'قلوب الرضا', value: courses.reduce((sum, course) => sum + course.hearts, 0), hint: 'عن الدروس والاختبارات', Icon: Heart, color: 'bg-rose-50 text-rose-600' },
+          { label: 'طلاب شاركوا', value: data?.learners || 0, hint: 'كل طالب يُحسب مرة واحدة', Icon: Users, color: 'bg-blue-50 text-blue-700' },
+          { label: 'دورات مقيّمة', value: rated, hint: data ? `من أصل ${number(courses.length)} دورة` : 'عبر جميع الدورات', Icon: BookOpen, color: 'bg-emerald-50 text-emerald-700' }].map(({ label, value, hint, Icon, color }, index) => <div key={label} className={`relative flex min-w-0 flex-col px-1 text-center sm:px-3 sm:pr-16 sm:text-right ${index ? 'border-r border-slate-200/80 sm:pr-20' : ''}`}>
+            <dt className="order-2 mt-1 truncate text-[10px] font-medium leading-5 text-slate-600 sm:text-xs">{label}</dt>
+            <dd className="order-1 flex items-center justify-center gap-1.5 text-xl font-bold leading-7 tabular-nums text-[#173A7C] sm:justify-start sm:text-2xl"><span aria-hidden="true" className={`absolute top-1 right-3 hidden h-11 w-11 items-center justify-center rounded-2xl sm:flex ${index ? 'sm:right-5' : ''} ${color}`}><Icon className="h-5 w-5" strokeWidth={1.7} /></span><Icon aria-hidden="true" className={`h-3.5 w-3.5 shrink-0 sm:hidden ${color.split(' ').at(-1)}`} /><bdi>{data ? number(value) : '—'}</bdi></dd>
+            <dd className="order-3 mt-0.5 hidden text-[11px] leading-5 text-slate-500 sm:block">{hint}</dd>
           </div>)}
       </dl>
     </header>

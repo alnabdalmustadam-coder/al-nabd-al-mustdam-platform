@@ -21,22 +21,22 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border: 1px solid rgb(255 255 255 / 55%);
+  border: 1px solid rgb(255 255 255 / 85%);
   background:
-    radial-gradient(ellipse at 5% 0, rgb(70 184 150 / 38%), transparent 55%),
-    linear-gradient(115deg, #123b51, #183e79 58%, #162d58);
-  box-shadow: 0 12px 28px -18px rgb(14 42 85 / 50%);
+    radial-gradient(ellipse at 5% 0, rgb(167 228 206 / 28%), transparent 55%),
+    linear-gradient(115deg, #f0f8f5, #fff 58%, #f1f5fc);
+  box-shadow: 0 12px 28px -18px rgb(23 58 124 / 20%);
 }
 
 .heroRefresh {
-  border-color: rgb(255 255 255 / 20%);
-  background: rgb(255 255 255 / 10%);
-  color: #fff;
+  border-color: #dce5ef;
+  background: rgb(255 255 255 / 85%);
+  color: #173a7c;
 }
 
 .heroRefresh:hover {
-  border-color: rgb(255 255 255 / 40%);
-  background: rgb(255 255 255 / 18%);
+  border-color: #bfdbfe;
+  background: #eff6ff;
 }
 
 .cards {
@@ -71,7 +71,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: linear-gradient(180deg, rgb(12 29 57 / 30%), transparent 30%, rgb(12 29 57 / 28%) 45%, rgb(11 30 59 / 80%) 72%, rgb(11 30 59 / 97%) 100%);
+  background: linear-gradient(180deg, rgb(12 29 57 / 10%), transparent 35%, rgb(12 29 57 / 12%) 55%, rgb(11 30 59 / 60%) 78%, rgb(11 30 59 / 88%) 100%);
 }
 
 .coverBadges {
