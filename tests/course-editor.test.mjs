@@ -18,7 +18,7 @@ function fixture(overrides = {}) {
     useEffect(fn, deps) { const index = cursor++; const previous = slots[index]; if (!previous || deps.some((item, i) => !Object.is(item, previous.deps[i]))) effects.push(() => { previous?.cleanup?.(); slots[index] = { deps, cleanup: fn() }; }); },
   };
   const jsx = (type, props) => ({ type, props });
-  const stubs = { react, 'react/jsx-runtime': { jsx, jsxs: jsx }, 'lucide-react': new Proxy({}, { get: (_, name) => name }),
+  const stubs = { react, 'react-dom': { createPortal: child => child }, 'react/jsx-runtime': { jsx, jsxs: jsx }, 'lucide-react': new Proxy({}, { get: (_, name) => name }),
     '@/components/quizzes/course-quiz-editor': { CourseQuizEditor: 'CourseQuizEditor' }, ...overrides };
   const loaded = new Map();
   function load(name, parent = '') {

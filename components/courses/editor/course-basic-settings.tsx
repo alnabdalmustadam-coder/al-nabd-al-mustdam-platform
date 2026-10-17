@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Plus, Check, X, BookOpen, LayoutGrid, BarChart3, UserRound, Link2, Wallet, Clock3, AlignRight, Image, Settings2, ShieldCheck, type LucideIcon } from 'lucide-react';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 import { EditorCardHeading, EditorField, EditorSectionHeading, EditorToggle, editorInput, editorButton } from './editor-ui';
+import { EditorSelect } from './editor-select';
 
 export type BasicSettings = { title: string; slug: string; category: string; level: string; trainer: string; price: string;
   hours: string; description: string; image: string; professionalDevelopment: boolean };
@@ -15,10 +16,7 @@ function EditableChoice({ label, value, options, onChange, onAdd, icon: Icon }: 
     {adding ? <div className="flex items-center gap-2"><input autoFocus aria-label={`اسم ${label}`} value={draft} onChange={(event) => setDraft(event.target.value)}
       onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); add(); } }} placeholder="اكتب الاسم هنا" className={editorInput} />
       <button type="button" aria-label="إضافة الاسم" onClick={add} className={`${editorButton} !px-3`}><Check className="h-4 w-4" /></button><button type="button" aria-label="إلغاء الإضافة" onClick={() => setAdding(false)} className="flex h-11 w-11 shrink-0 items-center justify-center text-slate-400"><X className="h-4 w-4" /></button></div>
-      : <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)} className={editorInput}>
-        {!options.some((option) => option.id === value) && <option value={value}>{value || 'اختر من القائمة'}</option>}
-        {options.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
-      </select>}
+      : <EditorSelect label={label} value={value} onChange={onChange} options={options} searchable />}
   </div>;
 }
 export function CourseBasicSettings({ value, onChange, categories, onAddCategory, trainers, onAddTrainer, onImageBusyChange }: {
@@ -33,7 +31,7 @@ export function CourseBasicSettings({ value, onChange, categories, onAddCategory
       <EditorField icon={BookOpen} label="عنوان الدورة"><input required maxLength={200} value={value.title} onChange={(event) => onChange({ title: event.target.value })} placeholder="مثال: أساسيات السلامة المهنية" className={editorInput} /></EditorField>
       <div className="grid gap-x-6 gap-y-6 sm:grid-cols-2">
         <EditableChoice icon={LayoutGrid} label="التصنيف" value={value.category} options={categories} onChange={(category) => onChange({ category })} onAdd={onAddCategory} />
-        <EditorField icon={BarChart3} label="المستوى"><select value={value.level} onChange={(event) => onChange({ level: event.target.value })} className={editorInput}><option value="all">جميع المستويات</option><option value="beginner">مبتدئ</option><option value="intermediate">متوسط</option><option value="advanced">متقدم</option></select></EditorField>
+        <EditorField icon={BarChart3} label="المستوى"><EditorSelect label="المستوى" value={value.level} onChange={(level) => onChange({ level })} options={[{ id: 'all', label: 'جميع المستويات' }, { id: 'beginner', label: 'مبتدئ' }, { id: 'intermediate', label: 'متوسط' }, { id: 'advanced', label: 'متقدم' }]} /></EditorField>
         {trainers ? <EditableChoice icon={UserRound} label="المدرّب" value={value.trainer} options={trainers.map((name) => ({ id: name, label: name }))} onChange={(trainer) => onChange({ trainer })} onAdd={onAddTrainer} /> : <EditorField icon={UserRound} label="المدرّب"><input value={value.trainer} readOnly className={editorInput} /></EditorField>}
         <EditorField icon={Link2} label="رابط الدورة" hint="اتركه فارغًا لإنشائه تلقائيًا من عنوان الدورة."><input dir="auto" value={value.slug} onChange={(event) => onChange({ slug: event.target.value })} placeholder="مثال: occupational-safety" className={editorInput} /></EditorField>
         <EditorField icon={Wallet} label="رسوم الدورة (ر.س)"><input inputMode="decimal" type="number" min="0" step="0.01" value={value.price} onChange={(event) => onChange({ price: event.target.value })} placeholder="0 للدورة المجانية" className={editorInput} /></EditorField>

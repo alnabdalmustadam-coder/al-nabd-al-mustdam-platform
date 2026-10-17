@@ -59,7 +59,7 @@ export function CourseEditorFrame({ title, editing, tab, onTabChange, onClose, o
               <span className="min-w-0"><span className="block text-xs font-semibold sm:text-sm">{label}</span><span className="mt-1 hidden text-[11px] font-normal leading-5 text-slate-500 lg:block">{description}</span></span>
               <span aria-hidden="true" className="mr-auto hidden text-[10px] tabular-nums text-slate-400 xl:block">0{number + 1}</span>
             </button>)}</div>
-            <div className="mt-7 hidden rounded-2xl border border-blue-100/80 bg-white/90 p-4 lg:block"><span className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><Save aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={1.7} /></span><p className="text-xs font-semibold text-slate-700">كل تفاصيل الدورة في مكان واحد</p><p className="mt-2 text-xs leading-6 text-slate-500">تنقّل بين الأقسام بحرية، ثم اضغط على حفظ التغييرات عند الانتهاء.</p></div>
+            <div className="mt-5 hidden items-start gap-2.5 px-2 lg:flex"><Save aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" strokeWidth={1.7} /><div><p className="text-[11px] font-semibold text-slate-600">كل تفاصيل الدورة في مكان واحد</p><p className="mt-1 text-[11px] leading-6 text-slate-400">تنقّل بين الأقسام، ثم اضغط على زر الحفظ عند الانتهاء.</p></div></div>
           </nav>
           <div ref={scroll} className={`${styles.content} min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-5 sm:p-8 lg:p-9`}><fieldset disabled={busy} className="min-w-0">{children}</fieldset></div>
         </div>

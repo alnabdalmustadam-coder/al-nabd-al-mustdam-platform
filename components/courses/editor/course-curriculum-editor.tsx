@@ -6,6 +6,7 @@ import { createCourseQuizDraft } from '@/lib/quizzes/course-quiz-draft';
 import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
 import { CourseFilesEditor, primaryDocumentFiles, type FilesUpdate } from './course-files-editor';
 import { EditorField, EditorSectionHeading, editorButton, editorInput, editorPrimary } from './editor-ui';
+import { EditorSelect } from './editor-select';
 
 type Props = { value: EditorSection[]; onChange: Dispatch<SetStateAction<EditorSection[]>>;
   onUploadVideo: (section: number, lesson?: number) => void;
@@ -68,9 +69,8 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
                   {section.subItems.length > 1 && <button type="button" disabled={busy} aria-label={`حذف الدرس ${lessonIndex + 1} من الوحدة ${sectionIndex + 1}`} onClick={() => onChange((current) => current.map((item) => item.id === section.id ? { ...item, subItems: item.subItems.filter((entry) => entry.id !== lesson.id) } : item))} className="flex h-11 w-11 items-center justify-center rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>}
                 </div>
                 <div className="grid gap-x-5 gap-y-5 sm:grid-cols-[minmax(0,1fr)_180px]"><EditorField icon={BookOpen} label="عنوان الدرس"><input required value={lesson.title} onChange={(event) => patchLesson(section.id, lesson.id, { title: event.target.value })} placeholder="اكتب عنوانًا يوضّح محتوى الدرس" className={editorInput} /></EditorField>
-                  <EditorField icon={Layers} label="نوع المحتوى"><select aria-label="نوع الدرس" disabled={busy} value={lesson.type} className={editorInput} onChange={(event) => { const type = event.target.value as EditorLesson['type']; patchLesson(section.id, lesson.id, { type, ...(type === 'quiz' && !lesson.quizData ? { quizData: createCourseQuizDraft() } : {}) }); }}>
-                    <option value="video">فيديو</option><option value="pdf">مستند PDF</option><option value="ppt">عرض PowerPoint</option><option value="doc">مستند Word</option><option value="quiz">اختبار</option>{lesson.type === 'article' && <option value="article">محتوى نصي</option>}
-                  </select></EditorField>
+                  <EditorField icon={Layers} label="نوع المحتوى"><EditorSelect label="نوع الدرس" disabled={busy} value={lesson.type} onChange={(value) => { const type = value as EditorLesson['type']; patchLesson(section.id, lesson.id, { type, ...(type === 'quiz' && !lesson.quizData ? { quizData: createCourseQuizDraft() } : {}) }); }}
+                    options={[{ id: 'video', label: 'فيديو' }, { id: 'pdf', label: 'مستند PDF' }, { id: 'ppt', label: 'عرض PowerPoint' }, { id: 'doc', label: 'مستند Word' }, { id: 'quiz', label: 'اختبار' }, ...(lesson.type === 'article' ? [{ id: 'article', label: 'محتوى نصي' }] : [])]} /></EditorField>
                 </div>
                 {lesson.type === 'video' && <div className="space-y-4"><div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]"><EditorField icon={Video} label="فيديو الدرس"><input value={lesson.videoUrl} dir="ltr" onChange={(event) => patchLesson(section.id, lesson.id, { videoUrl: event.target.value })} placeholder="رابط الفيديو أو معرّفه" className={`${editorInput} text-right`} /></EditorField>
                   <button type="button" disabled={busy} onClick={() => onUploadVideo(sectionIndex, lessonIndex)} className={`${editorButton} min-h-12`}>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}{uploading ? `جاري الرفع ${videoProgress}%` : 'رفع فيديو'}</button></div>
