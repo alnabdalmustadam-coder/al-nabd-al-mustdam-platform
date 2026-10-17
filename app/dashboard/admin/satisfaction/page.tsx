@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
-import { BookOpen, Check, ChevronDown, ClipboardCheck, Clock3, GraduationCap, Heart, HeartHandshake, Layers3, RefreshCw, Search, SlidersHorizontal, Sparkles, Users, X } from 'lucide-react';
-import { CardImage } from '@/components/ui/CardImage';
+import { useEffect, useState } from 'react';
+import { BookOpen, ChevronDown, Heart, HeartHandshake, RefreshCw, Search, SlidersHorizontal, Sparkles, Users, X } from 'lucide-react';
+import { CourseFeedbackCard, SatisfactionDetails } from './course-satisfaction';
 import { EditorSelect } from '@/components/courses/editor/editor-select';
 import styles from './satisfaction.module.css';
-import { selectSatisfactionCourses, type CourseSatisfaction, type SatisfactionContent, type SatisfactionFilter, type SatisfactionResponse, type SatisfactionSort } from '@/lib/learning/satisfaction-summary';
+import { selectSatisfactionCourses, type SatisfactionFilter, type SatisfactionResponse, type SatisfactionSort } from '@/lib/learning/satisfaction-summary';
 
 const number = (value: number) => value.toLocaleString('en-US');
-const categories: Record<string, string> = { tech: 'تقنية وحاسب', languages: 'لغات', security: 'أمن وسلامة', corporate: 'إدارة وأعمال', management: 'إدارة وأعمال', design: 'تصميم', admin: 'أعمال مكتبية', data: 'إدخال بيانات' };
+
 const action = 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-[#173A7C] transition-colors hover:border-blue-200 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/20 disabled:opacity-50';
 
 function SatisfactionArtwork() {
@@ -21,67 +21,10 @@ function SatisfactionArtwork() {
   </svg>;
 }
 
-function FeedbackRow({ item }: { item: SatisfactionContent }) {
-  const quiz = item.content_kind === 'quiz';
-  const Icon = quiz ? ClipboardCheck : BookOpen;
-  const title = item.title || (quiz ? 'اختبار الدورة' : 'درس الدورة');
-  return <li className={styles.row}>
-    <span className={`flex h-7 w-7 items-center justify-center rounded-lg border border-white/80 ${quiz ? 'bg-amber-50/90 text-amber-700' : 'bg-blue-50/90 text-[#173A7C]'}`}><Icon aria-hidden="true" className="h-3.5 w-3.5" /><span className="sr-only">{quiz ? 'اختبار' : 'درس'}</span></span>
-    <p title={title} className={styles.rowTitle}>{title}</p>
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-rose-100/70 bg-rose-50/90 px-2 py-1 text-[11px] font-semibold tabular-nums text-rose-700" aria-label={`${number(item.hearts)} قلب رضا`}><Heart aria-hidden="true" className="h-3 w-3" /><bdi>{number(item.hearts)}</bdi></span>
-  </li>;
-}
-
-function CourseFeedbackCard({ course }: { course: CourseSatisfaction }) {
-  const id = useId();
-  const [kind, setKind] = useState<'all' | 'lesson' | 'quiz'>('all');
-  const contents = course.contents.filter((item) => kind === 'all' || item.content_kind === kind);
-  const duration = course.duration.replace(/\s*تدريبية\s*معتمدة/g, '').trim();
-  const metrics = [
-    { label: 'كل القلوب', description: 'إجمالي قلوب الرضا', value: course.hearts, Icon: Heart, color: 'text-rose-300' },
-    { label: 'الطلاب', description: 'عدد الطلاب الذين عبّروا عن رضاهم', value: course.learners, Icon: Users, color: 'text-emerald-200' },
-    { label: 'رضا الدروس', description: 'قلوب الرضا عن الدروس', value: course.lesson_hearts, Icon: BookOpen, color: 'text-blue-200' },
-    { label: 'رضا الاختبار', description: 'قلوب الرضا عن الاختبارات', value: course.quiz_hearts, Icon: ClipboardCheck, color: 'text-amber-200' },
-  ];
-  return <article aria-labelledby={id} className={styles.card}>
-    <div className={styles.cover}>
-      <CardImage src={course.image} alt={course.title} sizes="(min-width: 1536px) 440px, (min-width: 1024px) 45vw, (min-width: 768px) 48vw, 95vw" />
-      <div className={styles.coverBadges}>
-        <span className={`${styles.badge} shrink-0`}><span className={`h-1.5 w-1.5 shrink-0 rounded-full ${course.status === 'published' ? 'bg-emerald-300' : 'bg-slate-300'}`} />{course.status === 'published' ? 'منشورة' : course.status === 'archived' ? 'مؤرشفة' : 'مسودة'}</span>
-        <span className={styles.badge} title={categories[course.category] || course.category}><span className="truncate">{categories[course.category] || course.category || 'دورة تدريبية'}</span></span>
-      </div>
-      <div className={styles.coverText}>
-        <h2 id={id} title={course.title} className={styles.courseTitle}>{course.title}</h2>
-        {course.instructor && <p className={styles.trainer} title={course.instructor}><GraduationCap aria-hidden="true" className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{course.instructor}</span></p>}
-      </div>
-    </div>
-    <div className={styles.body}>
-      <div className={styles.meta}>
-        {duration && <span title={course.duration} className="flex min-w-0 items-center gap-1"><Clock3 aria-hidden="true" className="h-3 w-3 shrink-0" /><span className="truncate">{duration}</span></span>}
-        <span className="inline-flex shrink-0 items-center gap-1" title="عدد عناصر المحتوى التعليمي"><Layers3 aria-hidden="true" className="h-3 w-3" />المحتوى <bdi>{number(course.lessonCount)}</bdi></span>
-        {course.professionalDevelopment && <span className="mr-auto inline-flex shrink-0 items-center gap-1 text-emerald-200"><Check aria-hidden="true" className="h-3 w-3" />تطوير مهني</span>}
-      </div>
-      <dl aria-label={`ملخص رضا الطلاب عن ${course.title}`} className={styles.metrics}>
-        {metrics.map(({ label, description, value, Icon, color }) => <div key={label} className={styles.metric} title={description}>
-          <dt aria-label={description}>{label}</dt>
-          <dd><Icon aria-hidden="true" className={`h-3.5 w-3.5 shrink-0 ${color}`} /><bdi>{number(value)}</bdi></dd>
-        </div>)}
-      </dl>
-      <div className={styles.feedback}>
-        {course.contents.length ? <>
-          <h3 className="sr-only">تفاصيل الرضا عن المحتوى</h3>
-          <div role="group" aria-label={`تصفية تقييمات ${course.title}`} className={styles.tabs}>{([{ id: 'all', label: 'الكل' }, { id: 'lesson', label: 'الدروس' }, { id: 'quiz', label: 'الاختبارات' }] as const).map((tab) => <button key={tab.id} type="button" aria-pressed={kind === tab.id} onClick={() => setKind(tab.id)} className={styles.tab}>{tab.label}</button>)}</div>
-          {contents.length ? <><ul>{contents.slice(0, 3).map((item) => <FeedbackRow key={`${item.content_kind}:${item.content_key}`} item={item} />)}</ul>
-            {contents.length > 3 && <details key={kind} className="group mt-1 border-t border-blue-100/15 pt-1"><summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-2 text-[11px] font-semibold text-emerald-200 [&::-webkit-details-marker]:hidden">المزيد من التقييمات ({number(contents.length - 3)})<ChevronDown aria-hidden="true" className="h-3.5 w-3.5 transition-transform group-open:rotate-180" /></summary><ul>{contents.slice(3).map((item) => <FeedbackRow key={`${item.content_kind}:${item.content_key}`} item={item} />)}</ul></details>}
-          </> : <p role="status" className="truncate py-3 text-[11px] text-blue-100/80">لا توجد قلوب رضا على {kind === 'quiz' ? 'الاختبارات' : 'الدروس'} بعد.</p>}
-        </> : <p className="flex items-center gap-2 text-[11px] leading-7 text-blue-100/80"><HeartHandshake aria-hidden="true" className="h-4 w-4 shrink-0 text-emerald-200" /><span className="truncate">بانتظار تقييم الطلاب للدروس والاختبارات</span></p>}
-      </div>
-    </div>
-  </article>;
-}
 
 export default function SatisfactionPage() {
   const [data, setData] = useState<SatisfactionResponse | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true), [error, setError] = useState(''), [reload, setReload] = useState(0);
   const [query, setQuery] = useState(''), [filter, setFilter] = useState<SatisfactionFilter>('all'), [sort, setSort] = useState<SatisfactionSort>('hearts');
   useEffect(() => {
@@ -96,6 +39,7 @@ export default function SatisfactionPage() {
   }, [reload]);
   const courses = data?.courses || [], rated = courses.filter((course) => course.hearts > 0).length;
   const visible = selectSatisfactionCourses(courses, query, filter, sort);
+  const selected = courses.find((course) => course.id === selectedId);
   const refresh = () => { setLoading(true); setReload((value) => value + 1); };
   return <div className={`${styles.page} mx-auto min-w-0 max-w-[1440px] space-y-4 px-0 py-1 sm:space-y-6 sm:px-2 sm:py-3 lg:p-5`} dir="rtl">
     <header className={`${styles.hero} rounded-2xl sm:rounded-3xl`}>
@@ -127,8 +71,9 @@ export default function SatisfactionPage() {
       <div className="space-y-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-3 sm:space-y-0"><div role="group" aria-label="حالة تقييم الدورات" className="grid grid-cols-3 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">{([{ id: 'all', label: 'كل الدورات', mobile: 'الكل', count: courses.length }, { id: 'rated', label: 'لديها تقييمات', mobile: 'مقيّمة', count: rated }, { id: 'waiting', label: 'في انتظار التقييم', mobile: 'بدون تقييم', count: courses.length - rated }] as const).map((tab) => <button key={tab.id} type="button" aria-pressed={filter === tab.id} onClick={() => setFilter(tab.id)} className={`inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-2 py-1 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/20 sm:min-h-10 sm:gap-2 sm:px-3.5 sm:text-xs ${filter === tab.id ? 'border-[#173A7C] bg-[#173A7C] text-white shadow-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:text-[#173A7C]'}`}><span className="sm:hidden">{tab.mobile}</span><span className="hidden sm:inline">{tab.label}</span><bdi className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] tabular-nums ${filter === tab.id ? 'bg-white/15 text-blue-100' : 'bg-slate-100 text-slate-500'}`}>{number(tab.count)}</bdi></button>)}</div><p role="status" className="text-left text-[11px] text-slate-500 sm:text-xs">عرض {number(visible.length)} من {number(courses.length)} دورة</p></div>
     </section>}
     {loading && !data ? <div role="status" aria-label="جاري تحميل رضا الطلاب" className={styles.cards}>{[0, 1].map((item) => <div key={item} className={`${styles.card} animate-pulse`}><div className="aspect-video bg-blue-200/50" /><div className="space-y-3 p-4"><div className="h-4 w-3/4 rounded-lg bg-blue-100" /><div className="h-14 rounded-xl bg-blue-100/60" /></div></div>)}</div>
-      : data && <div aria-busy={loading} className={styles.cards}>{visible.map((course) => <CourseFeedbackCard key={course.id} course={course} />)}
+      : data && <div aria-busy={loading} className={styles.cards}>{visible.map((course) => <CourseFeedbackCard key={course.id} course={course} onDetails={setSelectedId} />)}
         {!visible.length && <div className="col-span-full flex flex-col items-center rounded-3xl border border-dashed border-blue-200 bg-blue-50/70 px-6 py-12 text-center"><span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-[#173A7C]"><Search aria-hidden="true" className="h-6 w-6" /></span><h2 className="text-lg font-bold text-slate-800">{courses.length ? 'لا توجد دورات تطابق البحث' : 'لا توجد دورات لعرضها حاليًا'}</h2><p className="mt-2 text-sm leading-7 text-slate-500">{courses.length ? 'جرّب اسمًا آخر أو اعرض كل الدورات.' : 'ستظهر الدورات ونتائج رضا الطلاب هنا بعد إضافتها.'}</p>{courses.length > 0 && <button type="button" className={`${action} mt-5`} onClick={() => { setQuery(''); setFilter('all'); }}><X aria-hidden="true" className="h-4 w-4" />مسح التصفية</button>}</div>}
       </div>}
+    {selected && <SatisfactionDetails key={selected.id} course={selected} onClose={() => setSelectedId(null)} />}
   </div>;
 }
