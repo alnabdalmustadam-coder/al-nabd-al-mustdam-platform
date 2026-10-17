@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useId, useRef, type FormEvent, type ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, BookOpen, Check, ClipboardCheck, FileText, Layers, Loader2, Settings2, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpen, Check, ClipboardCheck, FolderOpen, Layers, Loader2, Save, Settings2, X } from 'lucide-react';
 import { editorButton, editorPrimary } from './editor-ui';
 import styles from './course-editor.module.css';
 
@@ -8,7 +8,7 @@ export type CourseEditorTab = 'basic' | 'curriculum' | 'attachments' | 'exam';
 const tabs = [
   { id: 'basic', title: 'بيانات الدورة', description: 'التفاصيل وإعدادات التعلم', Icon: Settings2 },
   { id: 'curriculum', title: 'المنهج والدروس', description: 'الوحدات والمحتوى والملفات', Icon: Layers },
-  { id: 'attachments', title: 'مرفقات الدورة', description: 'ملفات عامة لجميع الدروس', Icon: FileText },
+  { id: 'attachments', title: 'مرفقات الدورة', description: 'ملفات عامة لجميع الدروس', Icon: FolderOpen },
   { id: 'exam', title: 'الاختبار النهائي', description: 'الأسئلة وإعدادات الاجتياز', Icon: ClipboardCheck },
 ] as const;
 
@@ -39,29 +39,31 @@ export function CourseEditorFrame({ title, editing, tab, onTabChange, onClose, o
   }, []);
   useEffect(() => { scroll.current?.scrollTo({ top: 0 }); }, [tab]);
   const index = tabs.findIndex((item) => item.id === tab);
+  const ActiveIcon = tabs[index]?.Icon || BookOpen;
   return <div className="fixed inset-0 z-[100] flex items-stretch justify-center bg-slate-950/60 backdrop-blur-sm sm:items-center sm:p-5" dir="rtl">
     <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby={`${id}-title`} aria-describedby={`${id}-description`} tabIndex={-1}
       className={`${styles.dialog} flex h-[100dvh] w-full min-w-0 flex-col overflow-hidden rounded-none bg-[#f7f9fc] text-sm font-normal text-slate-700 shadow-2xl outline-none sm:h-[90dvh] sm:max-h-[94vh] sm:max-w-[1180px] sm:rounded-3xl`}>
-      <header className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 sm:px-8 sm:py-6">
-        <div className="flex min-w-0 items-center gap-4"><div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-900 sm:flex"><BookOpen className="h-6 w-6" /></div>
+      <header className={`${styles.header} relative flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 px-5 py-5 sm:px-8 sm:py-6`}>
+        <div className="relative flex min-w-0 items-center gap-4"><div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-700 bg-linear-to-br from-blue-700 to-blue-950 text-white shadow-[0_5px_16px_rgba(23,58,124,0.2)] sm:h-14 sm:w-14"><ActiveIcon aria-hidden="true" className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.7} /></div>
           <div className="min-w-0"><h1 id={`${id}-title`} className="text-lg font-bold leading-8 text-slate-950 sm:text-2xl">{editing ? 'تعديل الدورة' : 'إنشاء دورة جديدة'}</h1>
             <p id={`${id}-description`} className="mt-1 max-w-[70vw] truncate text-xs leading-6 text-slate-500 sm:max-w-2xl sm:text-sm">{title.trim() || 'أضف تفاصيل الدورة، ثم جهّز محتواها وملفاتها.'}</p></div></div>
-        <button type="button" aria-label="إغلاق نافذة الدورة" onClick={onClose} disabled={blocked} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition-colors hover:bg-slate-50 focus-visible:ring-4 focus-visible:ring-blue-500/20 disabled:opacity-50"><X className="h-5 w-5" /></button>
+        <button type="button" aria-label="إغلاق نافذة الدورة" onClick={onClose} disabled={blocked} className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white/90 text-slate-500 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50 focus-visible:ring-4 focus-visible:ring-blue-500/20 disabled:opacity-50"><X className="h-5 w-5" /></button>
       </header>
       <form onSubmit={onSubmit} onInvalidCapture={onInvalid} className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-          <nav aria-label="أقسام إعداد الدورة" className="shrink-0 border-b border-slate-200 bg-white p-3 sm:px-6 lg:w-60 lg:border-b-0 lg:border-l lg:px-4 lg:py-6">
+          <nav aria-label="أقسام إعداد الدورة" className={`${styles.navigation} shrink-0 border-b border-slate-200 p-3 sm:px-6 lg:w-[260px] lg:border-b-0 lg:border-l lg:px-4 lg:py-6`}>
+            <p className="mb-4 hidden items-center gap-2 px-3 text-[11px] font-semibold text-slate-400 lg:flex"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />إعداد الدورة</p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-1 lg:gap-3">{tabs.map(({ id: key, title: label, description, Icon }, number) => <button key={key} type="button" disabled={blocked} aria-current={tab === key ? 'step' : undefined} onClick={() => onTabChange(key)}
-              className={`flex min-h-12 min-w-0 items-center gap-2.5 rounded-xl border px-3 py-3 text-right transition-colors lg:px-4 lg:py-4 ${tab === key ? 'border-blue-200 bg-blue-50 text-blue-950' : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800'}`}>
-              <Icon className={`h-[18px] w-[18px] shrink-0 ${tab === key ? 'text-blue-800' : 'text-slate-400'}`} />
+              className={`${styles.navItem} flex min-h-12 min-w-0 items-center gap-2.5 rounded-2xl border px-2.5 py-3 text-right transition-colors lg:gap-3 lg:px-3 lg:py-4 ${tab === key ? 'border-blue-200 bg-blue-50 text-blue-950' : 'border-transparent text-slate-500 hover:bg-white hover:text-slate-800'}`}>
+              <span className={styles.navIcon}><Icon aria-hidden="true" className="h-[19px] w-[19px] shrink-0 lg:h-[22px] lg:w-[22px]" strokeWidth={1.7} /></span>
               <span className="min-w-0"><span className="block text-xs font-semibold sm:text-sm">{label}</span><span className="mt-1 hidden text-[11px] font-normal leading-5 text-slate-500 lg:block">{description}</span></span>
-              <span className="mr-auto hidden text-xs tabular-nums text-slate-400 xl:block">0{number + 1}</span>
+              <span aria-hidden="true" className="mr-auto hidden text-[10px] tabular-nums text-slate-400 xl:block">0{number + 1}</span>
             </button>)}</div>
-            <p className="mt-8 hidden border-t border-slate-100 pt-5 text-xs leading-6 text-slate-400 lg:block">يمكنك التنقل بين الأقسام بحرية. تُحفظ التغييرات عند الضغط على زر الحفظ.</p>
+            <div className="mt-7 hidden rounded-2xl border border-blue-100/80 bg-white/90 p-4 lg:block"><span className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><Save aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={1.7} /></span><p className="text-xs font-semibold text-slate-700">كل تفاصيل الدورة في مكان واحد</p><p className="mt-2 text-xs leading-6 text-slate-500">تنقّل بين الأقسام بحرية، ثم اضغط على حفظ التغييرات عند الانتهاء.</p></div>
           </nav>
-          <div ref={scroll} className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-5 sm:p-8 lg:p-9"><fieldset disabled={busy} className="min-w-0">{children}</fieldset></div>
+          <div ref={scroll} className={`${styles.content} min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-5 sm:p-8 lg:p-9`}><fieldset disabled={busy} className="min-w-0">{children}</fieldset></div>
         </div>
-        <footer className="grid shrink-0 grid-cols-2 items-center gap-3 border-t border-slate-200 bg-white px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:flex sm:justify-between sm:px-8">
+        <footer className={`${styles.footer} grid shrink-0 grid-cols-2 items-center gap-3 border-t border-slate-200 bg-white px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:flex sm:justify-between sm:px-8`}>
           <button type="button" disabled={blocked} onClick={onClose} className={`${editorButton} hidden sm:inline-flex`}>إلغاء</button>
           <div className="col-span-2 grid grid-cols-2 gap-3 sm:flex sm:items-center">
             <button type="button" disabled={blocked || index === 0} onClick={() => onTabChange(tabs[index - 1].id)} className={`${editorButton} disabled:opacity-30`}><ArrowRight className="h-4 w-4" />السابق</button>

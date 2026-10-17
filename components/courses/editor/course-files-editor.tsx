@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useId, useRef, useState } from 'react';
-import { ArrowUpFromLine, ExternalLink, FileText, Loader2, Presentation, Trash2 } from 'lucide-react';
+import { ArrowUpFromLine, ExternalLink, FileArchive, FileText, FolderOpen, Loader2, Presentation, Trash2 } from 'lucide-react';
 import type { CourseAttachment } from '@/types';
 
 export type FilesUpdate = (current: CourseAttachment[]) => CourseAttachment[];
@@ -46,10 +46,10 @@ export function CourseFilesEditor({ title, description, files, onChange, onBusyC
     }
   };
   return <section aria-labelledby={`${id}-title`} className="min-w-0 space-y-4">
-    <div><h3 id={`${id}-title`} className="text-sm font-semibold leading-7 text-slate-800">{title}</h3><p className="mt-1 text-xs font-normal leading-6 text-slate-500">{description}</p></div>
+    <div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-white text-blue-800 shadow-sm"><FolderOpen aria-hidden="true" className="h-5 w-5" strokeWidth={1.7} /></span><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 id={`${id}-title`} className="text-sm font-semibold leading-7 text-slate-800">{title}</h3>{files.length > 0 && <span className="rounded-md bg-blue-100/70 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-blue-800">{files.length}</span>}</div><p className="mt-1 text-xs font-normal leading-6 text-slate-500">{description}</p></div></div>
     {files.length > 0 && <div className="space-y-3">{files.map((file, index) => <div key={file.id || file.fileUrl} className="flex min-w-0 flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:p-4">
-      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${file.fileType === 'ppt' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-700'}`}>
-        {file.fileType === 'ppt' ? <Presentation className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
+      <div className={`flex h-12 w-12 shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl border ${file.fileType === 'ppt' ? 'border-orange-100 bg-orange-50 text-orange-700' : file.fileType === 'zip' ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-blue-100 bg-blue-50 text-blue-700'}`}>
+        {file.fileType === 'ppt' ? <Presentation aria-hidden="true" className="h-5 w-5" /> : file.fileType === 'zip' ? <FileArchive aria-hidden="true" className="h-5 w-5" /> : <FileText aria-hidden="true" className="h-5 w-5" />}<span aria-hidden="true" className="text-[8px] font-bold leading-none">{file.fileType?.toUpperCase() || 'FILE'}</span>
       </div>
       <div className="min-w-0 flex-1"><label className="block"><span className="sr-only">اسم الملف {index + 1} في {title}</span>
         <input value={file.title} aria-label={`اسم الملف ${index + 1} في ${title}`} onChange={(event) => {
@@ -66,10 +66,10 @@ export function CourseFilesEditor({ title, description, files, onChange, onBusyC
     <button type="button" disabled={Boolean(progress)} onClick={() => input.current?.click()}
       onDragOver={(event) => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)}
       onDrop={(event) => { event.preventDefault(); setDragging(false); void upload(Array.from(event.dataTransfer.files)); }}
-      className={`flex w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-5 py-5 text-center transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 disabled:cursor-wait ${dragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300 bg-white/70 hover:border-blue-400 hover:bg-blue-50/40'}`}>
-      <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-blue-800">{progress ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowUpFromLine className="h-5 w-5" />}</span>
+      className={`group flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed px-5 py-6 text-center transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 disabled:cursor-wait ${dragging ? 'border-blue-500 bg-blue-50' : 'border-blue-200 bg-linear-to-b from-white to-blue-50/50 hover:border-blue-400 hover:to-blue-50'}`}>
+      <span aria-hidden="true" className="relative isolate mb-1 flex h-14 w-14 items-center justify-center rounded-2xl border border-white bg-linear-to-br from-blue-600 to-blue-900 text-white shadow-[0_5px_14px_rgba(23,58,124,0.18)] before:absolute before:-z-10 before:h-14 before:w-14 before:rotate-[-14deg] before:rounded-2xl before:border before:border-blue-200 before:bg-blue-100/60">{progress ? <Loader2 className="h-6 w-6 animate-spin" /> : <ArrowUpFromLine className="h-6 w-6" strokeWidth={1.7} />}</span>
       <span role="status" className="text-sm font-semibold text-slate-700">{progress ? `جاري رفع الملف ${progress.current} من ${progress.total}…` : single && files.length ? 'استبدال الملف' : single ? 'اختر ملف المستند' : 'اضغط لإضافة ملفات أو اسحبها هنا'}</span>
-      <span className="text-xs font-normal leading-6 text-slate-400">PDF، Word، PowerPoint{!documentsOnly && '، ZIP، 7Z'}</span>
+      <span className="flex flex-wrap justify-center gap-1.5" dir="ltr">{(documentsOnly ? ['PDF', 'Word', 'PowerPoint'] : ['PDF', 'Word', 'PowerPoint', 'ZIP', '7Z']).map((type) => <span key={type} className="rounded-md border border-slate-200/80 bg-white px-2 py-1 text-[10px] font-medium text-slate-500">{type}</span>)}</span>
     </button>
     {error && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs leading-6 text-rose-800">{error}</p>}
   </section>;

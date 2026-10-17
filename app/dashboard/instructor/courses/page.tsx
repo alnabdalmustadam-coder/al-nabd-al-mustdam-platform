@@ -4,8 +4,9 @@ import { CourseEditorFrame } from '@/components/courses/editor/course-editor-fra
 import { CourseBasicSettings, type BasicSettings } from '@/components/courses/editor/course-basic-settings';
 import { CourseCurriculumEditor } from '@/components/courses/editor/course-curriculum-editor';
 import { CourseFilesEditor } from '@/components/courses/editor/course-files-editor';
-import { EditorSectionHeading, EditorToggle } from '@/components/courses/editor/editor-ui';
+import { EditorEmptyState, EditorSectionHeading, EditorToggle } from '@/components/courses/editor/editor-ui';
 import { curriculumToEditor, editorToCurriculum, type EditorLesson, type EditorSection } from '@/lib/courses/editor-model';
+import { ClipboardCheck } from 'lucide-react';
 import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
 import { createCourseQuizDraft, prepareCourseQuizForEditing } from '@/lib/quizzes/course-quiz-draft';
 import React, { useState, useEffect, useRef } from 'react';
@@ -805,14 +806,14 @@ export default function InstructorCoursesPage() {
           {modalActiveTab === 'curriculum' && <CourseCurriculumEditor value={formSections} onChange={setFormSections} onUploadVideo={triggerVideoUploadForTarget}
             videoUpload={lessonUploadProgress > 0 ? uploadingTarget : null} videoProgress={lessonUploadProgress} onFileBusyChange={onResourceBusy} disabled={isSubmitting || resourceUploads > 0} />}
           {modalActiveTab === 'attachments' && <div className="space-y-7">
-            <EditorSectionHeading eyebrow="مرفقات الدورة" title="ملفات تدعم الدورة بالكامل" description="أضف الحقيبة التدريبية أو الملفات العامة التي يحتاجها الطالب طوال الدورة. لملفات درس أو وحدة بعينها، استخدم قسم المنهج والدروس." />
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"><CourseFilesEditor title="ملفات عامة للتحميل" description="يمكن إضافة أكثر من مستند أو ملف مضغوط، وتعديل الاسم الذي يظهر للطالب." files={formAttachments} onChange={(update) => setFormAttachments(update)} onBusyChange={onResourceBusy} documentsOnly={false} /></div>
+            <EditorSectionHeading kind="files" eyebrow="مرفقات الدورة" title="ملفات تدعم الدورة بالكامل" description="أضف الحقيبة التدريبية أو الملفات العامة التي يحتاجها الطالب طوال الدورة. لملفات درس أو وحدة بعينها، استخدم قسم المنهج والدروس." />
+            <div data-editor-panel className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"><CourseFilesEditor title="ملفات عامة للتحميل" description="يمكن إضافة أكثر من مستند أو ملف مضغوط، وتعديل الاسم الذي يظهر للطالب." files={formAttachments} onChange={(update) => setFormAttachments(update)} onBusyChange={onResourceBusy} documentsOnly={false} /></div>
           </div>}
           {modalActiveTab === 'exam' && <div className="space-y-7">
-            <EditorSectionHeading eyebrow="تقييم التعلّم" title="الاختبار النهائي للدورة" description="فعّل الاختبار، ثم أضف أسئلة الاختيار من متعدد أو التوصيل وحدّد نسبة الاجتياز." />
-            <EditorToggle title="تفعيل الاختبار النهائي" description="عند تفعيله يظهر الاختبار للطالب ضمن الدورة، وتُحفظ أسئلته مع بياناتها." enabled={hasFinalExam} onChange={setHasFinalExam} />
-            {hasFinalExam ? <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"><CourseQuizEditor value={formFinalExam} onChange={setFormFinalExam} /></div>
-              : <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm leading-7 text-slate-500">الاختبار النهائي غير مفعّل لهذه الدورة. يمكنك تفعيله والبدء بإضافة الأسئلة من هنا.</p>}
+            <EditorSectionHeading kind="exam" eyebrow="تقييم التعلّم" title="الاختبار النهائي للدورة" description="فعّل الاختبار، ثم أضف أسئلة الاختيار من متعدد أو التوصيل وحدّد نسبة الاجتياز." />
+            <EditorToggle icon={ClipboardCheck} title="تفعيل الاختبار النهائي" description="عند تفعيله يظهر الاختبار للطالب ضمن الدورة، وتُحفظ أسئلته مع بياناتها." enabled={hasFinalExam} onChange={setHasFinalExam} />
+            {hasFinalExam ? <div data-editor-panel className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"><CourseQuizEditor value={formFinalExam} onChange={setFormFinalExam} /></div>
+              : <EditorEmptyState kind="exam" title="جهّز التقييم الختامي للدورة" description="فعّل الاختبار من الأعلى، ثم أضف أسئلته وحدّد نسبة الاجتياز المناسبة." />}
           </div>}
         </CourseEditorFrame>}
       </AnimatePresence>

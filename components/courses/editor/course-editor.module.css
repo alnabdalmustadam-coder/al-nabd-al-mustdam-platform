@@ -21,3 +21,85 @@
 .dialog p {
   line-height: 1.8;
 }
+
+.header {
+  background: radial-gradient(ellipse at 95% 0%, #eaf1ff 0, transparent 55%), linear-gradient(100deg, #fff 25%, #f8fbff);
+}
+
+.header::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, #173a7c 0%, #4274db 56%, #28b490 100%);
+  content: '';
+}
+
+.navigation {
+  background: linear-gradient(175deg, #fcfdff, #f0f5fe 65%, #f2faf7);
+}
+
+.navItem {
+  position: relative;
+}
+
+.navIcon {
+  display: flex;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e8f4;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 85%);
+  color: #5b76a5;
+}
+
+.navItem[aria-current='step'] {
+  background: linear-gradient(115deg, #fff, #edf3ff);
+  box-shadow: 0 5px 15px -9px rgb(23 58 124 / 35%), inset 0 1px 0 #fff;
+}
+
+.navItem[aria-current='step']::before {
+  position: absolute;
+  inset-block: 17px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 3px;
+  background: #16a47f;
+  content: '';
+}
+
+.navItem[aria-current='step'] .navIcon {
+  border-color: #254d9c;
+  background: linear-gradient(135deg, #3263c9, #173a7c);
+  color: #fff;
+  box-shadow: 0 4px 10px rgb(23 58 124 / 16%);
+}
+
+.navItem:focus-visible {
+  outline: 3px solid #a7c4f9;
+  outline-offset: 2px;
+}
+
+.content {
+  background: radial-gradient(ellipse at 100% 0%, rgb(226 237 254 / 45%), transparent 45%), #f7f9fc;
+  scrollbar-color: #bfcee5 transparent;
+  scrollbar-width: thin;
+}
+
+.dialog [data-editor-panel] {
+  box-shadow: 0 8px 25px -17px rgb(23 58 124 / 23%), 0 1px 3px rgb(23 58 124 / 3%);
+}
+
+.footer {
+  box-shadow: 0 -5px 20px -12px rgb(23 58 124 / 15%);
+}
+
+@media (max-width: 639px) {
+  .navIcon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+}
