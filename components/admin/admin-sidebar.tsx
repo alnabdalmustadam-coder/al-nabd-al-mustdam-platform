@@ -26,6 +26,7 @@ import {
   ClipboardList,
   Newspaper,
   Briefcase,
+  Heart,
 } from 'lucide-react';
 
 import { createClient } from '@/utils/supabase/client';
@@ -165,6 +166,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const navItems = [
     { label: 'الرئيسية', href: '/dashboard/admin', icon: LayoutDashboard, badge: 'مباشر' },
     { label: 'إدارة الدورات', href: '/dashboard/admin/courses', icon: BookOpen, count: '48' },
+    { label: 'رضا الطلاب', href: '/dashboard/admin/satisfaction', icon: Heart },
     { label: 'إدارة المتدربين', href: '/dashboard/admin/users', icon: Users, count: '14.2k' },
     { label: 'إدارة المدربين', href: '/dashboard/admin/trainers', icon: UserCheck, count: '32' },
     { label: 'إدارة المقالات', href: '/dashboard/admin/articles', icon: Newspaper, count: 'جديد' },

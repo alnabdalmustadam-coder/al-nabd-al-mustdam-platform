@@ -9,10 +9,11 @@ type Session = { id: string; title: string; passPercentage: number; startedAt: s
   questions: StudentQuizQuestion[]; savedAnswers: StudentQuizAnswer[] };
 type Quiz = { title: string; passPercentage: number; questionCount: number; durationMinutes: number };
 type Result = { attemptId: string; title: string; score: number; passPercentage: number; passed: boolean;
-  completedAt: string; totalQuestions: number; correctAnswers: number; results: GradedQuizQuestion[] };
+  completedAt: string; totalQuestions: number; correctAnswers: number; results: GradedQuizQuestion[];
+  ranking?: { rank: number; participants: number; bestScore: number } | null };
 type Payload = { success: boolean; message?: string; quiz?: Quiz; attempt?: Session | null; result?: Result | null };
 
-export function InternalQuizPanel({ courseId, lessonId }: { courseId: string; lessonId: string }) {
+export function InternalQuizPanel({ courseId, lessonId, onPassed }: { courseId: string; lessonId: string; onPassed?: () => void }) {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [result, setResult] = useState<Result | null>(null);
@@ -70,6 +71,7 @@ export function InternalQuizPanel({ courseId, lessonId }: { courseId: string; le
         throw new Error(payload.message || 'تعذر حفظ المحاولة');
       }
       accept(payload); setDraftError(false); setCanRestart(false);
+      if (payload.result?.passed) onPassed?.();
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : 'تعذر حفظ المحاولة');
       setCanRestart(staleAttempt || Boolean(session?.expiresAt && Date.parse(session.expiresAt) < Date.now()));
@@ -91,6 +93,10 @@ export function InternalQuizPanel({ courseId, lessonId }: { courseId: string; le
         <p className="text-sm font-bold text-slate-700">{result.correctAnswers} صحيحة · {result.totalQuestions - result.correctAnswers} خاطئة · {result.totalQuestions} سؤال</p>
         <p className="text-sm font-black text-slate-800">{result.passed ? 'تم اجتياز الاختبار' : 'لم تتحقق نسبة الاجتياز'} · المطلوب {result.passPercentage}%</p>
         <p className="flex items-center justify-center gap-1 text-xs text-slate-600"><CheckCircle2 className="h-4 w-4" />تم حفظ النتيجة في حسابك</p>
+        {result.ranking ? <div className="mt-4 rounded-xl border border-blue-200 bg-white/80 p-4">
+          <p className="text-sm font-black text-blue-900">ترتيبك {result.ranking.rank} من {result.ranking.participants} طالب</p>
+          <p className="mt-1 text-xs leading-6 text-slate-600">بأفضل نتيجة لك ({result.ranking.bestScore}%) بين من سلّموا نفس الاختبار في هذه الدورة. الدرجات المتساوية لها نفس المركز.</p>
+        </div> : <p className="text-xs text-slate-500">الترتيب غير متاح مؤقتاً. أعد تحميل الاختبار لتحديثه.</p>}
       </div>
       {result.results.map((question) => <QuizQuestionReview key={question.id} question={question} />)}
       <button type="button" disabled={busy} onClick={() => void perform('start')} className="flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-xs font-black text-blue-900 disabled:opacity-50"><RefreshCw className="h-4 w-4" />محاولة جديدة</button>

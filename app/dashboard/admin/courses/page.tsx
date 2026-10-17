@@ -76,6 +76,7 @@ interface CourseItem {
   curriculum?: any[];
   attachments?: CourseAttachment[];
   finalExam?: QuizData;
+  professionalDevelopment?: boolean;
 }
 
 interface FormSubLessonItem {
@@ -83,7 +84,7 @@ interface FormSubLessonItem {
   title: string;
   duration: string;
   videoUrl: string;
-  type: 'video' | 'pdf' | 'doc' | 'quiz';
+  type: 'video' | 'pdf' | 'doc' | 'ppt' | 'quiz';
   fileUrl?: string;
   fileName?: string;
   fileSize?: string;
@@ -230,6 +231,7 @@ export default function AdminCoursesPage() {
   const [formPrice, setFormPrice] = useState('500');
   const [formHours, setFormHours] = useState('30');
   const [formDescription, setFormDescription] = useState('');
+  const [formProfessionalDevelopment, setFormProfessionalDevelopment] = useState(false);
   const [formImage, setFormImage] = useState('');
   const [platformLogo, setPlatformLogo] = useState('/logo.webp');
 
@@ -417,6 +419,7 @@ export default function AdminCoursesPage() {
     setFormPrice('500');
     setFormHours('30');
     setFormDescription('');
+    setFormProfessionalDevelopment(false);
     setFormImage('');
     setFormAttachments([]);
     setHasFinalExam(false);
@@ -460,6 +463,7 @@ export default function AdminCoursesPage() {
     setFormPrice(String(course.rawPrice ?? 500));
     setFormHours(String(course.hours ?? 30));
     setFormDescription(course.description || '');
+    setFormProfessionalDevelopment(course.professionalDevelopment === true);
     setFormImage(course.image || '');
     setIsAddingNewCategory(false);
     setIsAddingNewInstructor(false);
@@ -782,6 +786,7 @@ export default function AdminCoursesPage() {
 
       if (subIdx !== undefined) {
         handleUpdateSubItem(secIdx, subIdx, 'fileUrl', data.fileUrl);
+        if (['ppt', 'pdf', 'word'].includes(data.fileType)) handleUpdateSubItem(secIdx, subIdx, 'type', data.fileType === 'word' ? 'doc' : data.fileType);
         handleUpdateSubItem(secIdx, subIdx, 'fileName', data.fileName);
         handleUpdateSubItem(secIdx, subIdx, 'fileSize', data.fileSize);
       } else {
@@ -950,6 +955,7 @@ export default function AdminCoursesPage() {
         price: priceNum,
         duration: `${hoursNum} ساعة تدريبية معتمدة`,
         description: formDescription.trim(),
+        professionalDevelopment: formProfessionalDevelopment,
         image: formImage.trim(),
         curriculum: formattedCurriculum,
         attachments: formAttachments,
@@ -1000,6 +1006,7 @@ export default function AdminCoursesPage() {
           description: savedC.description || formDescription,
           curriculum: savedC.curriculum || formattedCurriculum,
           attachments: savedC.attachments || formAttachments,
+          professionalDevelopment: savedC.professionalDevelopment === true,
           finalExam: savedC.finalExam || (hasFinalExam ? formFinalExam : undefined),
           image: savedC.image || formImage,
         };
@@ -1803,6 +1810,11 @@ export default function AdminCoursesPage() {
                       </div>
 
                       <div>
+                        <label className="mb-5 flex cursor-pointer items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                          <input type="checkbox" checked={formProfessionalDevelopment} onChange={(e) => setFormProfessionalDevelopment(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-blue-900" />
+                          <span><span className="block text-sm font-black text-blue-900">وضع التطوير المهني — إكمال بالترتيب</span>
+                          <span className="mt-1 block text-xs leading-6 text-slate-600">يتطلب مشاهدة الفيديوهات المرفوعة كاملة واجتياز الاختبارات المرتبطة قبل فتح الدرس التالي. التقدم السابق غير المتحقق بالمشاهدة يحتاج إكمالاً عند تفعيل هذا الوضع.</span></span>
+                        </label>
                         <label className="block text-xs font-black text-slate-700 mb-1.5">نبذة ووصف الدورة</label>
                         <textarea
                           rows={3}
@@ -2017,6 +2029,7 @@ export default function AdminCoursesPage() {
                                       >
                                         <option value="video">🎬 فيديو</option>
                                         <option value="pdf">📄 ملف PDF / وورد</option>
+                                        <option value="ppt">📊 عرض بوربوينت</option>
                                         <option value="quiz">❓ اختبار / كويز</option>
                                       </select>
 
@@ -2088,14 +2101,14 @@ export default function AdminCoursesPage() {
                                     </div>
                                   )}
 
-                                  {sub.type === 'pdf' && (
+                                  {['pdf', 'doc', 'ppt'].includes(sub.type) && (
                                     <div className="flex flex-col gap-2 p-2.5 bg-white rounded-lg border border-slate-200 text-xs">
                                       <div className="flex items-center justify-between gap-2">
                                         <div className="flex items-center gap-2 min-w-0">
                                           <FileText className="w-4 h-4 text-blue-600 shrink-0" />
                                           <div className="min-w-0">
                                             <span className="font-bold text-slate-800 truncate block">
-                                              {sub.fileName || 'ملف PDF / Word غير مرفوع'}
+                                              {sub.fileName || (sub.type === 'ppt' ? 'لم يتم رفع عرض البوربوينت' : 'لم يتم رفع المستند')}
                                             </span>
                                             <span className="text-[10px] text-slate-400 font-mono">
                                               {sub.fileSize || 'ملف مستند'}
@@ -2117,7 +2130,7 @@ export default function AdminCoursesPage() {
                                           ) : (
                                             <>
                                               <UploadCloud className="w-3.5 h-3.5" />
-                                              <span>{sub.fileUrl ? 'تغيير الملف' : 'رفع ملف PDF/Word'}</span>
+                                              <span>{sub.fileUrl ? 'تغيير الملف' : sub.type === 'ppt' ? 'رفع بوربوينت' : 'رفع PDF / Word'}</span>
                                             </>
                                           )}
                                         </button>
@@ -2191,7 +2204,7 @@ export default function AdminCoursesPage() {
                       <div>
                         <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
                           <Paperclip className="w-4 h-4 text-[#173A7C]" />
-                          <span>الحقيبة التدريبية وملفات الدورة المرفقة (PDF / Word / ZIP)</span>
+                          <span>الحقيبة التدريبية وملفات الدورة المرفقة (PDF / Word / PowerPoint / ZIP)</span>
                         </h4>
                         <p className="text-[11px] text-slate-500 font-medium mt-0.5">
                           الملفات المرفوعة هنا ستكون متاحة لجميع الطلاب المسجلين بالدورة في تبويب المرفقات 📄

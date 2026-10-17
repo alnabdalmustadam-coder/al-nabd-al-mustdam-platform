@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import * as nodeCrypto from 'node:crypto';
 import ts from 'typescript';
 
 const arabicSlug = 'hazmat-التعامل-مع-المواد-الخطرة';
@@ -71,6 +72,7 @@ function fixture({ slug = arabicSlug, enrolled = true, storedId, status = 'activ
   const activity = (params, verb) => ({ actor: { email: params.email }, verb: { display: { 'en-US': verb } }, object: { id: `https://nabdtraining.com/courses/${params.courseId}` } });
   const modules = {
     'server-only': {},
+    'node:crypto': nodeCrypto,
     'next/server': { NextResponse: { json: (body, init) => Response.json(body, init) } },
     '@/lib/supabase': { supabase: db, getSupabaseAdmin: () => db },
     '@/lib/security/auth': { requireUser: async () => authenticated ? { ok: true, user: student, role: 'STUDENT' } : { ok: false, response: Response.json({ success: false }, { status: 401 }) } },

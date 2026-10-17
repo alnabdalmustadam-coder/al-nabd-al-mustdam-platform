@@ -48,6 +48,7 @@ function fixture({ enrolled = true, status = 'active', authenticated = true, own
   } };
   const modules = {
     'node:crypto': crypto,
+    'server-only': {},
     'next/server': { NextResponse: { json: (value, options = {}) => Response.json(value, options) } },
     '@/lib/security/auth': { requireUser: async () => authenticated ? { ok: true, user } : { ok: false, response: Response.json({}, { status: 401 }) } },
     '@/lib/security/rate-limit': { consumeRateLimit: () => ({ allowed: true }) },
@@ -58,10 +59,18 @@ function fixture({ enrolled = true, status = 'active', authenticated = true, own
     '@/lib/security/validation': validation,
     '@/lib/quizzes/course-quiz': { resolveCourseQuiz }, '@/lib/quizzes/model': model,
   };
+  function load(name) {
+    if (name in modules) return modules[name];
+    const source = readFileSync(new URL(`../${name.slice(2)}.ts`, import.meta.url), 'utf8');
+    const exports = {}; modules[name] = exports;
+    vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText,
+      { exports, require: load, URL, Date, console: { error() {} } });
+    return exports;
+  }
   const source = readFileSync(new URL('../app/api/courses/quiz-attempt/route.ts', import.meta.url), 'utf8');
   const exports = {};
   vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText,
-    { exports, require: (name) => { if (!(name in modules)) throw new Error(name); return modules[name]; }, URL, Date, console: { error() {} } });
+    { exports, require: load, URL, Date, console: { error() {} } });
   const request = (method, body = {}) => new Request(`https://example.invalid/api/courses/quiz-attempt?${new URLSearchParams({ courseId: course.slug, lessonId: 'lesson', ...body })}`,
     { method, ...(method === 'GET' ? {} : { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ courseId: course.slug, lessonId: 'lesson', ...body }) }) });
   const invoke = async (method, body) => { const response = await exports[method](request(method, body)); return { status: response.status, payload: await response.json() }; };

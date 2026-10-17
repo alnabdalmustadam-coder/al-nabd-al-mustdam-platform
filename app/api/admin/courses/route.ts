@@ -48,6 +48,7 @@ export async function GET(req: Request) {
         curriculum: c.curriculum || [],
         attachments: c.attachments || [],
         finalExam: c.finalExam || undefined,
+        professionalDevelopment: c.professionalDevelopment === true,
         image: c.image || '/logo.webp',
       };
     });

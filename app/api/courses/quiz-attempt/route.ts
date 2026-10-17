@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/security/auth';
 import { consumeRateLimit } from '@/lib/security/rate-limit';
@@ -8,7 +8,10 @@ import { getCourseEnrollmentIdentifiers, parseCourseIdentifier } from '@/lib/pub
 import { isEnrollmentActive } from '@/lib/security/student-access';
 import { readJsonObject, ValidationError } from '@/lib/security/validation';
 import { resolveCourseQuiz } from '@/lib/quizzes/course-quiz';
-import { gradeQuizAnswers, isQuizAnswerComplete, parseQuizQuestions, sanitizeQuizAnswers, toStudentQuizQuestions,
+import { getQuizActivity } from '@/lib/quizzes/activity';
+import { assertCpdQuizAccess } from '@/lib/learning/cpd';
+import { LearningError } from '@/lib/learning/course-access';
+import { gradeQuizAnswers, isQuizAnswerComplete, sanitizeQuizAnswers, toStudentQuizQuestions,
   type QuizQuestionDefinition, type StudentQuizAnswer } from '@/lib/quizzes/model';
 
 export const dynamic = 'force-dynamic';
@@ -44,13 +47,10 @@ async function context(request: Request, courseValue: unknown, lessonValue: unkn
   }
   const resolved = resolveCourseQuiz(course, lessonId);
   if (!resolved) throw new QuizError('لم تتم إضافة اختبار لهذا الدرس بعد', 404);
-  const questions = parseQuizQuestions(resolved.quiz.questions);
+  if (course.professionalDevelopment) await assertCpdQuizAccess(admin, course, auth.user.id, lessonId, resolved.key);
+  const { questions, passPercentage, duration, activityId } = getQuizActivity(course.slug, resolved.key, resolved.quiz);
   if (!questions.length || questions.length !== resolved.quiz.questions.length) throw new QuizError('أسئلة الاختبار غير مكتملة. يرجى التواصل مع الإدارة', 409);
-  const passPercentage = Math.min(100, Math.max(0, Number(resolved.quiz.passingScore ?? 70)));
-  const duration = Math.min(240, Math.max(0, Number(resolved.quiz.durationMinutes || 0)));
   if (!Number.isFinite(passPercentage) || !Number.isFinite(duration)) throw new QuizError('إعدادات الاختبار غير صالحة', 409);
-  const version = createHash('sha256').update(JSON.stringify({ questions, passPercentage, duration })).digest('hex').slice(0, 20);
-  const activityId = `https://nabdtraining.com/courses/${encodeURIComponent(course.slug)}/quizzes/${encodeURIComponent(resolved.key)}/${version}`;
   return { auth, admin, email, activityId, questions, passPercentage, duration, title: resolved.quiz.title || 'اختبار الدرس' };
 }
 
@@ -68,6 +68,18 @@ async function readResult(ctx: Context, id: string): Promise<Result | null> {
   if (error) throw error;
   return data?.raw_statement?.result?.extensions?.[RESULT_KEY] as Result || null;
 }
+async function rankedResult(ctx: Context, result: Result | null) {
+  if (!result) return null;
+  // Ranking is recomputed after each saved attempt, without exposing anyone's identity.
+  try {
+    const { data, error } = await ctx.admin.rpc('internal_quiz_rank', { p_activity_id: ctx.activityId, p_email: ctx.email });
+    if (error) throw error;
+    return { ...result, ranking: data };
+  } catch (error) {
+    console.error('Quiz rank unavailable:', error);
+    return { ...result, ranking: null };
+  }
+}
 function session(attempt: Attempt) {
   return { id: attempt.id, title: attempt.title, passPercentage: attempt.passPercentage, startedAt: attempt.startedAt,
     expiresAt: attempt.expiresAt, questions: toStudentQuizQuestions(attempt.questions),
@@ -77,6 +89,7 @@ function expired(attempt: Attempt) { return attempt.expiresAt !== null && Date.p
 function failure(error: unknown) {
   if (error instanceof ValidationError) return response({ success: false, message: error.message }, 400);
   if (error instanceof QuizError) return response({ success: false, message: error.message }, error.status);
+  if (error instanceof LearningError) return response({ success: false, message: error.message }, error.status);
   console.error('Internal quiz operation failed:', error);
   return response({ success: false, message: 'تعذر حفظ أو تحميل الاختبار. حاول مرة أخرى' }, 503);
 }
@@ -89,7 +102,7 @@ export async function GET(request: Request) {
     const attempt = await readAttempt(ctx);
     const result = attempt ? await readResult(ctx, attempt.id) : null;
     return response({ success: true, quiz: { title: ctx.title, passPercentage: ctx.passPercentage,
-      questionCount: ctx.questions.length, durationMinutes: ctx.duration }, result,
+      questionCount: ctx.questions.length, durationMinutes: ctx.duration }, result: await rankedResult(ctx, result),
       attempt: attempt && !result && !expired(attempt) ? session(attempt) : null });
   } catch (error) { return failure(error); }
 }
@@ -126,7 +139,7 @@ export async function POST(request: Request) {
     }
     if (body.action !== 'submit' || !current || body.attemptId !== current.id) throw new QuizError('محاولة الاختبار غير صالحة', 409);
     const existing = await readResult(ctx, current.id);
-    if (existing) return response({ success: true, result: existing });
+    if (existing) return response({ success: true, result: await rankedResult(ctx, existing) });
     if (expired(current)) throw new QuizError('انتهى وقت المحاولة. ابدأ محاولة جديدة', 409);
     const safeQuestions = toStudentQuizQuestions(current.questions);
     const answers = sanitizeQuizAnswers(body.answers, safeQuestions);
@@ -150,10 +163,10 @@ export async function POST(request: Request) {
       timestamp: result.completedAt, raw_statement: statement, version: '1.0.3' });
     if (error?.code === '23505') {
       const canonical = await readResult(ctx, current.id);
-      if (canonical) return response({ success: true, result: canonical });
+      if (canonical) return response({ success: true, result: await rankedResult(ctx, canonical) });
     }
     if (error) throw error;
-    return response({ success: true, result });
+    return response({ success: true, result: await rankedResult(ctx, result) });
   } catch (error) { return failure(error); }
 }
 

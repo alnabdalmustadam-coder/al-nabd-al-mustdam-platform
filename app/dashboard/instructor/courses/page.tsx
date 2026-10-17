@@ -76,6 +76,7 @@ interface CourseItem {
   curriculum?: any[];
   attachments?: CourseAttachment[];
   finalExam?: QuizData;
+  professionalDevelopment?: boolean;
 }
 
 interface FormSubLessonItem {
@@ -83,7 +84,7 @@ interface FormSubLessonItem {
   title: string;
   duration: string;
   videoUrl: string;
-  type: 'video' | 'pdf' | 'doc' | 'quiz';
+  type: 'video' | 'pdf' | 'doc' | 'ppt' | 'quiz';
   fileUrl?: string;
   fileName?: string;
   fileSize?: string;
@@ -229,6 +230,7 @@ export default function InstructorCoursesPage() {
   const [formPrice, setFormPrice] = useState('500');
   const [formHours, setFormHours] = useState('30');
   const [formDescription, setFormDescription] = useState('');
+  const [formProfessionalDevelopment, setFormProfessionalDevelopment] = useState(false);
   const [formImage, setFormImage] = useState('/1.png');
 
   const [categoriesList, setCategoriesList] = useState<{ id: string; label: string }[]>([
@@ -328,6 +330,7 @@ export default function InstructorCoursesPage() {
     setFormPrice('500');
     setFormHours('30');
     setFormDescription('');
+    setFormProfessionalDevelopment(false);
     setFormImage('/1.png');
     setFormAttachments([]);
     setHasFinalExam(false);
@@ -368,6 +371,7 @@ export default function InstructorCoursesPage() {
     setFormPrice(String(course.rawPrice ?? 500));
     setFormHours(String(course.hours ?? 30));
     setFormDescription(course.description || '');
+    setFormProfessionalDevelopment(course.professionalDevelopment === true);
     setFormImage(course.image || '/1.png');
     setIsAddingNewCategory(false);
     setNewCategoryName('');
@@ -625,6 +629,7 @@ export default function InstructorCoursesPage() {
 
       if (subIdx !== undefined) {
         handleUpdateSubItem(secIdx, subIdx, 'fileUrl', data.fileUrl);
+        if (['ppt', 'pdf', 'word'].includes(data.fileType)) handleUpdateSubItem(secIdx, subIdx, 'type', data.fileType === 'word' ? 'doc' : data.fileType);
         handleUpdateSubItem(secIdx, subIdx, 'fileName', data.fileName);
         handleUpdateSubItem(secIdx, subIdx, 'fileSize', data.fileSize);
       } else {
@@ -784,6 +789,7 @@ export default function InstructorCoursesPage() {
         duration: `${hoursNum} ساعة تدريبية`,
         lessonsCount: totalLessons,
         description: formDescription.trim(),
+        professionalDevelopment: formProfessionalDevelopment,
         image: formImage || '/1.png',
         curriculum: formattedCurriculum,
         attachments: formAttachments,
@@ -1371,6 +1377,10 @@ export default function InstructorCoursesPage() {
                     />
 
                     <div className="space-y-1">
+                      <label className="mb-5 flex cursor-pointer items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                        <input type="checkbox" checked={formProfessionalDevelopment} onChange={(e) => setFormProfessionalDevelopment(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-blue-900" />
+                        <span><span className="block text-sm font-black text-blue-900">وضع التطوير المهني — إكمال بالترتيب</span><span className="mt-1 block text-xs leading-6 text-slate-600">يتطلب مشاهدة الفيديوهات المرفوعة كاملة واجتياز الاختبارات المرتبطة قبل فتح الدرس التالي. التقدم السابق غير المتحقق بالمشاهدة يحتاج إكمالاً عند تفعيل هذا الوضع.</span></span>
+                      </label>
                       <label className="text-slate-700 block">وصف البرنامج التدريبي ومخرجات التعلم *</label>
                       <textarea
                         rows={4}
@@ -1492,7 +1502,7 @@ export default function InstructorCoursesPage() {
                                   </div>
 
                                   <div className="flex items-center gap-2">
-                                    <select aria-label="نوع الدرس" value={sub.type || 'video'} onChange={(event) => handleUpdateSubItem(secIdx, subIdx, 'type', event.target.value)} className="rounded-xl border border-slate-200 p-2 text-xs font-bold"><option value="video">فيديو</option><option value="pdf">ملف PDF / وورد</option><option value="quiz">اختبار / كويز</option></select>
+                                    <select aria-label="نوع الدرس" value={sub.type || 'video'} onChange={(event) => handleUpdateSubItem(secIdx, subIdx, 'type', event.target.value)} className="rounded-xl border border-slate-200 p-2 text-xs font-bold"><option value="video">فيديو</option><option value="pdf">ملف PDF / وورد</option><option value="ppt">عرض بوربوينت</option><option value="quiz">اختبار / كويز</option></select>
                                     <input
                                       type="text"
                                       value={sub.duration}

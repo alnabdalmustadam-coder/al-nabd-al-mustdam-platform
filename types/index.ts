@@ -28,7 +28,7 @@ export interface SubLessonItem {
   id: string;
   title: string;
   duration?: string;
-  type?: 'video' | 'pdf' | 'doc' | 'quiz' | 'article';
+  type?: 'video' | 'pdf' | 'doc' | 'ppt' | 'quiz' | 'article';
   videoUrl?: string;
   fileUrl?: string;
   fileName?: string;
@@ -73,6 +73,7 @@ export interface Course {
   instructorImage?: string;
   instructorBio?: string;
   featured: boolean;
+  professionalDevelopment?: boolean;
   outcomes: string[];
   curriculum: CurriculumSection[];
   attachments?: CourseAttachment[];

@@ -32,9 +32,13 @@ import {
   FileCheck,
   Loader2,
   AlertCircle,
+  Lock,
 } from 'lucide-react';
 import { InternalQuizPanel } from '@/components/student/internal-quiz-panel';
 import { StudentVideoPlayer } from '@/components/student/student-video-player';
+import { CourseDocumentViewer, AttachmentPreview } from '@/components/student/course-document-viewer';
+import { SatisfactionHeart } from '@/components/student/satisfaction-heart';
+import { getCourseContent, isLessonUnlocked } from '@/lib/learning/course-content';
 import {
   saveCompletedLessons,
   getLessonNotes,
@@ -52,7 +56,7 @@ interface Lesson {
   isCompleted: boolean;
   isCurrent?: boolean;
   videoUrl: string;
-  type?: 'video' | 'pdf' | 'doc' | 'quiz' | 'article';
+  type?: 'video' | 'pdf' | 'doc' | 'ppt' | 'quiz' | 'article';
   fileUrl?: string;
   fileName?: string;
   fileSize?: string;
@@ -91,6 +95,8 @@ export default function StudentLessonPage() {
   const [completionError, setCompletionError] = useState<string | null>(null);
   const [serverProgressPercent, setServerProgressPercent] = useState(0);
   const [completionPendingAssessment, setCompletionPendingAssessment] = useState(false);
+  const [progressLoaded, setProgressLoaded] = useState(false);
+  const [videoVerified, setVideoVerified] = useState(false);
 
   /* ── Collapsed chapters & mobile playlist state ── */
   const [collapsedChapters, setCollapsedChapters] = useState<Set<string>>(new Set());
@@ -223,6 +229,10 @@ export default function StudentLessonPage() {
   const progressPercent = serverProgressPercent;
 
   const makeLessonUrl = (id: string) => `/dashboard/student/courses/${courseSlug}/lessons/${id}`;
+  const cpd = courseData?.professionalDevelopment === true;
+  const lessonAllowed = (id: string) => !cpd || (progressLoaded && isLessonUnlocked(allLessons.map((item) => item.id), completedSet, id));
+  const currentAllowed = Boolean(currentLesson && lessonAllowed(currentLesson.id));
+  const lessonContent = courseData ? getCourseContent(courseData).find((item) => item.id === currentLesson?.id) : null;
 
   const filteredChapters = useMemo(() => {
     if (!searchQuery.trim()) return chapters;
@@ -266,24 +276,25 @@ export default function StudentLessonPage() {
     // 2. Section & Sub-lesson Attachments
     if (Array.isArray(courseData?.curriculum)) {
       courseData.curriculum.forEach((sec: any) => {
-        if (sec.fileUrl && !list.some((l) => l.fileUrl === sec.fileUrl)) {
+        const sectionLessons = getCourseContent(courseData).filter((item) => item.sectionId === (sec.id || `sec-${courseData.curriculum.indexOf(sec) + 1}`));
+        if (sec.fileUrl && (!cpd || sectionLessons.every((item) => completedSet.has(item.id))) && !list.some((l) => l.fileUrl === sec.fileUrl)) {
           list.push({
             id: `sec-${sec.id || sec.title}`,
             title: sec.fileName || `${sec.title} - ملخص الوحدة`,
             fileUrl: sec.fileUrl,
             fileSize: sec.fileSize || 'PDF',
-            fileType: 'pdf',
+            fileType: sec.type || 'pdf',
           });
         }
         if (Array.isArray(sec.items)) {
           sec.items.forEach((it: any) => {
-            if (it.fileUrl && !list.some((l) => l.fileUrl === it.fileUrl)) {
+            if (it.fileUrl && (!cpd || (progressLoaded && isLessonUnlocked(allLessons.map((item) => item.id), completedSet, it.id))) && !list.some((l) => l.fileUrl === it.fileUrl)) {
               list.push({
                 id: `item-${it.id || it.title}`,
                 title: it.fileName || `${it.title} - المرفق`,
                 fileUrl: it.fileUrl,
                 fileSize: it.fileSize || 'PDF',
-                fileType: it.type === 'pdf' ? 'pdf' : 'word',
+                fileType: it.type || 'pdf',
               });
             }
           });
@@ -292,19 +303,23 @@ export default function StudentLessonPage() {
     }
 
     return list;
-  }, [courseData]);
+  }, [courseData, cpd, completedSet, progressLoaded, allLessons]);
 
 
   useEffect(() => {
+    const controller = new AbortController();
+    setProgressLoaded(false);
+    setVideoVerified(false);
     async function initProgress() {
       setNotesList(getLessonNotes(lessonId));
 
       try {
         const response = await fetch(
           `/api/courses/complete-lesson?courseId=${encodeURIComponent(courseSlug)}`,
-          { cache: 'no-store' },
+          { cache: 'no-store', signal: controller.signal },
         );
         const result = await response.json();
+        if (controller.signal.aborted) return;
 
         if (!response.ok || !result.success || !Array.isArray(result.completedLessonIds)) {
           throw new Error(result.message || 'تعذر تحميل تقدم الدورة');
@@ -316,14 +331,17 @@ export default function StudentLessonPage() {
         setCompletionPendingAssessment(Boolean(result.completionPendingAssessment));
         saveCompletedLessons(courseSlug, serverCompleted);
         setCompletionError(null);
+        setProgressLoaded(true);
       } catch (err) {
+        if (controller.signal.aborted) return;
         console.error('Error syncing lesson progress on init:', err);
         setCompletionError(err instanceof Error ? err.message : 'تعذر تحميل تقدم الدورة');
       }
     }
 
     initProgress();
-  }, [courseSlug, lessonId]);
+    return () => controller.abort();
+  }, [courseSlug, lessonId, cpd]);
 
   const toggleChapter = (chapId: string) => {
     setCollapsedChapters((prev) => {
@@ -601,6 +619,7 @@ export default function StudentLessonPage() {
                         {chap.lessons.map((les) => {
                           const isCurrent = les.id === (currentLesson?.id || lessonId);
                           const isDone = completedSet.has(les.id);
+                          const isLocked = !lessonAllowed(les.id);
 
                           return (
                             <div
@@ -615,19 +634,21 @@ export default function StudentLessonPage() {
                             >
                               <button
                                 onClick={(e) => handleToggleComplete(les.id, e)}
-                                disabled={isDone || savingLessonId === les.id}
+                                disabled={isDone || savingLessonId === les.id || cpd}
                                 className="shrink-0 cursor-pointer disabled:cursor-default"
                                 title={isDone ? 'الدرس مكتمل' : 'تحديد كمكتمل'}
                               >
                                 {isDone ? (
                                   <CheckCircle2 className={`w-4 h-4 ${isCurrent ? 'text-emerald-300' : 'text-emerald-600'}`} />
-                                ) : (
+                                ) : isLocked ? <Lock className="h-4 w-4 text-slate-400" /> : (
                                   <Circle className={`w-4 h-4 ${isCurrent ? 'text-white/60' : 'text-slate-300'}`} />
                                 )}
                               </button>
 
                               <Link
                                 href={makeLessonUrl(les.id)}
+                                aria-disabled={isLocked}
+                                onClick={(event) => { if (isLocked) { event.preventDefault(); setCompletionError('أكمل الدروس السابقة أولاً لفتح هذا الدرس'); } }}
                                 className="flex-1 flex items-center justify-between gap-2 min-w-0 cursor-pointer"
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
@@ -668,57 +689,43 @@ export default function StudentLessonPage() {
 
           {/* Video Player or Content Pane */}
           <div className="col-span-1 lg:col-span-8 xl:col-span-8 flex flex-col justify-between w-full">
-            {currentLesson?.type === 'quiz' ? (
+            {cpd && currentAllowed && lessonContent?.requiredQuiz && <p className="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs font-bold leading-6 text-blue-900">يتطلب إكمال هذا الدرس اجتياز الاختبار المرتبط به من تبويب «الاختبار والتقييم».</p>}
+            {!currentAllowed ? <div className="flex aspect-video flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
+              <Lock className="h-10 w-10 text-blue-900" /><h3 className="text-base font-black text-slate-900">{progressLoaded ? 'هذا الدرس مغلق حالياً' : completionError ? 'تعذر تحميل تقدمك' : 'جاري التحقق من تقدمك'}</h3>
+              <p className="text-sm text-slate-600">{progressLoaded ? 'أكمل الدروس السابقة بالترتيب لفتح المحتوى.' : completionError || 'يتم تحميل تقدم الدورة من حسابك.'}</p>
+              {completionError && !progressLoaded && <button type="button" onClick={() => window.location.reload()} className="min-h-11 rounded-xl bg-blue-900 px-5 py-3 text-xs font-bold text-white">إعادة تحميل الدرس</button>}
+            </div> : currentLesson?.type === 'quiz' ? (
               <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900 via-[#173A7C] to-slate-900 p-6 text-center text-white shadow-xl">
                 <HelpCircle className="h-12 w-12 text-amber-300" />
                 <h3 className="text-lg font-black">{currentLesson.title}</h3>
                 <p className="text-xs leading-6 text-blue-100">أجب عن أسئلة الدرس وراجع نتيجتك بعد التسليم.</p>
                 <button type="button" className="min-h-11 rounded-xl bg-white px-6 py-3 text-xs font-black text-blue-900"
                   onClick={() => { setActiveTab('quiz'); requestAnimationFrame(() => document.getElementById('internal-assessment')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); }}>فتح الاختبار</button>
+                {cpd && <button type="button" disabled={completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id} onClick={() => void handleToggleComplete(currentLesson.id)} className="min-h-11 rounded-xl border border-white/30 px-5 py-3 text-xs font-bold disabled:opacity-50">{completedSet.has(currentLesson.id) ? 'الدرس مكتمل' : 'إكمال الدرس بعد اجتياز الاختبار'}</button>}
               </div>
-            ) : currentLesson?.type === 'pdf' && currentLesson?.fileUrl ? (
-              <div className="aspect-video w-full rounded-2xl bg-gradient-to-br from-slate-900 via-[#173A7C] to-slate-900 flex flex-col items-center justify-center p-6 text-white text-center space-y-4 shadow-xl border border-white/10">
-                <div className="w-16 h-16 rounded-3xl bg-white/10 flex items-center justify-center border border-white/20 shadow-lg">
-                  <FileText className="w-8 h-8 text-emerald-300" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-lg font-black">{currentLesson.title}</h3>
-                  <p className="text-xs text-blue-100 font-medium">ملف تدريبي مرفق جاهز للقراءة والتحميل المباشر</p>
-                </div>
-                <div className="flex items-center gap-3 pt-2">
-                  <a
-                    href={currentLesson.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black shadow-md cursor-pointer transition-all"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>تحميل المستند ({currentLesson.fileSize || 'PDF'})</span>
-                  </a>
-                  <button
-                    onClick={() => handleToggleComplete(currentLesson.id)}
-                    disabled={completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id}
-                    className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer disabled:cursor-default disabled:opacity-80"
-                  >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>{completedSet.has(currentLesson.id) ? 'تمت القراءة' : 'تحديد كمكتمل'}</span>
-                  </button>
-                </div>
+            ) : currentLesson?.fileUrl && ['pdf', 'doc', 'ppt'].includes(currentLesson.type || '') ? (
+              <div className="space-y-3">
+                <CourseDocumentViewer fileUrl={currentLesson.fileUrl} title={currentLesson.title} type={currentLesson.type} />
+                <button type="button" onClick={() => void handleToggleComplete(currentLesson.id)} disabled={completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id} className="min-h-11 rounded-xl bg-blue-900 px-5 py-3 text-xs font-black text-white disabled:opacity-50">{completedSet.has(currentLesson.id) ? 'تمت القراءة' : 'أتممت قراءة المحتوى'}</button>
               </div>
             ) : (
               <StudentVideoPlayer
+                key={`${courseSlug}:${currentLesson?.id || lessonId}`}
                 courseSlug={courseSlug}
                 lessonId={currentLesson?.id || lessonId}
                 lessonTitle={currentLesson?.title || courseData?.title || 'الدرس التدريبي'}
                 videoUrl={currentLesson?.videoUrl || ''}
                 onLessonComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
-                nextLessonUrl={nextLesson ? makeLessonUrl(nextLesson.id) : undefined}
+                nextLessonUrl={nextLesson && lessonAllowed(nextLesson.id) ? makeLessonUrl(nextLesson.id) : undefined}
                 prevLessonUrl={prevLesson ? makeLessonUrl(prevLesson.id) : undefined}
                 onOpenLessonsDrawer={() => setIsMobilePlaylistOpen(true)}
                 onAddNoteAtTimestamp={handleAddTimestampNote}
                 isCompleted={completedSet.has(currentLesson?.id || lessonId)}
                 isSavingCompletion={savingLessonId === (currentLesson?.id || lessonId)}
                 onToggleComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
+                professionalDevelopment={cpd && currentLesson?.type !== 'article'}
+                onVideoVerified={() => setVideoVerified(true)}
+                completionDisabled={cpd && currentLesson?.type !== 'article' && !videoVerified}
               />
             )}
           </div>
@@ -739,7 +746,7 @@ export default function StudentLessonPage() {
       </div>
 
       {/* Interactive Tabs Workspace */}
-      <div className="w-full bg-white/85 backdrop-blur-2xl border border-white/60 rounded-3xl p-4 sm:p-7 shadow-xl space-y-6 text-slate-800">
+      <div hidden={!currentAllowed} className="w-full bg-white/85 backdrop-blur-2xl border border-white/60 rounded-3xl p-4 sm:p-7 shadow-xl space-y-6 text-slate-800">
         <div className="premium-tabs grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 border-b border-slate-200 pb-4">
           <button
             onClick={() => setActiveTab('notes')}
@@ -862,7 +869,7 @@ export default function StudentLessonPage() {
                 {allAttachments.map((att, idx) => (
                   <div
                     key={att.id || idx}
-                    className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-3 hover:border-blue-300 transition-all"
+                    className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3 hover:border-blue-300 transition-all"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="p-2.5 rounded-lg bg-blue-100 text-[#173A7C] shrink-0">
@@ -887,6 +894,7 @@ export default function StudentLessonPage() {
                     >
                       <Download className="w-4 h-4" />
                     </a>
+                    <AttachmentPreview fileUrl={att.fileUrl} title={att.title} type={att.fileType} />
                   </div>
                 ))}
               </div>
@@ -895,7 +903,8 @@ export default function StudentLessonPage() {
         )}
 
         {/* Tab 3: Authenticated, server-graded internal quiz */}
-        {activeTab === 'quiz' && <div id="internal-assessment"><InternalQuizPanel key={`${courseSlug}:${currentLesson?.id || lessonId}`} courseId={courseSlug} lessonId={currentLesson?.id || lessonId} /></div>}
+        {activeTab === 'quiz' && currentAllowed && <div id="internal-assessment"><InternalQuizPanel key={`${courseSlug}:${currentLesson?.id || lessonId}`} courseId={courseSlug} lessonId={currentLesson?.id || lessonId} /></div>}
+        {currentAllowed && <SatisfactionHeart key={`${courseSlug}:${currentLesson?.id}:${activeTab === 'quiz' ? 'quiz' : 'lesson'}`} courseId={courseSlug} lessonId={currentLesson?.id || lessonId} kind={activeTab === 'quiz' ? 'quiz' : 'lesson'} />}
 
         {/* Tab 4: Discussion */}
         {activeTab === 'discussion' && (
@@ -993,7 +1002,8 @@ export default function StudentLessonPage() {
                         <Link
                           key={les.id}
                           href={makeLessonUrl(les.id)}
-                          onClick={() => setIsMobilePlaylistOpen(false)}
+                          aria-disabled={!lessonAllowed(les.id)}
+                          onClick={(event) => { if (!lessonAllowed(les.id)) { event.preventDefault(); setCompletionError('أكمل الدروس السابقة أولاً'); } else setIsMobilePlaylistOpen(false); }}
                           className={`flex items-center justify-between p-2 rounded-lg border text-xs font-bold ${
                             isCurrent
                               ? 'bg-[#173A7C] text-white border-[#173A7C]'
@@ -1002,6 +1012,7 @@ export default function StudentLessonPage() {
                               : 'bg-white text-slate-700 border-slate-200'
                           }`}
                         >
+                          {!lessonAllowed(les.id) && <Lock className="h-3.5 w-3.5 shrink-0 text-slate-400" />}
                           <span className="truncate">{les.title}</span>
                           <span className="text-[10px] font-mono shrink-0">{les.duration}</span>
                         </Link>

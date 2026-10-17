@@ -108,6 +108,34 @@ function fixture({ role = 'INSTRUCTOR', authenticated = true, rows = [own, forei
   };
 }
 
+test('CPD setting persists through saves, defaults off, and can be disabled without losing the curriculum', async () => {
+  const f = fixture();
+  const curriculum = [{ id: 'unit', title: 'Unit', items: [{ id: 'video', title: 'Video', type: 'video', videoUrl: '11111111-1111-4111-8111-111111111111' }] }];
+  const enabled = await f.post({ id: own.id, slug: own.slug, title: own.title, status: 'published', professionalDevelopment: true, curriculum });
+  assert.equal(enabled.status, 200); assert.equal((await enabled.json()).course.professionalDevelopment, true);
+  const update = await f.post({ id: own.id, slug: own.slug, title: own.title, description: 'Updated description' });
+  assert.equal((await update.json()).course.professionalDevelopment, true);
+  const disabled = await f.post({ id: own.id, slug: own.slug, title: own.title, professionalDevelopment: false });
+  const saved = (await disabled.json()).course;
+  assert.equal(saved.professionalDevelopment, false); assert.deepEqual(saved.curriculum, curriculum);
+  const list = await (await f.list()).json();
+  assert.equal(list.courses.every((course) => typeof course.professionalDevelopment === 'boolean'), true);
+});
+
+test('published CPD courses reject unsupported video links, duplicate IDs and incomplete quiz or document content', async () => {
+  const cases = [
+    [{ id: 'unit', title: 'Unit', type: 'video', videoUrl: 'https://external.invalid/movie.mp4' }],
+    [{ id: 'unit', title: 'Unit', items: [{ id: 'same', title: 'A', type: 'ppt', fileUrl: 'https://files.invalid/a.pptx' }, { id: 'same', title: 'B', type: 'ppt', fileUrl: 'https://files.invalid/b.pptx' }] }],
+    [{ id: 'unit', title: 'Unit', type: 'ppt' }],
+    [{ id: 'unit', title: 'Unit', type: 'quiz', quizData: { title: 'Quiz', questions: [{ id: 'one', question: '', options: ['A','B'], correctIndex: 0 }] } }],
+  ];
+  for (const curriculum of cases) {
+    const f = fixture();
+    assert.equal((await f.post({ id: own.id, slug: own.slug, title: own.title, status: 'published', professionalDevelopment: true, curriculum })).status, 400);
+    assert.equal(f.writes.length, 0);
+  }
+});
+
 for (const body of [
   { id: foreign.id, slug: own.slug, title: 'Changed' },
   { id: foreign.id, slug: 'brand-new-slug', title: 'Changed' },

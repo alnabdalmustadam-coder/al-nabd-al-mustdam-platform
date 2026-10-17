@@ -173,6 +173,8 @@ function mountPage(filename, initialCourses = []) {
     '@/components/ui/CardImage': { CardImage: 'CardImage' },
     '@/components/student/student-video-player': { StudentVideoPlayer: 'StudentVideoPlayer' },
     '@/components/student/internal-quiz-panel': { InternalQuizPanel: 'InternalQuizPanel' },
+    '@/components/student/course-document-viewer': { CourseDocumentViewer: 'CourseDocumentViewer', AttachmentPreview: 'AttachmentPreview' },
+    '@/components/student/satisfaction-heart': { SatisfactionHeart: 'SatisfactionHeart' },
     '@/components/student/progress-card': { ProgressCard: 'ProgressCard' },
     '@/utils/supabase/client': { createClient: () => db },
     '@/context/CartContext': { useCart: () => ({ cart: [], clearCart() {} }) },

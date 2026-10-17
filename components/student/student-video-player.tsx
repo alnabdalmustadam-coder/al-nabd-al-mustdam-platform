@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Script from 'next/script';
+import { extractBunnyVideoId } from '@/lib/learning/course-content';
+import type { BunnyPlayer } from '@/lib/video/playerjs';
 import {
   CheckCircle2,
   Lock,
@@ -26,6 +29,9 @@ interface StudentVideoPlayerProps {
   isCompleted?: boolean;
   isSavingCompletion?: boolean;
   onToggleComplete?: () => void;
+  professionalDevelopment?: boolean;
+  completionDisabled?: boolean;
+  onVideoVerified?: () => void;
 }
 
 const extractBunnyGuid = (str: string): string | null => {
@@ -86,10 +92,19 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
   isCompleted = false,
   isSavingCompletion = false,
   onToggleComplete,
+  professionalDevelopment = false,
+  completionDisabled = false,
+  onVideoVerified,
 }) => {
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [cpdSession, setCpdSession] = useState<{ id: string; duration: number; watchedSeconds: number } | null>(null);
+  const [scriptReady, setScriptReady] = useState(false);
+  const [trackingError, setTrackingError] = useState('');
+  const [watchPercent, setWatchPercent] = useState(0);
+  const verifiedCallback = useRef(onVideoVerified);
+  useEffect(() => { verifiedCallback.current = onVideoVerified; }, [onVideoVerified]);
 
   const watchedSecondsRef = useRef<number>(0);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -115,7 +130,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
         }
 
         // 1. Bunny Stream GUID Extraction (from GUID or URL)
-        const bunnyGuid = extractBunnyGuid(trimmed);
+        const bunnyGuid = extractBunnyVideoId(trimmed);
 
         if (bunnyGuid) {
           const res = await fetch('/api/videos/playback-token', {
@@ -131,12 +146,15 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
 
           if (isMounted) {
             setIframeUrl(data.iframeUrl);
+            setCpdSession(data.cpdSession || null);
+            if (professionalDevelopment && !data.cpdSession) throw new Error('تعذر بدء جلسة التحقق من المشاهدة');
             setLoading(false);
             return;
           }
         }
 
         // 2. Direct embedded or stream URL
+        if (professionalDevelopment) throw new Error('هذا الدرس يتطلب فيديو مرفوعاً من داخل المنصة يدعم التحقق من المشاهدة');
         const parsed = parseEmbedUrl(trimmed);
         if (parsed) {
           if (isMounted) {
@@ -165,12 +183,86 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
       isMounted = false;
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     };
-  }, [courseSlug, lessonId, videoUrl]);
+  }, [courseSlug, lessonId, videoUrl, professionalDevelopment]);
+
+  useEffect(() => {
+    if (!professionalDevelopment || !cpdSession || !iframeUrl || !scriptReady || !iframeRef.current || !window.playerjs) return;
+    const player: BunnyPlayer = new window.playerjs.Player(iframeRef.current);
+    let alive = true;
+    let ready = false;
+    let playing = false;
+    let frontier = cpdSession.watchedSeconds;
+    let seconds = frontier;
+    let lastTime = performance.now();
+    let queue = Promise.resolve();
+    const update = (watched: number) => {
+      if (!alive) return;
+      setWatchPercent(Math.min(100, Math.round(watched / cpdSession.duration * 100)));
+      if (watched >= cpdSession.duration - Math.min(1, cpdSession.duration * 0.01)) verifiedCallback.current?.();
+    };
+    update(frontier);
+    const report = (event: 'play' | 'pause' | 'tick') => {
+      const position = seconds;
+      queue = queue.then(async () => {
+        if (!alive) return;
+        try {
+          const response = await fetch('/api/courses/video-progress', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ courseId: courseSlug, lessonId, sessionId: cpdSession.id, seconds: position, event }) });
+          const payload = await response.json();
+          if (!alive) return;
+          if (!response.ok || !payload.success) throw new Error(payload.message || 'تعذر حفظ المشاهدة');
+          update(payload.watchedSeconds);
+          if (typeof payload.seekTo === 'number') {
+            frontier = payload.seekTo; seconds = frontier; playing = false;
+            player.pause(); player.setCurrentTime(frontier);
+            setTrackingError('لا يمكن تجاوز الجزء الذي تمت مشاهدته. استكمل من موضعك المحفوظ.');
+          } else setTrackingError('');
+        } catch (failure) {
+          if (alive) { playing = false; player.pause(); setTrackingError(failure instanceof Error ? failure.message : 'تعذر حفظ المشاهدة'); }
+        }
+      });
+    };
+    const onReady = () => {
+      if (!alive || ready) return;
+      ready = true;
+      player.pause(); player.setCurrentTime(frontier);
+      if (player.supports('method', 'setPlaybackRate')) player.setPlaybackRate(1);
+      player.on('timeupdate', (value) => {
+        if (!alive || typeof value !== 'object' || typeof value.seconds !== 'number') return;
+        const now = performance.now();
+        const elapsed = Math.min(2, Math.max(0, (now - lastTime) / 1000));
+        if (value.seconds > frontier + (playing ? elapsed : 0) + 0.75) {
+          player.setCurrentTime(frontier); seconds = frontier;
+        } else {
+          seconds = value.seconds;
+          if (playing) frontier = Math.max(frontier, seconds);
+          watchedSecondsRef.current = Math.floor(seconds);
+        }
+        lastTime = now;
+      });
+      player.on('play', () => { playing = true; lastTime = performance.now(); report('play'); });
+      player.on('pause', () => { playing = false; report('pause'); });
+      player.on('ended', () => { playing = false; report('pause'); });
+      player.on('seeked', () => { if (seconds > frontier + 0.75) player.setCurrentTime(frontier); });
+      player.on('playbackratechange', (rate) => { if (rate !== 1 && player.supports('method', 'setPlaybackRate')) player.setPlaybackRate(1); });
+    };
+    player.on('ready', onReady);
+    const readyTimeout = setTimeout(() => {
+      if (alive && !ready) setTrackingError('تعذر الاتصال بمشغل الفيديو لحفظ المشاهدة. أعد تحميل الدرس.');
+    }, 15_000);
+    const timer = setInterval(() => { if (ready && playing) report('tick'); }, 5000);
+    const hide = () => { if (document.hidden && ready) { player.pause(); playing = false; report('pause'); } };
+    document.addEventListener('visibilitychange', hide);
+    return () => {
+      alive = false; clearInterval(timer); clearTimeout(readyTimeout); document.removeEventListener('visibilitychange', hide);
+      ['ready', 'timeupdate', 'play', 'pause', 'ended', 'seeked', 'playbackratechange'].forEach((event) => player.off(event));
+    };
+  }, [professionalDevelopment, cpdSession, iframeUrl, scriptReady, courseSlug, lessonId]);
 
   // Keep an approximate local timestamp for note-taking only. Academic lesson
   // completion is recorded explicitly by the page when the student confirms it.
   useEffect(() => {
-    if (!iframeUrl) return;
+    if (!iframeUrl || professionalDevelopment) return;
 
     watchedSecondsRef.current = 0;
     progressTimerRef.current = setInterval(() => {
@@ -180,7 +272,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
     return () => {
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     };
-  }, [iframeUrl]);
+  }, [iframeUrl, professionalDevelopment]);
 
   const handleTimestampNote = () => {
     const totalSecs = watchedSecondsRef.current;
@@ -194,6 +286,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
 
   return (
     <div className="w-full flex flex-col justify-between h-full bg-[#10223E]/80 backdrop-blur-xl border border-white/15 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+      {professionalDevelopment && <Script src="https://assets.mediadelivery.net/playerjs/playerjs-latest.min.js" strategy="afterInteractive" onReady={() => setScriptReady(true)} onError={() => setTrackingError('تعذر تحميل تتبع المشاهدة. أعد تحميل الصفحة')} />}
       {/* Video Header Strip */}
       <div className="flex items-center justify-between gap-2 px-3.5 sm:px-4 py-2.5 bg-[#173056]/85 backdrop-blur-md border-b border-white/10 text-white shrink-0">
         <div className="flex items-center gap-2 min-w-0">
@@ -248,6 +341,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
           <iframe
             ref={iframeRef}
             src={iframeUrl}
+            title={lessonTitle}
             loading="eager"
             className="w-full h-full border-0"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
@@ -267,6 +361,12 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
           </div>
         )}
       </div>
+
+      {professionalDevelopment && <div className="space-y-2 border-t border-white/10 bg-blue-950 px-4 py-3 text-xs font-bold text-blue-100">
+        <p>وضع التطوير المهني · المشاهدة المحفوظة {watchPercent}% · يمكنك الرجوع إلى الأجزاء التي شاهدتها.</p>
+        <div className="h-1.5 overflow-hidden rounded-full bg-white/15"><div className="h-full bg-emerald-400 transition-all" style={{ width: `${watchPercent}%` }} /></div>
+        {trackingError && <p role="alert" className="text-amber-200">{trackingError} <button type="button" onClick={() => window.location.reload()} className="underline">إعادة التحميل</button></p>}
+      </div>}
 
       {/* Control Bar */}
       <div className="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-[#173056]/85 backdrop-blur-md border-t border-white/10 flex items-center justify-between gap-2 text-xs font-bold text-slate-200 shrink-0">
@@ -308,7 +408,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
 
           <button
             onClick={onToggleComplete || onLessonComplete}
-            disabled={isCompleted || isSavingCompletion}
+            disabled={isCompleted || isSavingCompletion || completionDisabled}
             className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md disabled:cursor-default ${isCompleted
                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 border border-emerald-400/40'
                 : 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white hover:opacity-95 border border-white/20 shadow-blue-900/30'
@@ -327,7 +427,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
             ) : (
               <>
                 <Circle className="w-4 h-4 text-slate-300" />
-                <span>تحديد كمكتمل</span>
+                <span>{completionDisabled ? 'أكمل المشاهدة أولاً' : 'تحديد كمكتمل'}</span>
               </>
             )}
           </button>

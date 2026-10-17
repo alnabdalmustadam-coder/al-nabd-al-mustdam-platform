@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { logger } from '@/lib/observability/logger';
 import { findCourseByIdentifier } from '@/lib/public-courses';
 import { parseQuizQuestions } from '@/lib/quizzes/model';
+import { getCourseContent, extractBunnyVideoId } from '@/lib/learning/course-content';
 import type { Course, CourseCategory, CourseLevel, CurriculumSection } from '@/types';
 
 type CourseStatus = 'draft' | 'published' | 'archived';
@@ -92,6 +93,7 @@ function toCourse(row: CourseRow): Course {
     instructorImage: typeof payload.instructorImage === 'string' ? payload.instructorImage : undefined,
     instructorBio: typeof payload.instructorBio === 'string' ? payload.instructorBio : undefined,
     featured: payload.featured === true,
+    professionalDevelopment: payload.professionalDevelopment === true,
     outcomes: Array.isArray(payload.outcomes) ? payload.outcomes.filter((item): item is string => typeof item === 'string') : [],
     curriculum: Array.isArray(payload.curriculum) ? payload.curriculum as CurriculumSection[] : [],
     attachments: Array.isArray(payload.attachments) ? payload.attachments as Course['attachments'] : [],
@@ -189,6 +191,7 @@ function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 
     instructorImage: input.instructorImage ?? current?.instructorImage,
     instructorBio: input.instructorBio ?? current?.instructorBio,
     featured: input.featured ?? current?.featured ?? false,
+    professionalDevelopment: input.professionalDevelopment ?? current?.professionalDevelopment ?? false,
     outcomes: input.outcomes ?? current?.outcomes ?? [],
     curriculum,
     attachments: input.attachments ?? current?.attachments ?? [],
@@ -204,6 +207,9 @@ function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 
 }
 
 export async function saveCourseAsync(courseData: CourseInput, actorId?: string, options: CourseWriteOptions = {}): Promise<Course> {
+  if (courseData.professionalDevelopment !== undefined && typeof courseData.professionalDevelopment !== 'boolean') {
+    throw new CourseAccessError('قيمة وضع التطوير المهني غير صالحة', 400);
+  }
   const quizSets = [courseData.finalExam, ...(courseData.curriculum || []).flatMap((section) => [section.quizData,
     ...(section.items || []).map((item) => item.quizData),
     ...(section.lessons || []).flatMap((item) => typeof item === 'object' ? [item.quizData] : []),
@@ -236,6 +242,26 @@ export async function saveCourseAsync(courseData: CourseInput, actorId?: string,
     ...(options.instructorId ? { trainerId: options.instructorId } : {}),
   }, existing);
   const status = payload.status || 'published';
+  if (payload.professionalDevelopment && status === 'published') {
+    const content = getCourseContent(payload);
+    if (new Set(content.map((lesson) => lesson.id)).size !== content.length || content.some((lesson) => lesson.id.length > 160)) {
+      throw new CourseAccessError('معرفات الدروس يجب أن تكون مختلفة وصالحة لتتبع الإكمال بالترتيب.', 400);
+    }
+    if (content.some((lesson) => lesson.type === 'video' && !extractBunnyVideoId(lesson.videoUrl))) {
+      throw new CourseAccessError('أرفق فيديو من داخل المنصة لكل درس فيديو قبل تفعيل وضع التطوير المهني ونشر الدورة.', 400);
+    }
+    if (content.some((lesson) => lesson.type === 'quiz' && !lesson.requiredQuiz)) {
+      throw new CourseAccessError('أضف أسئلة لكل درس اختبار قبل تفعيل وضع التطوير المهني ونشر الدورة.', 400);
+    }
+    const requiredQuizzes = [...content.flatMap((lesson) => lesson.requiredQuiz ? [lesson.requiredQuiz] : []),
+      ...(payload.finalExam ? [payload.finalExam] : [])];
+    if (requiredQuizzes.some((quiz) => !quiz.questions?.length || parseQuizQuestions(quiz.questions).length !== quiz.questions.length)) {
+      throw new CourseAccessError('أكمل نصوص وإجابات جميع أسئلة الاختبارات قبل نشر دورة التطوير المهني.', 400);
+    }
+    if (content.some((lesson) => ['pdf', 'doc', 'ppt'].includes(lesson.type) && !lesson.fileUrl)) {
+      throw new CourseAccessError('أرفق المستندات وعروض البوربوينت الخاصة بالدروس قبل نشر دورة التطوير المهني.', 400);
+    }
+  }
   const values = {
     slug: payload.slug,
     title: payload.title,

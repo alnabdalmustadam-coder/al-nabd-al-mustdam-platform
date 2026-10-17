@@ -5,8 +5,15 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { buildActor, buildStatement, stmtProgressed, storeStatement } from '@/lib/xapi';
 import { getCourseAllLessons } from '@/lib/course-lessons';
 import { getCourseEnrollmentIdentifiers, parseCourseIdentifier } from '@/lib/public-courses';
+import { readCpdProgress, verifyCpdCompletion } from '@/lib/learning/cpd';
+import { LearningError } from '@/lib/learning/course-access';
+import { isEnrollmentActive } from '@/lib/security/student-access';
 
-type EnrollmentRow = { id: string; status: string | null };
+export const dynamic = 'force-dynamic';
+type EnrollmentRow = { id: string; status: string | null; user_id?: string | null; email?: string };
+const active = (row: EnrollmentRow, userId: string, email: string) =>
+  (row.user_id === userId || (!row.user_id && row.email === email)) && isEnrollmentActive(row.status)
+  && !['suspended', 'expired'].includes(String(row.status).toLowerCase());
 
 export async function GET(request: Request) {
   const auth = await requireUser(request);
@@ -30,12 +37,12 @@ export async function GET(request: Request) {
     const [byUser, byEmail] = await Promise.all([
       admin
         .from('enrollments')
-        .select('id, status')
+        .select('id, user_id, email, status')
         .eq('user_id', auth.user.id)
         .in('course_id', identifiers),
       admin
         .from('enrollments')
-        .select('id, status')
+        .select('id, user_id, email, status')
         .eq('email', email)
         .in('course_id', identifiers),
     ]);
@@ -46,7 +53,7 @@ export async function GET(request: Request) {
       [...((byUser.data || []) as EnrollmentRow[]), ...((byEmail.data || []) as EnrollmentRow[])]
         .map((row) => [row.id, row]),
     ).values()].some(
-      (row) => !['REVOKED', 'CANCELLED', 'CANCELED'].includes(String(row.status || '').toUpperCase()),
+      (row) => active(row, auth.user.id, email),
     );
 
     if (!hasActiveEnrollment) {
@@ -54,6 +61,14 @@ export async function GET(request: Request) {
     }
 
     const lessons = getCourseAllLessons(course);
+    if (course.professionalDevelopment) {
+      const progress = await readCpdProgress(admin, course, auth.user.id);
+      const calculated = Math.round(progress.completed.size / Math.max(lessons.length, 1) * 100);
+      return NextResponse.json({ success: true, professionalDevelopment: true,
+        completedLessonIds: [...progress.completed], completedCount: progress.completed.size,
+        totalLessons: lessons.length, progress: Math.min(99, calculated), completionPendingAssessment: calculated >= 100,
+      }, { headers: { 'Cache-Control': 'private, no-store' } });
+    }
     const platformIri = 'https://nabdtraining.com';
     const lessonIriPrefix = `${platformIri}/courses/${course.slug}/lessons/`;
     const lessonIdByIri = new Map(
@@ -122,12 +137,12 @@ export async function POST(request: Request) {
     const [byUser, byEmail] = await Promise.all([
       admin
         .from('enrollments')
-        .select('id, status')
+        .select('id, user_id, email, status')
         .eq('user_id', auth.user.id)
         .in('course_id', identifiers),
       admin
         .from('enrollments')
-        .select('id, status')
+        .select('id, user_id, email, status')
         .eq('email', email)
         .in('course_id', identifiers),
     ]);
@@ -138,12 +153,14 @@ export async function POST(request: Request) {
       [...((byUser.data || []) as EnrollmentRow[]), ...((byEmail.data || []) as EnrollmentRow[])]
         .map((row) => [row.id, row]),
     ).values()].filter(
-      (row) => !['REVOKED', 'CANCELLED', 'CANCELED'].includes(String(row.status || '').toUpperCase()),
+      (row) => active(row, auth.user.id, email),
     );
 
     if (enrollments.length === 0) {
       return NextResponse.json({ success: false, message: 'غير مسجل في هذه الدورة' }, { status: 403 });
     }
+
+    if (course.professionalDevelopment) await verifyCpdCompletion(admin, course, auth.user.id, email, lessonId);
 
     const { data: profile } = await admin
       .from('profiles')
@@ -185,7 +202,9 @@ export async function POST(request: Request) {
     const validLessonIris = new Set(
       lessons.map((item) => `${platformIri}/courses/${course.slug}/lessons/${encodeURIComponent(item.id)}`),
     );
-    const completedCount = new Set(
+    const completedCount = course.professionalDevelopment
+      ? (await readCpdProgress(admin, course, auth.user.id)).completed.size
+      : new Set(
       (completions || [])
         .map((row) => row.object_id)
         .filter((objectId) => validLessonIris.has(objectId)),
@@ -224,6 +243,7 @@ export async function POST(request: Request) {
       totalLessons: Math.max(lessons.length, 1),
     });
   } catch (error) {
+    if (error instanceof LearningError) return NextResponse.json({ success: false, message: error.message }, { status: error.status });
     console.error('Complete lesson route error:', error);
     return NextResponse.json({ success: false, message: 'حدث خطأ في الخادم' }, { status: 500 });
   }
