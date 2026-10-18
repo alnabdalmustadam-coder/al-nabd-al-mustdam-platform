@@ -9,7 +9,7 @@ import { extractBunnyVideoId } from '../lib/learning/course-content.ts';
 // player/network/clock boundaries. No browser auth or live learner writes.
 function playerFixture({ resume = 0, duration = 60, playbackResponses = [], recordProgress } = {}) {
   const slots = []; const effects = []; const intervals = new Map(); const timeouts = new Map(); const requests = [];
-  const documentListeners = new Map(); const players = []; let cursor = 0; let clock = 0; let handle = 0; let verified = 0;
+  const documentListeners = new Map(); const players = []; const intervalDelays = new Map(); let cursor = 0; let clock = 0; let handle = 0; let verified = 0;
   let savedWatch = resume; let tree; const iframe = {}; let readyHook; let playbackCalls = 0; let detached = false;
   const react = { useState(initial) {
     const index = cursor++; if (!(index in slots)) slots[index] = { value: typeof initial === 'function' ? initial() : initial };
@@ -22,7 +22,7 @@ function playerFixture({ resume = 0, duration = 60, playbackResponses = [], reco
     }
   } };
   class Player {
-    events = new Map(); seeks = []; rates = []; pauses = 0; currentTime = resume;
+    events = new Map(); seeks = []; rates = []; pauses = 0; plays = 0; isPlaying = false; currentTime = resume;
     constructor() { players.push(this); }
     on(event, callback) { this.events.set(event, callback); }
     off(event) {
@@ -31,12 +31,13 @@ function playerFixture({ resume = 0, duration = 60, playbackResponses = [], reco
       // passive cleanup the iframe may already have no browsing context.
       if (detached) throw new TypeError("Cannot read properties of null (reading 'postMessage')");
     }
-    pause() { this.pauses++; }
+    pause() { this.pauses++; if (this.isPlaying) { this.isPlaying = false; this.emit('pause'); } }
+    play() { this.plays++; if (!this.isPlaying) { this.isPlaying = true; this.emit('play'); } }
     setCurrentTime(value) { this.seeks.push(value); this.currentTime = value; }
     getCurrentTime(callback) { callback(this.currentTime); }
     setPlaybackRate(value) { this.rates.push(value); }
     supports() { return true; }
-    emit(event, value) { if (event === 'timeupdate') this.currentTime = value.seconds; this.events.get(event)?.(value); }
+    emit(event, value) { if (event === 'play') this.isPlaying = true; if (event === 'timeupdate') this.currentTime = value.seconds; this.events.get(event)?.(value); }
   }
   const jsx = (type, props) => ({ type, props });
   const modules = { react: { ...react, default: react, __esModule: true },
@@ -50,7 +51,7 @@ function playerFixture({ resume = 0, duration = 60, playbackResponses = [], reco
   vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText, {
     exports, require: (name) => { assert.ok(name in modules, name); return modules[name]; }, URL, AbortController,
     window: { playerjs: { Player }, location: { reload() {} } }, document, performance: { now: () => clock },
-    setInterval: (fn) => { const id = ++handle; intervals.set(id, fn); return id; }, clearInterval: (id) => intervals.delete(id),
+    setInterval: (fn, delay) => { const id = ++handle; intervals.set(id, fn); intervalDelays.set(id, delay); return id; }, clearInterval: (id) => { intervals.delete(id); intervalDelays.delete(id); },
     setTimeout: (fn) => { const id = ++handle; timeouts.set(id, fn); return id; }, clearTimeout: (id) => timeouts.delete(id),
     fetch: async (url, init) => {
       const body = JSON.parse(init.body); requests.push({ url, body, signal: init.signal });
@@ -79,7 +80,7 @@ function playerFixture({ resume = 0, duration = 60, playbackResponses = [], reco
     visit(tree); effects.splice(0).forEach((fn) => fn()); return tree;
   }
   async function flush() { for (let i = 0; i < 12; i++) await Promise.resolve(); render(); }
-  return { render, flush, requests, players, intervals, timeouts, document, documentListeners,
+  return { render, flush, requests, players, intervals, intervalDelays, timeouts, document, documentListeners,
     retryTimer: () => { const [id, fn] = timeouts.entries().next().value; timeouts.delete(id); fn(); },
     scriptReady: () => readyHook(), setClock: (value) => { clock = value; },
     setSavedWatch: (value) => { savedWatch = value; }, verified: () => verified,
@@ -94,7 +95,7 @@ test('CPD player blocks forward seeking, retains backwards replay and restores s
   player.emit('ready'); assert.equal(player.seeks[0], 12);
   player.emit('timeupdate', { seconds: 45, duration: 60 }); assert.equal(player.seeks.at(-1), 12);
   player.emit('timeupdate', { seconds: 4, duration: 60 }); assert.equal(player.seeks.at(-1), 12);
-  player.emit('play'); f.setClock(1000); player.emit('timeupdate', { seconds: 5, duration: 60 });
+  player.emit('play'); await f.flush(); f.setClock(1000); player.emit('timeupdate', { seconds: 5, duration: 60 });
   assert.equal(player.seeks.at(-1), 12); // Allowed replay did not snap back.
   player.emit('playbackratechange', 2); assert.equal(player.rates.at(-1), 1);
   f.cleanup();
@@ -141,7 +142,7 @@ test('CPD player does not automatically retry metadata outages or failed uploads
 
 test('CPD completion comes from saved server watch history; hiding the page pauses and cleans listeners', async () => {
   const f = playerFixture(); f.render(); await f.flush(); f.scriptReady(); f.render();
-  const player = f.players[0]; player.emit('ready'); player.emit('play');
+  const player = f.players[0]; player.emit('ready'); player.emit('play'); await f.flush();
   for (let seconds = 1; seconds <= 5; seconds++) { f.setClock(seconds * 1000); player.emit('timeupdate', { seconds, duration: 60 }); }
   for (const fn of f.intervals.values()) fn(); await f.flush();
   assert.equal(f.verified(), 0);
@@ -149,7 +150,7 @@ test('CPD completion comes from saved server watch history; hiding the page paus
   assert.equal(event.body.sessionId, 'server-session'); assert.equal(event.body.courseId, 'course');
   assert.equal(f.requests.find((request) => request.body.event === 'tick').body.seconds, 5);
   f.setSavedWatch(60); player.emit('ended'); await f.flush(); assert.ok(f.verified() > 0);
-  const pauses = player.pauses; f.document.hidden = true; f.documentListeners.get('visibilitychange')();
+  player.emit('play'); await f.flush(); const pauses = player.pauses; f.document.hidden = true; f.documentListeners.get('visibilitychange')();
   assert.ok(player.pauses > pauses);
   f.cleanup(); assert.equal(f.intervals.size, 0); assert.equal(f.documentListeners.size, 0); assert.equal(player.events.size, 0);
 });
@@ -194,4 +195,80 @@ test('refreshing or leaving a video before readiness also tolerates iframe teard
   const f = playerFixture(); f.render(); await f.flush(); f.scriptReady(); f.render();
   f.detachIframe(); assert.doesNotThrow(() => f.cleanup());
   assert.equal(f.players[0].events.size, 0); assert.equal(f.timeouts.size, 0);
+});
+
+test('one play click waits for server authorization then automatically tracks every second through the final frame', async () => {
+  let authorize;
+  const f = playerFixture({ duration: 30, recordProgress: (body) => body.event === 'play'
+    ? new Promise(resolve => { authorize = () => resolve({ success: true, accepted: true, watchedSeconds: 0 }); })
+    : { success: true, accepted: true, watchedSeconds: body.seconds } });
+  f.render(); await f.flush(); f.scriptReady(); f.render();
+  const player = f.players[0]; player.emit('ready'); player.emit('play'); await f.flush();
+  assert.equal(player.isPlaying, false); assert.equal(player.plays, 0);
+  f.setClock(1200); authorize(); await f.flush();
+  assert.equal(player.isPlaying, true); assert.equal(player.plays, 1);
+  assert.deepEqual([...f.intervalDelays.values()], [1000]);
+  for (let second = 1; second <= 29; second++) {
+    f.setClock(1200 + second * 1000); player.emit('timeupdate', { seconds: second });
+    for (const fn of f.intervals.values()) fn(); await f.flush();
+  }
+  f.setClock(31200); player.currentTime = 29.96; player.emit('ended'); await f.flush();
+  assert.equal(f.verified(), 1);
+  assert.equal(f.requests.filter(r => r.body.event === 'play').length, 1);
+  assert.equal(f.requests.filter(r => r.body.event === 'tick').length, 29);
+  assert.equal(player.seeks.length, 1, 'Normal playback must not be rewound');
+  f.cleanup();
+});
+
+test('sparse mobile timeupdates do not look like skipping, while a real forward seek is blocked', async () => {
+  const f = playerFixture(); f.render(); await f.flush(); f.scriptReady(); f.render();
+  const player = f.players[0]; player.emit('ready'); player.emit('play'); await f.flush();
+  f.setClock(3500); player.emit('timeupdate', { seconds: 3.5 });
+  assert.equal(player.seeks.length, 1);
+  player.currentTime = 25; player.emit('seeked'); await f.flush();
+  assert.equal(player.seeks.at(-1), 3.5);
+  assert.equal(player.isPlaying, true); f.cleanup();
+});
+
+test('slow heartbeat requests are coalesced and a server correction resumes without another manual click', async () => {
+  let release; let tickCount = 0;
+  const f = playerFixture({ recordProgress: body => body.event === 'tick' && ++tickCount === 1
+    ? new Promise(resolve => { release = () => resolve({ success: true, accepted: false, watchedSeconds: 1, seekTo: 1 }); })
+    : { success: true, accepted: true, watchedSeconds: body.seconds } });
+  f.render(); await f.flush(); f.scriptReady(); f.render();
+  const player = f.players[0]; player.emit('ready'); player.emit('play'); await f.flush();
+  f.setClock(1000); player.emit('timeupdate', { seconds: 1 });
+  for (const fn of f.intervals.values()) fn(); await f.flush();
+  for (let i = 0; i < 10; i++) for (const fn of f.intervals.values()) fn();
+  assert.equal(tickCount, 1);
+  release(); await f.flush(); await f.flush();
+  assert.equal(player.isPlaying, true); assert.equal(player.plays, 2);
+  assert.equal(player.seeks.at(-1), 1);
+  assert.doesNotMatch(JSON.stringify(f.render()), /لا يمكن تجاوز|المشاهدة المحفوظة|وضع التطوير المهني/);
+  f.cleanup();
+});
+
+test('hiding the page during play authorization never resumes media in the background', async () => {
+  let release;
+  const f = playerFixture({ recordProgress: body => body.event === 'play'
+    ? new Promise(resolve => { release = () => resolve({ success: true, accepted: true, watchedSeconds: 0 }); })
+    : { success: true, accepted: true, watchedSeconds: 0 } });
+  f.render(); await f.flush(); f.scriptReady(); f.render();
+  const player = f.players[0]; player.emit('ready'); player.emit('play'); await f.flush();
+  f.document.hidden = true; f.documentListeners.get('visibilitychange')();
+  release(); await f.flush(); await f.flush();
+  assert.equal(player.plays, 0); assert.equal(player.isPlaying, false);
+  assert.ok(f.requests.some(request => request.body.event === 'pause'));
+  f.cleanup();
+});
+
+test('repeated server corrections stop with a retry instead of an endless resume loop', async () => {
+  const f = playerFixture({ recordProgress: () => ({ success: true, accepted: false, watchedSeconds: 0, seekTo: 0 }) });
+  f.render(); await f.flush(); f.scriptReady(); f.render();
+  const player = f.players[0]; player.emit('ready'); player.emit('play');
+  for (let i = 0; i < 8; i++) await f.flush();
+  assert.equal(f.requests.filter(request => request.body.event === 'play').length, 3);
+  assert.equal(player.plays, 0); assert.equal(player.isPlaying, false);
+  assert.match(JSON.stringify(f.render()), /تعذر مزامنة المشاهدة/);
+  f.cleanup();
 });

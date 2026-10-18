@@ -106,7 +106,6 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
   const [cpdSession, setCpdSession] = useState<{ id: string; duration: number; watchedSeconds: number } | null>(null);
   const [scriptReady, setScriptReady] = useState(false);
   const [trackingError, setTrackingError] = useState('');
-  const [watchPercent, setWatchPercent] = useState(0);
   const verifiedCallback = useRef(onVideoVerified);
   useEffect(() => { verifiedCallback.current = onVideoVerified; }, [onVideoVerified]);
 
@@ -124,7 +123,6 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
     setIframeUrl(null);
     setCpdSession(null);
     setTrackingError('');
-    setWatchPercent(0);
 
     async function loadVideo(attempt = 0) {
       try {
@@ -212,11 +210,15 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
     const player: BunnyPlayer = new window.playerjs.Player(iframeRef.current);
     let alive = true;
     let ready = false;
-    let playing = false;
+    let phase: 'paused' | 'authorizing' | 'resuming' | 'playing' = 'paused';
+    let generation = 0;
     let frontier = cpdSession.watchedSeconds;
     let seconds = frontier;
-    let lastTime = performance.now();
+    let anchorSeconds = frontier;
+    let anchorTime = performance.now();
     let queue = Promise.resolve();
+    let tickPending = false;
+    let corrections = 0;
     let verified = false;
     const positionTimers = new Set<ReturnType<typeof setTimeout>>();
     const readPosition = () => new Promise<number>((resolve) => {
@@ -234,35 +236,67 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
     const update = (watched: number) => {
       if (!alive) return;
       const complete = watched >= cpdSession.duration - Math.min(1, cpdSession.duration * 0.01);
-      setWatchPercent(complete ? 100 : Math.min(99, Math.round(watched / cpdSession.duration * 100)));
       if (complete && !verified) { verified = true; verifiedCallback.current?.(); }
     };
-    update(frontier);
-    const report = (event: 'play' | 'pause' | 'tick') => {
-      if (!alive) return;
-      // Read immediately, before queueing: pause/ended can arrive between
-      // timeupdate events, and a queued tick must not sample a later playback state.
-      const position = readPosition();
-      queue = queue.then(async () => {
-        if (!alive) return;
-        try {
-          const current = await position;
-          if (!alive) return;
-          const response = await fetch('/api/courses/video-progress', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ courseId: courseSlug, lessonId, sessionId: cpdSession.id, seconds: current, event }) });
-          const payload = await response.json();
-          if (!alive) return;
-          if (!response.ok || !payload.success) throw new Error(payload.message || 'تعذر حفظ المشاهدة');
-          update(payload.watchedSeconds);
-          if (typeof payload.seekTo === 'number') {
-            frontier = payload.seekTo; seconds = frontier; playing = false;
-            player.pause(); player.setCurrentTime(frontier);
-            setTrackingError('لا يمكن تجاوز الجزء الذي تمت مشاهدته. استكمل من موضعك المحفوظ.');
-          } else setTrackingError('');
-        } catch (failure) {
-          if (alive) { playing = false; player.pause(); setTrackingError(failure instanceof Error ? failure.message : 'تعذر حفظ المشاهدة'); }
-        }
+    const resetPosition = (position: number) => {
+      seconds = position; anchorSeconds = position; anchorTime = performance.now();
+      watchedSecondsRef.current = Math.floor(position);
+    };
+    type SavedWatch = { watchedSeconds: number; accepted?: boolean; seekTo?: number | null };
+    const save = (event: 'play' | 'pause' | 'tick', position: Promise<number> | number) => {
+      const request = queue.then(async (): Promise<SavedWatch | null> => {
+        if (!alive) return null;
+        const current = await position;
+        if (!alive) return null;
+        const response = await fetch('/api/courses/video-progress', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courseId: courseSlug, lessonId, sessionId: cpdSession.id, seconds: current, event }) });
+        const payload = await response.json();
+        if (!alive) return null;
+        if (!response.ok || !payload.success || !Number.isFinite(payload.watchedSeconds)) throw new Error(payload.message || 'تعذر حفظ المشاهدة');
+        update(payload.watchedSeconds);
+        return payload as SavedWatch;
       });
+      queue = request.then(() => {}, () => {});
+      return request;
+    };
+    const fail = (failure: unknown) => {
+      if (!alive) return;
+      generation++; phase = 'paused'; player.pause();
+      setTrackingError(failure instanceof Error ? failure.message : 'تعذر حفظ المشاهدة. أعد المحاولة لاستكمال الفيديو.');
+    };
+    // Start the server clock BEFORE resuming the media. Network latency during
+    // the first play/resume must never be deducted from the learner's viewing.
+    const beginPlayback = () => {
+      if (!alive || !ready || document.hidden || phase === 'authorizing' || phase === 'resuming') return;
+      phase = 'authorizing';
+      const version = ++generation;
+      player.pause();
+      void save('play', seconds).then((saved) => {
+        if (!alive || !saved || generation !== version || document.hidden) return;
+        if (typeof saved.seekTo === 'number') {
+          if (++corrections > 2) { fail(new Error('تعذر مزامنة المشاهدة. أعد المحاولة لاستكمالها من موضعك المحفوظ.')); return; }
+          frontier = saved.seekTo; resetPosition(frontier); player.setCurrentTime(frontier);
+          phase = 'paused'; beginPlayback(); return;
+        }
+        setTrackingError('');
+        phase = 'resuming'; player.play();
+      }).catch(fail);
+    };
+    const reconcile = (saved: SavedWatch | null) => {
+      if (!alive || !saved) return;
+      if (typeof saved.seekTo !== 'number') { corrections = 0; setTrackingError(''); return; }
+      if (++corrections > 2) { fail(new Error('تعذر مزامنة المشاهدة. أعد المحاولة لاستكمالها من موضعك المحفوظ.')); return; }
+      const resume = phase === 'playing' && !document.hidden;
+      generation++; phase = 'paused'; player.pause();
+      frontier = saved.seekTo; resetPosition(frontier); player.setCurrentTime(frontier);
+      // Resume from the verified position; a timing correction is not an
+      // accusation of skipping and must not require another manual play.
+      if (resume) beginPlayback();
+    };
+    const stopAndSave = (final = false) => {
+      if (!alive || !ready || (!final && phase !== 'playing')) return;
+      generation++; phase = 'paused';
+      void save('pause', readPosition()).then(reconcile).catch(fail);
     };
     const onReady = () => {
       if (!alive || ready) return;
@@ -270,39 +304,59 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
       player.pause(); player.setCurrentTime(frontier);
       if (player.supports('method', 'setPlaybackRate')) player.setPlaybackRate(1);
       player.on('timeupdate', (value) => {
-        if (!alive || typeof value !== 'object' || typeof value.seconds !== 'number') return;
-        const now = performance.now();
-        const elapsed = Math.min(2, Math.max(0, (now - lastTime) / 1000));
-        if (value.seconds > frontier + (playing ? elapsed : 0) + 0.75) {
-          player.setCurrentTime(frontier); seconds = frontier;
-        } else {
-          seconds = value.seconds;
-          if (playing) frontier = Math.max(frontier, seconds);
-          watchedSecondsRef.current = Math.floor(seconds);
+        if (!alive || typeof value !== 'object' || typeof value.seconds !== 'number' || !Number.isFinite(value.seconds)) return;
+        const elapsed = phase === 'playing' ? Math.max(0, (performance.now() - anchorTime) / 1000) : 0;
+        // Use one continuous playback anchor. Sparse mobile events or a busy
+        // main thread must not look like a seek after an arbitrary 2s clamp.
+        if (value.seconds > Math.max(frontier, anchorSeconds + elapsed) + 0.5) {
+          player.setCurrentTime(frontier); resetPosition(frontier); return;
         }
-        lastTime = now;
+        if (value.seconds < seconds - 0.5) { anchorSeconds = value.seconds; anchorTime = performance.now(); }
+        seconds = value.seconds;
+        if (phase === 'playing' && !document.hidden) frontier = Math.max(frontier, seconds);
+        watchedSecondsRef.current = Math.floor(seconds);
       });
-      player.on('play', () => { playing = true; lastTime = performance.now(); report('play'); });
-      player.on('pause', () => { playing = false; report('pause'); });
-      player.on('ended', () => { playing = false; report('pause'); });
-      player.on('seeked', () => { if (alive && seconds > frontier + 0.75) player.setCurrentTime(frontier); });
+      player.on('play', () => {
+        if (!alive) return;
+        if (document.hidden) { player.pause(); return; }
+        if (phase === 'resuming') { phase = 'playing'; anchorSeconds = seconds; anchorTime = performance.now(); return; }
+        if (phase !== 'playing') beginPlayback();
+      });
+      player.on('pause', () => stopAndSave());
+      player.on('ended', () => stopAndSave(true));
+      player.on('seeked', () => {
+        if (!alive) return;
+        void readPosition().then((position) => {
+          if (!alive) return;
+          if (position > frontier + 0.5) { player.setCurrentTime(frontier); resetPosition(frontier); }
+          else resetPosition(position);
+        });
+      });
       player.on('playbackratechange', (rate) => { if (alive && rate !== 1 && player.supports('method', 'setPlaybackRate')) player.setPlaybackRate(1); });
     };
+    update(frontier);
     player.on('ready', onReady);
     const readyTimeout = setTimeout(() => {
       if (alive && !ready) setTrackingError('تعذر الاتصال بمشغل الفيديو لحفظ المشاهدة. أعد تحميل الدرس.');
     }, 15_000);
-    const timer = setInterval(() => { if (ready && playing) report('tick'); }, 5000);
-    const hide = () => { if (document.hidden && ready) { player.pause(); playing = false; report('pause'); } };
+    const timer = setInterval(() => {
+      if (!alive || !ready || phase !== 'playing' || tickPending || document.hidden) return;
+      tickPending = true;
+      void save('tick', readPosition()).then(reconcile).catch(fail).finally(() => { tickPending = false; });
+    }, 1000);
+    const hide = () => {
+      if (!alive || !ready || !document.hidden || phase === 'paused') return;
+      generation++; phase = 'paused'; player.pause();
+      void save('pause', readPosition()).then(reconcile).catch(fail);
+    };
     document.addEventListener('visibilitychange', hide);
     return () => {
-      alive = false; clearInterval(timer); clearTimeout(readyTimeout); document.removeEventListener('visibilitychange', hide);
+      alive = false; generation++; clearInterval(timer); clearTimeout(readyTimeout); document.removeEventListener('visibilitychange', hide);
       positionTimers.forEach(clearTimeout); positionTimers.clear();
       ['ready', 'timeupdate', 'play', 'pause', 'ended', 'seeked', 'playbackratechange'].forEach((event) => {
         try { player.off(event); } catch {
-          // Bunny removes its local callback before posting the unsubscribe.
-          // React may already have removed the iframe/contentWindow by this
-          // passive cleanup. Continue detaching the remaining callbacks.
+          // The SDK clears the local callback before posting to the iframe,
+          // whose browsing context may already be gone during React cleanup.
         }
       });
     };
@@ -386,6 +440,10 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
           </div>
         )}
 
+        {professionalDevelopment && trackingError && <div role="alert" className="absolute inset-x-3 top-3 z-20 rounded-xl border border-white/20 bg-slate-950/95 p-3 text-center text-xs leading-6 text-white shadow-lg">
+          {trackingError} <button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)} className="mr-2 font-bold underline">إعادة المحاولة</button>
+        </div>}
+
         {!loading && !error && iframeUrl && (
           <iframe
             ref={iframeRef}
@@ -410,12 +468,6 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
           </div>
         )}
       </div>
-
-      {professionalDevelopment && <div className="space-y-2 border-t border-white/10 bg-blue-950 px-4 py-3 text-xs font-bold text-blue-100">
-        <p>وضع التطوير المهني · المشاهدة المحفوظة {watchPercent}% · يمكنك الرجوع إلى الأجزاء التي شاهدتها.</p>
-        <div className="h-1.5 overflow-hidden rounded-full bg-white/15"><div className="h-full bg-emerald-400 transition-all" style={{ width: `${watchPercent}%` }} /></div>
-        {trackingError && <p role="alert" className="text-amber-200">{trackingError} <button type="button" onClick={() => window.location.reload()} className="underline">إعادة التحميل</button></p>}
-      </div>}
 
       {/* Control Bar */}
       {!hideToolbar && <div className="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-[#173056]/85 backdrop-blur-md border-t border-white/10 flex items-center justify-between gap-2 text-xs font-bold text-slate-200 shrink-0">

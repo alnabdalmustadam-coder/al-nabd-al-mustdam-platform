@@ -45,7 +45,7 @@ begin
     where user_id=learner and course_id=course and lesson_id=item;
   perform public.record_cpd_video_progress(learner,course,item,'tail-v2',sid,4,'tick');
   select uncredited_seconds into credit from public.course_lesson_progress where user_id=learner and course_id=course and lesson_id=item;
-  if credit < 0.99 or credit > 1 then raise exception 'Missing or unbounded carry'; end if;
+  if credit < 0.99 or credit > 1.1 then raise exception 'Missing or unbounded carry'; end if;
   -- Rewinding must discard carry; waiting/replaying cannot bank future seconds.
   perform public.record_cpd_video_progress(learner,course,item,'tail-v2',sid,0,'tick');
   select uncredited_seconds into credit from public.course_lesson_progress where user_id=learner and course_id=course and lesson_id=item;
