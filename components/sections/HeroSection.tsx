@@ -8,10 +8,6 @@ import { usePublicCourses } from "@/lib/hooks/use-public-courses";
 
 const typewriterWords = ["التقني", "الإداري", "الرقمي", "اللغوي", "القيادي"];
 const heroButtonIconClass = "w-4 h-4 sm:w-5 sm:h-5 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 shrink-0";
-// The bundled lab artwork places its title on the right.
-const heroArtworkPositions: Record<string, string> = {
-  "/demo/cpd-lab/cover.svg": "right center",
-};
 
 export default function HeroSection() {
   const { courses, loading, error, reload } = usePublicCourses();
@@ -215,7 +211,7 @@ export default function HeroSection() {
             className="hero-fixed-side-card relative w-full h-full grid grid-rows-[minmax(0,1fr)_auto] pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
           >
             <div className="relative isolate min-h-0 overflow-hidden rounded-t-[2rem] sm:rounded-t-[2.5rem] lg:rounded-t-[1.5rem] xl:rounded-t-[2rem]">
-              <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="absolute inset-0 block w-full h-full object-cover" style={{ objectPosition: heroArtworkPositions[heroCourse?.image || ""] || "center" }} />
+              <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="absolute inset-0 block w-full h-full object-fill" />
             </div>
 
             <div className="relative px-6 pb-6 pt-4 sm:px-10 sm:pb-10 sm:pt-6 lg:px-6 lg:pb-6 lg:pt-4 xl:px-8 xl:pb-8 xl:pt-5 2xl:px-10 2xl:pb-10">
