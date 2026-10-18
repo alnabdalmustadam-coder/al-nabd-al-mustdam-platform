@@ -277,12 +277,13 @@ export default function StudentDashboardPage() {
             <div className="absolute -bottom-16 -left-16 w-44 h-44 bg-[#5CB07C]/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex flex-col md:flex-row items-stretch relative z-10">
-              <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-gradient-to-br from-slate-50 to-blue-50/40 md:w-72 md:border-b-0 md:border-l">
-                <div className="relative w-full">
+              <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-gradient-to-br from-slate-50 to-blue-50/40 md:w-1/3 md:border-b-0 md:border-l">
+                <div className="relative w-full md:absolute md:inset-0 md:h-full">
                   <CardImage
                     src={topCourse.thumbnailUrl || '/logo.webp'}
                     alt={topCourse.title}
-                    sizes="(max-width: 768px) 100vw, 288px"
+                    sizes="(max-width: 767px) 100vw, 33vw"
+                    className="md:aspect-auto md:h-full"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-white/20 via-transparent to-transparent pointer-events-none" />
@@ -293,7 +294,7 @@ export default function StudentDashboardPage() {
                 </span>
               </div>
 
-              <div className="p-5 sm:p-7 flex-1 flex flex-col justify-between space-y-4 sm:space-y-5">
+              <div className="p-5 sm:p-7 min-w-0 flex-1 flex flex-col justify-between space-y-4 sm:space-y-5">
                 <div className="space-y-3.5 sm:space-y-4">
                   <motion.div variants={textItemVariants}>
                     <span className="inline-flex items-center gap-1.5 text-xs font-black text-[#0D5C3A] mb-2.5">
