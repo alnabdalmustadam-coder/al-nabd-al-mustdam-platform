@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { Building2, ChevronRight, ChevronLeft, Compass, CreditCard, FileText } from "lucide-react";
 import { usePublicCourses } from "@/lib/hooks/use-public-courses";
 
 const typewriterWords = ["التقني", "الإداري", "الرقمي", "اللغوي", "القيادي"];
+const heroButtonIconClass = "w-4 h-4 sm:w-5 sm:h-5 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 shrink-0";
 
 export default function HeroSection() {
   const { courses, loading, error, reload } = usePublicCourses();
@@ -105,7 +106,8 @@ export default function HeroSection() {
               </div>
 
               <Button href={heroCourse ? `/courses/${heroCourse.slug}` : "/courses"} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
-                {heroCourse ? "اشترك الآن وادفع بالتقسيط" : "استعرض الدورات"}
+                <CreditCard className={heroButtonIconClass} aria-hidden="true" focusable="false" />
+                <span>{heroCourse ? "اشترك الآن وادفع بالتقسيط" : "استعرض الدورات"}</span>
               </Button>
               {error && <button type="button" onClick={reload} className="font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
             </motion.div>
@@ -149,10 +151,12 @@ export default function HeroSection() {
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 sm:gap-4 lg:gap-2 xl:gap-4 w-full px-1 lg:px-0">
                 <Button href="/courses" size="lg" className="flex-1 w-full h-12 sm:h-14 lg:h-10 xl:h-12 2xl:h-14 text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold border border-white/20 px-2 sm:px-8 lg:px-1 xl:px-4 transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
-                  استكشف الدورات
+                  <Compass className={heroButtonIconClass} aria-hidden="true" focusable="false" />
+                  <span>استكشف الدورات</span>
                 </Button>
                 <Button href="/corporate" variant="secondary" size="lg" className="flex-1 w-full h-12 sm:h-14 lg:h-10 xl:h-12 2xl:h-14 text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold bg-white/80 backdrop-blur-md border border-white/80 px-2 sm:px-8 lg:px-1 xl:px-4 transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
-                  دورات الشركات
+                  <Building2 className={heroButtonIconClass} aria-hidden="true" focusable="false" />
+                  <span>دورات الشركات</span>
                 </Button>
               </div>
             </div>
@@ -211,13 +215,16 @@ export default function HeroSection() {
               onMouseLeave={() => setIsPaused(false)}
               className="hero-fixed-side-card relative w-full h-full grid grid-rows-[minmax(0,1fr)_auto] pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
             >
-              <div className="min-h-0 overflow-hidden rounded-t-[2rem] sm:rounded-t-[2.5rem] lg:rounded-t-[1.5rem] xl:rounded-t-[2rem]">
-                <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="block w-full h-full object-contain object-top" />
+              <div className="relative isolate min-h-0 overflow-hidden rounded-t-[2rem] sm:rounded-t-[2.5rem] lg:rounded-t-[1.5rem] xl:rounded-t-[2rem]">
+                <img src={heroCourse?.image || "/logo.webp"} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full scale-110 object-cover blur-2xl opacity-70" />
+                <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="relative z-10 block w-full h-full origin-top scale-[1.03] object-contain object-top" />
               </div>
 
-              <div className="p-6 sm:p-10 lg:p-6 xl:p-8 2xl:p-10">
+              <div className="relative px-6 pb-6 pt-4 sm:px-10 sm:pb-10 sm:pt-6 lg:px-6 lg:pb-6 lg:pt-4 xl:px-8 xl:pb-8 xl:pt-5 2xl:px-10 2xl:pb-10">
+                <div aria-hidden="true" className="absolute top-0 inset-x-6 sm:inset-x-10 lg:inset-x-6 xl:inset-x-8 2xl:inset-x-10 border-t border-[#173A7C]/8" />
                 <Button href={heroCourse ? `/courses/${heroCourse.slug}` : "/courses"} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
-                  {heroCourse ? "تفاصيل الدورة" : "استعرض الدورات"}
+                  <FileText className={heroButtonIconClass} aria-hidden="true" focusable="false" />
+                  <span>{heroCourse ? "تفاصيل الدورة" : "استعرض الدورات"}</span>
                 </Button>
               </div>
 
