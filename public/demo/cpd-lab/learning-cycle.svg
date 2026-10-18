@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-label="الهدف والخطة والتطبيق والمراجعة">
+<rect width="1200" height="520" rx="32" fill="#f2f7fb"/><g font-family="DejaVu Sans, sans-serif" text-anchor="middle"><text x="600" y="96" fill="#173a7c" font-size="36" font-weight="bold" direction="rtl">خطوات تعلم يمكنك متابعتها</text>
+<path d="M220 252h760" stroke="#c8dcec" stroke-width="8"/>
+<g fill="#173a7c"><circle cx="980" cy="252" r="55"/><circle cx="727" cy="252" r="55"/><circle cx="473" cy="252" r="55"/><circle cx="220" cy="252" r="55"/></g>
+<g fill="white" font-size="36"><text x="980" y="265">1</text><text x="727" y="265">2</text><text x="473" y="265">3</text><text x="220" y="265">4</text></g>
+<g fill="#173a7c" font-size="28" direction="rtl"><text x="980" y="364">الهدف</text><text x="727" y="364">الخطة</text><text x="473" y="364">التطبيق</text><text x="220" y="364">المراجعة</text></g></g></svg>
