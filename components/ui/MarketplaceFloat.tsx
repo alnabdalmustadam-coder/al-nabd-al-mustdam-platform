@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Store, Sparkles } from 'lucide-react';
+import { Store} from 'lucide-react';
 
 export default function MarketplaceFloat() {
   const [hovered, setHovered] = useState(false);
@@ -31,7 +31,7 @@ export default function MarketplaceFloat() {
           hovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
         }`}
       >
-        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+        <Store aria-hidden="true" className="w-3.5 h-3.5 text-amber-500" />
         <span>متجر الخدمات المصغرة</span>
       </div>
 

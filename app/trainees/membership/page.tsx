@@ -6,7 +6,7 @@ import Button from "@/components/ui/Button";
 import {
   Send, CheckCircle, User, Phone, Mail, GraduationCap,
   Briefcase, Building2, UserPlus, Star, Trophy, Award,
-  Sparkles, MessageSquare, Info
+  BadgeCheck, MessageSquare, Info
 } from "lucide-react";
 import { submitToGHL } from "@/lib/ghl";
 
@@ -190,7 +190,7 @@ export default function MembershipPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="mb-6">
               <span className="section-badge-glass">
-                <Sparkles className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+                <BadgeCheck aria-hidden="true" className="w-4 h-4 text-[#173A7C] ml-1 inline" />
                 عضوية التميز
               </span>
             </div>

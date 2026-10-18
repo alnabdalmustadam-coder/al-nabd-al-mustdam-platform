@@ -9,7 +9,7 @@ import {
   Star,
   Clock,
   ShoppingCart,
-  Sparkles,
+  BadgeCheck,
   Users,
   Package,
   RefreshCw,
@@ -31,7 +31,6 @@ import {
   HelpCircle,
   FileText,
   AlertCircle,
-  BadgeCheck,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -561,7 +560,7 @@ export default function ServiceDetailPage() {
                 </span>
                 {service.is_featured && (
                   <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#173A7C]/[0.08] text-[#173A7C] border border-[#173A7C]/20 text-xs font-black">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <BadgeCheck aria-hidden="true" className="w-3.5 h-3.5 text-amber-500" />
                     <span>خدمة مميزة</span>
                   </span>
                 )}

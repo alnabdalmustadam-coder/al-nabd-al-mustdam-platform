@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Clock, CheckCircle2, XCircle, ArrowLeft, ArrowRight, Send, Trophy, RotateCcw, GraduationCap, Target, Sparkles, AlertCircle, Mail, MessageCircle, Loader2 } from "lucide-react";
+import { BookOpen, Clock, CheckCircle2, XCircle, ArrowLeft, ArrowRight, Send, Trophy, RotateCcw, GraduationCap, Target, AlertCircle, Mail, MessageCircle, Loader2, Award, Pencil, SpellCheck } from "lucide-react";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { submitToGHL } from "@/lib/ghl";
 
@@ -43,11 +43,11 @@ const TIMER_MINUTES = 10;
 
 function getLevel(score: number) {
   const pct = (score / totalPoints) * 100;
-  if (pct >= 90) return { label: "Advanced (C1)", labelAr: "متقدم", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200", emoji: "🏆", ring: "ring-emerald-500/20" };
-  if (pct >= 75) return { label: "Upper-Intermediate (B2)", labelAr: "فوق المتوسط", color: "text-blue-600", bg: "bg-blue-50 border-blue-200", emoji: "🌟", ring: "ring-blue-500/20" };
-  if (pct >= 55) return { label: "Intermediate (B1)", labelAr: "متوسط", color: "text-indigo-600", bg: "bg-indigo-50 border-indigo-200", emoji: "📚", ring: "ring-indigo-500/20" };
-  if (pct >= 35) return { label: "Elementary (A2)", labelAr: "مبتدئ متقدم", color: "text-amber-600", bg: "bg-amber-50 border-amber-200", emoji: "✏️", ring: "ring-amber-500/20" };
-  return { label: "Beginner (A1)", labelAr: "مبتدئ", color: "text-rose-600", bg: "bg-rose-50 border-rose-200", emoji: "🔤", ring: "ring-rose-500/20" };
+  if (pct >= 90) return { label: "Advanced (C1)", labelAr: "متقدم", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200", Icon: Trophy, ring: "ring-emerald-500/20" };
+  if (pct >= 75) return { label: "Upper-Intermediate (B2)", labelAr: "فوق المتوسط", color: "text-blue-600", bg: "bg-blue-50 border-blue-200", Icon: Award, ring: "ring-blue-500/20" };
+  if (pct >= 55) return { label: "Intermediate (B1)", labelAr: "متوسط", color: "text-indigo-600", bg: "bg-indigo-50 border-indigo-200", Icon: BookOpen, ring: "ring-indigo-500/20" };
+  if (pct >= 35) return { label: "Elementary (A2)", labelAr: "مبتدئ متقدم", color: "text-amber-600", bg: "bg-amber-50 border-amber-200", Icon: Pencil, ring: "ring-amber-500/20" };
+  return { label: "Beginner (A1)", labelAr: "مبتدئ", color: "text-rose-600", bg: "bg-rose-50 border-rose-200", Icon: SpellCheck, ring: "ring-rose-500/20" };
 }
 
 /* ═══════════════════════════════════════════════════════════════════════ */
@@ -70,6 +70,8 @@ export default function EnglishEvaluationPage() {
   const [showReview, setShowReview] = useState(false);
   const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const emailSentRef = useRef(false);
+  const level = getLevel(score);
+  const LevelIcon = level.Icon;
 
   useEffect(() => {
     if (!timerActive || step !== "test") return;
@@ -222,7 +224,7 @@ export default function EnglishEvaluationPage() {
               <span className="w-1 h-1 rounded-full bg-slate-300 hidden sm:block" />
               <span className="flex items-center gap-2"><Target className="w-4 h-4 text-[#5CB07C]" /> 25 Questions</span>
               <span className="w-1 h-1 rounded-full bg-slate-300 hidden sm:block" />
-              <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-[#5CB07C]" /> {totalPoints} Points</span>
+              <span className="flex items-center gap-2"><Trophy aria-hidden="true" className="w-4 h-4 text-[#5CB07C]" /> {totalPoints} Points</span>
             </div>
           </motion.div>
         </section>
@@ -413,11 +415,11 @@ export default function EnglishEvaluationPage() {
                   </div>
                   <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
                     <p className="text-xs font-bold text-slate-400 uppercase mb-2">Percentage</p>
-                    <p className={`text-4xl font-black ${getLevel(score).color}`}>{Math.round((score / totalPoints) * 100)}%</p>
+                    <p className={`text-4xl font-black ${level.color}`}>{Math.round((score / totalPoints) * 100)}%</p>
                   </div>
-                  <div className={`rounded-2xl p-6 border ${getLevel(score).bg}`}>
+                  <div className={`rounded-2xl p-6 border ${level.bg}`}>
                     <p className="text-xs font-bold text-slate-400 uppercase mb-2">Level</p>
-                    <p className={`text-lg font-black ${getLevel(score).color}`}>{getLevel(score).emoji} {getLevel(score).label}</p>
+                    <p className={`flex items-center justify-center gap-2 text-lg font-black ${level.color}`}><LevelIcon aria-hidden="true" className="h-5 w-5 shrink-0" /><span>{level.label}</span></p>
                   </div>
                 </motion.div>
 

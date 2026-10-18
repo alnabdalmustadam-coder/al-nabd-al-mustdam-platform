@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BookOpen, ChevronDown, Heart, HeartHandshake, RefreshCw, Search, SlidersHorizontal, Sparkles, Users, X } from 'lucide-react';
+import { BookOpen, ChevronDown, Heart, HeartHandshake, RefreshCw, Search, SlidersHorizontal, Info, Users, X } from 'lucide-react';
 import { CourseFeedbackCard, SatisfactionDetails } from './course-satisfaction';
 import { EditorSelect } from '@/components/courses/editor/editor-select';
 import styles from './satisfaction.module.css';
@@ -62,7 +62,7 @@ export default function SatisfactionPage() {
           </div>)}
       </dl>
     </header>
-    <details className="group px-1 text-[11px] leading-6 text-slate-500 sm:text-xs"><summary className="inline-flex min-h-8 cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden"><Sparkles aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-emerald-700" />كيف تُحسب أرقام الرضا؟<ChevronDown aria-hidden="true" className="h-3.5 w-3.5 transition-transform group-open:rotate-180" /></summary><p className="mt-1 max-w-2xl pb-1">كل قلب يعكس رضا طالب عن محتوى محدد. عدم التقييم لا يُحسب عدم رضا، وهذه التقييمات مستقلة عن درجات الاختبارات. يُحسب كل طالب مرة واحدة في إجمالي المشاركين.</p></details>
+    <details className="group px-1 text-[11px] leading-6 text-slate-500 sm:text-xs"><summary className="inline-flex min-h-8 cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden"><Info aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-emerald-700" />كيف تُحسب أرقام الرضا؟<ChevronDown aria-hidden="true" className="h-3.5 w-3.5 transition-transform group-open:rotate-180" /></summary><p className="mt-1 max-w-2xl pb-1">كل قلب يعكس رضا طالب عن محتوى محدد. عدم التقييم لا يُحسب عدم رضا، وهذه التقييمات مستقلة عن درجات الاختبارات. يُحسب كل طالب مرة واحدة في إجمالي المشاركين.</p></details>
     {error && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm leading-7 text-rose-800"><p>{error}{data ? ' · المعروض آخر بيانات تم تحميلها.' : ''}</p><button type="button" disabled={loading} onClick={refresh} className={action}>إعادة المحاولة</button></div>}
     {data && <section aria-label="البحث وتصفية الدورات" className="space-y-3 sm:space-y-4">
       <div className="grid grid-cols-[minmax(0,1fr)_160px] items-center gap-2 sm:grid-cols-[minmax(0,1fr)_225px] sm:gap-3"><div className="relative min-w-0"><Search aria-hidden="true" className="pointer-events-none absolute right-3 top-4 h-4 w-4 text-slate-400" /><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} aria-label="البحث باسم الدورة أو المحاضر" placeholder="بحث…" className="h-12 w-full min-w-0 rounded-xl border border-slate-200 bg-white pr-9 pl-2 text-base text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 sm:rounded-2xl sm:pl-4 sm:text-sm" /></div>

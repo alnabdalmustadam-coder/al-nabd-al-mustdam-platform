@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
 import {
   Send, CheckCircle, User, Phone, Briefcase, Building,
-  Sparkles, Target, BookOpen, Layers, GraduationCap,
+  ClipboardCheck, Target, BookOpen, Layers, GraduationCap,
   ChevronLeft, ChevronRight, Lightbulb
 } from "lucide-react";
 import { submitToGHL } from "@/lib/ghl";
@@ -278,7 +278,7 @@ export default function SkillsApplicationsPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="mb-6">
               <span className="section-badge-glass">
-                <Sparkles className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+                <ClipboardCheck aria-hidden="true" className="w-4 h-4 text-[#173A7C] ml-1 inline" />
                 نموذج التقييم
               </span>
             </div>

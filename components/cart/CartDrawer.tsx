@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingBag, Trash2, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
+import { X, ShoppingBag, Trash2, ArrowLeft, ShieldCheck} from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 export function CartDrawer() {
@@ -142,7 +142,7 @@ export function CartDrawer() {
                       onClick={closeCart}
                       className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#0D5C3A] via-[#127A4D] to-[#0D5C3A] hover:from-[#127A4D] hover:to-[#0D5C3A] text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#0D5C3A]/25 hover:shadow-xl transition-all cursor-pointer"
                     >
-                      <Sparkles className="w-4 h-4" />
+                      <ShoppingBag aria-hidden="true" className="w-4 h-4" />
                       <span>إتمام الطلب والتسجيل</span>
                       <ArrowLeft className="w-4 h-4 mr-1" />
                     </Link>

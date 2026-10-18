@@ -6,7 +6,7 @@ import Button from "@/components/ui/Button";
 import {
   Send, CheckCircle, User, Phone, Mail, GraduationCap,
   ShieldAlert, Globe, CreditCard, ChevronLeft, ChevronRight,
-  Sparkles, ShieldCheck
+  UserPlus, ShieldCheck
 } from "lucide-react";
 import { submitToGHL } from "@/lib/ghl";
 
@@ -240,7 +240,7 @@ export default function SubscriptionPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
             <div className="mb-6">
               <span className="section-badge-glass">
-                <Sparkles className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+                <UserPlus aria-hidden="true" className="w-4 h-4 text-[#173A7C] ml-1 inline" />
                 نموذج التسجيل بالموقع
               </span>
             </div>

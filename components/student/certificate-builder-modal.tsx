@@ -14,7 +14,7 @@ import {
   Printer,
   Copy,
   Check,
-  Sparkles,
+  BadgeCheck,
   Share2,
 } from 'lucide-react';
 import { CertificateTemplate, CertificateCanvasElement } from '@/types/certificates';
@@ -311,7 +311,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                     {/* Center: Official Title */}
                     <div className="text-center flex-1 px-4 space-y-1">
                       <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/10 text-amber-800 border border-amber-500/30 text-[9px] sm:text-xs font-black">
-                        <Sparkles className="w-3 h-3 text-amber-600" />
+                        <BadgeCheck aria-hidden="true" className="w-3 h-3 text-amber-600" />
                         <span>المملكة العربية السعودية • الاعتماد المهني</span>
                       </div>
                       <h1

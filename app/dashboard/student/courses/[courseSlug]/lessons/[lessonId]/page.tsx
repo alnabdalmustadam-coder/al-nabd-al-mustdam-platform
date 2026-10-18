@@ -5,8 +5,10 @@ import { LessonContentBlocks } from '@/components/student/lesson-content-blocks'
 import { isLearningJourney } from '@/lib/learning/journey';
 import { getLessonResourceGroups } from '@/lib/courses/curriculum-files';
 import { CourseResourcesPanel } from '@/components/student/course-resources-panel';
+import workspace from '@/components/student/course-workspace.module.css';
+import { COURSE_FINAL_ASSESSMENT, resolveCourseQuiz } from '@/lib/quizzes/course-quiz';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 
@@ -81,6 +83,8 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
   const [completionError, setCompletionError] = useState<string | null>(null);
   const [serverProgressPercent, setServerProgressPercent] = useState(0);
   const [completionPendingAssessment, setCompletionPendingAssessment] = useState(false);
+  const [quizTarget, setQuizTarget] = useState<'lesson' | 'final'>('lesson');
+  const completionSync = useRef<AbortController | null>(null);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [videoVerified, setVideoVerified] = useState(false);
   const [articleReady, setArticleReady] = useState(false);
@@ -220,6 +224,8 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
   const lessonAllowed = (id: string) => !cpd || (progressLoaded && isLessonUnlocked(allLessons.map((item) => item.id), completedSet, id));
   const currentAllowed = Boolean(currentLesson && lessonAllowed(currentLesson.id));
   const lessonContent = courseData ? getCourseContent(courseData).find((item) => item.id === currentLesson?.id) : null;
+  const assessmentLessonId = quizTarget === 'final' ? COURSE_FINAL_ASSESSMENT : currentLesson?.id || lessonId;
+  const finalAssessmentSelected = Boolean(courseData && resolveCourseQuiz(courseData, assessmentLessonId)?.key === 'final');
 
   const filteredChapters = useMemo(() => {
     if (!searchQuery.trim()) return chapters;
@@ -257,6 +263,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
     const controller = new AbortController();
     setProgressLoaded(false);
     setVideoVerified(false);
+    setQuizTarget('lesson');
     async function initProgress() {
       setNotesList(getLessonNotes(lessonId));
 
@@ -265,11 +272,20 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
           `/api/courses/complete-lesson?courseId=${encodeURIComponent(courseSlug)}`,
           { cache: 'no-store', signal: controller.signal },
         );
-        const result = await response.json();
+        let result = await response.json();
         if (controller.signal.aborted) return;
 
         if (!response.ok || !result.success || !Array.isArray(result.completedLessonIds)) {
           throw new Error(result.message || 'تعذر تحميل تقدم الدورة');
+        }
+
+        if (result.completionNeedsSync) {
+          const sync = await fetch('/api/courses/complete', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ courseId: courseSlug }), signal: controller.signal });
+          const saved = await sync.json();
+          if (controller.signal.aborted) return;
+          if (!sync.ok || !saved.success) throw new Error(saved.message || 'تعذر حفظ إكمال الدورة');
+          result = { ...result, ...saved };
         }
 
         const serverCompleted = new Set<string>(result.completedLessonIds);
@@ -289,6 +305,26 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
     initProgress();
     return () => controller.abort();
   }, [courseSlug, lessonId, cpd]);
+
+  useEffect(() => () => { completionSync.current?.abort(); }, [courseSlug]);
+
+  const syncCourseCompletion = useCallback(async () => {
+    completionSync.current?.abort();
+    const controller = new AbortController(); completionSync.current = controller;
+    try {
+      const response = await fetch('/api/courses/complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ courseId: courseSlug }), signal: controller.signal });
+      const result = await response.json();
+      if (controller.signal.aborted) return;
+      if (!response.ok || !result.success) throw new Error(result.message || 'تعذر حفظ إكمال الدورة');
+      setServerProgressPercent(result.progress); setCompletionPendingAssessment(false); setCompletionError(null);
+      saveCompletedLessons(courseSlug, new Set<string>(result.completedLessonIds));
+    } catch (failure) { if (!controller.signal.aborted) setCompletionError(failure instanceof Error ? failure.message : 'تعذر حفظ إكمال الدورة'); }
+  }, [courseSlug]);
+
+  const openFinalAssessment = () => {
+    setQuizTarget('final'); setActiveTab('quiz');
+    requestAnimationFrame(() => document.getElementById('internal-assessment')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  };
 
   const toggleChapter = (chapId: string) => {
     setCollapsedChapters((prev) => {
@@ -479,11 +515,11 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
       </div>
 
       {/* Main Unified Container */}
-      <div className="w-full bg-white/85 backdrop-blur-2xl border border-white/60 rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden p-2 sm:p-5 mb-6 sm:mb-8 text-slate-800">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+      <div className={`${workspace.shell} mb-6 sm:mb-8 text-slate-800`}>
+        <div className={workspace.grid}>
           
           {/* Playlist Index (DESKTOP) */}
-          <div className="hidden lg:flex lg:col-span-4 xl:col-span-4 flex-col justify-between space-y-3 bg-slate-50/90 p-4 rounded-2xl border border-slate-200/80 h-full max-h-[640px] xl:max-h-[720px]">
+          <div className="hidden lg:flex flex-col justify-between space-y-3 bg-slate-50/90 p-4 rounded-2xl border border-slate-200/80 h-full max-h-[640px] xl:max-h-[720px] min-w-0">
             <div className="space-y-3 pb-3 border-b border-slate-200 shrink-0">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
@@ -635,7 +671,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
           </div>
 
           {/* Video Player or Content Pane */}
-          <div className="col-span-1 lg:col-span-8 xl:col-span-8 flex flex-col justify-between w-full">
+          <div className={workspace.content}>
             {cpd && currentAllowed && lessonContent?.requiredQuiz && <p className="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs font-bold leading-6 text-blue-900">يتطلب إكمال هذا الدرس اجتياز الاختبار المرتبط به من تبويب «الاختبار والتقييم».</p>}
             {!currentAllowed ? <div className="flex aspect-video flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
               <Lock className="h-10 w-10 text-blue-900" /><h3 className="text-base font-black text-slate-900">{progressLoaded ? 'هذا الدرس مغلق حالياً' : completionError ? 'تعذر تحميل تقدمك' : 'جاري التحقق من تقدمك'}</h3>
@@ -677,19 +713,12 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
             )}
           </div>
 
-          {completionError && (
-            <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-bold text-red-700" role="alert">
-              {completionError}
-            </div>
-          )}
-
-          {completionPendingAssessment && !completionError && (
-            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-bold text-amber-800" role="status">
-              اكتملت جميع الدروس. تتاح الشهادة بعد اعتماد إكمال متطلبات الدورة في سجل اشتراكك.
-            </div>
-          )}
-
         </div>
+        {completionError && <div className={`${workspace.notice} ${workspace.error}`} role="alert"><AlertCircle aria-hidden="true" /><p>{completionError}</p></div>}
+        {(completionPendingAssessment || progressPercent === 100) && !completionError && <div className={workspace.notice} role="status">
+          <CheckCircle2 aria-hidden="true" /><p>{completionPendingAssessment ? 'اكتملت جميع الدروس. اجتز الاختبار النهائي لإكمال الدورة.' : 'أكملت الدورة بنسبة 100%. تقدمك محفوظ في حسابك.'}</p>
+          {completionPendingAssessment && !cpd && Boolean(courseData.finalExam?.questions?.length) && <button type="button" onClick={openFinalAssessment}>فتح الاختبار النهائي</button>}
+        </div>}
       </div>
 
       {/* Interactive Tabs Workspace */}
@@ -801,8 +830,15 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
         {activeTab === 'attachments' && <CourseResourcesPanel groups={attachmentGroups} />}
 
         {/* Tab 3: Authenticated, server-graded internal quiz */}
-        {activeTab === 'quiz' && currentAllowed && <div id="internal-assessment"><InternalQuizPanel key={`${courseSlug}:${currentLesson?.id || lessonId}`} courseId={courseSlug} lessonId={currentLesson?.id || lessonId} /></div>}
-        {currentAllowed && <SatisfactionHeart key={`${courseSlug}:${currentLesson?.id}:${activeTab === 'quiz' ? 'quiz' : 'lesson'}`} courseId={courseSlug} lessonId={currentLesson?.id || lessonId} kind={activeTab === 'quiz' ? 'quiz' : 'lesson'} />}
+        {activeTab === 'quiz' && currentAllowed && <div id="internal-assessment" className="space-y-4">
+          {!cpd && completedLessons === totalLessons && Boolean(courseData.finalExam?.questions?.length) && <div className="flex flex-wrap gap-2" aria-label="اختر الاختبار">
+            <button type="button" aria-pressed={quizTarget === 'lesson'} onClick={() => setQuizTarget('lesson')} className={`rounded-xl border px-4 py-2 text-xs font-bold ${quizTarget === 'lesson' ? 'border-blue-900 bg-blue-900 text-white' : 'border-slate-200 bg-white text-slate-600'}`}>اختبار الدرس</button>
+            <button type="button" aria-pressed={quizTarget === 'final'} onClick={() => setQuizTarget('final')} className={`rounded-xl border px-4 py-2 text-xs font-bold ${quizTarget === 'final' ? 'border-blue-900 bg-blue-900 text-white' : 'border-slate-200 bg-white text-slate-600'}`}>الاختبار النهائي</button>
+          </div>}
+          <InternalQuizPanel key={`${courseSlug}:${assessmentLessonId}`} courseId={courseSlug} lessonId={assessmentLessonId}
+            onPassed={!cpd && finalAssessmentSelected && completedLessons === totalLessons ? () => void syncCourseCompletion() : undefined} />
+        </div>}
+        {currentAllowed && <SatisfactionHeart key={`${courseSlug}:${activeTab === 'quiz' ? assessmentLessonId : currentLesson?.id}:${activeTab === 'quiz' ? 'quiz' : 'lesson'}`} courseId={courseSlug} lessonId={activeTab === 'quiz' ? assessmentLessonId : currentLesson?.id || lessonId} kind={activeTab === 'quiz' ? 'quiz' : 'lesson'} />}
 
         {/* Tab 4: Discussion */}
         {activeTab === 'discussion' && (

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { UserCheck, CheckCircle2, ChevronRight, Award, Star, Users, BookOpen, Sparkles, Medal, PlayCircle, Globe2, MessageSquare, Target, HeartPulse, Building, TrendingUp, Coins, Brain } from "lucide-react";
+import { UserCheck, CheckCircle2, ChevronRight, Award, Star, Users, BookOpen, GraduationCap, Medal, PlayCircle, Globe2, MessageSquare, Target, HeartPulse, Building, TrendingUp, Coins, Brain } from "lucide-react";
 import React, { useState } from "react";
 
 // Real Trainer Seed Data as Fallback
@@ -162,7 +162,7 @@ export default function TrainersPage() {
           {/* Glowing Badge */}
           <div className="mb-8 cursor-default">
             <span className="section-badge-glass">
-              <Sparkles className="w-4 h-4 text-[#5CB07C] ml-1 inline" strokeWidth={2.5} />
+              <GraduationCap aria-hidden="true" className="w-4 h-4 text-[#5CB07C] ml-1 inline" strokeWidth={2.5} />
               نخبة الكفاءات التدريبية
             </span>
           </div>

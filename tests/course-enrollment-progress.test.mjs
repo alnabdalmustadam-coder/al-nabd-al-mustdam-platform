@@ -11,10 +11,11 @@ const videoLessonId = '11111111-1111-4111-8111-111111111111';
 
 // Execute the actual enrollment/progress routes and identifier/lesson helpers.
 // Only authentication, catalog I/O, database I/O and xAPI transport are replaced.
-function fixture({ slug = arabicSlug, enrolled = true, storedId, status = 'active', authenticated = true, readError = false, paidEnrollmentDisabled = false } = {}) {
+function fixture({ slug = arabicSlug, enrolled = true, storedId, status = 'active', authenticated = true, readError = false, paidEnrollmentDisabled = false, finalExam, professionalDevelopment = false } = {}) {
   const course = { id: 91, slug, ghlCourseId: 'course-hazmat-2026', title: 'دورة المواد الخطرة', price: 500, status: 'published', curriculum: [
     { id: 'section-1', title: 'السلامة', items: [{ id: 'درس-١', title: 'المقدمة' }, { id: 'درس-٢', title: 'المخاطر' }] },
   ] };
+  course.finalExam = finalExam; course.professionalDevelopment = professionalDevelopment;
   const rows = {
     enrollments: enrolled ? [{ id: 'enrollment-1', user_id: student.id, email: student.email, course_id: storedId || slug, progress: 0, status }] : [],
     profiles: [{ id: student.id, email: student.email, full_name: 'Test Student', national_id: '' }],
@@ -108,9 +109,10 @@ function fixture({ slug = arabicSlug, enrolled = true, storedId, status = 'activ
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   }));
   return {
-    rows, writes, statements, course, catalogLookups,
+    rows, writes, statements, course, catalogLookups, load,
     enroll: courseId => post('courses/enroll', { courseId }),
     complete: (courseId, lessonId = 'درس-١') => post('courses/complete-lesson', { courseId, lessonId }),
+    finish: (values = {}) => post('courses/complete', { courseId: slug, ...values }),
     progress: (courseSlug, progress = 100) => post('courses/update-progress', { courseSlug, progress }),
     get: courseId => load('app/api/courses/complete-lesson/route').GET(new Request(`https://audit.invalid/api/courses/complete-lesson?courseId=${encodeURIComponent(courseId)}`)),
     video: () => post('lessons/progress', { lessonId: videoLessonId, watchedSeconds: 60, lastPositionSeconds: 60, isCompleted: true }),
@@ -132,14 +134,15 @@ for (const identifier of [arabicSlug, encodeURIComponent(arabicSlug), `course-${
     assert.equal((await f.complete(identifier, 'درس-٢')).status, 200);
     const final = await (await f.get(identifier)).json();
     assert.equal(final.completedCount, 2);
-    assert.equal(final.progress, 99);
-    assert.equal(final.completionPendingAssessment, true);
+    assert.equal(final.progress, 100);
+    assert.equal(final.completionPendingAssessment, false);
+    assert.equal(final.courseComplete, true);
     assert.equal((await f.progress(identifier)).status, 200);
-    assert.equal(f.rows.enrollments[0].progress, 99);
-    assert.equal(f.rows.enrollments[0].status, 'active');
+    assert.equal(f.rows.enrollments[0].progress, 100);
+    assert.equal(f.rows.enrollments[0].status, 'completed');
     assert.equal((await f.enroll(encodeURIComponent(arabicSlug))).status, 200);
     assert.equal(f.rows.enrollments.length, 1);
-    assert.equal(f.rows.enrollments[0].progress, 99);
+    assert.equal(f.rows.enrollments[0].progress, 100);
   });
 }
 
@@ -219,4 +222,59 @@ test('the legacy video telemetry endpoint cannot grant 100 percent academic comp
   assert.equal((await response.json()).courseProgress, 99);
   assert.equal(f.rows.enrollments[0].progress, 99);
   assert.equal(f.rows.enrollments[0].status, 'active');
+});
+
+test('an earlier ordinary 99 percent enrollment is reconciled from saved lessons without changing GET state', async () => {
+  const f = fixture();
+  for (const lesson of f.course.curriculum[0].items) f.rows.xapi_statements.push({ actor_email: student.email,
+    verb_display: 'completed', object_id: `https://nabdtraining.com/courses/${f.course.slug}/lessons/${encodeURIComponent(lesson.id)}` });
+  f.rows.enrollments[0].progress = 99;
+  const before = await (await f.get(f.course.slug)).json();
+  assert.equal(before.progress, 100); assert.equal(before.completionNeedsSync, true);
+  assert.equal(f.rows.enrollments[0].progress, 99, 'GET is read-only');
+  assert.equal((await f.finish({ progress: 3 })).status, 200);
+  assert.equal(f.rows.enrollments[0].progress, 100); assert.equal(f.rows.enrollments[0].status, 'completed');
+  assert.ok(f.rows.enrollments[0].completed_at);
+  assert.equal((await (await f.get(f.course.slug)).json()).completionNeedsSync, false);
+  assert.equal((await f.video()).status, 200); assert.equal(f.rows.enrollments[0].progress, 100);
+  assert.equal((await f.progress(f.course.slug, 1)).status, 200); assert.equal(f.rows.enrollments[0].status, 'completed');
+});
+
+test('ordinary completion rejects forged totals, duplicate/foreign completions and newly added unfinished lessons', async () => {
+  const f = fixture();
+  await f.complete(f.course.slug);
+  f.rows.xapi_statements.push(...f.rows.xapi_statements, { actor_email: student.email, verb_display: 'completed',
+    object_id: `https://nabdtraining.com/courses/${f.course.slug}/lessons/foreign` });
+  assert.equal((await f.finish({ progress: 100, completedCount: 2, score: 100 })).status, 409);
+  assert.equal(f.rows.enrollments[0].progress, 50);
+  await f.complete(f.course.slug, 'درس-٢');
+  f.course.curriculum[0].items.push({ id: 'new-lesson', title: 'درس جديد' });
+  assert.equal((await f.finish()).status, 409);
+  assert.equal((await (await f.get(f.course.slug)).json()).progress, 67);
+});
+
+test('ordinary completion requires a saved passing final result for its current version', async () => {
+  const finalExam = { title: 'الاختبار النهائي', passingScore: 70, questions: [{ id: 'one', type: 'mcq', question: 'اختر', options: ['أ','ب'], correctIndex: 1 }] };
+  const f = fixture({ finalExam });
+  for (const id of ['درس-١','درس-٢']) await f.complete(f.course.slug, id);
+  let status = await (await f.get(f.course.slug)).json();
+  assert.equal(status.progress, 99); assert.equal(status.completionPendingAssessment, true);
+  assert.equal((await f.finish({ passed: true, score: 100 })).status, 409);
+  const { activityId } = f.load('@/lib/quizzes/activity').getQuizActivity(f.course.slug, 'final', f.course.finalExam);
+  const result = { actor_email: student.email, object_id: activityId, verb_display: 'answered', result_completion: true, result_success: false, result_score: 0.5 };
+  f.rows.xapi_statements.push(result);
+  assert.equal((await f.finish()).status, 409);
+  result.result_success = true; result.result_score = 0.8;
+  assert.equal((await f.finish()).status, 200);
+  status = await (await f.get(f.course.slug)).json(); assert.equal(status.progress, 100);
+  f.course.finalExam.questions[0].correctIndex = 0;
+  assert.equal((await f.finish()).status, 409, 'Old exam versions cannot complete the updated course');
+});
+
+test('ordinary completion authenticates enrollment ownership and cannot replace CPD completion', async () => {
+  for (const [options, expected] of [[{ authenticated: false },401],[{ enrolled: false },403],[{ status: 'revoked' },403],[{ professionalDevelopment: true },409]]) {
+    const f = fixture(options); assert.equal((await f.finish({ score: 100 })).status, expected); assert.equal(f.writes.length, 0);
+  }
+  const f = fixture(); f.rows.enrollments[0].user_id = 'someone-else';
+  assert.equal((await f.finish()).status, 403); assert.equal(f.writes.length, 0);
 });

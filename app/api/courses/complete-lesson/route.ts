@@ -9,9 +9,10 @@ import { getCourseEnrollmentIdentifiers, parseCourseIdentifier } from '@/lib/pub
 import { readCpdProgress, verifyCpdCompletion } from '@/lib/learning/cpd';
 import { LearningError } from '@/lib/learning/course-access';
 import { isEnrollmentActive } from '@/lib/security/student-access';
+import { readOrdinaryCourseProgress, saveOrdinaryCourseProgress } from '@/lib/learning/ordinary-progress';
 
 export const dynamic = 'force-dynamic';
-type EnrollmentRow = { id: string; status: string | null; user_id?: string | null; email?: string };
+type EnrollmentRow = { id: string; status: string | null; user_id?: string | null; email?: string; progress?: number };
 const active = (row: EnrollmentRow, userId: string, email: string) =>
   (row.user_id === userId || (!row.user_id && row.email === email)) && isEnrollmentActive(row.status)
   && !['suspended', 'expired'].includes(String(row.status).toLowerCase());
@@ -38,12 +39,12 @@ export async function GET(request: Request) {
     const [byUser, byEmail] = await Promise.all([
       admin
         .from('enrollments')
-        .select('id, user_id, email, status')
+        .select('id, user_id, email, status, progress')
         .eq('user_id', auth.user.id)
         .in('course_id', identifiers),
       admin
         .from('enrollments')
-        .select('id, user_id, email, status')
+        .select('id, user_id, email, status, progress')
         .eq('email', email)
         .in('course_id', identifiers),
     ]);
@@ -72,38 +73,12 @@ export async function GET(request: Request) {
         totalLessons: lessons.length, progress: journeyComplete ? 100 : Math.min(99, calculated), completionPendingAssessment: calculated >= 100 && !journeyComplete,
       }, { headers: { 'Cache-Control': 'private, no-store' } });
     }
-    const platformIri = 'https://nabdtraining.com';
-    const lessonIriPrefix = `${platformIri}/courses/${course.slug}/lessons/`;
-    const lessonIdByIri = new Map(
-      lessons.map((lesson) => [`${lessonIriPrefix}${encodeURIComponent(lesson.id)}`, lesson.id]),
-    );
-    const { data: completions, error: completionsError } = await admin
-      .from('xapi_statements')
-      .select('object_id')
-      .eq('actor_email', email)
-      .eq('verb_display', 'completed')
-      .ilike('object_id', `${lessonIriPrefix}%`);
-
-    if (completionsError) throw completionsError;
-
-    const completedLessonIds = [...new Set(
-      (completions || [])
-        .map((row) => lessonIdByIri.get(row.object_id))
-        .filter((lessonId): lessonId is string => Boolean(lessonId)),
-    )];
-    const calculatedProgress = Math.min(
-      100,
-      Math.round((completedLessonIds.length / Math.max(lessons.length, 1)) * 100),
-    );
-
-    return NextResponse.json({
-      success: true,
-      completedLessonIds,
-      completedCount: completedLessonIds.length,
-      totalLessons: Math.max(lessons.length, 1),
-      progress: Math.min(99, calculatedProgress),
-      completionPendingAssessment: calculatedProgress >= 100,
-    });
+    const progress = await readOrdinaryCourseProgress(admin, course, email);
+    const owned = [...(byUser.data || []), ...(byEmail.data || [])]
+      .filter((row) => active(row, auth.user.id, email));
+    return NextResponse.json({ success: true, ...progress,
+      completionNeedsSync: progress.courseComplete && owned.some((row) => Number(row.progress) !== 100 || String(row.status).toLowerCase() !== 'completed'),
+    }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     console.error('Get completed lessons route error:', error);
     return NextResponse.json({ success: false, message: 'تعذر تحميل تقدم الدورة' }, { status: 500 });
@@ -192,6 +167,16 @@ export async function POST(request: Request) {
       result: { completion: true },
     });
     await storeStatement(statement);
+
+    if (!course.professionalDevelopment) {
+      const progress = await readOrdinaryCourseProgress(admin, course, email);
+      await saveOrdinaryCourseProgress(admin, progress, enrollments.map((row) => row.id));
+      try {
+        await storeStatement(stmtProgressed({ email, name, nationalId, courseId: course.slug,
+          courseName: course.title, courseNameAr: course.title, progress: progress.progress }));
+      } catch (xapiError) { console.error('Non-fatal: failed to store course progress statement:', xapiError); }
+      return NextResponse.json({ success: true, ...progress });
+    }
 
     const { data: completions, error: completionsError } = await admin
       .from('xapi_statements')

@@ -11,7 +11,6 @@ import {
   Film,
   Briefcase,
   CheckCircle2,
-  Sparkles,
   Layers,
   Terminal,
   FileCode2,
@@ -68,7 +67,7 @@ export default function ServiceVisualMockup({
               <span className="text-2xl sm:text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-white to-sky-200">
                 {title.charAt(0) || 'ن'}
               </span>
-              <Sparkles className="w-4 h-4 text-amber-300 absolute -top-1 -right-1 animate-pulse" />
+              <PenTool aria-hidden="true" className="w-4 h-4 text-amber-300 absolute -top-1 -right-1 animate-pulse" />
             </div>
           </div>
 

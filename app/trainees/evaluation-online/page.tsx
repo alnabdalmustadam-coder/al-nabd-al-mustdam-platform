@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
 import {
   Send, CheckCircle, Star, User, Phone, Briefcase, Building,
-  Sparkles, ClipboardCheck, Users, MessageSquare, Globe,
+  ClipboardCheck, Users, MessageSquare, Globe,
   ChevronLeft, ChevronRight, Award, Mail, BookOpen, MonitorPlay, Lightbulb, UsersRound
 } from "lucide-react";
 import { submitToGHL } from "@/lib/ghl";
@@ -329,7 +329,7 @@ export default function OnlineEvaluationPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="mb-6">
               <span className="section-badge-glass">
-                <Sparkles className="w-4 h-4 text-amber-500 ml-1 inline" />
+                <ClipboardCheck aria-hidden="true" className="w-4 h-4 text-amber-500 ml-1 inline" />
                 نموذج التقييم
               </span>
             </div>

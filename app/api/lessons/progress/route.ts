@@ -113,15 +113,13 @@ export async function POST(request: Request) {
     // Keep this legacy telemetry route under the same certificate boundary as
     // the course progress routes: only trusted completion may reach 100%.
     const percent = Math.min(99, Math.round((completed / total) * 100));
-    const enrollmentIds = activeEnrollments.map((row) => row.id);
-    const { error: enrollmentError } = await admin
-      .from('enrollments')
-      .update({ progress: percent })
-      .in('id', enrollmentIds);
-
-    if (enrollmentError) throw enrollmentError;
-
-    return NextResponse.json({ success: true, progress: progressData, courseProgress: percent });
+    const enrollmentIds = activeEnrollments.filter((row) => String(row.status).toLowerCase() !== 'completed').map((row) => row.id);
+    if (enrollmentIds.length) {
+      const { error: enrollmentError } = await admin.from('enrollments').update({ progress: percent }).in('id', enrollmentIds);
+      if (enrollmentError) throw enrollmentError;
+    }
+    return NextResponse.json({ success: true, progress: progressData,
+      courseProgress: enrollmentIds.length ? percent : 100 });
   } catch (error) {
     console.error('Error updating lesson progress:', error);
     return NextResponse.json({ error: 'خطأ أثناء تحديث الإنجاز' }, { status: 500 });

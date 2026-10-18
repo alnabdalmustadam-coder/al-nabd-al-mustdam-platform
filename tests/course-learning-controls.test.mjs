@@ -133,6 +133,30 @@ test('CPD refuses direct lesson jumps, forged video completion and unpassed quiz
   assert.equal(progress.payload.progress, 75);
 });
 
+test('ordinary courses can open a distinct final after lesson quizzes, grade it and finish at 100 percent', async () => {
+  const f = fixture({ cpd: false });
+  for (const lesson of getCourseContent(f.course)) assert.equal((await f.invoke('courses/complete-lesson','POST',{ lessonId: lesson.id })).status, 200);
+  assert.equal((await f.invoke('courses/complete-lesson','GET')).payload.progress, 99);
+  const lessonId = f.load('@/lib/quizzes/course-quiz').COURSE_FINAL_ASSESSMENT;
+  assert.equal((await f.invoke('courses/complete-lesson','POST',{ lessonId })).status, 400);
+  const start = await f.invoke('courses/quiz-attempt','POST',{ lessonId, action: 'start' });
+  assert.equal(start.status, 200);
+  const failed = await f.invoke('courses/quiz-attempt','POST',{ lessonId, action: 'submit', attemptId: start.payload.attempt.id,
+    answers: [{ questionId: 'one', selectedIndex: 0 }] });
+  assert.equal(failed.payload.result.passed, false);
+  assert.equal((await f.invoke('courses/complete','POST',{ score: 100 })).status, 409);
+  const retry = await f.invoke('courses/quiz-attempt','POST',{ lessonId, action: 'start' });
+  const passed = await f.invoke('courses/quiz-attempt','POST',{ lessonId, action: 'submit', attemptId: retry.payload.attempt.id,
+    answers: [{ questionId: 'one', selectedIndex: 1 }] });
+  assert.equal(passed.payload.result.passed, true);
+  const complete = await f.invoke('courses/complete','POST');
+  assert.equal(complete.status, 200); assert.equal(complete.payload.progress, 100);
+  assert.equal(f.rows.enrollments[0].status, 'completed');
+  assert.equal((await f.invoke('courses/complete-lesson','GET')).payload.progress, 100);
+  assert.equal((await f.invoke('courses/satisfaction','PUT',{ lessonId, kind: 'quiz', liked: true })).status, 200);
+  assert.equal(f.rows.content_satisfaction[0].content_key, 'final');
+});
+
 test('CPD unlocks final assessment only after all lessons; changed lesson content invalidates prior completion', async () => {
   const f = fixture();
   assert.equal((await f.invoke('courses/quiz-attempt','GET')).status, 403);

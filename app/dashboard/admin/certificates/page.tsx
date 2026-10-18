@@ -7,7 +7,7 @@ import {
   Plus,
   ShieldCheck,
   Crown,
-  Sparkles,
+  Move,
   Download,
   Eye,
   EyeOff,
@@ -34,7 +34,6 @@ import {
   Image as ImageIcon,
   Loader2,
   ExternalLink,
-  Move,
   AlignCenter,
   AlignRight,
   AlignLeft,
@@ -48,7 +47,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Maximize2,
-  Sparkle,
 } from 'lucide-react';
 import {
   CertificateTemplate,
@@ -282,7 +280,7 @@ export default function AdminCertificatesPage() {
       const data = await res.json();
 
       if (data.success && data.template) {
-        showToast(editingTemplateId ? 'تم حفظ وتحديث القالب فوراً بنجاح! ✨' : 'تم إنشاء وحفظ القالب الجديد فوراً! 🎉');
+        showToast(editingTemplateId ? 'تم حفظ وتحديث القالب فوراً بنجاح!' : 'تم إنشاء وحفظ القالب الجديد فوراً! 🎉');
         setIsDesignerModalOpen(false);
         fetchData();
       } else {
@@ -343,7 +341,7 @@ export default function AdminCertificatesPage() {
     setCanvasElements((prev) => [...prev, newEl]);
     setSelectedElementId(newEl.id);
     setDesignerActiveTab('inspector');
-    showToast('تم تكرار العنصر بنجاح ✨');
+    showToast('تم تكرار العنصر بنجاح');
   };
 
   const handleDeleteElement = (id: string) => {
@@ -1431,7 +1429,7 @@ export default function AdminCertificatesPage() {
                       /* If No Element Selected: Helpful Tips & Add Button */
                       <div className="w-full flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 text-slate-400 text-xs">
-                          <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                          <Move aria-hidden="true" className="w-4 h-4 text-amber-400 shrink-0" />
                           <span>اضغط على أي نص أو ختم لتحريكه، واسحب زوايا المربع بالماوس لتكبير وتصغير الحجم مباشرة.</span>
                         </div>
                         <button

@@ -75,14 +75,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'غير مسجل في هذه الدورة' }, { status: 403 });
     }
 
-    // The current UI progress is client telemetry. Keep it below the completion
-    // threshold so it can never issue a certificate or grant an academic result.
-    // Final completion will be enabled with the future server-graded assessment.
+    // Client telemetry cannot grant completion or downgrade a server-completed
+    // enrollment. Ordinary completion is verified by the course completion API.
+    const unfinished = enrollments.filter((row) => String(row.status).toLowerCase() !== 'completed');
+    if (!unfinished.length) return NextResponse.json({ success: true, updatedCount: 0, progress: 100, completionPendingAssessment: false });
     const safeProgress = Math.min(99, Math.round(progressValue));
     const { data, error } = await admin
       .from('enrollments')
       .update({ progress: safeProgress, status: 'active', completed_at: null })
-      .in('id', enrollments.map((row) => row.id))
+      .in('id', unfinished.map((row) => row.id))
       .select('id, course_id, progress, status');
 
     if (error) throw error;

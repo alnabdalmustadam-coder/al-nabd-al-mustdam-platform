@@ -11,7 +11,7 @@ import {
   ArrowLeft, 
   Loader2, 
   User, 
-  Sparkles,
+  UserPlus,
   Smartphone,
   AlertCircle,
   ShoppingBag
@@ -255,7 +255,7 @@ function CheckoutContent() {
           <div className="text-right">
             <div className="mb-3">
               <span className="section-badge-glass">
-                <Sparkles className="w-3.5 h-3.5 text-[#173A7C] ml-1 inline" />
+                <UserPlus aria-hidden="true" className="w-3.5 h-3.5 text-[#173A7C] ml-1 inline" />
                 التسجيل المفتوح مؤقتاً
               </span>
             </div>

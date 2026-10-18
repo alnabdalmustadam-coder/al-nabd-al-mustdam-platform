@@ -13,7 +13,7 @@ import {
   Palette,
   ArrowRight,
   MonitorPlay,
-  Sparkles
+  Building2
 } from "lucide-react";
 
 // The 8 Corporate Courses Data with accent colors for variety
@@ -108,7 +108,7 @@ export default function PremiumCourseHighlights() {
           className="text-center mb-20"
         >
           <span className="section-badge-glass mb-6">
-            <Sparkles className="w-4 h-4 text-[#5CB07C]" strokeWidth={2.5} />
+            <Building2 aria-hidden="true" className="w-4 h-4 text-[#5CB07C]" strokeWidth={2.5} />
             تدريب المؤسسات
           </span>
           <h2 className="section-main-title-premium mt-2 mb-5">

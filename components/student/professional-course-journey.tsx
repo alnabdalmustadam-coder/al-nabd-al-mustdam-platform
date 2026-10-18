@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Award, BookOpen, Bookmark, Check, CheckCircle2, ChevronDown, Circle, FileText, Flag, HelpCircle, ListChecks, Loader2, LockKeyhole, Play, Sparkles, Target, Video } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Award, BookOpen, Bookmark, Check, CheckCircle2, ChevronDown, Circle, DoorOpen, FileText, Flag, GraduationCap, HelpCircle, ListChecks, Loader2, LockKeyhole, Play, Route, Target, Video } from 'lucide-react';
 import type { Course } from '@/types';
 import type { LessonContent } from '@/lib/learning/course-content';
 import { isLessonUnlocked } from '@/lib/learning/course-content';
@@ -15,9 +15,10 @@ import { CourseDocumentViewer } from './course-document-viewer';
 import { CourseResourcesPanel } from './course-resources-panel';
 import { SatisfactionHeart } from './satisfaction-heart';
 import styles from './professional-journey.module.css';
+import workspace from './course-workspace.module.css';
 
 const REVIEW = '__journey_review__';
-const stationIcon = (type: string) => type === 'video' ? Video : type === 'quiz' ? HelpCircle : type === 'welcome' ? Sparkles : type === 'objectives' ? Target : ['pdf', 'ppt', 'doc'].includes(type) ? FileText : BookOpen;
+const stationIcon = (type: string) => type === 'video' ? Video : type === 'quiz' ? HelpCircle : type === 'welcome' ? DoorOpen : type === 'objectives' ? Target : ['pdf', 'ppt', 'doc'].includes(type) ? FileText : BookOpen;
 
 function JourneyStation({ course, lesson, completed, busy, onContinue }: { course: Course; lesson: LessonContent; completed: boolean; busy: boolean; onContinue: () => void }) {
   const [videoReady, setVideoReady] = useState(false);
@@ -30,7 +31,7 @@ function JourneyStation({ course, lesson, completed, busy, onContinue }: { cours
   return <>
     <div className={styles.stationBody}>
       {lesson.type === 'welcome' ? <div className={styles.welcome}>
-        <span className={styles.welcomeIcon}><Sparkles aria-hidden="true" /></span><p className={styles.eyebrow}>تعلّم بخطوات واضحة</p><h2>{course.title}</h2>
+        <span className={styles.welcomeIcon}><GraduationCap aria-hidden="true" /></span><p className={styles.eyebrow}>تعلّم بخطوات واضحة</p><h2>{course.title}</h2>
         <p className={styles.introduction}>{lesson.description || 'أهلًا بك. ابدأ رحلتك، وتقدّم خطوة بخطوة حتى إكمال جميع المحطات.'}</p>
         <div className={styles.welcomeFeatures}>{[{ Icon: Target, text: 'أهداف محددة' }, { Icon: BookOpen, text: 'تعلّم تفاعلي' }, { Icon: CheckCircle2, text: 'تقدّم محفوظ' }].map(({ Icon, text }) => <span key={text}><Icon aria-hidden="true" />{text}</span>)}</div>
         <p className={styles.helper}>ابدأ بالأهداف والتقييم القبلي، ثم أكمل الدروس بالترتيب. يمكنك العودة إلى المحتوى المكتمل في أي وقت.</p>
@@ -49,7 +50,6 @@ function JourneyStation({ course, lesson, completed, busy, onContinue }: { cours
       {resources.length > 0 && <details className={styles.resources}><summary>ملفات هذه المحطة ومراجع الدورة <ChevronDown aria-hidden="true" /></summary><div className="pt-5"><CourseResourcesPanel groups={resources} /></div></details>}
     </div>
     <div className={styles.continueBar}><p role="status">{completed ? 'هذه المحطة مكتملة ومحفوظة في حسابك.' : ready ? 'أكمل المحطة واحفظ تقدمك للانتقال إلى التالية.' : lesson.type === 'video' && !videoReady ? 'شاهد الفيديو كاملًا لفتح المتابعة.' : lesson.requiredQuiz && !quizReady ? lesson.diagnostic ? 'سلّم إجابات التقييم القبلي للمتابعة.' : 'اجتز اختبار المحطة للمتابعة.' : document ? 'اطّلع على المستند وأكّد القراءة للمتابعة.' : 'افتح جميع أجزاء المحتوى التفاعلي للمتابعة.'}</p><button type="button" disabled={!ready || busy} onClick={onContinue} className={styles.primary}>{busy ? <Loader2 className="animate-spin" /> : completed ? <ArrowLeft /> : <CheckCircle2 />}{completed ? 'المحطة التالية' : lesson.type === 'welcome' ? 'ابدأ الرحلة' : 'إكمال ومتابعة'}</button></div>
-    <SatisfactionHeart key={lesson.id} courseId={course.slug} lessonId={lesson.id} kind={lesson.type === 'quiz' ? 'quiz' : 'lesson'} />
   </>;
 }
 
@@ -116,8 +116,9 @@ export function ProfessionalCourseJourney({ course, initialLessonId }: { course:
   if (loading || !selected) return <div className={styles.loading} dir="rtl">{loading ? <><Loader2 className="animate-spin" /><p>نجهّز رحلتك وتقدمك المحفوظ…</p></> : <><LockKeyhole /><p role="alert">{error || 'تعذر تحميل رحلة التعلّم'}</p><button type="button" className={styles.primary} onClick={() => setReload((value) => value + 1)}>إعادة المحاولة</button><Link href="/dashboard/student/courses">العودة إلى دوراتي</Link></>}</div>;
   const ActiveIcon = lesson ? stationIcon(lesson.type) : Award;
   return <div className={styles.journey} dir="rtl">
-    <header className={styles.topbar}><Link href="/dashboard/student/courses" className={styles.backLink}><ArrowRight />دوراتي</Link><span className={styles.courseTitle}>{course.title}</span><span className={styles.mode}><Sparkles />تطوير مهني</span></header>
-    <div className={styles.layout}>
+    <header className={styles.topbar}><Link href="/dashboard/student/courses" className={styles.backLink}><ArrowRight />دوراتي</Link><span className={styles.courseTitle}>{course.title}</span><span className={styles.mode}><Route aria-hidden="true" />تطوير مهني</span></header>
+    <div className={workspace.shell}>
+    <div className={workspace.grid}>
       <aside className={styles.sidebar} aria-label="خريطة رحلة التعلّم">
         <div className={styles.progressHeader}><span className={styles.brandIcon}><ListChecks /></span><div><h2>رحلتك التعليمية</h2><p>{completed.size} من {lessons.length} محطات مكتملة</p></div><strong>{progress}%</strong></div>
         <div role="progressbar" aria-label="تقدم الدورة" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} className={styles.progressTrack}><span style={{ width: `${progress}%` }} /></div>
@@ -142,5 +143,7 @@ export function ProfessionalCourseJourney({ course, initialLessonId }: { course:
         <footer className={styles.navigation}><button type="button" disabled={busy || index === 0} onClick={() => navigate(ids[selected === REVIEW ? ids.length - 1 : index - 1])}><ArrowRight />المحطة السابقة</button><span><CheckCircle2 />تقدمك محفوظ في حسابك</span></footer>
       </main>
     </div>
+    </div>
+    {lesson && <SatisfactionHeart key={lesson.id} courseId={course.slug} lessonId={lesson.id} kind={lesson.type === 'quiz' ? 'quiz' : 'lesson'} />}
   </div>;
 }

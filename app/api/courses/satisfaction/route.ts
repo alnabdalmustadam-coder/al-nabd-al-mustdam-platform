@@ -14,14 +14,15 @@ async function context(request: Request, values: Record<string, unknown>) {
   const lessonId = typeof values.lessonId === 'string' ? values.lessonId : '';
   const kind = values.kind;
   const lesson = getLearningContent(ctx.course).find((item) => item.id === lessonId);
-  if (!lesson || !['lesson', 'quiz'].includes(String(kind))) throw new LearningError('المحتوى غير موجود', 404);
+  if (!['lesson', 'quiz'].includes(String(kind))) throw new LearningError('المحتوى غير موجود', 404);
   const quiz = kind === 'quiz' ? resolveCourseQuiz(ctx.course, lessonId) : null;
+  if (!lesson && !quiz) throw new LearningError('المحتوى غير موجود', 404);
   if (kind === 'quiz' && !quiz) throw new LearningError('لا يوجد اختبار لهذا الدرس', 404);
   if (ctx.course.professionalDevelopment) {
     if (quiz) await assertCpdQuizAccess(ctx.admin, ctx.course, ctx.auth.user.id, lessonId, quiz.key);
     else await assertCpdLessonAccess(ctx.admin, ctx.course, ctx.auth.user.id, lessonId);
   }
-  return { ...ctx, kind: kind as 'lesson' | 'quiz', key: quiz ? quiz.key : lessonId, title: quiz ? quiz.quiz.title || 'اختبار الدرس' : lesson.title };
+  return { ...ctx, kind: kind as 'lesson' | 'quiz', key: quiz ? quiz.key : lessonId, title: quiz ? quiz.quiz.title || 'اختبار الدرس' : lesson!.title };
 }
 type Context = Exclude<Awaited<ReturnType<typeof context>>, { rejected: NextResponse }>;
 async function read(ctx: Context) {

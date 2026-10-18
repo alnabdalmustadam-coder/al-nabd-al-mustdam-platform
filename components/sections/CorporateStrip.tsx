@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
-import { Building2, ArrowLeft, Sparkles, ShieldCheck, BarChart3 } from "lucide-react";
+import { Building2, ArrowLeft, SlidersHorizontal, ShieldCheck, BarChart3 } from "lucide-react";
 
 export default function CorporateStrip() {
   return (
@@ -56,7 +56,7 @@ export default function CorporateStrip() {
                     {[
                       { icon: ShieldCheck, label: "شهادات معتمدة" },
                       { icon: BarChart3, label: "تقارير أداء شاملة" },
-                      { icon: Sparkles, label: "برامج مخصصة" },
+                      { icon: SlidersHorizontal, label: "برامج مخصصة" },
                     ].map((item, i) => (
                       <motion.span
                         key={i}

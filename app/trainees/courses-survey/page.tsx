@@ -5,8 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
 import {
   Send, CheckCircle, User, Phone, MapPin,
-  Sparkles, MessageSquare, ChevronLeft, ChevronRight,
-  ClipboardList, Globe, Building2
+  ClipboardList, MessageSquare, ChevronLeft, ChevronRight, Globe, Building2
 } from "lucide-react";
 import { submitToGHL } from "@/lib/ghl";
 
@@ -221,7 +220,7 @@ export default function CoursesSurveyPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="mb-6">
               <span className="section-badge-glass">
-                <Sparkles className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+                <ClipboardList aria-hidden="true" className="w-4 h-4 text-[#173A7C] ml-1 inline" />
                 الاستشارات والتدريب
               </span>
             </div>

@@ -157,6 +157,7 @@ function mountPage(filename, initialCourses = []) {
       return slots[index].value;
     },
     useCallback(fn, deps) { return react.useMemo(() => fn, deps); },
+    useRef(value) { const index = cursor++; slots[index] ??= { current: value }; return slots[index]; },
   };
   const modules = {
     react,
@@ -176,6 +177,7 @@ function mountPage(filename, initialCourses = []) {
     '@/components/student/student-video-player': { StudentVideoPlayer: 'StudentVideoPlayer' },
     '@/components/student/internal-quiz-panel': { InternalQuizPanel: 'InternalQuizPanel' },
     '@/components/student/course-resources-panel': { CourseResourcesPanel: 'CourseResourcesPanel' },
+    '@/components/student/course-workspace.module.css': { __esModule: true, default: new Proxy({}, { get: (_target, name) => String(name) }) },
     '@/components/student/course-document-viewer': { CourseDocumentViewer: 'CourseDocumentViewer', AttachmentPreview: 'AttachmentPreview' },
     '@/components/student/satisfaction-heart': { SatisfactionHeart: 'SatisfactionHeart' },
     '@/components/student/progress-card': { ProgressCard: 'ProgressCard' },

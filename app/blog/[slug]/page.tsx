@@ -20,7 +20,7 @@ import {
   BookOpen,
   Quote,
   GraduationCap,
-  Sparkles,
+  ListChecks,
   Award,
   Layers,
   ArrowUpRight,
@@ -286,7 +286,7 @@ export default function SingleBlogPostPage({
               <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#173A7C]/[0.05] via-slate-50 to-[#5CB07C]/[0.06] border border-[#173A7C]/15 shadow-sm">
                 <div className="flex items-center gap-2.5 mb-5">
                   <div className="w-8 h-8 rounded-xl bg-[#173A7C] text-white flex items-center justify-center shadow-xs">
-                    <Sparkles className="w-4 h-4 text-emerald-300" />
+                    <ListChecks aria-hidden="true" className="w-4 h-4 text-emerald-300" />
                   </div>
                   <h3 className="text-lg sm:text-xl font-black text-slate-900">
                     أبرز مخرجات ومحاور المقال الأكاديمي

@@ -2,9 +2,13 @@ import { isLearningJourney, JOURNEY_IDS } from '@/lib/learning/journey';
 import type { Course, QuizData, SubLessonItem } from '@/types';
 
 const hasQuestions = (quiz?: QuizData): quiz is QuizData => Boolean(quiz && Array.isArray(quiz.questions) && quiz.questions.length);
+export const COURSE_FINAL_ASSESSMENT = '__course_final__';
 
 /** Mirrors the canonical identifiers in getCourseAllLessons, including legacy curricula. */
 export function resolveCourseQuiz(course: Course, lessonId: string): { key: string; quiz: QuizData } | null {
+  if (!course.professionalDevelopment && lessonId === COURSE_FINAL_ASSESSMENT) {
+    return hasQuestions(course.finalExam) ? { key: 'final', quiz: course.finalExam } : null;
+  }
   if (isLearningJourney(course)) {
     if (lessonId === JOURNEY_IDS.pre) return hasQuestions(course.learningJourney?.preAssessment) ? { key: 'pre', quiz: course.learningJourney!.preAssessment! } : null;
     if (lessonId === JOURNEY_IDS.final) return hasQuestions(course.finalExam) ? { key: 'final', quiz: course.finalExam } : null;
