@@ -53,6 +53,8 @@ export class BunnyStreamProvider implements IVideoProvider {
       const res = await fetch(
         `https://video.bunnycdn.com/library/${this.libraryId}/videos/${videoId}`,
         {
+          cache: 'no-store',
+          signal: AbortSignal.timeout(10_000),
           headers: {
             AccessKey: this.apiKey,
             accept: 'application/json',
@@ -61,39 +63,41 @@ export class BunnyStreamProvider implements IVideoProvider {
       );
 
       if (!res.ok) {
-        throw new Error(`Bunny API error: ${res.statusText}`);
+        throw new Error(`Bunny video metadata HTTP ${res.status}`);
       }
 
       const data = await res.json();
       
       const statusMap: Record<number, 'processing' | 'ready' | 'failed'> = {
-        0: 'processing', // Created
-        1: 'processing', // Uploaded
-        2: 'processing', // Processing
-        3: 'ready',      // Transcoded
-        4: 'failed',     // Error
+        0: 'processing', // Queued
+        1: 'processing', // Processing
+        2: 'processing', // Encoding
+        3: 'ready',      // Finished
+        4: 'ready',      // Resolution finished: the first resolution is playable
+        5: 'failed',     // Encoding failed
+        6: 'processing', // Presigned upload started
+        7: 'processing', // Presigned upload finished
+        8: 'failed',     // Presigned upload failed
       };
+      const status = typeof data?.status === 'number' ? statusMap[data.status] : undefined;
+      if (!status || data.guid !== videoId || String(data.videoLibraryId) !== this.libraryId) {
+        throw new Error('Invalid Bunny video metadata');
+      }
 
       return {
         videoId: data.guid,
         libraryId: `${data.videoLibraryId}`,
         title: data.title || '',
-        durationSeconds: data.length || 0,
-        status: statusMap[data.status] || 'ready',
+        durationSeconds: Number.isFinite(data.length) && data.length > 0 ? data.length : 0,
+        status,
         thumbnailUrl: `https://vz-${this.libraryId}.b-cdn.net/${videoId}/thumbnail.jpg`,
-        encodingProgress: data.encodeProgress || 100,
+        encodingProgress: Number.isFinite(data.encodeProgress) ? Math.max(0, Math.min(100, data.encodeProgress)) : 0,
       };
     } catch (err) {
-      console.error('Error fetching Bunny video details:', err);
-      return {
-        videoId,
-        libraryId: this.libraryId,
-        title: '',
-        durationSeconds: 0,
-        status: 'ready',
-        thumbnailUrl: '',
-        encodingProgress: 100,
-      };
+      // Never turn an API failure into a playable video with an invented duration.
+      // Keep upstream response bodies and request credentials out of logs.
+      if (err instanceof Error && /^Bunny video metadata HTTP \d{3}$|^Invalid Bunny video metadata$/.test(err.message)) throw err;
+      throw new Error('Bunny video metadata request failed');
     }
   }
 

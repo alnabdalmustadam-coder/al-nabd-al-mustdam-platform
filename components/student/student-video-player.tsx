@@ -101,6 +101,8 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadingMessage, setLoadingMessage] = useState('جاري تحميل مشغل الفيديو...');
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [cpdSession, setCpdSession] = useState<{ id: string; duration: number; watchedSeconds: number } | null>(null);
   const [scriptReady, setScriptReady] = useState(false);
   const [trackingError, setTrackingError] = useState('');
@@ -114,11 +116,17 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
 
   useEffect(() => {
     let isMounted = true;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+    setLoadingMessage('جاري تحميل مشغل الفيديو...');
+    setIframeUrl(null);
+    setCpdSession(null);
+    setTrackingError('');
+    setWatchPercent(0);
 
-    async function loadVideo() {
-      setLoading(true);
-      setError(null);
-
+    async function loadVideo(attempt = 0) {
       try {
         const trimmed = (videoUrl || '').trim();
 
@@ -139,9 +147,19 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lessonId, videoId: bunnyGuid, courseSlug }),
+            signal: controller.signal,
           });
 
           const data = await res.json();
+          if (!isMounted) return;
+          if (res.status === 409 && data.code === 'VIDEO_PROCESSING') {
+            if (attempt < 6) {
+              setLoadingMessage('الفيديو قيد التجهيز. نتحقق تلقائياً من جاهزيته...');
+              retryTimer = setTimeout(() => { void loadVideo(attempt + 1); }, 5000);
+              return;
+            }
+            throw new Error('الفيديو ما زال قيد التجهيز. انتظر قليلاً ثم اضغط إعادة المحاولة.');
+          }
           if (!res.ok || !data.success || !data.iframeUrl) {
             throw new Error(data.error || 'تعذر التحقق من صلاحية مشاهدة الفيديو');
           }
@@ -183,9 +201,11 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
 
     return () => {
       isMounted = false;
+      controller.abort();
+      if (retryTimer !== undefined) clearTimeout(retryTimer);
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     };
-  }, [courseSlug, lessonId, videoUrl, professionalDevelopment]);
+  }, [courseSlug, lessonId, videoUrl, professionalDevelopment, loadAttempt]);
 
   useEffect(() => {
     if (!professionalDevelopment || !cpdSession || !iframeUrl || !scriptReady || !iframeRef.current || !window.playerjs) return;
@@ -322,7 +342,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
         {loading && (
           <div className="flex flex-col items-center gap-3 text-slate-300">
             <RefreshCw className="w-7 h-7 animate-spin text-emerald-400" />
-            <p className="text-xs font-bold">جاري تحميل مشغل الفيديو...</p>
+            <p role="status" className="px-4 text-center text-xs font-bold leading-relaxed">{loadingMessage}</p>
           </div>
         )}
 
@@ -331,7 +351,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
             <Lock className="w-7 h-7 text-red-400 mx-auto mb-2" />
             <p className="text-xs font-bold leading-relaxed mb-4">{error}</p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => setLoadAttempt((attempt) => attempt + 1)}
               className="px-4 py-2 bg-[#173A7C] hover:bg-[#1E4D9D] text-white rounded-xl text-xs font-bold cursor-pointer"
             >
               إعادة المحاولة

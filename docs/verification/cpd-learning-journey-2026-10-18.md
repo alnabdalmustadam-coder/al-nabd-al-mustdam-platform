@@ -50,3 +50,14 @@ The reference's named leaderboard/time-based ranking has not been copied: the cu
 8. Verify the itinerary collapses on mobile, the content remains within the screen width, and ordinary courses still use their existing player.
 
 Rollback: revert the code commit to its parent. Existing catalog JSON, assessment attempts and progress rows can remain; no destructive migration needs reversing.
+
+## Uploaded video readiness correction
+
+The live trial screenshots show the 30-second upload playing in the admin preview while the enrolled learner sees an unavailable-duration error. Admin preview signs playback without requesting video metadata; CPD playback additionally requires the provider's duration before creating its verified watch session. The exact live provider response was not available in this environment.
+
+- Corrected Bunny status mapping: finished (3) and resolution finished (4) are playable; encoding/upload failures (5/8) cannot start a session. Queued, encoding and upload states remain pending. Reference: https://bunny.net/docs/stream/webhooks and https://bunny.net/docs/api-reference/stream/manage-videos/get-video.
+- Metadata requests bypass caching and have a 10-second timeout. HTTP, network, malformed and mismatched metadata failures no longer become a fake ready response with zero duration. Zero encoding progress remains zero.
+- Playback responses distinguish actual processing, upload failure and metadata unavailability. Session duration still comes exclusively from Bunny; manually entered lesson duration and client duration are ignored.
+- Processing triggers at most six automatic retries, five seconds apart. Leaving the lesson aborts the request and cancels pending retries. Manual retry restarts the player without reloading the whole course page.
+- Verification: all 257 automated tests pass; targeted ESLint, production build and build-time TypeScript checks pass. Tests include provider states, API outages, bounded retries, cleanup, authoritative duration and existing seek/progress protection.
+- Live acceptance remains: reload the learner's video station, try seeking ahead, watch to the end, and verify that the next required step unlocks. No authenticated learner playback or production runtime-log inspection was possible here.

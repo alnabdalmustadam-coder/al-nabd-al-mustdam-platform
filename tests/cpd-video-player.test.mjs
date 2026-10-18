@@ -7,10 +7,10 @@ import { extractBunnyVideoId } from '../lib/learning/course-content.ts';
 
 // Execute the real player component and its event handlers with deterministic
 // player/network/clock boundaries. No browser auth or live learner writes.
-function playerFixture({ resume = 0 } = {}) {
+function playerFixture({ resume = 0, playbackResponses = [] } = {}) {
   const slots = []; const effects = []; const intervals = new Map(); const timeouts = new Map(); const requests = [];
   const documentListeners = new Map(); const players = []; let cursor = 0; let clock = 0; let handle = 0; let verified = 0;
-  let savedWatch = resume; let tree; const iframe = {}; let readyHook;
+  let savedWatch = resume; let tree; const iframe = {}; let readyHook; let playbackCalls = 0;
   const react = { useState(initial) {
     const index = cursor++; if (!(index in slots)) slots[index] = { value: typeof initial === 'function' ? initial() : initial };
     return [slots[index].value, (next) => { slots[index].value = typeof next === 'function' ? next(slots[index].value) : next; }];
@@ -42,12 +42,16 @@ function playerFixture({ resume = 0 } = {}) {
   const source = readFileSync(new URL('../components/student/student-video-player.tsx', import.meta.url), 'utf8');
   const document = { hidden: false, addEventListener: (event, callback) => documentListeners.set(event, callback), removeEventListener: (event) => documentListeners.delete(event) };
   vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText, {
-    exports, require: (name) => { assert.ok(name in modules, name); return modules[name]; }, URL,
+    exports, require: (name) => { assert.ok(name in modules, name); return modules[name]; }, URL, AbortController,
     window: { playerjs: { Player }, location: { reload() {} } }, document, performance: { now: () => clock },
     setInterval: (fn) => { const id = ++handle; intervals.set(id, fn); return id; }, clearInterval: (id) => intervals.delete(id),
     setTimeout: (fn) => { const id = ++handle; timeouts.set(id, fn); return id; }, clearTimeout: (id) => timeouts.delete(id),
     fetch: async (url, init) => {
-      const body = JSON.parse(init.body); requests.push({ url, body });
+      const body = JSON.parse(init.body); requests.push({ url, body, signal: init.signal });
+      if (url.includes('playback-token')) {
+        const response = playbackResponses[playbackCalls++];
+        if (response) return { ok: false, status: response.status, json: async () => response.payload };
+      }
       return { ok: true, json: async () => url.includes('playback-token')
         ? { success: true, iframeUrl: 'https://iframe.mediadelivery.net/embed/1/11111111-1111-4111-8111-111111111111', cpdSession: { id: 'server-session', duration: 60, watchedSeconds: resume } }
         : { success: true, accepted: true, watchedSeconds: savedWatch } };
@@ -68,7 +72,8 @@ function playerFixture({ resume = 0 } = {}) {
     visit(tree); effects.splice(0).forEach((fn) => fn()); return tree;
   }
   async function flush() { for (let i = 0; i < 12; i++) await Promise.resolve(); render(); }
-  return { render, flush, requests, players, intervals, document, documentListeners,
+  return { render, flush, requests, players, intervals, timeouts, document, documentListeners,
+    retryTimer: () => { const [id, fn] = timeouts.entries().next().value; timeouts.delete(id); fn(); },
     scriptReady: () => readyHook(), setClock: (value) => { clock = value; },
     setSavedWatch: (value) => { savedWatch = value; }, verified: () => verified,
     cleanup: () => slots.forEach((slot) => slot?.cleanup?.()),
@@ -85,6 +90,45 @@ test('CPD player blocks forward seeking, retains backwards replay and restores s
   assert.equal(player.seeks.at(-1), 12); // Allowed replay did not snap back.
   player.emit('playbackratechange', 2); assert.equal(player.rates.at(-1), 1);
   f.cleanup();
+});
+
+const processing = { status: 409, payload: { success: false, code: 'VIDEO_PROCESSING', error: 'قيد التجهيز' } };
+
+test('CPD player waits for encoding before creating the tracked player and cancels pending work on exit', async () => {
+  const f = playerFixture({ playbackResponses: [processing] }); f.render(); await f.flush();
+  assert.equal(f.requests.length, 1); assert.equal(f.players.length, 0); assert.equal(f.timeouts.size, 1);
+  f.retryTimer(); await f.flush(); assert.equal(f.timeouts.size, 0);
+  f.scriptReady(); f.render();
+  assert.equal(f.requests.length, 2); assert.equal(f.players.length, 1); f.cleanup();
+  const waiting = playerFixture({ playbackResponses: [processing] }); waiting.render(); await waiting.flush();
+  const signal = waiting.requests[0].signal;
+  waiting.cleanup(); assert.equal(waiting.timeouts.size, 0); assert.equal(signal.aborted, true);
+});
+
+function findRetry(node) {
+  if (!node || typeof node !== 'object') return;
+  if (Array.isArray(node)) return node.map(findRetry).find(Boolean);
+  if (node.type === 'button' && node.props.children === 'إعادة المحاولة') return node;
+  return findRetry(node.props?.children);
+}
+
+test('CPD encoding polling is bounded and manual retry starts a fresh request without reloading the page', async () => {
+  const f = playerFixture({ playbackResponses: Array(7).fill(processing) }); f.render(); await f.flush();
+  for (let attempt = 0; attempt < 6; attempt++) { f.retryTimer(); await f.flush(); }
+  assert.equal(f.requests.length, 7); assert.equal(f.timeouts.size, 0);
+  const button = findRetry(f.render()); assert.ok(button); button.props.onClick(); f.render(); await f.flush();
+  assert.equal(f.requests.length, 8); assert.equal(findRetry(f.render()), undefined);
+  f.scriptReady(); f.render(); assert.equal(f.players.length, 1); f.cleanup();
+});
+
+test('CPD player does not automatically retry metadata outages or failed uploads', async () => {
+  for (const response of [
+    { status: 503, payload: { success: false, code: 'VIDEO_METADATA_UNAVAILABLE', error: 'تعذر التحقق من البيانات' } },
+    { status: 422, payload: { success: false, error: 'تعذر تجهيز الفيديو' } },
+  ]) {
+    const f = playerFixture({ playbackResponses: [response] }); f.render(); await f.flush();
+    assert.equal(f.timeouts.size, 0); assert.equal(f.players.length, 0); assert.ok(findRetry(f.render())); f.cleanup();
+  }
 });
 
 test('CPD completion comes from saved server watch history; hiding the page pauses and cleans listeners', async () => {

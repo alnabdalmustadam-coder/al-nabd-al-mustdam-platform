@@ -10,7 +10,8 @@ import { documentViewerUrl, documentType } from '../lib/learning/documents.ts';
 const videoId = '11111111-1111-4111-8111-111111111111';
 const otherVideo = '22222222-2222-4222-8222-222222222222';
 const quiz = { title: 'اختبار الوحدة', passingScore: 70, questions: [{ id: 'one', question: 'اختر الإجابة', options: ['أ', 'ب'], correctIndex: 1 }] };
-function fixture({ journey = false, cpd = true, enrolled = true, authenticated = true, owner = 'student-1', status = 'active', failedTable = null } = {}) {
+function fixture({ journey = false, cpd = true, enrolled = true, authenticated = true, owner = 'student-1', status = 'active', failedTable = null,
+  metadata = { durationSeconds: 120, status: 'ready' }, metadataFailure = false, manager = false } = {}) {
   const user = { id: 'student-1', email: 'student@qa.invalid' };
   const course = { id: 91, slug: 'دورة-تجريبية', title: 'دورة', professionalDevelopment: cpd, finalExam: structuredClone(quiz), curriculum: [
     { id: 'unit-a', title: 'الوحدة الأولى', items: [
@@ -66,13 +67,13 @@ function fixture({ journey = false, cpd = true, enrolled = true, authenticated =
   } };
   const modules = { 'server-only': {}, 'node:crypto': crypto,
     'next/server': { NextResponse: { json: (data, options = {}) => Response.json(data, options) } },
-    '@/lib/security/auth': { requireUser: async () => authenticated ? { ok: true, user, supabase: db, role: 'STUDENT' } : { ok: false, response: Response.json({}, { status: 401 }) }, isAdminRole: () => false, isInstructorRole: () => false },
+    '@/lib/security/auth': { requireUser: async () => authenticated ? { ok: true, user, supabase: db, role: manager ? 'ADMIN' : 'STUDENT' } : { ok: false, response: Response.json({}, { status: 401 }) }, isAdminRole: (role) => role === 'ADMIN', isInstructorRole: () => false },
     '@/lib/supabase': { getSupabaseAdmin: () => db },
     '@/lib/security/rate-limit': { consumeRateLimit: () => ({ allowed: true }) },
     '@/lib/courses-store': { getCourseBySlugAsync: async (id) => [course.slug, String(course.id)].includes(id) ? course : null },
     '@/lib/video/providers/bunny-provider': { BunnyStreamProvider: class {
       async generateSignedPlaybackUrl() { providerCalls++; return { iframeUrl: `https://iframe.mediadelivery.net/embed/1/${videoId}?token=server-token`, expiresAt: 1234 }; }
-      async getVideoDetails() { return { durationSeconds: 120, status: 'ready' }; }
+      async getVideoDetails() { if (metadataFailure) throw new Error('Bunny video metadata HTTP 401'); return metadata; }
     } },
     '@/lib/xapi': { buildActor: (value) => value, buildStatement: (value) => value, stmtProgressed: () => null,
       storeStatement: async (statement) => { if (statement) rows.xapi_statements.push({ object_id: statement.object.id, verb_display: 'completed', actor_email: statement.actor.email }); } },
@@ -159,6 +160,34 @@ test('playback tokens bind to the actual enrolled course lesson and server video
   assert.equal(f.rpcCalls[0].params.p_duration, 120);
   assert.equal(new URL(token.payload.iframeUrl).searchParams.get('showSpeed'), 'false');
   assert.equal(extractBunnyVideoId(`https://evil.invalid/${videoId}`), null);
+});
+
+test('CPD playback distinguishes encoding, failed uploads and metadata outages without starting a watch session', async () => {
+  for (const scenario of [
+    { metadata: { status: 'processing', durationSeconds: 30 }, status: 409, code: 'VIDEO_PROCESSING' },
+    { metadata: { status: 'failed', durationSeconds: 30 }, status: 422 },
+    { metadataFailure: true, status: 503, code: 'VIDEO_METADATA_UNAVAILABLE' },
+    { metadata: { status: 'ready', durationSeconds: 0 }, status: 503, code: 'VIDEO_METADATA_UNAVAILABLE' },
+    { metadata: { status: 'ready', durationSeconds: Infinity }, status: 503, code: 'VIDEO_METADATA_UNAVAILABLE' },
+  ]) {
+    const f = fixture({ metadata: scenario.metadata, metadataFailure: scenario.metadataFailure });
+    const response = await f.invoke('videos/playback-token', 'POST', { courseSlug: f.course.slug, videoId, duration: 30 });
+    assert.equal(response.status, scenario.status);
+    assert.equal(response.payload.code, scenario.code);
+    assert.equal(response.payload.iframeUrl, undefined);
+    assert.equal(f.rpcCalls.length, 0);
+    if (scenario.code === 'VIDEO_PROCESSING') assert.equal(response.payload.retryAfterSeconds, 5);
+    else assert.doesNotMatch(response.payload.error, /قيد التجهيز|انتظر اكتمال/);
+  }
+});
+
+test('admin preview and ordinary playback do not require a CPD metadata session', async () => {
+  for (const options of [{ manager: true }, { cpd: false }]) {
+    const f = fixture({ ...options, metadataFailure: true });
+    const response = await f.invoke('videos/playback-token', 'POST', { courseSlug: f.course.slug, videoId });
+    assert.equal(response.status, 200); assert.equal(response.payload.cpdSession, null);
+    assert.equal(f.rpcCalls.length, 0);
+  }
 });
 
 test('video heartbeats bind to canonical user/course/content and ignore forged identity fields', async () => {

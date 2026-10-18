@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { BunnyStreamProvider } from '@/lib/video/providers/bunny-provider';
+import type { VideoDetails } from '@/lib/video/video-provider.interface';
 import { requireUser, isAdminRole, isInstructorRole } from '@/lib/security/auth';
 import { requireCourseLearner, LearningError } from '@/lib/learning/course-access';
 import { getCourseBySlugAsync } from '@/lib/courses-store';
@@ -29,8 +30,24 @@ export async function POST(req: Request) {
     const playbackData = await provider.generateSignedPlaybackUrl(videoId);
     let cpdSession = null;
     if (ctx && course?.professionalDevelopment && lesson) {
-      const details = await provider.getVideoDetails(videoId);
-      if (!(details.durationSeconds > 0) || details.status !== 'ready') throw new LearningError('مدة الفيديو غير متاحة حالياً. انتظر اكتمال تجهيز الفيديو ثم أعد المحاولة');
+      let details: VideoDetails;
+      try {
+        details = await provider.getVideoDetails(videoId);
+      } catch (error) {
+        console.error('CPD video metadata unavailable:', { videoId, error });
+        return NextResponse.json({ success: false, code: 'VIDEO_METADATA_UNAVAILABLE',
+          error: 'تعذر التحقق من بيانات الفيديو لدى خدمة الاستضافة. أعد المحاولة، وإذا استمرت المشكلة تواصل مع إدارة الدورة.' },
+        { status: 503, headers: { 'Cache-Control': 'private, no-store' } });
+      }
+      if (details.status === 'processing') return NextResponse.json({ success: false, code: 'VIDEO_PROCESSING',
+        error: 'الفيديو قيد التجهيز. نتحقق تلقائياً من جاهزيته، يرجى الانتظار قليلاً.', retryAfterSeconds: 5 },
+      { status: 409, headers: { 'Cache-Control': 'private, no-store', 'Retry-After': '5' } });
+      if (details.status === 'failed') throw new LearningError('تعذر تجهيز الفيديو لدى خدمة الاستضافة. يرجى إبلاغ إدارة الدورة لإعادة رفعه.', 422);
+      if (!Number.isFinite(details.durationSeconds) || !(details.durationSeconds > 0) || details.status !== 'ready') {
+        return NextResponse.json({ success: false, code: 'VIDEO_METADATA_UNAVAILABLE',
+          error: 'الفيديو متاح، لكن تعذر التحقق من مدته. أعد المحاولة، وإذا استمرت المشكلة تواصل مع إدارة الدورة.' },
+        { status: 503, headers: { 'Cache-Control': 'private, no-store' } });
+      }
       const { data, error } = await ctx.admin.rpc('start_cpd_video_session', {
         p_user_id: auth.user.id, p_course_id: course.id, p_lesson_id: lesson.id,
         p_content_key: lessonContentKey(lesson), p_duration: details.durationSeconds, p_session_id: randomUUID(),
