@@ -73,3 +73,14 @@ The next live screenshot showed the upload at 00:30 while its watch percentage r
 - All 259 JavaScript tests, targeted ESLint, production build and build-time TypeScript checks pass. Supabase security advisors returned no findings for the modified table/functions; unrelated findings were left outside this fix.
 - Acceptance: refresh the learner's station, resume the final seconds, verify saved watch reaches 100%, complete the newly visible station quiz, then continue. Authenticated visual playback remains for the site owner to confirm.
 - Code rollback can leave the additive database fix in place. If its function behavior must also be rolled back, restore the two function definitions from the earlier `course_learning_controls` migration; retaining the unused defaulted column is safe.
+
+## Leaving the player and returning to the tab
+
+The next screenshot showed Next.js's client error fallback when opening the unit quiz or returning after leaving the browser. The live watch record was now 30/30; video completion was preserved.
+
+- Reproduced a concrete teardown exception using the actual CDN player.js SDK: after an iframe loses its browsing context, `off` removes a local listener, then tries `contentWindow.postMessage` and throws `Cannot read properties of null (reading 'postMessage')`. React's passive cleanup can run after that iframe has been removed. The former cleanup stopped at the first exception and crashed the page.
+- Player cleanup now isolates each unsubscribe so all remaining local callbacks, timers and visibility listeners are detached even when the iframe is gone. Late playback/seek/rate callbacks cannot issue commands after teardown.
+- Public catalog refresh preserves the existing object for each unchanged course. Focus/visibility events and edits to another course no longer reinitialize an unchanged active journey or quiz. Actual curriculum edits and removals still propagate.
+- Three regression cases failed before the fix and pass after it: teardown after readiness, teardown before readiness, and unchanged CPD course refresh. Also verified the real component with React 19.2.4 and the actual Bunny SDK in a renderer harness, removing the iframe context before switching to quiz content; no exception and no remaining SDK event callbacks.
+- All 262 JavaScript tests, targeted ESLint, production build and build-time TypeScript checks pass.
+- No database mutation or learner-attempt reset in this fix. Authenticated browser console/visual verification remains unavailable; the reproduced SDK failure and component regression tests supply the diagnosis evidence.

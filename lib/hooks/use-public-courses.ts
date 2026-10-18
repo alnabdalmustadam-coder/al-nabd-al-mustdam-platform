@@ -23,7 +23,16 @@ export function usePublicCourses() {
       try {
         const latest = await fetchPublicCourses(request.signal);
         if (!active || request.signal.aborted) return;
-        setCourses(latest);
+        setCourses((current) => {
+          // A focus/visibility refresh must not reset an active lesson or quiz
+          // when its course data is unchanged, including edits to other courses.
+          const previous = new Map(current.map((course) => [course.id, course]));
+          const next = latest.map((course) => {
+            const saved = previous.get(course.id);
+            return saved && JSON.stringify(saved) === JSON.stringify(course) ? saved : course;
+          });
+          return current.length === next.length && next.every((course, index) => course === current[index]) ? current : next;
+        });
         setError(null);
       } catch {
         if (!active || request.signal.aborted) return;

@@ -239,6 +239,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
     };
     update(frontier);
     const report = (event: 'play' | 'pause' | 'tick') => {
+      if (!alive) return;
       // Read immediately, before queueing: pause/ended can arrive between
       // timeupdate events, and a queued tick must not sample a later playback state.
       const position = readPosition();
@@ -284,8 +285,8 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
       player.on('play', () => { playing = true; lastTime = performance.now(); report('play'); });
       player.on('pause', () => { playing = false; report('pause'); });
       player.on('ended', () => { playing = false; report('pause'); });
-      player.on('seeked', () => { if (seconds > frontier + 0.75) player.setCurrentTime(frontier); });
-      player.on('playbackratechange', (rate) => { if (rate !== 1 && player.supports('method', 'setPlaybackRate')) player.setPlaybackRate(1); });
+      player.on('seeked', () => { if (alive && seconds > frontier + 0.75) player.setCurrentTime(frontier); });
+      player.on('playbackratechange', (rate) => { if (alive && rate !== 1 && player.supports('method', 'setPlaybackRate')) player.setPlaybackRate(1); });
     };
     player.on('ready', onReady);
     const readyTimeout = setTimeout(() => {
@@ -297,7 +298,13 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
     return () => {
       alive = false; clearInterval(timer); clearTimeout(readyTimeout); document.removeEventListener('visibilitychange', hide);
       positionTimers.forEach(clearTimeout); positionTimers.clear();
-      ['ready', 'timeupdate', 'play', 'pause', 'ended', 'seeked', 'playbackratechange'].forEach((event) => player.off(event));
+      ['ready', 'timeupdate', 'play', 'pause', 'ended', 'seeked', 'playbackratechange'].forEach((event) => {
+        try { player.off(event); } catch {
+          // Bunny removes its local callback before posting the unsubscribe.
+          // React may already have removed the iframe/contentWindow by this
+          // passive cleanup. Continue detaching the remaining callbacks.
+        }
+      });
     };
   }, [professionalDevelopment, cpdSession, iframeUrl, scriptReady, courseSlug, lessonId]);
 

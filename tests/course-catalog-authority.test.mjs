@@ -282,6 +282,21 @@ test('catalog view clears deleted rows, reports failures and recovers through re
   assert.equal(nodes(tree, node => node.type === 'CourseCard').length, 1);
 });
 
+test('focus refresh retains an unchanged active CPD course but still applies curriculum updates', async t => {
+  const cpd = { ...liveCourse, professionalDevelopment: true, learningJourney: { enabled: true } };
+  const other = { ...liveCourse, id: 999, slug: 'other-course' };
+  const ui = mountPage('app/dashboard/student/courses/[courseSlug]/lessons/[lessonId]/page.tsx', [cpd, other]);
+  t.after(ui.unmount); await settle();
+  const journey = () => nodes(ui.render(), node => node.type === 'ProfessionalCourseJourney')[0];
+  const original = journey().props.course;
+  ui.update([structuredClone(cpd), { ...other, title: 'دورة أخرى محدثة' }]); await settle();
+  assert.equal(journey().props.course, original, 'Unchanged course must not reinitialize the active lesson/quiz');
+  ui.update([{ ...cpd, title: 'عنوان محدث', curriculum: [{ id: 'new-unit', title: 'وحدة جديدة' }] }, other]); await settle();
+  assert.notEqual(journey().props.course, original);
+  assert.equal(journey().props.course.title, 'عنوان محدث');
+  ui.update([]); await settle(); assert.equal(journey(), undefined);
+});
+
 test('hero keeps a valid slide when the active last course disappears', async t => {
   const ui = mountPage('components/sections/HeroSection.tsx', [liveCourse, { ...liveCourse, id: 2, slug: 'second' }, { ...liveCourse, id: 3, slug: 'third' }]);
   t.after(ui.unmount);

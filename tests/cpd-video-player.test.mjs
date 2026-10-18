@@ -10,7 +10,7 @@ import { extractBunnyVideoId } from '../lib/learning/course-content.ts';
 function playerFixture({ resume = 0, duration = 60, playbackResponses = [], recordProgress } = {}) {
   const slots = []; const effects = []; const intervals = new Map(); const timeouts = new Map(); const requests = [];
   const documentListeners = new Map(); const players = []; let cursor = 0; let clock = 0; let handle = 0; let verified = 0;
-  let savedWatch = resume; let tree; const iframe = {}; let readyHook; let playbackCalls = 0;
+  let savedWatch = resume; let tree; const iframe = {}; let readyHook; let playbackCalls = 0; let detached = false;
   const react = { useState(initial) {
     const index = cursor++; if (!(index in slots)) slots[index] = { value: typeof initial === 'function' ? initial() : initial };
     return [slots[index].value, (next) => { slots[index].value = typeof next === 'function' ? next(slots[index].value) : next; }];
@@ -25,7 +25,12 @@ function playerFixture({ resume = 0, duration = 60, playbackResponses = [], reco
     events = new Map(); seeks = []; rates = []; pauses = 0; currentTime = resume;
     constructor() { players.push(this); }
     on(event, callback) { this.events.set(event, callback); }
-    off(event) { this.events.delete(event); }
+    off(event) {
+      this.events.delete(event);
+      // Bunny removes the local listener, then posts to the iframe. In React's
+      // passive cleanup the iframe may already have no browsing context.
+      if (detached) throw new TypeError("Cannot read properties of null (reading 'postMessage')");
+    }
     pause() { this.pauses++; }
     setCurrentTime(value) { this.seeks.push(value); this.currentTime = value; }
     getCurrentTime(callback) { callback(this.currentTime); }
@@ -78,6 +83,7 @@ function playerFixture({ resume = 0, duration = 60, playbackResponses = [], reco
     retryTimer: () => { const [id, fn] = timeouts.entries().next().value; timeouts.delete(id); fn(); },
     scriptReady: () => readyHook(), setClock: (value) => { clock = value; },
     setSavedWatch: (value) => { savedWatch = value; }, verified: () => verified,
+    detachIframe: () => { detached = true; },
     cleanup: () => slots.forEach((slot) => slot?.cleanup?.()),
   };
 }
@@ -168,4 +174,24 @@ test('CPD periodic saves read the current player position rather than the last t
   for (const fn of f.intervals.values()) fn(); await f.flush();
   assert.equal(f.requests.find((request) => request.body.event === 'tick').body.seconds, 5);
   f.cleanup();
+});
+
+test('leaving a ready video for its quiz tolerates an already detached iframe and removes every listener', async () => {
+  const f = playerFixture(); f.render(); await f.flush(); f.scriptReady(); f.render();
+  const player = f.players[0]; player.emit('ready');
+  const lateRateChange = player.events.get('playbackratechange');
+  const latePlay = player.events.get('play');
+  const requestCount = f.requests.length; const rates = player.rates.length;
+  f.detachIframe();
+  assert.doesNotThrow(() => f.cleanup());
+  assert.equal(player.events.size, 0); assert.equal(f.intervals.size, 0);
+  assert.equal(f.timeouts.size, 0); assert.equal(f.documentListeners.size, 0);
+  lateRateChange(2); latePlay(); await f.flush();
+  assert.equal(player.rates.length, rates); assert.equal(f.requests.length, requestCount);
+});
+
+test('refreshing or leaving a video before readiness also tolerates iframe teardown', async () => {
+  const f = playerFixture(); f.render(); await f.flush(); f.scriptReady(); f.render();
+  f.detachIframe(); assert.doesNotThrow(() => f.cleanup());
+  assert.equal(f.players[0].events.size, 0); assert.equal(f.timeouts.size, 0);
 });
