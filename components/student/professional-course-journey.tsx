@@ -26,6 +26,9 @@ function JourneyStation({ course, lesson, completed, busy, onContinue }: { cours
   const [quizReady, setQuizReady] = useState(false);
   const [documentRead, setDocumentRead] = useState(false);
   const document = ['pdf', 'doc', 'ppt'].includes(lesson.type);
+  const canRateLesson = lesson.type === 'video' ? Boolean(lesson.videoUrl?.trim())
+    : document ? Boolean(lesson.fileUrl?.trim())
+    : lesson.type === 'article' && Boolean(lesson.description?.trim() || lesson.contentBlocks?.length);
   const ready = completed || ((lesson.type !== 'video' || videoReady) && blocksReady && (!lesson.requiredQuiz || quizReady) && (!document || documentRead));
   const resources = getLessonResourceGroups(course, lesson.id, true);
   return <>
@@ -40,10 +43,10 @@ function JourneyStation({ course, lesson, completed, busy, onContinue }: { cours
         {lesson.type === 'video' && <StudentVideoPlayer courseSlug={course.slug} lessonId={lesson.id} lessonTitle={lesson.title} videoUrl={lesson.videoUrl} professionalDevelopment hideToolbar isCompleted={completed} onVideoVerified={() => setVideoReady(true)} />}
         {lesson.contentBlocks?.length ? <LessonContentBlocks blocks={lesson.contentBlocks} onReady={setBlocksReady} /> : null}
         {document && <><CourseDocumentViewer fileUrl={lesson.fileUrl} title={lesson.title} type={lesson.type} /><label className={styles.readConfirmation}><input type="checkbox" checked={completed || documentRead} disabled={completed} onChange={(event) => setDocumentRead(event.target.checked)} />اطّلعت على مستند الدرس</label></>}
+        {canRateLesson && <SatisfactionHeart courseId={course.slug} lessonId={lesson.id} kind="lesson" />}
         {lesson.requiredQuiz && (lesson.type !== 'video' || videoReady || completed) && <section aria-label={lesson.diagnostic ? 'الاختبار القبلي' : 'اختبار المحطة'} className="space-y-5">
           {lesson.type !== 'quiz' && <h3 className="text-base font-semibold text-blue-950">اختبار هذه المحطة</h3>}
           <InternalQuizPanel courseId={course.slug} lessonId={lesson.id} diagnostic={lesson.diagnostic} sequential onResult={setQuizReady} />
-          {lesson.type !== 'quiz' && <SatisfactionHeart inline courseId={course.slug} lessonId={lesson.id} kind="quiz" />}
         </section>}
         {lesson.type === 'video' && lesson.requiredQuiz && !videoReady && !completed && <p className={styles.helper}>يظهر اختبار المحطة بعد اكتمال مشاهدة الفيديو.</p>}
       </>}
@@ -144,6 +147,5 @@ export function ProfessionalCourseJourney({ course, initialLessonId }: { course:
       </main>
     </div>
     </div>
-    {lesson && <SatisfactionHeart key={lesson.id} courseId={course.slug} lessonId={lesson.id} kind={lesson.type === 'quiz' ? 'quiz' : 'lesson'} />}
   </div>;
 }

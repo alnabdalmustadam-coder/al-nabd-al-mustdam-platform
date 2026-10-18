@@ -110,3 +110,11 @@ The mobile report showed 29.47543/30 seconds saved, a large heart over the botto
 - Automated verification: all 272 tests pass, including genuine ordinary final start/fail/retry/pass/completion, historical 99% reconciliation, forged totals/scores, duplicate or foreign completions, changed curricula/exam versions, enrollment ownership, and preserved CPD gates. Production build and build-time TypeScript pass. ESLint comparison found no new findings in changed TypeScript files.
 - Replaced all rendered decorative sparkle icons with contextual SVGs throughout the platform. A source AST audit found no remaining rendered sparkle icons or sparkle emojis; the existing Lucide icon imports render valid SVGs. No database schema changes or certificate issuance were performed.
 - Live acceptance: refresh the completed ordinary course, confirm 100% and the compact completion row; inspect CPD's shared frame and open/complete stations on desktop and mobile. Authenticated visual checks remain for the site owner.
+
+## Contextual satisfaction controls
+
+- Removed fixed positioning from the shared heart control. It is now a compact row in the associated content's normal document flow. Loading or unavailable controls remain hidden, and errors stay within the same row.
+- Ordinary lesson feedback sits beneath its player/document/article inside the course workspace, with no heart in notes, attachments or discussions. Empty content placeholders have no feedback control.
+- Professional lesson feedback sits after actual lesson content and before its attached quiz. Welcome, objectives and completion review have no heart. Quiz feedback is owned by the shared quiz panel and appears within its saved result, whether passed or failed; starting another attempt removes it until the next result.
+- Existing course/lesson/quiz identifiers, saved votes and aggregate calculations remain unchanged. Removed the sidebar-width variable used only by the former floating control.
+- All 272 tests and the production build/TypeScript checks pass. ESLint comparison reports no new findings. Authenticated mobile/desktop visual confirmation remains for the site owner.

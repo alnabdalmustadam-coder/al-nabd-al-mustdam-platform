@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BookOpen, CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
 import { QuizQuestionInput, QuizQuestionReview } from '@/components/quizzes/quiz-question';
+import { SatisfactionHeart } from './satisfaction-heart';
 import { isQuizAnswerComplete, type GradedQuizQuestion, type StudentQuizAnswer, type StudentQuizQuestion } from '@/lib/quizzes/model';
 
 type Session = { id: string; title: string; passPercentage: number; startedAt: string; expiresAt: string | null;
@@ -101,6 +102,7 @@ export function InternalQuizPanel({ courseId, lessonId, onPassed, onResult, sequ
           <p className="text-sm font-black text-blue-900">ترتيبك {result.ranking.rank} من {result.ranking.participants} طالب</p>
           <p className="mt-1 text-xs leading-6 text-slate-600">بأفضل نتيجة لك ({result.ranking.bestScore}%) بين من سلّموا نفس الاختبار في هذه الدورة. الدرجات المتساوية لها نفس المركز.</p>
         </div> : <p className="text-xs text-slate-500">الترتيب غير متاح مؤقتاً. أعد تحميل الاختبار لتحديثه.</p>}
+        <SatisfactionHeart courseId={courseId} lessonId={lessonId} kind="quiz" />
       </div>
       {sequential ? <details className="rounded-2xl border border-slate-200 p-4"><summary className="cursor-pointer text-sm font-semibold text-blue-900">مراجعة الإجابات والشرح</summary><div className="mt-4 space-y-4">{result.results.map((question) => <QuizQuestionReview key={question.id} question={question} />)}</div></details> : result.results.map((question) => <QuizQuestionReview key={question.id} question={question} />)}
       <button type="button" disabled={busy} onClick={() => void perform('start')} className="flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-xs font-black text-blue-900 disabled:opacity-50"><RefreshCw className="h-4 w-4" />محاولة جديدة</button>

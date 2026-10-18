@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Heart, Loader2 } from 'lucide-react';
 
 type Satisfaction = { liked: boolean; count: number };
-export function SatisfactionHeart({ courseId, lessonId, kind, inline = false }: { courseId: string; lessonId: string; kind: 'lesson' | 'quiz'; inline?: boolean }) {
+export function SatisfactionHeart({ courseId, lessonId, kind }: { courseId: string; lessonId: string; kind: 'lesson' | 'quiz' }) {
   const [state, setState] = useState<Satisfaction | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -34,17 +34,20 @@ export function SatisfactionHeart({ courseId, lessonId, kind, inline = false }: 
     } catch (failure) { setError(failure instanceof Error ? failure.message : 'تعذر حفظ الرضا'); }
     finally { setBusy(false); }
   };
-  if (hidden) return null;
-  return <div className={`${inline ? 'relative inline-flex' : 'fixed right-2 top-1/2 z-30 -translate-y-1/2 lg:right-[calc(var(--student-sidebar-width,18rem)+0.75rem)]'} flex flex-col items-center gap-2`} dir="rtl">
-    {error && <p role="alert" className={`${inline ? '' : 'absolute right-full top-0 mr-2 w-52'} rounded-xl border border-rose-200 bg-white p-3 text-xs font-bold text-rose-800 shadow-lg`}>{error}</p>}
-    <button type="button" onClick={() => void toggle()} disabled={busy || (!state && !error)} aria-pressed={state?.liked || false}
-      aria-label={`${state?.liked ? 'إلغاء الرضا عن' : 'أعجبني'} ${kind === 'quiz' ? 'الاختبار' : 'الدرس'}`}
-      title={state?.liked ? 'تقييمك محفوظ؛ اضغط لإلغائه' : 'عبّر عن رضاك'}
-      className={`flex items-center justify-center border font-bold shadow-lg transition-colors disabled:opacity-60 ${inline ? 'min-h-11 gap-2 rounded-full px-3 py-2 text-xs' : 'w-11 flex-col gap-1 rounded-2xl px-1 py-2 text-[9px] leading-4'} ${state?.liked ? 'border-rose-300 bg-rose-600 text-white' : 'border-rose-100 bg-white text-rose-700 hover:bg-rose-50'}`}>
-      {busy || (!state && !error) ? <Loader2 className="h-5 w-5 animate-spin" /> : <Heart className={`h-5 w-5 ${state?.liked ? 'fill-current' : ''}`} />}
-      <span>{inline ? state?.liked ? 'أعجبني' : 'تقييم الاختبار' : 'رضاك'}</span>
-      {state && <span className="min-w-5 rounded-full bg-rose-100 px-1.5 text-center text-[10px] leading-5 text-rose-800" aria-label={`${state.count} تعبير عن الرضا`}>{state.count}</span>}
-    </button>
+  if (hidden || (!state && !error)) return null;
+  return <div className="w-full min-w-0 border-t border-slate-200/70 pt-3" dir="rtl">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <p className="text-xs font-medium leading-6 text-slate-500">{kind === 'quiz' ? 'ما رأيك في هذا الاختبار؟' : 'هل أعجبك هذا الدرس؟'}</p>
+      <button type="button" onClick={() => void toggle()} disabled={busy} aria-pressed={state ? state.liked : undefined}
+        aria-label={!state ? 'إعادة تحميل التقييم' : `${state.liked ? 'إلغاء الرضا عن' : 'أعجبني'} ${kind === 'quiz' ? 'الاختبار' : 'الدرس'}`}
+        title={state?.liked ? 'تقييمك محفوظ؛ اضغط لإلغائه' : 'عبّر عن رضاك'}
+        className={`inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors disabled:opacity-60 ${state?.liked ? 'border-rose-200 bg-rose-50 text-rose-700' : 'border-slate-200 bg-white text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700'}`}>
+        {busy ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" /> : <Heart aria-hidden="true" className={`h-4 w-4 ${state?.liked ? 'fill-current' : ''}`} />}
+        <span>{state ? 'أعجبني' : 'إعادة المحاولة'}</span>
+        {state && <span className="min-w-5 rounded-full bg-rose-100 px-1.5 text-center text-[10px] leading-5 text-rose-800" aria-label={`${state.count} تعبير عن الرضا`}>{state.count}</span>}
+      </button>
+    </div>
+    {error && <p role="alert" className="mt-2 text-xs leading-6 text-rose-800">{error}</p>}
     {state?.liked && <p role="status" className="sr-only">تم حفظ تقييمك. اضغط مرة أخرى لإلغائه.</p>}
   </div>;
 }

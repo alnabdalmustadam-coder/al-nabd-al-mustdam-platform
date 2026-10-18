@@ -116,8 +116,7 @@ export default function StudentDashboardLayout({ children }: { children: React.R
   }
 
   return (
-    <div className="min-h-screen liquid-dashboard-backdrop text-slate-800 font-[family-name:var(--font-cairo)] relative overflow-x-clip" dir="rtl"
-      style={{ '--student-sidebar-width': isSidebarCollapsed ? '5rem' : '18rem' } as React.CSSProperties}>
+    <div className="min-h-screen liquid-dashboard-backdrop text-slate-800 font-[family-name:var(--font-cairo)] relative overflow-x-clip" dir="rtl">
 
       {/* Ambient Glowing Orbs Background for Balanced Depth */}
       <div className="fixed top-12 right-10 w-[500px] h-[500px] bg-[#173A7C]/8 rounded-full blur-[140px] pointer-events-none -z-10 animate-pulse" />

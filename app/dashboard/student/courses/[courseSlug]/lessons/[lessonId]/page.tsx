@@ -224,6 +224,10 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
   const lessonAllowed = (id: string) => !cpd || (progressLoaded && isLessonUnlocked(allLessons.map((item) => item.id), completedSet, id));
   const currentAllowed = Boolean(currentLesson && lessonAllowed(currentLesson.id));
   const lessonContent = courseData ? getCourseContent(courseData).find((item) => item.id === currentLesson?.id) : null;
+  const canRateLesson = currentAllowed && Boolean(currentLesson && (currentLesson.type === 'article'
+    ? lessonContent?.description?.trim() || lessonContent?.contentBlocks?.length
+    : ['pdf', 'doc', 'ppt'].includes(currentLesson.type || '') ? currentLesson.fileUrl?.trim()
+    : currentLesson.type !== 'quiz' && currentLesson.videoUrl?.trim()));
   const assessmentLessonId = quizTarget === 'final' ? COURSE_FINAL_ASSESSMENT : currentLesson?.id || lessonId;
   const finalAssessmentSelected = Boolean(courseData && resolveCourseQuiz(courseData, assessmentLessonId)?.key === 'final');
 
@@ -711,6 +715,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                 completionDisabled={cpd && !videoVerified}
               />
             )}
+            {canRateLesson && <div className="mt-3"><SatisfactionHeart key={`${courseSlug}:${currentLesson.id}`} courseId={courseSlug} lessonId={currentLesson.id} kind="lesson" /></div>}
           </div>
 
         </div>
@@ -838,7 +843,6 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
           <InternalQuizPanel key={`${courseSlug}:${assessmentLessonId}`} courseId={courseSlug} lessonId={assessmentLessonId}
             onPassed={!cpd && finalAssessmentSelected && completedLessons === totalLessons ? () => void syncCourseCompletion() : undefined} />
         </div>}
-        {currentAllowed && <SatisfactionHeart key={`${courseSlug}:${activeTab === 'quiz' ? assessmentLessonId : currentLesson?.id}:${activeTab === 'quiz' ? 'quiz' : 'lesson'}`} courseId={courseSlug} lessonId={activeTab === 'quiz' ? assessmentLessonId : currentLesson?.id || lessonId} kind={activeTab === 'quiz' ? 'quiz' : 'lesson'} />}
 
         {/* Tab 4: Discussion */}
         {activeTab === 'discussion' && (
