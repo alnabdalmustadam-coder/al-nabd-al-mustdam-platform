@@ -9,7 +9,7 @@ const tabs = [
   { id: 'basic', title: 'بيانات الدورة', description: 'التفاصيل وإعدادات التعلم', Icon: Settings2 },
   { id: 'curriculum', title: 'المنهج والدروس', description: 'الوحدات والمحتوى والملفات', Icon: Layers },
   { id: 'attachments', title: 'مرفقات الدورة', description: 'ملفات عامة لجميع الدروس', Icon: FolderOpen },
-  { id: 'exam', title: 'الاختبار النهائي', description: 'الأسئلة وإعدادات الاجتياز', Icon: ClipboardCheck },
+  { id: 'exam', title: 'الاختبارات', description: 'الأسئلة وإعدادات الاجتياز', Icon: ClipboardCheck },
 ] as const;
 
 export function CourseEditorFrame({ title, editing, tab, onTabChange, onClose, onSubmit, onInvalid, busy, uploading = false, mode = 'course', children }: {

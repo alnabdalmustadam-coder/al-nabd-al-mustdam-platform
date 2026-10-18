@@ -3,6 +3,7 @@
 import { CourseEditorFrame } from '@/components/courses/editor/course-editor-frame';
 import { CourseBasicSettings, type BasicSettings } from '@/components/courses/editor/course-basic-settings';
 import { CourseCurriculumEditor } from '@/components/courses/editor/course-curriculum-editor';
+import { JourneySettingsEditor } from '@/components/courses/editor/journey-settings-editor';
 import { CourseFilesEditor } from '@/components/courses/editor/course-files-editor';
 import { EditorEmptyState, EditorSectionHeading, EditorToggle } from '@/components/courses/editor/editor-ui';
 import { curriculumToEditor, editorToCurriculum, type EditorLesson, type EditorSection } from '@/lib/courses/editor-model';
@@ -13,7 +14,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as tus from 'tus-js-client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Plus, Search, Clock, Edit3, Trash2, CheckCircle2, Video, GraduationCap, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
-import { QuizData, CourseAttachment } from '@/types';
+import { QuizData, CourseAttachment, LearningJourneySettings } from '@/types';
 
 import { CardImage } from '@/components/ui/CardImage';
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
@@ -40,6 +41,8 @@ interface CourseItem {
   attachments?: CourseAttachment[];
   finalExam?: QuizData;
   professionalDevelopment?: boolean;
+  learningJourney?: LearningJourneySettings;
+  outcomes?: string[];
 }
 
 type FormSubLessonItem = EditorLesson;
@@ -207,6 +210,8 @@ export default function AdminCoursesPage() {
   // Final Course Exam State
   const [hasFinalExam, setHasFinalExam] = useState(false);
   const [formFinalExam, setFormFinalExam] = useState<QuizData>(createCourseQuizDraft);
+  const [formJourney, setFormJourney] = useState<LearningJourneySettings>(() => ({ enabled: true, introduction: '', summary: '', preAssessment: createCourseQuizDraft() }));
+  const [formOutcomes, setFormOutcomes] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resourceUploads, setResourceUploads] = useState(0);
@@ -308,6 +313,8 @@ export default function AdminCoursesPage() {
     setFormHours('30');
     setFormDescription('');
     setFormProfessionalDevelopment(false);
+    setFormJourney({ enabled: true, introduction: '', summary: '', preAssessment: createCourseQuizDraft() });
+    setFormOutcomes('');
     setFormImage('');
     setFormAttachments([]);
     setHasFinalExam(false);
@@ -350,6 +357,8 @@ export default function AdminCoursesPage() {
     setFormHours(String(course.hours ?? 30));
     setFormDescription(course.description || '');
     setFormProfessionalDevelopment(course.professionalDevelopment === true);
+    setFormJourney({ enabled: true, introduction: course.learningJourney?.introduction || '', summary: course.learningJourney?.summary || '', preAssessment: prepareCourseQuizForEditing(course.learningJourney?.preAssessment) || createCourseQuizDraft() });
+    setFormOutcomes((course.outcomes || []).join('\n'));
     setFormImage(course.image || '');
 
     // Ensure course category is in list
@@ -524,7 +533,7 @@ export default function AdminCoursesPage() {
       const payload: Record<string, unknown> = contentMode && editingCourse ? {
         id: editingCourse.id, slug: editingCourse.slug, title: editingCourse.title,
         curriculum: formattedCurriculum, attachments: formAttachments,
-        finalExam: hasFinalExam ? formFinalExam : null,
+        finalExam: hasFinalExam || formProfessionalDevelopment ? formFinalExam : null,
       } : {
         title: formTitle.trim(),
         slug: formSlug.trim() || undefined,
@@ -538,8 +547,13 @@ export default function AdminCoursesPage() {
         image: formImage.trim(),
         curriculum: formattedCurriculum,
         attachments: formAttachments,
-        finalExam: hasFinalExam ? formFinalExam : null,
+        finalExam: hasFinalExam || formProfessionalDevelopment ? formFinalExam : null,
       };
+
+      if (formProfessionalDevelopment || editingCourse?.learningJourney) {
+        payload.learningJourney = { ...formJourney, enabled: formProfessionalDevelopment };
+        payload.outcomes = formOutcomes.split('\n').map((line) => line.trim()).filter(Boolean);
+      }
 
       if (editingCourse?.id) {
         payload.id = editingCourse.id;
@@ -587,6 +601,8 @@ export default function AdminCoursesPage() {
           curriculum: savedC.curriculum || formattedCurriculum,
           attachments: savedC.attachments || formAttachments,
           professionalDevelopment: savedC.professionalDevelopment === true,
+          learningJourney: savedC.learningJourney,
+          outcomes: savedC.outcomes,
           finalExam: savedC.finalExam || (hasFinalExam ? formFinalExam : undefined),
           image: savedC.image || formImage,
         };
@@ -904,16 +920,17 @@ export default function AdminCoursesPage() {
             trainer: formTrainer, price: formPrice, hours: formHours, description: formDescription, image: formImage, professionalDevelopment: formProfessionalDevelopment }}
             onChange={changeBasicSettings} categories={categoriesList} onAddCategory={(name) => setCategoriesList((list) => list.some((item) => item.id === name) ? list : [...list, { id: name, label: name }])}
             trainers={instructorsList} onAddTrainer={(name) => setInstructorsList((list) => list.includes(name) ? list : [...list, name])} onImageBusyChange={onResourceBusy} />}
-          {modalActiveTab === 'curriculum' && <CourseCurriculumEditor courseSlug={editingCourse?.slug || formSlug || undefined} value={formSections} onChange={setFormSections} onUploadVideo={triggerVideoUpload}
-            videoUpload={lessonUploadProgress > 0 ? uploadingTarget : null} videoProgress={lessonUploadProgress} onFileBusyChange={onResourceBusy} disabled={isSubmitting || resourceUploads > 0} />}
+          {modalActiveTab === 'curriculum' && <div className="space-y-7">{formProfessionalDevelopment && <JourneySettingsEditor value={formJourney} outcomes={formOutcomes} onChange={setFormJourney} onOutcomesChange={setFormOutcomes} />}<CourseCurriculumEditor courseSlug={editingCourse?.slug || formSlug || undefined} value={formSections} onChange={setFormSections} onUploadVideo={triggerVideoUpload}
+            videoUpload={lessonUploadProgress > 0 ? uploadingTarget : null} videoProgress={lessonUploadProgress} onFileBusyChange={onResourceBusy} disabled={isSubmitting || resourceUploads > 0} /></div>}
           {modalActiveTab === 'attachments' && <div className="space-y-7">
             <EditorSectionHeading kind="files" eyebrow="مرفقات الدورة" title="ملفات تدعم الدورة بالكامل" description="أضف الحقيبة التدريبية أو الملفات العامة التي يحتاجها الطالب طوال الدورة. لملفات درس أو وحدة بعينها، استخدم قسم المنهج والدروس." />
             <div data-editor-panel className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"><CourseFilesEditor title="ملفات عامة للتحميل" description="يمكن إضافة أكثر من مستند أو ملف مضغوط، وتعديل الاسم الذي يظهر للطالب." files={formAttachments} onChange={(update) => setFormAttachments(update)} onBusyChange={onResourceBusy} documentsOnly={false} /></div>
           </div>}
           {modalActiveTab === 'exam' && <div className="space-y-7">
-            <EditorSectionHeading kind="exam" eyebrow="تقييم التعلّم" title="الاختبار النهائي للدورة" description="فعّل الاختبار، ثم أضف أسئلة الاختيار من متعدد أو التوصيل وحدّد نسبة الاجتياز." />
-            <EditorToggle icon={ClipboardCheck} title="تفعيل الاختبار النهائي" description="عند تفعيله يظهر الاختبار للطالب ضمن الدورة، وتُحفظ أسئلته مع بياناتها." enabled={hasFinalExam} onChange={setHasFinalExam} />
-            {hasFinalExam ? <div data-editor-panel className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"><CourseQuizEditor value={formFinalExam} onChange={setFormFinalExam} /></div>
+            <EditorSectionHeading kind="exam" eyebrow="تقييم التعلّم" title={formProfessionalDevelopment ? 'الاختبار القبلي والبعدي' : 'الاختبار النهائي للدورة'} description={formProfessionalDevelopment ? 'اختبار قبلي لقياس المعرفة السابقة، واختبار بعدي مستقل يشترط اجتيازه لإكمال الرحلة.' : 'فعّل الاختبار، ثم أضف أسئلة الاختيار من متعدد أو التوصيل وحدّد نسبة الاجتياز.'} />
+            {formProfessionalDevelopment && <section data-editor-panel className="space-y-5 rounded-2xl border border-emerald-200 bg-white p-5 sm:p-7"><h3 className="text-base font-semibold text-emerald-900">الاختبار القبلي</h3><p className="text-sm leading-7 text-slate-500">يُسجّل مستوى الطالب قبل التعلّم. تسليم الإجابات يفتح المحتوى مهما كانت النتيجة.</p><CourseQuizEditor diagnostic value={formJourney.preAssessment || { title: '', passingScore: 70, questions: [] }} onChange={(preAssessment) => setFormJourney((current) => ({ ...current, preAssessment }))} /></section>}
+            {!formProfessionalDevelopment && <EditorToggle icon={ClipboardCheck} title="تفعيل الاختبار النهائي" description="عند تفعيله يظهر الاختبار للطالب ضمن الدورة، وتُحفظ أسئلته مع بياناتها." enabled={hasFinalExam} onChange={setHasFinalExam} />}
+            {hasFinalExam || formProfessionalDevelopment ? <div data-editor-panel className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">{formProfessionalDevelopment && <h3 className="text-base font-semibold text-blue-950">الاختبار البعدي</h3>}<CourseQuizEditor value={formFinalExam} onChange={setFormFinalExam} /></div>
               : <EditorEmptyState kind="exam" title="جهّز التقييم الختامي للدورة" description="فعّل الاختبار من الأعلى، ثم أضف أسئلته وحدّد نسبة الاجتياز المناسبة." />}
           </div>}
         </CourseEditorFrame>}

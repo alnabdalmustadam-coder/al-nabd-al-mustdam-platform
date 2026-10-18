@@ -1,3 +1,6 @@
+import { readCompletedJourneyScore } from '@/lib/learning/journey-completion';
+import { isLearningJourney } from '@/lib/learning/journey';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   CertificatePersistenceError,
@@ -77,8 +80,14 @@ export async function POST(req: NextRequest) {
       allCourses.find((c) => c.title === enrollment.course_title) ||
       null;
 
+    const journey = matchedCourse && isLearningJourney(matchedCourse);
+    const journeyScore = journey ? await readCompletedJourneyScore(getSupabaseAdmin(), matchedCourse, auth.user.id, email) : null;
+    if (journey && journeyScore === null) {
+      return NextResponse.json({ success: false, error: 'أكمل محطات رحلة التعلّم واختبارها البعدي قبل إصدار الشهادة' }, { status: 403 });
+    }
+
     const title = matchedCourse?.title || enrollment.course_title || enrollment.course_id || 'الدورة التدريبية المعتمدة';
-    const finalGrade = formatCertificateGrade(null, typeof enrollment.grade === 'string' ? enrollment.grade : null);
+    const finalGrade = journey ? formatCertificateGrade(journeyScore, null) : formatCertificateGrade(null, typeof enrollment.grade === 'string' ? enrollment.grade : null);
     const finalHours = formatCertificateHours(matchedCourse?.duration, typeof enrollment.hours === 'string' ? enrollment.hours : null);
 
     const [allIssued, allTemplates] = await Promise.all([

@@ -41,8 +41,8 @@ export function CourseBasicSettings({ value, onChange, categories, onAddCategory
     </section>
     <section className="space-y-4"><EditorCardHeading icon={Settings2} title="إعدادات التعلّم" description="حدّد طريقة تقدّم الطالب في محتوى الدورة." />
       <EditorToggle icon={ShieldCheck} title="وضع التطوير المهني" enabled={value.professionalDevelopment} onChange={(professionalDevelopment) => onChange({ professionalDevelopment })}
-        description="يلتزم الطالب بترتيب الدروس، ويشاهد الفيديو كاملًا ويجتاز الاختبار المرتبط قبل الانتقال إلى الدرس التالي." />
-      {value.professionalDevelopment && <p className="rounded-xl bg-amber-50 px-5 py-3 text-xs leading-6 text-amber-900">عند تفعيله لدورة موجودة، يحتاج التقدم السابق المسجّل يدويًا إلى التحقق من المشاهدة.</p>}
+        description="رحلة تبدأ بالأهداف والتقييم القبلي، ثم محتوى بالترتيب وفيديوهات كاملة، وتنتهي باختبار بعدي لاعتماد الإكمال." />
+      {value.professionalDevelopment && <p className="rounded-xl bg-amber-50 px-5 py-3 text-xs leading-6 text-amber-900">جهّز الأهداف والاختبار القبلي والبعدي قبل الحفظ. تفعيل هذا الوضع لدورة موجودة يضيف محطات جديدة ويستلزم التحقق من المشاهدة بدل التقدم اليدوي السابق.</p>}
     </section>
     <section data-editor-panel className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-7"><EditorCardHeading icon={Image} title="غلاف الدورة" description="صورة واضحة تعكس محتوى الدورة وهويتها." meta="1280 × 720" />
       <DeviceImageUploader value={value.image} onChange={(image) => onChange({ image })} onBusyChange={onImageBusyChange} folder="courses" slug={value.slug || 'course'} label="صورة غلاف الدورة" recommendedSize="المقاس المناسب: 1280 × 720 بكسل" aspectRatio="video" />

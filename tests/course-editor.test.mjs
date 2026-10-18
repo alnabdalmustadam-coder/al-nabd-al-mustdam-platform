@@ -18,7 +18,7 @@ function fixture(overrides = {}) {
     useEffect(fn, deps) { const index = cursor++; const previous = slots[index]; if (!previous || deps.some((item, i) => !Object.is(item, previous.deps[i]))) effects.push(() => { previous?.cleanup?.(); slots[index] = { deps, cleanup: fn() }; }); },
   };
   const jsx = (type, props) => ({ type, props });
-  const stubs = { react, 'react-dom': { createPortal: child => child }, 'react/jsx-runtime': { jsx, jsxs: jsx }, 'lucide-react': new Proxy({}, { get: (_, name) => name }),
+  const stubs = { 'next/image': { default: 'Image' }, react, 'react-dom': { createPortal: child => child }, 'react/jsx-runtime': { jsx, jsxs: jsx }, 'lucide-react': new Proxy({}, { get: (_, name) => name }),
     '@/components/quizzes/course-quiz-editor': { CourseQuizEditor: 'CourseQuizEditor' }, ...overrides };
   const loaded = new Map();
   function load(name, parent = '') {
@@ -216,4 +216,15 @@ for (const curriculum of [[], [{ id: 'old', title: 'درس سابق', type: 'vid
   assert.deepEqual(f.requests[0].attachments.map(item => item.id), ['general']);
   if (curriculum.length) { assert.equal(f.requests[0].curriculum[0].items[0].id, 'old'); assert.equal(f.requests[0].curriculum[0].attachments[0].fileType, 'ppt'); }
   else assert.deepEqual(f.requests[0].curriculum, []);
+});
+
+test('interactive image upload callbacks preserve edits and other completed uploads', () => {
+  const f = fixture(); const { LessonBlocksEditor } = f.load('@/components/courses/editor/lesson-blocks-editor');
+  let blocks = [{ id: 'cards', type: 'cards', items: [{ id: 'a', title: 'أ', text: 'شرح أ' }, { id: 'b', title: 'ب', text: 'شرح ب' }] }];
+  const tree = f.render(LessonBlocksEditor, { blocks, onChange: update => { blocks = typeof update === 'function' ? update(blocks) : update; }, onBusyChange() {} });
+  const uploaders = findAll(tree, node => node.type?.name === 'DeviceImageUploader'); assert.equal(uploaders.length, 2);
+  blocks = [{ ...blocks[0], items: blocks[0].items.map(item => item.id === 'a' ? { ...item, text: 'شرح معدل أثناء الرفع' } : item) }];
+  uploaders[0].props.onChange('https://files.invalid/a.webp'); uploaders[1].props.onChange('https://files.invalid/b.webp');
+  assert.equal(blocks[0].items[0].text, 'شرح معدل أثناء الرفع');
+  assert.equal(blocks[0].items[0].imageUrl, 'https://files.invalid/a.webp'); assert.equal(blocks[0].items[1].imageUrl, 'https://files.invalid/b.webp');
 });

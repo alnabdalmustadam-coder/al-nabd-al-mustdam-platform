@@ -1,9 +1,14 @@
+import { isLearningJourney, JOURNEY_IDS } from '@/lib/learning/journey';
 import type { Course, QuizData, SubLessonItem } from '@/types';
 
 const hasQuestions = (quiz?: QuizData): quiz is QuizData => Boolean(quiz && Array.isArray(quiz.questions) && quiz.questions.length);
 
 /** Mirrors the canonical identifiers in getCourseAllLessons, including legacy curricula. */
 export function resolveCourseQuiz(course: Course, lessonId: string): { key: string; quiz: QuizData } | null {
+  if (isLearningJourney(course)) {
+    if (lessonId === JOURNEY_IDS.pre) return hasQuestions(course.learningJourney?.preAssessment) ? { key: 'pre', quiz: course.learningJourney!.preAssessment! } : null;
+    if (lessonId === JOURNEY_IDS.final) return hasQuestions(course.finalExam) ? { key: 'final', quiz: course.finalExam } : null;
+  }
   let sectionQuiz: { key: string; quiz: QuizData } | null = null;
   let lessonFound = false;
   for (const [sectionIndex, section] of (course.curriculum || []).entries()) {
@@ -25,7 +30,7 @@ export function resolveCourseQuiz(course: Course, lessonId: string): { key: stri
   if (!course.curriculum?.length && lessonId === 'lesson-1') lessonFound = true;
   if (!lessonFound) return null;
   if (sectionQuiz) return sectionQuiz;
-  return hasQuestions(course.finalExam) ? { key: 'final', quiz: course.finalExam } : null;
+  return !isLearningJourney(course) && hasQuestions(course.finalExam) ? { key: 'final', quiz: course.finalExam } : null;
 }
 
 function publicQuiz(quiz?: QuizData): QuizData | undefined {
@@ -39,7 +44,7 @@ function publicQuiz(quiz?: QuizData): QuizData | undefined {
 
 /** Catalog metadata is public; answer keys are only loaded by authenticated grading routes. */
 export function toPublicCourse(course: Course): Course {
-  return { ...course, finalExam: publicQuiz(course.finalExam), curriculum: (course.curriculum || []).map((section) => ({
+  return { ...course, learningJourney: course.learningJourney ? { ...course.learningJourney, preAssessment: publicQuiz(course.learningJourney.preAssessment) } : undefined, finalExam: publicQuiz(course.finalExam), curriculum: (course.curriculum || []).map((section) => ({
     ...section, quizData: publicQuiz(section.quizData),
     items: section.items?.map((item) => ({ ...item, quizData: publicQuiz(item.quizData) })),
     lessons: section.lessons?.map((item) => typeof item === 'string' ? item : { ...item, quizData: publicQuiz(item.quizData) }),

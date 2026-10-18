@@ -1,3 +1,4 @@
+import { getLearningContent, isLearningJourney } from '@/lib/learning/journey';
 import { NextResponse } from 'next/server';
 import { getCourseBySlugAsync } from '@/lib/courses-store';
 import { requireUser } from '@/lib/security/auth';
@@ -60,13 +61,15 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, message: 'غير مسجل في هذه الدورة' }, { status: 403 });
     }
 
-    const lessons = getCourseAllLessons(course);
+    const lessons = isLearningJourney(course) ? getLearningContent(course) : getCourseAllLessons(course);
     if (course.professionalDevelopment) {
       const progress = await readCpdProgress(admin, course, auth.user.id);
       const calculated = Math.round(progress.completed.size / Math.max(lessons.length, 1) * 100);
-      return NextResponse.json({ success: true, professionalDevelopment: true,
+      const journeyComplete = isLearningJourney(course) && calculated === 100
+        && [...(byUser.data || []), ...(byEmail.data || [])].some((row) => active(row, auth.user.id, email) && String(row.status).toLowerCase() === 'completed');
+      return NextResponse.json({ success: true, professionalDevelopment: true, journeyComplete,
         completedLessonIds: [...progress.completed], completedCount: progress.completed.size,
-        totalLessons: lessons.length, progress: Math.min(99, calculated), completionPendingAssessment: calculated >= 100,
+        totalLessons: lessons.length, progress: journeyComplete ? 100 : Math.min(99, calculated), completionPendingAssessment: calculated >= 100 && !journeyComplete,
       }, { headers: { 'Cache-Control': 'private, no-store' } });
     }
     const platformIri = 'https://nabdtraining.com';
@@ -126,7 +129,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'الدورة غير موجودة' }, { status: 404 });
     }
 
-    const lessons = getCourseAllLessons(course);
+    const lessons = isLearningJourney(course) ? getLearningContent(course) : getCourseAllLessons(course);
     const lesson = lessons.find((item) => item.id === lessonId);
     if (!lesson) {
       return NextResponse.json({ success: false, message: 'الدرس لا ينتمي إلى هذه الدورة' }, { status: 400 });
@@ -211,12 +214,13 @@ export async function POST(request: Request) {
     ).size;
     const calculatedProgress = Math.min(100, Math.round((completedCount / Math.max(lessons.length, 1)) * 100));
 
-    // Lesson completion is self-paced telemetry. Keep academic completion and
-    // certificate eligibility server/admin controlled until assessments exist.
-    const safeProgress = Math.min(99, calculatedProgress);
+    // The dedicated journey completion route verifies the final assessment.
+    // Preserve that result when a completed station is revisited.
+    const alreadyComplete = isLearningJourney(course) && calculatedProgress === 100 && enrollments.some((row) => String(row.status).toLowerCase() === 'completed');
+    const safeProgress = alreadyComplete ? 100 : Math.min(99, calculatedProgress);
     const { error: enrollmentError } = await admin
       .from('enrollments')
-      .update({ progress: safeProgress, status: 'active', completed_at: null })
+      .update(alreadyComplete ? { progress: 100 } : { progress: safeProgress, status: 'active', completed_at: null })
       .in('id', enrollments.map((row) => row.id));
 
     if (enrollmentError) throw enrollmentError;
@@ -238,7 +242,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       progress: safeProgress,
-      completionPendingAssessment: calculatedProgress >= 100,
+      completionPendingAssessment: calculatedProgress >= 100 && !alreadyComplete,
       completedCount,
       totalLessons: Math.max(lessons.length, 1),
     });

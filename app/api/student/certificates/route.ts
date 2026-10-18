@@ -1,3 +1,6 @@
+import { readCompletedJourneyScore } from '@/lib/learning/journey-completion';
+import { isLearningJourney } from '@/lib/learning/journey';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   CertificatePersistenceError,
@@ -85,6 +88,9 @@ export async function GET(req: NextRequest) {
           (enroll.course_title && issuedCourseTitles.has(normalizeCourseTitle(enroll.course_title)));
 
         if (alreadyIssued) continue;
+        const journey = matchedCourse && isLearningJourney(matchedCourse);
+        const journeyScore = journey ? await readCompletedJourneyScore(getSupabaseAdmin(), matchedCourse, auth.user.id, studentEmail) : null;
+        if (journey && journeyScore === null) continue;
 
         const matchedTemplate =
           allTemplates.find(
@@ -101,7 +107,7 @@ export async function GET(req: NextRequest) {
           studentEmail,
           courseTitle,
           templateId: matchedTemplate ? matchedTemplate.id : 'tpl-1',
-          grade: formatCertificateGrade(null, typeof enroll.grade === 'string' ? enroll.grade : null),
+          grade: journey ? formatCertificateGrade(journeyScore, null) : formatCertificateGrade(null, typeof enroll.grade === 'string' ? enroll.grade : null),
           hours: formatCertificateHours(matchedCourse?.duration, typeof enroll.hours === 'string' ? enroll.hours : null),
           imageUrl: matchedTemplate?.imageUrl || '/1.png',
         });

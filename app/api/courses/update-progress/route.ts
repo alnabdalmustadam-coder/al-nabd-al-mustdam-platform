@@ -1,3 +1,4 @@
+import { isLearningJourney } from '@/lib/learning/journey';
 import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/security/auth';
 import { getSupabaseAdmin } from '@/lib/supabase';
@@ -29,6 +30,10 @@ export async function POST(request: Request) {
     const course = await getCourseBySlugAsync(courseSlug);
     if (!course) {
       return NextResponse.json({ success: false, error: 'الدورة غير موجودة' }, { status: 404 });
+    }
+
+    if (isLearningJourney(course)) {
+      return NextResponse.json({ success: false, error: 'يُحتسب تقدم رحلة التعلّم من المحطات والاختبارات المكتملة' }, { status: 409 });
     }
 
     const progressValue = Number(body.progress);

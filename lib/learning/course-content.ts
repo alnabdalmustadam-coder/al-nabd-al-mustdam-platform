@@ -1,8 +1,9 @@
-import type { Course, QuizData, SubLessonItem } from '@/types';
+import type { Course, QuizData, SubLessonItem, LessonBlock } from '@/types';
 
 export type LessonContent = {
   id: string; title: string; type: string; videoUrl: string; fileUrl: string;
   sectionId: string; lastInSection: boolean; requiredQuiz?: QuizData; quizKey?: string;
+  description?: string; contentBlocks?: LessonBlock[]; diagnostic?: boolean;
 };
 
 /** Same identifiers and order as getCourseAllLessons, including legacy courses. */
@@ -22,7 +23,7 @@ export function getCourseContent(course: Pick<Course, 'curriculum'>): LessonCont
       const requiredQuiz = ownQuiz || (lastInSection && section.quizData?.questions?.length ? section.quizData : undefined);
       return { id, title: item?.title || (typeof value === 'string' ? value : `الوحدة ${sectionIndex + 1}`), type: item?.type || 'video',
         videoUrl: item?.videoUrl || (!explicitItems && index === 0 ? section.videoUrl || '' : ''), fileUrl: item?.fileUrl || '',
-        sectionId, lastInSection, requiredQuiz,
+        sectionId, lastInSection, requiredQuiz, description: item?.description, contentBlocks: item?.contentBlocks,
         quizKey: ownQuiz ? `lesson:${id}` : requiredQuiz ? `section:${sectionId}` : undefined };
     });
   });

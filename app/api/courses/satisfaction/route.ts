@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireCourseLearner, LearningError } from '@/lib/learning/course-access';
-import { getCourseContent } from '@/lib/learning/course-content';
+import { getLearningContent } from '@/lib/learning/journey';
 import { assertCpdLessonAccess, assertCpdQuizAccess } from '@/lib/learning/cpd';
 import { resolveCourseQuiz } from '@/lib/quizzes/course-quiz';
 import { readJsonObject, ValidationError } from '@/lib/security/validation';
@@ -13,7 +13,7 @@ async function context(request: Request, values: Record<string, unknown>) {
   if ('rejected' in ctx) return { rejected: ctx.rejected! };
   const lessonId = typeof values.lessonId === 'string' ? values.lessonId : '';
   const kind = values.kind;
-  const lesson = getCourseContent(ctx.course).find((item) => item.id === lessonId);
+  const lesson = getLearningContent(ctx.course).find((item) => item.id === lessonId);
   if (!lesson || !['lesson', 'quiz'].includes(String(kind))) throw new LearningError('المحتوى غير موجود', 404);
   const quiz = kind === 'quiz' ? resolveCourseQuiz(ctx.course, lessonId) : null;
   if (kind === 'quiz' && !quiz) throw new LearningError('لا يوجد اختبار لهذا الدرس', 404);

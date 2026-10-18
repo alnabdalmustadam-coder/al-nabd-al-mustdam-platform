@@ -13,7 +13,7 @@ type Result = { attemptId: string; title: string; score: number; passPercentage:
   ranking?: { rank: number; participants: number; bestScore: number } | null };
 type Payload = { success: boolean; message?: string; quiz?: Quiz; attempt?: Session | null; result?: Result | null };
 
-export function InternalQuizPanel({ courseId, lessonId, onPassed }: { courseId: string; lessonId: string; onPassed?: () => void }) {
+export function InternalQuizPanel({ courseId, lessonId, onPassed, onResult, sequential = false, diagnostic = false }: { courseId: string; lessonId: string; onPassed?: () => void; onResult?: (ready: boolean) => void; sequential?: boolean; diagnostic?: boolean }) {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [result, setResult] = useState<Result | null>(null);
@@ -25,12 +25,16 @@ export function InternalQuizPanel({ courseId, lessonId, onPassed }: { courseId: 
   const [draftError, setDraftError] = useState(false);
   const [canRestart, setCanRestart] = useState(false);
   const [reload, setReload] = useState(0);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  useEffect(() => { onResult?.(Boolean(result && (diagnostic || result.passed))); }, [result, diagnostic, onResult]);
   const touched = useRef(false);
   const accept = useCallback((payload: Payload) => {
     if (payload.quiz) setQuiz(payload.quiz);
     setResult(payload.result || null);
     setSession(payload.attempt || null);
     touched.current = false;
+    const saved = Object.fromEntries((payload.attempt?.savedAnswers || []).map((answer) => [answer.questionId, answer]));
+    setQuestionIndex(Math.max(0, payload.attempt?.questions.findIndex((question) => !isQuizAnswerComplete(question, saved[question.id])) ?? 0));
     setAnswers(Object.fromEntries((payload.attempt?.savedAnswers || []).map((answer) => [answer.questionId, answer])));
   }, []);
   useEffect(() => {
@@ -87,33 +91,35 @@ export function InternalQuizPanel({ courseId, lessonId, onPassed }: { courseId: 
       {canRestart && <button type="button" disabled={busy} onClick={() => void perform('start')} className="underline">بدء محاولة جديدة</button>}
     </div>}
     {result ? <>
-      <div className={`space-y-2 rounded-2xl border p-5 text-center ${result.passed ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
+      <div className={`space-y-2 rounded-2xl border p-5 text-center ${diagnostic || result.passed ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
         <h3 className="text-base font-black text-slate-900">{result.title}</h3>
         <p className="text-4xl font-black text-blue-900">{result.score}%</p>
         <p className="text-sm font-bold text-slate-700">{result.correctAnswers} صحيحة · {result.totalQuestions - result.correctAnswers} خاطئة · {result.totalQuestions} سؤال</p>
-        <p className="text-sm font-black text-slate-800">{result.passed ? 'تم اجتياز الاختبار' : 'لم تتحقق نسبة الاجتياز'} · المطلوب {result.passPercentage}%</p>
+        <p className="text-sm font-black text-slate-800">{diagnostic ? 'تم تسجيل التقييم القبلي؛ يمكنك الآن بدء التعلّم.' : `${result.passed ? 'تم اجتياز الاختبار' : 'لم تتحقق نسبة الاجتياز'} · المطلوب ${result.passPercentage}%`}</p>
         <p className="flex items-center justify-center gap-1 text-xs text-slate-600"><CheckCircle2 className="h-4 w-4" />تم حفظ النتيجة في حسابك</p>
         {result.ranking ? <div className="mt-4 rounded-xl border border-blue-200 bg-white/80 p-4">
           <p className="text-sm font-black text-blue-900">ترتيبك {result.ranking.rank} من {result.ranking.participants} طالب</p>
           <p className="mt-1 text-xs leading-6 text-slate-600">بأفضل نتيجة لك ({result.ranking.bestScore}%) بين من سلّموا نفس الاختبار في هذه الدورة. الدرجات المتساوية لها نفس المركز.</p>
         </div> : <p className="text-xs text-slate-500">الترتيب غير متاح مؤقتاً. أعد تحميل الاختبار لتحديثه.</p>}
       </div>
-      {result.results.map((question) => <QuizQuestionReview key={question.id} question={question} />)}
+      {sequential ? <details className="rounded-2xl border border-slate-200 p-4"><summary className="cursor-pointer text-sm font-semibold text-blue-900">مراجعة الإجابات والشرح</summary><div className="mt-4 space-y-4">{result.results.map((question) => <QuizQuestionReview key={question.id} question={question} />)}</div></details> : result.results.map((question) => <QuizQuestionReview key={question.id} question={question} />)}
       <button type="button" disabled={busy} onClick={() => void perform('start')} className="flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-xs font-black text-blue-900 disabled:opacity-50"><RefreshCw className="h-4 w-4" />محاولة جديدة</button>
     </> : session ? <>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
-        <h3 className="text-sm font-black text-slate-900">{session.title}</h3><span className="text-xs font-bold text-slate-600">نسبة الاجتياز {session.passPercentage}%</span>
+        <h3 className="text-sm font-black text-slate-900">{session.title}</h3><span className="text-xs font-bold text-slate-600">{diagnostic ? 'تقييم قبلي · لا يشترط الاجتياز' : `نسبة الاجتياز ${session.passPercentage}%`}</span>
         {session.expiresAt && <span className="text-xs font-bold text-slate-600">تنتهي المحاولة: {new Date(session.expiresAt).toLocaleTimeString('ar-EG')}</span>}
       </div>
-      {session.questions.map((question, index) => <section key={question.id} className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+      {sequential && <div className="space-y-2"><p role="status" className="text-xs text-slate-500">السؤال {questionIndex + 1} من {session.questions.length}</p><div className="h-1.5 overflow-hidden rounded-full bg-blue-50"><div className="h-full rounded-full bg-emerald-500" style={{ width: `${((questionIndex + 1) / session.questions.length) * 100}%` }} /></div></div>}
+      {session.questions.map((question, index) => (!sequential || index === questionIndex) && <section key={question.id} className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
         <h4 className="text-sm font-black leading-7 text-slate-900">{index + 1}. {question.text}</h4>
         <QuizQuestionInput question={question} answer={answers[question.id]} onChange={(answer) => { touched.current = true; setAnswers((current) => ({ ...current, [question.id]: answer })); }} />
       </section>)}
       {draftError && <p role="status" className="text-xs text-amber-800">تعذر حفظ مسودة الإجابات. يمكنك إعادة المحاولة أو تسليم الإجابات الحالية.</p>}
-      <button type="button" disabled={!complete || busy} onClick={() => void perform('submit')} className="flex min-h-11 items-center gap-2 rounded-xl bg-blue-900 px-5 py-3 text-xs font-black text-white disabled:cursor-not-allowed disabled:opacity-50">{busy && <Loader2 className="h-4 w-4 animate-spin" />}اعتماد الإجابات وحفظ النتيجة</button>
+      {sequential && <div className="flex items-center justify-between gap-3"><button type="button" disabled={questionIndex === 0 || busy} onClick={() => setQuestionIndex((index) => index - 1)} className="min-h-11 rounded-xl border border-slate-200 px-5 text-xs font-semibold text-slate-600 disabled:opacity-40">السؤال السابق</button>{questionIndex < session.questions.length - 1 && <button type="button" disabled={busy || !isQuizAnswerComplete(session.questions[questionIndex], answers[session.questions[questionIndex].id])} onClick={() => setQuestionIndex((index) => index + 1)} className="min-h-11 rounded-xl bg-blue-900 px-5 text-xs font-semibold text-white disabled:opacity-40">السؤال التالي</button>}</div>}
+      {(!sequential || questionIndex === session.questions.length - 1) && <button type="button" disabled={!complete || busy} onClick={() => void perform('submit')} className="flex min-h-11 items-center gap-2 rounded-xl bg-blue-900 px-5 py-3 text-xs font-black text-white disabled:cursor-not-allowed disabled:opacity-50">{busy && <Loader2 className="h-4 w-4 animate-spin" />}اعتماد الإجابات وحفظ النتيجة</button>}
     </> : quiz ? <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-6">
       <h3 className="text-base font-black text-slate-900">{quiz.title}</h3>
-      <p className="text-sm text-slate-600">{quiz.questionCount} سؤال · نسبة الاجتياز {quiz.passPercentage}%{quiz.durationMinutes ? ` · المدة ${quiz.durationMinutes} دقيقة` : ''}</p>
+      <p className="text-sm text-slate-600">{quiz.questionCount} سؤال · {diagnostic ? 'تقييم المعرفة السابقة دون شرط نجاح' : `نسبة الاجتياز ${quiz.passPercentage}%`}{quiz.durationMinutes ? ` · المدة ${quiz.durationMinutes} دقيقة` : ''}</p>
       <button type="button" disabled={busy} onClick={() => void perform('start')} className="flex min-h-11 items-center gap-2 rounded-xl bg-blue-900 px-5 py-3 text-xs font-black text-white disabled:opacity-50">{busy && <Loader2 className="h-4 w-4 animate-spin" />}ابدأ الاختبار</button>
     </div> : null}
   </div>;

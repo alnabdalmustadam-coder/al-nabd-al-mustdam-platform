@@ -1,3 +1,4 @@
+import { isLearningJourney, validLessonBlocks, JOURNEY_IDS } from '@/lib/learning/journey';
 import 'server-only';
 
 import fs from 'fs';
@@ -95,6 +96,7 @@ function toCourse(row: CourseRow): Course {
     instructorBio: typeof payload.instructorBio === 'string' ? payload.instructorBio : undefined,
     featured: payload.featured === true,
     professionalDevelopment: payload.professionalDevelopment === true,
+    learningJourney: isRecord(payload.learningJourney) ? payload.learningJourney as unknown as Course['learningJourney'] : undefined,
     outcomes: Array.isArray(payload.outcomes) ? payload.outcomes.filter((item): item is string => typeof item === 'string') : [],
     curriculum: Array.isArray(payload.curriculum) ? payload.curriculum as CurriculumSection[] : [],
     attachments: Array.isArray(payload.attachments) ? payload.attachments as Course['attachments'] : [],
@@ -193,6 +195,7 @@ function buildCoursePayload(input: CourseInput, current?: Course): Omit<Course, 
     instructorBio: input.instructorBio ?? current?.instructorBio,
     featured: input.featured ?? current?.featured ?? false,
     professionalDevelopment: input.professionalDevelopment ?? current?.professionalDevelopment ?? false,
+    learningJourney: input.learningJourney ?? current?.learningJourney,
     outcomes: input.outcomes ?? current?.outcomes ?? [],
     curriculum,
     attachments: input.attachments ?? current?.attachments ?? [],
@@ -211,7 +214,7 @@ export async function saveCourseAsync(courseData: CourseInput, actorId?: string,
   if (courseData.professionalDevelopment !== undefined && typeof courseData.professionalDevelopment !== 'boolean') {
     throw new CourseAccessError('قيمة وضع التطوير المهني غير صالحة', 400);
   }
-  const quizSets = [courseData.finalExam, ...(courseData.curriculum || []).flatMap((section) => [section.quizData,
+  const quizSets = [courseData.learningJourney?.preAssessment, courseData.finalExam, ...(courseData.curriculum || []).flatMap((section) => [section.quizData,
     ...(section.items || []).map((item) => item.quizData),
     ...(section.lessons || []).flatMap((item) => typeof item === 'object' ? [item.quizData] : []),
   ])];
@@ -243,8 +246,28 @@ export async function saveCourseAsync(courseData: CourseInput, actorId?: string,
     ...(options.instructorId ? { trainerId: options.instructorId } : {}),
   }, existing);
   const status = payload.status || 'published';
+  if (payload.learningJourney && (typeof payload.learningJourney.enabled !== 'boolean'
+    || typeof payload.learningJourney.introduction !== 'string' || payload.learningJourney.introduction.length > 10000
+    || typeof payload.learningJourney.summary !== 'string' || payload.learningJourney.summary.length > 10000)) {
+    throw new CourseAccessError('إعدادات رحلة التعلّم غير صالحة.', 400);
+  }
+  if (status === 'published' && getCourseContent(payload).some((lesson) => lesson.type === 'article' && (isLearningJourney(payload) || lesson.contentBlocks !== undefined) && !validLessonBlocks(lesson.contentBlocks))) {
+    throw new CourseAccessError('أكمل المحتوى النصي والتفاعلي لكل درس، مع عناوين الصور ونصوص البطاقات.', 400);
+  }
+  if (isLearningJourney(payload) && status === 'published') {
+    if (!payload.outcomes.length || payload.outcomes.length > 100 || payload.outcomes.some((item) => typeof item !== 'string' || !item.trim() || item.length > 1000)) {
+      throw new CourseAccessError('أضف أهداف التعلّم لرحلة التطوير المهني.', 400);
+    }
+    if (!payload.learningJourney?.preAssessment?.questions?.length || !payload.finalExam?.questions?.length) {
+      throw new CourseAccessError('أكمل الاختبار القبلي والاختبار البعدي قبل نشر رحلة التطوير المهني.', 400);
+    }
+    if (!payload.curriculum.length || getCourseContent(payload).some((lesson) => Object.values(JOURNEY_IDS).includes(lesson.id as typeof JOURNEY_IDS[keyof typeof JOURNEY_IDS]))) {
+      throw new CourseAccessError('أضف محتوى الدورة بمعرفات دروس صالحة.', 400);
+    }
+  }
   if (payload.professionalDevelopment && status === 'published') {
     const content = getCourseContent(payload);
+    if (content.some((lesson) => !['video', 'quiz', 'article', 'pdf', 'ppt', 'doc'].includes(lesson.type))) throw new CourseAccessError('نوع محتوى غير مدعوم في رحلة التطوير المهني.', 400);
     if (new Set(content.map((lesson) => lesson.id)).size !== content.length || content.some((lesson) => lesson.id.length > 160)) {
       throw new CourseAccessError('معرفات الدروس يجب أن تكون مختلفة وصالحة لتتبع الإكمال بالترتيب.', 400);
     }
@@ -255,7 +278,8 @@ export async function saveCourseAsync(courseData: CourseInput, actorId?: string,
       throw new CourseAccessError('أضف أسئلة لكل درس اختبار قبل تفعيل وضع التطوير المهني ونشر الدورة.', 400);
     }
     const requiredQuizzes = [...content.flatMap((lesson) => lesson.requiredQuiz ? [lesson.requiredQuiz] : []),
-      ...(payload.finalExam ? [payload.finalExam] : [])];
+      ...(payload.finalExam ? [payload.finalExam] : []),
+      ...(isLearningJourney(payload) && payload.learningJourney?.preAssessment ? [payload.learningJourney.preAssessment] : [])];
     if (requiredQuizzes.some((quiz) => !quiz.questions?.length || parseQuizQuestions(quiz.questions).length !== quiz.questions.length)) {
       throw new CourseAccessError('أكمل نصوص وإجابات جميع أسئلة الاختبارات قبل نشر دورة التطوير المهني.', 400);
     }

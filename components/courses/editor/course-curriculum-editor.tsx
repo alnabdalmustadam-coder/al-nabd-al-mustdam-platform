@@ -7,6 +7,7 @@ import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
 import { CourseFilesEditor, primaryDocumentFiles, type FilesUpdate } from './course-files-editor';
 import { EditorField, EditorSectionHeading, editorButton, editorInput, editorPrimary } from './editor-ui';
 import { EditorSelect } from './editor-select';
+import { LessonBlocksEditor } from './lesson-blocks-editor';
 import { CourseVideoPreview } from './course-video-preview';
 
 type Props = { value: EditorSection[]; onChange: Dispatch<SetStateAction<EditorSection[]>>;
@@ -25,7 +26,7 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
       : { ...section, attachments: update(section.attachments || []) }));
   const addLesson = (id: string, type: EditorLesson['type']) => onChange((current) => current.map((section) => section.id === id ? { ...section,
     subItems: [...section.subItems, { id: `lesson-${crypto.randomUUID()}`, title: '', duration: '', videoUrl: '', type, isLocked: false,
-      attachments: [], ...(type === 'quiz' ? { quizData: createCourseQuizDraft() } : {}) }] } : section));
+      attachments: [], ...(type === 'article' ? { contentBlocks: [] } : {}), ...(type === 'quiz' ? { quizData: createCourseQuizDraft() } : {}) }] } : section));
   const addSection = () => {
     setCollapsed(new Set(value.map((section) => section.id)));
     onChange((current) => [...current, { id: `section-${crypto.randomUUID()}`, title: '', duration: '', videoUrl: '', type: 'video', isLocked: false, attachments: [],
@@ -33,7 +34,7 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
   };
   const busy = disabled || Boolean(videoUpload);
   return <div className="space-y-7">
-    <EditorSectionHeading kind="curriculum" eyebrow="المحتوى التعليمي" title="الوحدات والدروس" description="أضف فيديو أو مستندًا أو اختبارًا داخل أي وحدة، وأرفق ملفاتها ومراجعها. اضغط على زر الحفظ عند الانتهاء."
+    <EditorSectionHeading kind="curriculum" eyebrow="المحتوى التعليمي" title="الوحدات والدروس" description="أضف فيديو أو محتوى تفاعليًا أو مستندًا أو اختبارًا داخل أي وحدة، وأرفق ملفاتها ومراجعها. اضغط على زر الحفظ عند الانتهاء."
       action={<button type="button" onClick={addSection} disabled={busy} className={editorPrimary}><Plus className="h-4 w-4" />إضافة وحدة</button>} />
     <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600"><span className="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-white px-3 py-2.5 shadow-sm"><Layers aria-hidden="true" className="h-4 w-4 text-blue-700" /><strong className="font-semibold text-blue-950">{value.length}</strong> وحدات</span>
       <span className="inline-flex items-center gap-2 rounded-xl border border-emerald-100 bg-white px-3 py-2.5 shadow-sm"><BookOpen aria-hidden="true" className="h-4 w-4 text-emerald-700" /><strong className="font-semibold text-slate-900">{value.reduce((total, section) => total + section.subItems.length, 0)}</strong> دروس</span></div>
@@ -71,9 +72,11 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
                   {section.subItems.length > 1 && <button type="button" disabled={busy} aria-label={`حذف الدرس ${lessonIndex + 1} من الوحدة ${sectionIndex + 1}`} onClick={() => onChange((current) => current.map((item) => item.id === section.id ? { ...item, subItems: item.subItems.filter((entry) => entry.id !== lesson.id) } : item))} className="flex h-11 w-11 items-center justify-center rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>}
                 </div>
                 <div className="grid gap-x-5 gap-y-5 sm:grid-cols-[minmax(0,1fr)_180px]"><EditorField icon={BookOpen} label="عنوان الدرس"><input required value={lesson.title} onChange={(event) => patchLesson(section.id, lesson.id, { title: event.target.value })} placeholder="اكتب عنوانًا يوضّح محتوى الدرس" className={editorInput} /></EditorField>
-                  <EditorField icon={Layers} label="نوع المحتوى"><EditorSelect label="نوع الدرس" disabled={busy} value={lesson.type} onChange={(value) => { const type = value as EditorLesson['type']; patchLesson(section.id, lesson.id, { type, ...(type === 'quiz' && !lesson.quizData ? { quizData: createCourseQuizDraft() } : {}) }); }}
-                    options={[{ id: 'video', label: 'فيديو' }, { id: 'pdf', label: 'مستند PDF' }, { id: 'ppt', label: 'عرض PowerPoint' }, { id: 'doc', label: 'مستند Word' }, { id: 'quiz', label: 'اختبار' }, ...(lesson.type === 'article' ? [{ id: 'article', label: 'محتوى نصي' }] : [])]} /></EditorField>
+                  <EditorField icon={Layers} label="نوع المحتوى"><EditorSelect label="نوع الدرس" disabled={busy} value={lesson.type} onChange={(value) => { const type = value as EditorLesson['type']; patchLesson(section.id, lesson.id, { type, ...(type === 'article' && !lesson.contentBlocks ? { contentBlocks: [] } : {}), ...(type === 'quiz' && !lesson.quizData ? { quizData: createCourseQuizDraft() } : {}) }); }}
+                    options={[{ id: 'video', label: 'فيديو' }, { id: 'pdf', label: 'مستند PDF' }, { id: 'ppt', label: 'عرض PowerPoint' }, { id: 'doc', label: 'مستند Word' }, { id: 'quiz', label: 'اختبار' }, { id: 'article', label: 'محتوى نصي وتفاعلي' }]} /></EditorField>
                 </div>
+                <EditorField icon={FileText} label="مقدمة الدرس (اختياري)"><textarea rows={2} maxLength={10000} value={lesson.description || ''} onChange={(event) => patchLesson(section.id, lesson.id, { description: event.target.value })} placeholder="تمهيد قصير يساعد الطالب على فهم محتوى الدرس" className={`${editorInput} leading-7`} /></EditorField>
+                {lesson.type === 'article' && <LessonBlocksEditor blocks={lesson.contentBlocks || []} onChange={(update) => onChange((current) => current.map((unit) => unit.id === section.id ? { ...unit, subItems: unit.subItems.map((item) => item.id === lesson.id ? { ...item, contentBlocks: typeof update === 'function' ? update(item.contentBlocks || []) : update } : item) } : unit))} onBusyChange={onFileBusyChange} />}
                 {lesson.type === 'video' && <div className="space-y-4"><div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]"><EditorField icon={Video} label="فيديو الدرس"><input value={lesson.videoUrl} dir="ltr" onChange={(event) => patchLesson(section.id, lesson.id, { videoUrl: event.target.value })} placeholder="رابط الفيديو أو معرّفه" className={`${editorInput} text-right`} /></EditorField>
                   <button type="button" disabled={busy} onClick={() => onUploadVideo(sectionIndex, lessonIndex)} className={`${editorButton} min-h-12`}>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}{uploading ? `جاري الرفع ${videoProgress}%` : 'رفع فيديو'}</button></div>
                   {uploading && <div role="progressbar" aria-label="رفع فيديو الدرس" aria-valuenow={videoProgress} aria-valuemin={0} aria-valuemax={100} className="h-2 overflow-hidden rounded-full bg-blue-100"><div className="h-full rounded-full bg-blue-700 transition-all" style={{ width: `${videoProgress}%` }} /></div>}
@@ -89,7 +92,7 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
           </div>
           {section.quizData && !(section.legacySingle && section.subItems[0]?.type === 'quiz') && <details className="rounded-2xl border border-slate-200 p-5"><summary className="cursor-pointer text-sm font-semibold text-slate-800">إعدادات اختبار الوحدة الحالي</summary><div className="pt-5"><CourseQuizEditor value={section.quizData} onChange={(quizData) => patchSection(section.id, { quizData })} /></div></details>}
           <div className="flex flex-wrap gap-3 border-t border-slate-100 pt-5">
-            {([{ type: 'video', label: 'إضافة درس فيديو', Icon: Video }, { type: 'pdf', label: 'إضافة درس مستند', Icon: FileText }, { type: 'quiz', label: 'إضافة اختبار', Icon: HelpCircle }] as const).map(({ type, label, Icon }) => <button key={type} type="button" disabled={busy} onClick={() => addLesson(section.id, type)} className={editorButton}><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50"><Icon aria-hidden="true" className="h-4 w-4 text-blue-800" /></span>{label}</button>)}
+            {([{ type: 'video', label: 'إضافة درس فيديو', Icon: Video }, { type: 'article', label: 'إضافة محتوى تفاعلي', Icon: BookOpen }, { type: 'pdf', label: 'إضافة درس مستند', Icon: FileText }, { type: 'quiz', label: 'إضافة اختبار', Icon: HelpCircle }] as const).map(({ type, label, Icon }) => <button key={type} type="button" disabled={busy} onClick={() => addLesson(section.id, type)} className={editorButton}><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50"><Icon aria-hidden="true" className="h-4 w-4 text-blue-800" /></span>{label}</button>)}
           </div>
         </div>}
       </section>;

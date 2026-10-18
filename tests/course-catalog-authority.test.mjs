@@ -171,6 +171,8 @@ function mountPage(filename, initialCourses = []) {
     '@/components/ui/CourseCard': { __esModule: true, default: 'CourseCard' },
     '@/components/ui/CardSkeleton': { CourseCardSkeleton: 'CourseCardSkeleton' },
     '@/components/ui/CardImage': { CardImage: 'CardImage' },
+    '@/components/student/professional-course-journey': { ProfessionalCourseJourney: 'ProfessionalCourseJourney' },
+    '@/components/student/lesson-content-blocks': { LessonContentBlocks: 'LessonContentBlocks' },
     '@/components/student/student-video-player': { StudentVideoPlayer: 'StudentVideoPlayer' },
     '@/components/student/internal-quiz-panel': { InternalQuizPanel: 'InternalQuizPanel' },
     '@/components/student/course-resources-panel': { CourseResourcesPanel: 'CourseResourcesPanel' },

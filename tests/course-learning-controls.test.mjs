@@ -10,7 +10,7 @@ import { documentViewerUrl, documentType } from '../lib/learning/documents.ts';
 const videoId = '11111111-1111-4111-8111-111111111111';
 const otherVideo = '22222222-2222-4222-8222-222222222222';
 const quiz = { title: 'اختبار الوحدة', passingScore: 70, questions: [{ id: 'one', question: 'اختر الإجابة', options: ['أ', 'ب'], correctIndex: 1 }] };
-function fixture({ cpd = true, enrolled = true, authenticated = true, owner = 'student-1', status = 'active', failedTable = null } = {}) {
+function fixture({ journey = false, cpd = true, enrolled = true, authenticated = true, owner = 'student-1', status = 'active', failedTable = null } = {}) {
   const user = { id: 'student-1', email: 'student@qa.invalid' };
   const course = { id: 91, slug: 'دورة-تجريبية', title: 'دورة', professionalDevelopment: cpd, finalExam: structuredClone(quiz), curriculum: [
     { id: 'unit-a', title: 'الوحدة الأولى', items: [
@@ -22,6 +22,7 @@ function fixture({ cpd = true, enrolled = true, authenticated = true, owner = 's
       { id: 'last', title: 'الفيديو الأخير', type: 'video', videoUrl: otherVideo },
     ] },
   ] };
+  if (journey) { course.learningJourney = { enabled: true, introduction: 'مرحبا', summary: 'أحسنت', preAssessment: structuredClone(quiz) }; course.outcomes = ['فهم المحتوى']; }
   const rows = { enrollments: enrolled ? [{ id: 'enrollment', user_id: owner, email: user.email, course_id: course.slug, status }] : [],
     profiles: [], xapi_state: [], xapi_statements: [], course_lesson_progress: [], content_satisfaction: [] };
   const rpcCalls = [];
@@ -92,13 +93,13 @@ function fixture({ cpd = true, enrolled = true, authenticated = true, owner = 's
     return { status: response.status, payload: await response.json() };
   }
   function seed(lessonId, { completed = false, watched = 0 } = {}) {
-    const lesson = getCourseContent(course).find((item) => item.id === lessonId);
+    const lesson = load('@/lib/learning/journey').getLearningContent(course).find((item) => item.id === lessonId);
     const key = load('@/lib/learning/cpd').lessonContentKey(lesson);
     const row = { user_id: user.id, course_id: course.id, lesson_id: lessonId, content_key: key,
       duration_seconds: lesson.type === 'video' ? 120 : 0, watched_seconds: watched, completed_at: completed ? new Date().toISOString() : null };
     rows.course_lesson_progress = rows.course_lesson_progress.filter((item) => item.lesson_id !== lessonId); rows.course_lesson_progress.push(row);
   }
-  return { course, user, rows, invoke, seed, rpcCalls, providerCalls: () => providerCalls };
+  return { course, user, rows, invoke, seed, load, rpcCalls, providerCalls: () => providerCalls };
 }
 
 test('CPD canonical content follows units and legacy lesson IDs; unit quiz belongs to the last lesson', () => {
@@ -212,4 +213,90 @@ test('PowerPoint previews encode the complete public URL and preserve safe downl
   assert.equal(documentType(url, 'pdf'), 'ppt');
   assert.equal(documentViewerUrl('javascript:alert(1)', 'ppt'), null);
   assert.equal(documentViewerUrl('https://files.invalid/manual.pdf'), 'https://files.invalid/manual.pdf');
+});
+
+async function answerJourneyQuiz(f, lessonId, selectedIndex = 1) {
+  const start = await f.invoke('courses/quiz-attempt', 'POST', { lessonId, action: 'start' });
+  assert.equal(start.status, 200, JSON.stringify(start.payload));
+  const result = await f.invoke('courses/quiz-attempt', 'POST', { lessonId, action: 'submit', attemptId: start.payload.attempt.id, answers: [{ questionId: 'one', selectedIndex }] });
+  assert.equal(result.status, 200, JSON.stringify(result.payload));
+  return result.payload.result;
+}
+
+test('opt-in journey preserves lesson IDs and gives pre/post assessments their own stations and safe public metadata', () => {
+  const f = fixture({ journey: true });
+  const { getLearningContent, JOURNEY_IDS } = f.load('@/lib/learning/journey');
+  const { resolveCourseQuiz, toPublicCourse } = f.load('@/lib/quizzes/course-quiz');
+  const steps = getLearningContent(f.course);
+  assert.deepEqual(Array.from(steps, step => step.id), [JOURNEY_IDS.welcome, JOURNEY_IDS.objectives, JOURNEY_IDS.pre, 'video', 'quiz', 'slides', 'last', JOURNEY_IDS.final]);
+  assert.equal(steps[2].diagnostic, true);
+  assert.equal(resolveCourseQuiz(f.course, JOURNEY_IDS.pre).key, 'pre');
+  assert.equal(resolveCourseQuiz(f.course, JOURNEY_IDS.final).key, 'final');
+  assert.equal(resolveCourseQuiz(f.course, 'video'), null);
+  assert.equal(resolveCourseQuiz(f.course, 'quiz').key, 'lesson:quiz');
+  const safe = toPublicCourse(f.course);
+  assert.equal(safe.learningJourney.preAssessment.questions[0].correctIndex, undefined);
+  assert.equal(f.course.learningJourney.preAssessment.questions[0].correctIndex, 1);
+  f.course.professionalDevelopment = false;
+  assert.deepEqual(Array.from(getLearningContent(f.course), step => step.id), ['video', 'quiz', 'slides', 'last']);
+});
+
+test('journey enforces ordered stations, accepts a failed diagnostic, and reaches 100 only after server-graded post-assessment', async () => {
+  const f = fixture({ journey: true });
+  const { JOURNEY_IDS: ids } = f.load('@/lib/learning/journey');
+  assert.equal((await f.invoke('courses/journey/complete', 'POST', { score: 100, completed: true })).status, 409);
+  assert.equal((await f.invoke('courses/quiz-attempt', 'GET', { lessonId: ids.final })).status, 403);
+  assert.equal((await f.invoke('courses/complete-lesson', 'POST', { lessonId: ids.objectives })).status, 403);
+  for (const lessonId of [ids.welcome, ids.objectives]) assert.equal((await f.invoke('courses/complete-lesson', 'POST', { lessonId })).status, 200);
+  assert.equal((await f.invoke('courses/complete-lesson', 'POST', { lessonId: ids.pre, passed: true })).status, 409);
+  assert.equal((await answerJourneyQuiz(f, ids.pre, 0)).passed, false);
+  assert.equal((await f.invoke('courses/complete-lesson', 'POST', { lessonId: ids.pre })).status, 200);
+  f.seed('video', { watched: 120 });
+  assert.equal((await f.invoke('courses/complete-lesson', 'POST', { lessonId: 'video' })).status, 200);
+  await answerJourneyQuiz(f, 'quiz');
+  for (const lessonId of ['quiz', 'slides']) assert.equal((await f.invoke('courses/complete-lesson', 'POST', { lessonId })).status, 200);
+  assert.equal((await f.invoke('courses/quiz-attempt', 'GET', { lessonId: ids.final })).status, 403);
+  f.seed('last', { watched: 120 });
+  assert.equal((await f.invoke('courses/complete-lesson', 'POST', { lessonId: 'last' })).status, 200);
+  assert.equal((await answerJourneyQuiz(f, ids.final, 0)).passed, false);
+  assert.equal((await f.invoke('courses/complete-lesson', 'POST', { lessonId: ids.final, score: 100 })).status, 409);
+  assert.equal((await f.invoke('courses/journey/complete', 'POST', { score: 100 })).status, 409);
+  assert.equal((await answerJourneyQuiz(f, ids.final)).passed, true);
+  const last = await f.invoke('courses/complete-lesson', 'POST', { lessonId: ids.final });
+  assert.equal(last.status, 200); assert.equal(last.payload.progress, 99);
+  assert.equal(f.rows.enrollments[0].status, 'active');
+  const finish = await f.invoke('courses/journey/complete', 'POST', { score: 0 });
+  assert.equal(finish.status, 200, JSON.stringify(finish.payload)); assert.equal(finish.payload.progress, 100);
+  assert.equal(f.rows.enrollments[0].status, 'completed'); assert.equal(finish.payload.score, 100); assert.equal(f.rows.enrollments[0].grade, undefined);
+  assert.equal((await f.invoke('courses/complete-lesson', 'GET')).payload.journeyComplete, true);
+  const revisit = await f.invoke('courses/complete-lesson', 'POST', { lessonId: ids.welcome });
+  assert.equal(revisit.payload.progress, 100); assert.equal(revisit.payload.completionPendingAssessment, false);
+  f.course.outcomes.push('هدف جديد');
+  assert.equal((await f.invoke('courses/complete-lesson', 'GET')).payload.journeyComplete, false);
+  assert.equal((await f.invoke('courses/journey/complete', 'POST')).status, 409);
+});
+
+test('interactive content completion is versioned and future lesson and quiz hearts remain locked', async () => {
+  const f = fixture({ journey: true });
+  f.course.curriculum = [{ id: 'article', title: 'محتوى', type: 'article', contentBlocks: [{ id: 'text', type: 'text', text: 'شرح أول' }] }];
+  const { getLearningContent, JOURNEY_IDS: ids } = f.load('@/lib/learning/journey');
+  assert.equal((await f.invoke('courses/satisfaction', 'PUT', { lessonId: ids.final, kind: 'quiz', liked: true })).status, 403);
+  for (const step of getLearningContent(f.course)) f.seed(step.id, { completed: true });
+  assert.equal((await f.invoke('courses/satisfaction', 'PUT', { lessonId: ids.pre, kind: 'quiz', liked: true })).status, 200);
+  assert.equal(f.rows.content_satisfaction[0].content_key, 'pre');
+  f.course.curriculum[0].contentBlocks[0].text = 'شرح جديد';
+  assert.equal((await f.invoke('courses/complete-lesson', 'GET')).payload.completedLessonIds.includes('article'), false);
+  assert.equal((await f.invoke('courses/quiz-attempt', 'GET', { lessonId: ids.final })).status, 403);
+});
+
+for (const options of [{ enrolled: false }, { authenticated: false }, { owner: 'another-user' }, { status: 'revoked' }]) test(`journey completion rejects unauthorized user ${JSON.stringify(options)}`, async () => {
+  const f = fixture({ journey: true, ...options });
+  assert.equal((await f.invoke('courses/journey/complete', 'POST')).status, options.authenticated === false ? 401 : 403);
+  assert.equal(f.rows.enrollments[0]?.completed_at, undefined);
+});
+
+test('legacy client progress cannot overwrite a verified journey completion', async () => {
+  const f = fixture({ journey: true, status: 'completed' }); f.rows.enrollments[0].progress = 100;
+  assert.equal((await f.invoke('courses/update-progress', 'POST', { courseSlug: f.course.slug, progress: 1 })).status, 409);
+  assert.equal(f.rows.enrollments[0].status, 'completed'); assert.equal(f.rows.enrollments[0].progress, 100);
 });

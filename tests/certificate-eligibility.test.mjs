@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import * as crypto from 'node:crypto';
 import ts from 'typescript';
 
 const student = { id: 'student-1', email: 'student@example.invalid', user_metadata: {} };
@@ -14,7 +15,7 @@ const enrolled = (overrides = {}) => ({
 
 // Run the real route code. Only auth, persistence and NextResponse are replaced;
 // the entitlement decision itself is never mocked.
-function fixture({ enrollment = enrolled(), databaseError = null, certificates = [], authenticated = true } = {}) {
+function fixture({ enrollment = enrolled(), databaseError = null, certificates = [], authenticated = true, journeyCourse = null, progressRows = [], results = [] } = {}) {
   const issued = [...certificates];
   const writes = [];
   const templates = [{ id: 'template-1', courseTitle: course.title, autoIssue: true }];
@@ -24,7 +25,7 @@ function fixture({ enrollment = enrolled(), databaseError = null, certificates =
     const selected = () => {
       const rows = table === 'enrollments'
         ? (enrollment ? [enrollment] : [])
-        : table === 'profiles' ? [{ id: student.id, full_name: 'Trusted Student Name' }] : [];
+        : table === 'profiles' ? [{ id: student.id, full_name: 'Trusted Student Name' }] : table === 'course_lesson_progress' ? progressRows : table === 'xapi_statements' ? results : [];
       return rows.filter(row => filters.every(([key, values]) => values.includes(row[key])));
     };
     const query = {
@@ -41,13 +42,13 @@ function fixture({ enrollment = enrolled(), databaseError = null, certificates =
     return query;
   } };
   const modules = {
-    'server-only': {},
+    'server-only': {}, 'node:crypto': crypto,
     'next/server': { NextResponse: { json: (body, init) => Response.json(body, init) } },
     '@/lib/security/auth': { requireUser: async () => authenticated
       ? { ok: true, user: student, role: 'STUDENT' }
       : { ok: false, response: Response.json({ success: false }, { status: 401 }) } },
     '@/lib/supabase': { supabase: db, getSupabaseAdmin: () => db },
-    '@/lib/courses-store': { getAllCoursesAsync: async () => [course] },
+    '@/lib/courses-store': { getAllCoursesAsync: async () => [journeyCourse || course] },
     '@/data/courses': { getCourseBySlug: () => undefined },
     '@/lib/certificates-store': {
       CertificatePersistenceError: class CertificatePersistenceError extends Error {},
@@ -69,7 +70,7 @@ function fixture({ enrollment = enrolled(), databaseError = null, certificates =
     if (loaded.has(name)) return loaded.get(name);
     const relative = name.startsWith('@/') ? name.slice(2) : name;
     const source = readFileSync(new URL(`../${relative}.ts`, import.meta.url), 'utf8');
-    const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+    const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
     const exports = {};
     loaded.set(name, exports);
     vm.runInNewContext(compiled, {
@@ -78,7 +79,7 @@ function fixture({ enrollment = enrolled(), databaseError = null, certificates =
     return exports;
   }
   return {
-    writes, issued,
+    writes, issued, load,
     post: body => load('app/api/student/certificates/auto-issue/route').POST(new Request('https://audit.invalid/api/student/certificates/auto-issue', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
     })),
@@ -178,4 +179,27 @@ test('unauthenticated requests cannot read or issue certificates', async () => {
   assert.equal((await f.post({ courseSlug: course.slug })).status, 401);
   assert.equal((await f.get()).status, 401);
   assert.equal(f.writes.length, 0);
+});
+
+test('both certificate paths require the current journey and use its verified post-assessment score', async () => {
+  const journeyCourse = { ...course, professionalDevelopment: true, outcomes: ['هدف'],
+    learningJourney: { enabled: true, introduction: 'مرحبا', summary: 'خلاصة', preAssessment: { title: 'قبلي', passingScore: 70, questions: [{ id: 'pre', question: 'سؤال', options: ['أ', 'ب'], correctIndex: 0 }] } },
+    finalExam: { title: 'بعدي', passingScore: 70, questions: [{ id: 'post', question: 'سؤال', options: ['أ', 'ب'], correctIndex: 0 }] },
+    curriculum: [{ id: 'reading', title: 'درس', type: 'article', contentBlocks: [{ id: 'text', type: 'text', text: 'شرح' }] }],
+  };
+  const progressRows = [], results = [];
+  const f = fixture({ journeyCourse, progressRows, results, enrollment: enrolled({ progress: 100, status: 'completed', grade: 'Unrelated old grade' }) });
+  assert.equal((await f.post({ courseSlug: course.slug, score: 100 })).status, 403);
+  assert.equal((await f.get()).status, 200); assert.equal(f.issued.length, 0);
+  const steps = f.load('@/lib/learning/journey').getLearningContent(journeyCourse);
+  const { lessonContentKey } = f.load('@/lib/learning/cpd');
+  progressRows.push(...steps.map(step => ({ user_id: student.id, course_id: course.id, lesson_id: step.id, content_key: lessonContentKey(step), completed_at: new Date().toISOString() })));
+  assert.equal((await f.post({ courseSlug: course.slug })).status, 403); // Completed flags alone do not supply a passing result.
+  const { activityId } = f.load('@/lib/quizzes/activity').getQuizActivity(course.slug, 'final', journeyCourse.finalExam);
+  results.push({ actor_email: student.email, object_id: activityId, verb_display: 'answered', result_completion: true, result_success: true, result_score: 0.8 });
+  assert.equal((await f.get()).status, 200); assert.equal(f.issued.length, 1); assert.equal(f.issued[0].grade, 'SCORE:80');
+  const response = await f.post({ courseSlug: course.slug }); assert.equal(response.status, 200); assert.equal((await response.json()).certificate.grade, 'SCORE:80');
+  journeyCourse.curriculum[0].contentBlocks[0].text = 'محتوى جديد';
+  const changed = fixture({ journeyCourse, progressRows, results, enrollment: enrolled({ progress: 100, status: 'completed' }) });
+  assert.equal((await changed.post({ courseSlug: course.slug })).status, 403); await changed.get(); assert.equal(changed.issued.length, 0);
 });

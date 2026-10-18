@@ -31,6 +31,7 @@ interface StudentVideoPlayerProps {
   onToggleComplete?: () => void;
   professionalDevelopment?: boolean;
   completionDisabled?: boolean;
+  hideToolbar?: boolean;
   onVideoVerified?: () => void;
 }
 
@@ -94,6 +95,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
   onToggleComplete,
   professionalDevelopment = false,
   completionDisabled = false,
+  hideToolbar = false,
   onVideoVerified,
 }) => {
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
@@ -369,7 +371,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
       </div>}
 
       {/* Control Bar */}
-      <div className="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-[#173056]/85 backdrop-blur-md border-t border-white/10 flex items-center justify-between gap-2 text-xs font-bold text-slate-200 shrink-0">
+      {!hideToolbar && <div className="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-[#173056]/85 backdrop-blur-md border-t border-white/10 flex items-center justify-between gap-2 text-xs font-bold text-slate-200 shrink-0">
         {/* Left Side: Note with Timestamp Button */}
         <div className="flex items-center gap-2">
           <button
@@ -432,7 +434,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
             )}
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   );
 };

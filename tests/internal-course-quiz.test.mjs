@@ -5,7 +5,15 @@ import vm from 'node:vm';
 import * as crypto from 'node:crypto';
 import ts from 'typescript';
 import * as model from '../lib/quizzes/model.ts';
-import { resolveCourseQuiz, toPublicCourse } from '../lib/quizzes/course-quiz.ts';
+const publicModules = new Map();
+function loadPublicModule(name) {
+  if (publicModules.has(name)) return publicModules.get(name);
+  const source = readFileSync(new URL(`../${name.slice(2)}.ts`, import.meta.url), 'utf8');
+  const exports = {}; publicModules.set(name, exports);
+  vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, { exports, require: loadPublicModule, URL });
+  return exports;
+}
+const { resolveCourseQuiz, toPublicCourse } = loadPublicModule('@/lib/quizzes/course-quiz');
 import * as identifiers from '../lib/public-courses.ts';
 const validation = {};
 vm.runInNewContext(ts.transpileModule(readFileSync(new URL('../lib/security/validation.ts', import.meta.url), 'utf8'), {

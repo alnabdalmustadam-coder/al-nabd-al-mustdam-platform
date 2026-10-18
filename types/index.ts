@@ -24,6 +24,22 @@ export interface CourseAttachment {
   fileSize?: string;
 }
 
+export interface LessonBlock {
+  id: string;
+  type: 'text' | 'image' | 'steps' | 'cards' | 'tabs';
+  title?: string;
+  text?: string;
+  imageUrl?: string;
+  items?: { id: string; title: string; text: string; imageUrl?: string }[];
+}
+
+export interface LearningJourneySettings {
+  enabled: boolean;
+  introduction: string;
+  summary: string;
+  preAssessment?: QuizData;
+}
+
 export interface SubLessonItem {
   id: string;
   title: string;
@@ -36,6 +52,8 @@ export interface SubLessonItem {
   isLocked?: boolean;
   quizData?: QuizData;
   attachments?: CourseAttachment[];
+  description?: string;
+  contentBlocks?: LessonBlock[];
 }
 
 export interface CurriculumSection {
@@ -52,6 +70,8 @@ export interface CurriculumSection {
   attachments?: CourseAttachment[];
   items?: SubLessonItem[];
   lessons?: (string | SubLessonItem)[];
+  description?: string;
+  contentBlocks?: LessonBlock[];
 }
 
 export interface Course {
@@ -76,6 +96,7 @@ export interface Course {
   instructorBio?: string;
   featured: boolean;
   professionalDevelopment?: boolean;
+  learningJourney?: LearningJourneySettings;
   outcomes: string[];
   curriculum: CurriculumSection[];
   attachments?: CourseAttachment[];

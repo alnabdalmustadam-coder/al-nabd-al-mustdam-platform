@@ -317,3 +317,31 @@ test('standalone lesson edits preserve unit document attachments when the field 
   assert.equal((await f.lesson('POST', own.slug)).status, 200);
   assert.deepEqual(f.records[0].payload.curriculum[0].attachments, attachments);
 });
+
+const journeyQuiz = { title: 'التقييم', passingScore: 70, questions: [{ id: 'q', question: 'اختر الإجابة', options: ['أ', 'ب'], correctIndex: 1 }] };
+const journeyPayload = () => ({ id: own.id, slug: own.slug, title: own.title, status: 'published', professionalDevelopment: true,
+  learningJourney: { enabled: true, introduction: 'مرحبا', summary: 'خلاصة الرحلة', preAssessment: structuredClone(journeyQuiz) },
+  finalExam: structuredClone(journeyQuiz), outcomes: ['هدف تعليمي'], curriculum: [{ id: 'reading', title: 'المفاهيم', type: 'article', contentBlocks: [{ id: 'cards', type: 'cards', items: [{ id: 'card1', title: 'مصطلح', text: 'شرحه' }] }] }] });
+
+test('publishing a journey persists author content and independently editable pre and post assessments', async () => {
+  const f = fixture({ role: 'ADMIN' }); const payload = journeyPayload();
+  const response = await f.adminPost(payload); const data = await response.json();
+  assert.equal(response.status, 200, JSON.stringify(data));
+  assert.deepEqual(data.course.learningJourney, payload.learningJourney);
+  assert.deepEqual(data.course.curriculum, payload.curriculum);
+  assert.deepEqual(data.course.outcomes, payload.outcomes);
+  const update = await f.adminPost({ id: own.id, title: own.title, slug: own.slug, description: 'وصف جديد' });
+  assert.equal(update.status, 200); assert.deepEqual((await update.json()).course.learningJourney, payload.learningJourney);
+});
+
+for (const [label, change] of [
+  ['missing goals', p => { p.outcomes = []; }],
+  ['missing pre', p => { delete p.learningJourney.preAssessment; }],
+  ['missing post', p => { p.finalExam = null; }],
+  ['blank card', p => { p.curriculum[0].contentBlocks[0].items[0].text = ''; }],
+  ['unsafe image', p => { p.curriculum[0].contentBlocks = [{ id: 'bad', type: 'image', title: 'image', imageUrl: 'javascript:alert(1)' }]; }],
+  ['reserved ID', p => { p.curriculum[0].id = '__journey_pre__'; }],
+]) test(`journey publication rejects ${label} without modifying a live course`, async () => {
+  const f = fixture({ role: 'ADMIN' }); const payload = journeyPayload(); change(payload);
+  const response = await f.adminPost(payload); assert.equal(response.status, 400); assert.equal(f.writes.length, 0);
+});

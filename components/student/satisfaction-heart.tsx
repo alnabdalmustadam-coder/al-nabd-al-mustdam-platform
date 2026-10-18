@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Heart, Loader2 } from 'lucide-react';
 
 type Satisfaction = { liked: boolean; count: number };
-export function SatisfactionHeart({ courseId, lessonId, kind }: { courseId: string; lessonId: string; kind: 'lesson' | 'quiz' }) {
+export function SatisfactionHeart({ courseId, lessonId, kind, inline = false }: { courseId: string; lessonId: string; kind: 'lesson' | 'quiz'; inline?: boolean }) {
   const [state, setState] = useState<Satisfaction | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -35,7 +35,7 @@ export function SatisfactionHeart({ courseId, lessonId, kind }: { courseId: stri
     finally { setBusy(false); }
   };
   if (hidden) return null;
-  return <div className="fixed bottom-24 left-4 z-40 flex max-w-[260px] flex-col items-start gap-2 sm:left-6" dir="rtl">
+  return <div className={`${inline ? '' : 'fixed bottom-24 left-4 z-40 sm:left-6'} flex max-w-[260px] flex-col items-start gap-2`} dir="rtl">
     {error && <p role="alert" className="rounded-xl border border-rose-200 bg-white p-3 text-xs font-bold text-rose-800 shadow-lg">{error}</p>}
     <button type="button" onClick={() => void toggle()} disabled={busy || (!state && !error)} aria-pressed={state?.liked || false}
       aria-label={`${state?.liked ? 'إلغاء الرضا عن' : 'أعجبني'} ${kind === 'quiz' ? 'الاختبار' : 'الدرس'}`}

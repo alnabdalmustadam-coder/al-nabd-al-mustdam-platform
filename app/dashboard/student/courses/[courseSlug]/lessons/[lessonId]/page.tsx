@@ -1,5 +1,8 @@
 'use client';
 
+import { ProfessionalCourseJourney } from '@/components/student/professional-course-journey';
+import { LessonContentBlocks } from '@/components/student/lesson-content-blocks';
+import { isLearningJourney } from '@/lib/learning/journey';
 import { getLessonResourceGroups } from '@/lib/courses/curriculum-files';
 import { CourseResourcesPanel } from '@/components/student/course-resources-panel';
 
@@ -20,7 +23,7 @@ import {
 } from '@/lib/actions/student-actions';
 import { usePublicCourses } from '@/lib/hooks/use-public-courses';
 import { findCourseByIdentifier } from '@/lib/public-courses';
-import { QuizData, SubLessonItem } from '@/types';
+import { Course, QuizData, SubLessonItem } from '@/types';
 
 /* ── Types ── */
 interface Lesson {
@@ -45,13 +48,22 @@ interface Chapter {
 
 export default function StudentLessonPage() {
   const params = useParams();
+  const courseSlug = ((params?.courseSlug as string) || '').replace(/^course-/, '');
+  const lessonId = (params?.lessonId as string) || 'lesson-1';
+  const { courses: catalog, loading: isLoadingCourse, error: courseError, reload } = usePublicCourses();
+  const courseData = findCourseByIdentifier(catalog, courseSlug) || null;
+  if (!isLoadingCourse && !courseError && courseData && isLearningJourney(courseData)) {
+    return <ProfessionalCourseJourney key={courseData.slug} course={courseData} initialLessonId={lessonId} />;
+  }
+  return <LegacyStudentLessonPage courseData={courseData} isLoadingCourse={isLoadingCourse} courseError={courseError} reload={reload} />;
+}
+
+function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, reload }: { courseData: Course | null; isLoadingCourse: boolean; courseError: string | null; reload: () => void }) {
+  const params = useParams();
   const router = useRouter();
   const rawSlug = (params?.courseSlug as string) || '';
   const courseSlug = rawSlug.replace(/^course-/, '');
   const lessonId = (params?.lessonId as string) || 'lesson-1';
-
-  const { courses: catalog, loading: isLoadingCourse, error: courseError, reload } = usePublicCourses();
-  const courseData = findCourseByIdentifier(catalog, courseSlug) || null;
 
   const [activeTab, setActiveTab] = useState<'notes' | 'attachments' | 'quiz' | 'discussion'>('notes');
   const [userNote, setUserNote] = useState('');
@@ -71,6 +83,7 @@ export default function StudentLessonPage() {
   const [completionPendingAssessment, setCompletionPendingAssessment] = useState(false);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [videoVerified, setVideoVerified] = useState(false);
+  const [articleReady, setArticleReady] = useState(false);
 
   /* ── Collapsed chapters & mobile playlist state ── */
   const [collapsedChapters, setCollapsedChapters] = useState<Set<string>>(new Set());
@@ -637,7 +650,7 @@ export default function StudentLessonPage() {
                   onClick={() => { setActiveTab('quiz'); requestAnimationFrame(() => document.getElementById('internal-assessment')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); }}>فتح الاختبار</button>
                 {cpd && <button type="button" disabled={completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id} onClick={() => void handleToggleComplete(currentLesson.id)} className="min-h-11 rounded-xl border border-white/30 px-5 py-3 text-xs font-bold disabled:opacity-50">{completedSet.has(currentLesson.id) ? 'الدرس مكتمل' : 'إكمال الدرس بعد اجتياز الاختبار'}</button>}
               </div>
-            ) : currentLesson?.fileUrl && ['pdf', 'doc', 'ppt'].includes(currentLesson.type || '') ? (
+            ) : currentLesson?.type === 'article' ? <div className="space-y-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-8">{lessonContent?.description && <p className="whitespace-pre-wrap text-sm leading-8 text-slate-600">{lessonContent.description}</p>}<LessonContentBlocks key={currentLesson.id} blocks={lessonContent?.contentBlocks || []} onReady={setArticleReady} /><button type="button" disabled={!articleReady || completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id} onClick={() => void handleToggleComplete(currentLesson.id)} className="min-h-11 rounded-xl bg-blue-900 px-5 py-3 text-xs font-semibold text-white disabled:opacity-50">{completedSet.has(currentLesson.id) ? 'المحتوى مكتمل' : 'إكمال المحتوى'}</button></div> : currentLesson?.fileUrl && ['pdf', 'doc', 'ppt'].includes(currentLesson.type || '') ? (
               <div className="space-y-3">
                 <CourseDocumentViewer fileUrl={currentLesson.fileUrl} title={currentLesson.title} type={currentLesson.type} />
                 <button type="button" onClick={() => void handleToggleComplete(currentLesson.id)} disabled={completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id} className="min-h-11 rounded-xl bg-blue-900 px-5 py-3 text-xs font-black text-white disabled:opacity-50">{completedSet.has(currentLesson.id) ? 'تمت القراءة' : 'أتممت قراءة المحتوى'}</button>
@@ -657,9 +670,9 @@ export default function StudentLessonPage() {
                 isCompleted={completedSet.has(currentLesson?.id || lessonId)}
                 isSavingCompletion={savingLessonId === (currentLesson?.id || lessonId)}
                 onToggleComplete={() => handleToggleComplete(currentLesson?.id || lessonId)}
-                professionalDevelopment={cpd && currentLesson?.type !== 'article'}
+                professionalDevelopment={cpd}
                 onVideoVerified={() => setVideoVerified(true)}
-                completionDisabled={cpd && currentLesson?.type !== 'article' && !videoVerified}
+                completionDisabled={cpd && !videoVerified}
               />
             )}
           </div>

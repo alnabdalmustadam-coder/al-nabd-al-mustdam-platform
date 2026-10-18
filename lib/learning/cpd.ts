@@ -1,8 +1,9 @@
+import { getLearningContent, isLearningJourney } from '@/lib/learning/journey';
 import 'server-only';
 import { createHash } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Course } from '@/types';
-import { getCourseContent, isLessonUnlocked, type LessonContent } from '@/lib/learning/course-content';
+import { isLessonUnlocked, type LessonContent } from '@/lib/learning/course-content';
 import { LearningError } from '@/lib/learning/course-access';
 import { getQuizActivity } from '@/lib/quizzes/activity';
 
@@ -10,10 +11,10 @@ export type CpdProgress = { lesson_id: string; content_key: string; duration_sec
   session_id: string | null; completed_at: string | null };
 export function lessonContentKey(lesson: LessonContent): string {
   return createHash('sha256').update(JSON.stringify({ type: lesson.type, video: lesson.videoUrl,
-    file: lesson.fileUrl, quiz: lesson.requiredQuiz })).digest('hex');
+    file: lesson.fileUrl, quiz: lesson.requiredQuiz, description: lesson.description, blocks: lesson.contentBlocks, diagnostic: lesson.diagnostic })).digest('hex');
 }
 export async function readCpdProgress(admin: SupabaseClient, course: Course, userId: string) {
-  const lessons = getCourseContent(course);
+  const lessons = getLearningContent(course);
   const { data, error } = await admin.from('course_lesson_progress').select('lesson_id, content_key, duration_seconds, watched_seconds, session_id, completed_at')
     .eq('course_id', course.id).eq('user_id', userId);
   if (error) throw error;
@@ -36,7 +37,7 @@ export function videoWatched(row?: CpdProgress): boolean {
 }
 export async function assertCpdQuizAccess(admin: SupabaseClient, course: Course, userId: string, lessonId: string, key: string) {
   const progress = await assertCpdLessonAccess(admin, course, userId, lessonId);
-  if (key === 'final') {
+  if (key === 'final' && !isLearningJourney(course)) {
     if (progress.completed.size !== progress.lessons.length) throw new LearningError('أكمل جميع دروس الدورة قبل الاختبار النهائي', 403);
     return;
   }
@@ -51,10 +52,12 @@ export async function verifyCpdCompletion(admin: SupabaseClient, course: Course,
   if (lesson.type === 'quiz' && !lesson.requiredQuiz) throw new LearningError('لم تتم إضافة أسئلة لهذا الاختبار بعد');
   if (lesson.requiredQuiz && lesson.quizKey) {
     const { activityId } = getQuizActivity(course.slug, lesson.quizKey, lesson.requiredQuiz);
-    const { count, error } = await admin.from('xapi_statements').select('id', { head: true, count: 'exact' })
-      .eq('actor_email', email).eq('object_id', activityId).eq('verb_display', 'answered').eq('result_completion', true).eq('result_success', true);
+    let query = admin.from('xapi_statements').select('id', { head: true, count: 'exact' })
+      .eq('actor_email', email).eq('object_id', activityId).eq('verb_display', 'answered').eq('result_completion', true);
+    if (!lesson.diagnostic) query = query.eq('result_success', true);
+    const { count, error } = await query;
     if (error) throw error;
-    if (!count) throw new LearningError('اجتز اختبار الدرس أولاً لإكماله');
+    if (!count) throw new LearningError(lesson.diagnostic ? 'سلّم إجابات الاختبار القبلي أولاً' : 'اجتز اختبار الدرس أولاً لإكماله');
   }
   const values = { user_id: userId, course_id: course.id, lesson_id: lessonId,
     content_key: lessonContentKey(lesson), completed_at: new Date().toISOString() };

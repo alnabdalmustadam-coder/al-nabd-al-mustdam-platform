@@ -50,6 +50,7 @@ export async function GET(req: Request) {
         attachments: c.attachments || [],
         finalExam: c.finalExam || undefined,
         professionalDevelopment: c.professionalDevelopment === true,
+        learningJourney: c.learningJourney, outcomes: c.outcomes,
         image: c.image || '/logo.webp',
       };
     });

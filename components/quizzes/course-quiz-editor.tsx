@@ -23,7 +23,7 @@ function MatchingPreview({ question }: { question: QuizQuestion }) {
   </details>;
 }
 
-export function CourseQuizEditor({ value, onChange }: { value: QuizData; onChange: (quiz: QuizData) => void }) {
+export function CourseQuizEditor({ value, onChange, diagnostic = false }: { value: QuizData; onChange: (quiz: QuizData) => void; diagnostic?: boolean }) {
   const editorId = useId();
   const update = (index: number, patch: Partial<QuizQuestion>) => onChange({ ...value,
     questions: value.questions.map((question, i) => i === index ? { ...question, ...patch } : question) });
@@ -34,9 +34,9 @@ export function CourseQuizEditor({ value, onChange }: { value: QuizData; onChang
   }] }); };
   const field = editorInput;
   return <div className="space-y-6" dir="rtl">
-    <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_180px]">
+    <div className={`grid gap-5 ${diagnostic ? '' : 'sm:grid-cols-[minmax(0,1fr)_180px]'}`}>
       <EditorField icon={ClipboardList} label="عنوان الاختبار"><input className={field} value={value.title} maxLength={200} placeholder="مثال: اختبار المفاهيم الأساسية" onChange={(event) => onChange({ ...value, title: event.target.value })} /></EditorField>
-      <EditorField icon={Target} label="نسبة الاجتياز (%)"><input type="number" min={0} max={100} className={field} value={value.passingScore ?? 70} onChange={(event) => onChange({ ...value, passingScore: Number(event.target.value) })} /></EditorField>
+      {!diagnostic && <EditorField icon={Target} label="نسبة الاجتياز (%)"><input type="number" min={0} max={100} className={field} value={value.passingScore ?? 70} onChange={(event) => onChange({ ...value, passingScore: Number(event.target.value) })} /></EditorField>}
     </div>
     {value.questions.map((question, index) => <section key={question.id} className="space-y-6 rounded-2xl border border-blue-100/80 bg-linear-to-b from-blue-50/50 to-white p-4 sm:p-6">
       <div className="flex items-center justify-between gap-3">
