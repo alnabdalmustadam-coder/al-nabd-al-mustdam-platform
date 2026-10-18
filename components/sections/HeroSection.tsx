@@ -211,8 +211,8 @@ export default function HeroSection() {
               onMouseLeave={() => setIsPaused(false)}
               className="hero-fixed-side-card relative w-full h-full flex items-center justify-center pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
             >
-              <div className="w-full h-full relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem]">
-                <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="w-full h-full object-cover sm:object-cover transition-transform duration-[1.5s] ease-out hover:scale-[1.08]" />
+              <div className="absolute inset-0 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem]">
+                <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="block w-full h-full object-contain object-center" />
               </div>
 
               {/* Badges positioned cleanly on all screen sizes */}
