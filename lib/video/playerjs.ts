@@ -3,6 +3,7 @@ export interface BunnyPlayer {
   off(event: string): void;
   pause(): void;
   setCurrentTime(seconds: number): void;
+  getCurrentTime(callback: (seconds: number) => void): void;
   setPlaybackRate(rate: number): void;
   supports(kind: string, method: string): boolean;
 }

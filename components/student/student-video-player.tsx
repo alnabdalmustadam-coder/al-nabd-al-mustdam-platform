@@ -217,19 +217,38 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
     let seconds = frontier;
     let lastTime = performance.now();
     let queue = Promise.resolve();
+    let verified = false;
+    const positionTimers = new Set<ReturnType<typeof setTimeout>>();
+    const readPosition = () => new Promise<number>((resolve) => {
+      let settled = false;
+      const finish = (position: number) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeout); positionTimers.delete(timeout);
+        resolve(Number.isFinite(position) && position >= 0 ? position : seconds);
+      };
+      const timeout = setTimeout(() => finish(seconds), 1000);
+      positionTimers.add(timeout);
+      player.getCurrentTime(finish);
+    });
     const update = (watched: number) => {
       if (!alive) return;
-      setWatchPercent(Math.min(100, Math.round(watched / cpdSession.duration * 100)));
-      if (watched >= cpdSession.duration - Math.min(1, cpdSession.duration * 0.01)) verifiedCallback.current?.();
+      const complete = watched >= cpdSession.duration - Math.min(1, cpdSession.duration * 0.01);
+      setWatchPercent(complete ? 100 : Math.min(99, Math.round(watched / cpdSession.duration * 100)));
+      if (complete && !verified) { verified = true; verifiedCallback.current?.(); }
     };
     update(frontier);
     const report = (event: 'play' | 'pause' | 'tick') => {
-      const position = seconds;
+      // Read immediately, before queueing: pause/ended can arrive between
+      // timeupdate events, and a queued tick must not sample a later playback state.
+      const position = readPosition();
       queue = queue.then(async () => {
         if (!alive) return;
         try {
+          const current = await position;
+          if (!alive) return;
           const response = await fetch('/api/courses/video-progress', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ courseId: courseSlug, lessonId, sessionId: cpdSession.id, seconds: position, event }) });
+            body: JSON.stringify({ courseId: courseSlug, lessonId, sessionId: cpdSession.id, seconds: current, event }) });
           const payload = await response.json();
           if (!alive) return;
           if (!response.ok || !payload.success) throw new Error(payload.message || 'تعذر حفظ المشاهدة');
@@ -277,6 +296,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
     document.addEventListener('visibilitychange', hide);
     return () => {
       alive = false; clearInterval(timer); clearTimeout(readyTimeout); document.removeEventListener('visibilitychange', hide);
+      positionTimers.forEach(clearTimeout); positionTimers.clear();
       ['ready', 'timeupdate', 'play', 'pause', 'ended', 'seeked', 'playbackratechange'].forEach((event) => player.off(event));
     };
   }, [professionalDevelopment, cpdSession, iframeUrl, scriptReady, courseSlug, lessonId]);
@@ -307,7 +327,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-col justify-between h-full bg-[#10223E]/80 backdrop-blur-xl border border-white/15 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+    <div className="w-full min-w-0 flex flex-col bg-[#10223E]/80 backdrop-blur-xl border border-white/15 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
       {professionalDevelopment && <Script src="https://assets.mediadelivery.net/playerjs/playerjs-latest.min.js" strategy="afterInteractive" onReady={() => setScriptReady(true)} onError={() => setTrackingError('تعذر تحميل تتبع المشاهدة. أعد تحميل الصفحة')} />}
       {/* Video Header Strip */}
       <div className="flex items-center justify-between gap-2 px-3.5 sm:px-4 py-2.5 bg-[#173056]/85 backdrop-blur-md border-b border-white/10 text-white shrink-0">
@@ -336,7 +356,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
 
       {/* Video Viewport (No watermarks) */}
       <div
-        className="relative w-full flex-1 aspect-video lg:aspect-auto lg:min-h-[560px] xl:min-h-[650px] bg-[#0A1322]/85 backdrop-blur-sm flex items-center justify-center select-none overflow-hidden"
+        className="relative w-full shrink-0 aspect-video bg-[#0A1322]/85 backdrop-blur-sm flex items-center justify-center select-none overflow-hidden"
         onContextMenu={(e) => e.preventDefault()}
       >
         {loading && (
@@ -365,7 +385,7 @@ export const StudentVideoPlayer: React.FC<StudentVideoPlayerProps> = ({
             src={iframeUrl}
             title={lessonTitle}
             loading="eager"
-            className="w-full h-full border-0"
+            className="absolute inset-0 block w-full h-full border-0"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
             allowFullScreen
           />

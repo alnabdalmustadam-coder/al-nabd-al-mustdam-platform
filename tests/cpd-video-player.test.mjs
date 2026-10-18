@@ -7,7 +7,7 @@ import { extractBunnyVideoId } from '../lib/learning/course-content.ts';
 
 // Execute the real player component and its event handlers with deterministic
 // player/network/clock boundaries. No browser auth or live learner writes.
-function playerFixture({ resume = 0, playbackResponses = [] } = {}) {
+function playerFixture({ resume = 0, duration = 60, playbackResponses = [], recordProgress } = {}) {
   const slots = []; const effects = []; const intervals = new Map(); const timeouts = new Map(); const requests = [];
   const documentListeners = new Map(); const players = []; let cursor = 0; let clock = 0; let handle = 0; let verified = 0;
   let savedWatch = resume; let tree; const iframe = {}; let readyHook; let playbackCalls = 0;
@@ -22,15 +22,16 @@ function playerFixture({ resume = 0, playbackResponses = [] } = {}) {
     }
   } };
   class Player {
-    events = new Map(); seeks = []; rates = []; pauses = 0;
+    events = new Map(); seeks = []; rates = []; pauses = 0; currentTime = resume;
     constructor() { players.push(this); }
     on(event, callback) { this.events.set(event, callback); }
     off(event) { this.events.delete(event); }
     pause() { this.pauses++; }
-    setCurrentTime(value) { this.seeks.push(value); }
+    setCurrentTime(value) { this.seeks.push(value); this.currentTime = value; }
+    getCurrentTime(callback) { callback(this.currentTime); }
     setPlaybackRate(value) { this.rates.push(value); }
     supports() { return true; }
-    emit(event, value) { this.events.get(event)?.(value); }
+    emit(event, value) { if (event === 'timeupdate') this.currentTime = value.seconds; this.events.get(event)?.(value); }
   }
   const jsx = (type, props) => ({ type, props });
   const modules = { react: { ...react, default: react, __esModule: true },
@@ -52,8 +53,9 @@ function playerFixture({ resume = 0, playbackResponses = [] } = {}) {
         const response = playbackResponses[playbackCalls++];
         if (response) return { ok: false, status: response.status, json: async () => response.payload };
       }
+      if (url.includes('video-progress') && recordProgress) return { ok: true, json: async () => recordProgress(body, clock) };
       return { ok: true, json: async () => url.includes('playback-token')
-        ? { success: true, iframeUrl: 'https://iframe.mediadelivery.net/embed/1/11111111-1111-4111-8111-111111111111', cpdSession: { id: 'server-session', duration: 60, watchedSeconds: resume } }
+        ? { success: true, iframeUrl: 'https://iframe.mediadelivery.net/embed/1/11111111-1111-4111-8111-111111111111', cpdSession: { id: 'server-session', duration, watchedSeconds: resume } }
         : { success: true, accepted: true, watchedSeconds: savedWatch } };
     },
   });
@@ -144,4 +146,26 @@ test('CPD completion comes from saved server watch history; hiding the page paus
   const pauses = player.pauses; f.document.hidden = true; f.documentListeners.get('visibilitychange')();
   assert.ok(player.pauses > pauses);
   f.cleanup(); assert.equal(f.intervals.size, 0); assert.equal(f.documentListeners.size, 0); assert.equal(player.events.size, 0);
+});
+
+test('CPD ending reads the real final frame after a stale timeupdate and unlocks only after the server saves it', async () => {
+  const f = playerFixture({ resume: 27.25, duration: 30 }); f.render(); await f.flush(); f.scriptReady(); f.render();
+  const player = f.players[0]; player.emit('ready'); player.emit('play'); await f.flush();
+  // The player has ended at 29.96, but its last timeupdate was still 27.25.
+  player.currentTime = 29.96; f.setClock(3000); player.emit('pause'); player.emit('ended'); await f.flush();
+  const tail = f.requests.filter((request) => request.url.includes('video-progress') && request.body.event === 'pause');
+  assert.equal(tail.length, 2); assert.ok(tail.every((request) => request.body.seconds === 29.96));
+  assert.equal(f.verified(), 0); // The ended event itself never grants completion.
+  f.setSavedWatch(29.96); player.emit('ended'); await f.flush();
+  assert.equal(f.verified(), 1);
+  player.emit('ended'); await f.flush(); assert.equal(f.verified(), 1); f.cleanup();
+});
+
+test('CPD periodic saves read the current player position rather than the last timeupdate', async () => {
+  const f = playerFixture(); f.render(); await f.flush(); f.scriptReady(); f.render();
+  const player = f.players[0]; player.emit('ready'); player.emit('play'); await f.flush();
+  player.currentTime = 5; f.setClock(5000);
+  for (const fn of f.intervals.values()) fn(); await f.flush();
+  assert.equal(f.requests.find((request) => request.body.event === 'tick').body.seconds, 5);
+  f.cleanup();
 });

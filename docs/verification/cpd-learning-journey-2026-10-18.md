@@ -61,3 +61,15 @@ The live trial screenshots show the 30-second upload playing in the admin previe
 - Processing triggers at most six automatic retries, five seconds apart. Leaving the lesson aborts the request and cancels pending retries. Manual retry restarts the player without reloading the whole course page.
 - Verification: all 257 automated tests pass; targeted ESLint, production build and build-time TypeScript checks pass. Tests include provider states, API outages, bounded retries, cleanup, authoritative duration and existing seek/progress protection.
 - Live acceptance remains: reload the learner's video station, try seeking ahead, watch to the end, and verify that the next required step unlocks. No authenticated learner playback or production runtime-log inspection was possible here.
+
+## Final-frame progress and player sizing correction
+
+The next live screenshot showed the upload at 00:30 while its watch percentage remained below completion. The database confirmed 27.254122 of 30 seconds saved, so the station correctly remained locked on that incomplete record.
+
+- Playback saves now call the player.js `getCurrentTime` method for play, periodic save, pause and ended events. Final saves no longer reuse a potentially stale `timeupdate` value. Requests stay serialized, and only the server's saved watch history can enable the station quiz. Duplicate final events notify completion once.
+- The iframe now fills a responsive 16:9 viewport. Removed forced desktop minimum heights and the unresolved percentage-height layout that left the source video at a small intrinsic height.
+- Added `20261018171636_cpd_video_tail_accounting.sql`, created with the Supabase CLI and applied to the existing project. One bounded, service-only `uncredited_seconds` column carries up to one second of already elapsed playback time between advancing reports. It clears on pause, rewind, stalled positions, rejected seeks and new sessions. Existing seek bounds, duration requirements, privileges and row-level security remain enforced.
+- Reproduced lost elapsed time with the previous database function. The revised function passes both SQL suites, including coarse time updates through the last frame, resuming 27.25/30, duplicate final events, rewind, request spam, stale sessions and direct-client privilege checks. Tests run in transactions and roll back all QA rows. No actual learner progress was manually completed or reset.
+- All 259 JavaScript tests, targeted ESLint, production build and build-time TypeScript checks pass. Supabase security advisors returned no findings for the modified table/functions; unrelated findings were left outside this fix.
+- Acceptance: refresh the learner's station, resume the final seconds, verify saved watch reaches 100%, complete the newly visible station quiz, then continue. Authenticated visual playback remains for the site owner to confirm.
+- Code rollback can leave the additive database fix in place. If its function behavior must also be rolled back, restore the two function definitions from the earlier `course_learning_controls` migration; retaining the unused defaulted column is safe.
