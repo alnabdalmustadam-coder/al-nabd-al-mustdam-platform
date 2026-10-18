@@ -309,7 +309,7 @@ test('hero keeps a valid slide when the active last course disappears', async t 
   ui.update([liveCourse]);
   await settle();
   const tree = ui.render();
-  assert.equal(nodes(tree, node => node.props?.href === `/courses/${liveCourse.slug}`).length, 1);
+  assert.equal(nodes(tree, node => node.props?.href === `/courses/${liveCourse.slug}`).length, 2, 'Both hero actions must follow the current course');
   assert.equal(nodes(tree, node => node.type === 'img' && node.props.src === liveCourse.image).length, 1);
   ui.update([]);
   await settle();

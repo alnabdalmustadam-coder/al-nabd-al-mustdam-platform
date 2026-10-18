@@ -209,10 +209,16 @@ export default function HeroSection() {
               transition={{ delay: 0.5, duration: 0.7 }}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
-              className="hero-fixed-side-card relative w-full h-full flex items-center justify-center pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
+              className="hero-fixed-side-card relative w-full h-full grid grid-rows-[minmax(0,1fr)_auto] pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
             >
-              <div className="absolute inset-0 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem]">
-                <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="block w-full h-full object-contain object-center" />
+              <div className="min-h-0 overflow-hidden rounded-t-[2rem] sm:rounded-t-[2.5rem] lg:rounded-t-[1.5rem] xl:rounded-t-[2rem]">
+                <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="block w-full h-full object-contain object-top" />
+              </div>
+
+              <div className="p-6 sm:p-10 lg:p-6 xl:p-8 2xl:p-10">
+                <Button href={heroCourse ? `/courses/${heroCourse.slug}` : "/courses"} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
+                  {heroCourse ? "تفاصيل الدورة" : "استعرض الدورات"}
+                </Button>
               </div>
 
               {/* Badges positioned cleanly on all screen sizes */}
