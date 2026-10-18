@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import { Building2, ChevronRight, ChevronLeft, Compass, CreditCard, FileText } from "lucide-react";
 import { usePublicCourses } from "@/lib/hooks/use-public-courses";
@@ -88,34 +88,31 @@ export default function HeroSection() {
 
         {/* Left Side in LTR / Right Side in RTL (Course Card) */}
         <div className="w-full max-w-[500px] lg:max-w-none lg:w-[30.5%] xl:w-[30%] 2xl:w-[29.5%] order-3 lg:order-1 flex items-stretch justify-center pointer-events-none mb-0 lg:mb-0">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={heroCourse?.slug || "catalog-status"}
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ delay: 0.3, duration: 0.7 }}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-              className="hero-fixed-side-card hero-course-copy-card w-full h-full text-right pointer-events-auto bg-white/40 backdrop-blur-md p-6 sm:p-10 lg:p-6 xl:p-8 2xl:p-10 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl grid grid-rows-[auto_minmax(0,1fr)_auto] gap-4 sm:gap-6 lg:gap-4 xl:gap-5 cursor-pointer"
-            >
-              <h2 className="hero-course-title-premium">
-                {heroCourse?.title || "استكشف مسارك التدريبي"}
-              </h2>
+          <motion.div
+            key={heroCourse?.slug || "catalog-status"}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.7 }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            className="hero-fixed-side-card hero-course-copy-card w-full h-full text-right pointer-events-auto bg-white/40 backdrop-blur-md p-6 sm:p-10 lg:p-6 xl:p-8 2xl:p-10 rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl grid grid-rows-[auto_minmax(0,1fr)_auto] gap-4 sm:gap-6 lg:gap-4 xl:gap-5 cursor-pointer"
+          >
+            <h2 className="hero-course-title-premium">
+              {heroCourse?.title || "استكشف مسارك التدريبي"}
+            </h2>
 
-              <div className="min-h-0 min-w-0 overflow-hidden flex items-center border-y border-[#173A7C]/8 py-3 sm:py-4 lg:py-3 xl:py-4">
-                <p className="hero-course-description-premium">
-                  {heroCourse?.description || (loading ? "جارٍ تحميل الدورات…" : error || "تابع دليل الدورات للاطلاع على البرامج المتاحة.")}
-                </p>
-              </div>
+            <div className="min-h-0 min-w-0 overflow-hidden flex items-center border-y border-[#173A7C]/8 py-3 sm:py-4 lg:py-3 xl:py-4">
+              <p className="hero-course-description-premium">
+                {heroCourse?.description || (loading ? "جارٍ تحميل الدورات…" : error || "تابع دليل الدورات للاطلاع على البرامج المتاحة.")}
+              </p>
+            </div>
 
-              <Button href={heroCourse ? `/courses/${heroCourse.slug}` : "/courses"} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
-                <CreditCard className={heroButtonIconClass} aria-hidden="true" focusable="false" />
-                <span>{heroCourse ? "اشترك الآن وادفع بالتقسيط" : "استعرض الدورات"}</span>
-              </Button>
-              {error && <button type="button" onClick={reload} className="font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
-            </motion.div>
-          </AnimatePresence>
+            <Button href={heroCourse ? `/courses/${heroCourse.slug}` : "/courses"} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
+              <CreditCard className={heroButtonIconClass} aria-hidden="true" focusable="false" />
+              <span>{heroCourse ? "اشترك الآن وادفع بالتقسيط" : "استعرض الدورات"}</span>
+            </Button>
+            {error && <button type="button" onClick={reload} className="font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
+          </motion.div>
         </div>
 
         {/* Center Side (Glass Block + Stats) */}
@@ -208,38 +205,35 @@ export default function HeroSection() {
 
         {/* Right Side in LTR / Left Side in RTL (Image Area) */}
         <div className="w-full max-w-[500px] lg:max-w-none lg:w-[30.5%] xl:w-[30%] 2xl:w-[29.5%] order-2 lg:order-3 flex items-stretch justify-center pointer-events-none">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={heroCourse?.slug || "catalog-status"}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 30 }}
-              transition={{ delay: 0.5, duration: 0.7 }}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-              className="hero-fixed-side-card relative w-full h-full grid grid-rows-[minmax(0,1fr)_auto] pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
-            >
-              <div className="relative isolate min-h-0 overflow-hidden rounded-t-[2rem] sm:rounded-t-[2.5rem] lg:rounded-t-[1.5rem] xl:rounded-t-[2rem]">
-                <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="absolute inset-0 block w-full h-full object-cover" style={{ objectPosition: heroArtworkPositions[heroCourse?.image || ""] || "center" }} />
-              </div>
+          <motion.div
+            key={heroCourse?.slug || "catalog-status"}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.7 }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            className="hero-fixed-side-card relative w-full h-full grid grid-rows-[minmax(0,1fr)_auto] pointer-events-auto bg-white/40 backdrop-blur-md rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[1.5rem] xl:rounded-[2rem] border border-white/60 shadow-xl cursor-pointer"
+          >
+            <div className="relative isolate min-h-0 overflow-hidden rounded-t-[2rem] sm:rounded-t-[2.5rem] lg:rounded-t-[1.5rem] xl:rounded-t-[2rem]">
+              <img src={heroCourse?.image || "/logo.webp"} alt={heroCourse?.title || "النبض المستدام"} className="absolute inset-0 block w-full h-full object-cover" style={{ objectPosition: heroArtworkPositions[heroCourse?.image || ""] || "center" }} />
+            </div>
 
-              <div className="relative px-6 pb-6 pt-4 sm:px-10 sm:pb-10 sm:pt-6 lg:px-6 lg:pb-6 lg:pt-4 xl:px-8 xl:pb-8 xl:pt-5 2xl:px-10 2xl:pb-10">
-                <div aria-hidden="true" className="absolute top-0 inset-x-6 sm:inset-x-10 lg:inset-x-6 xl:inset-x-8 2xl:inset-x-10 border-t border-[#173A7C]/8" />
-                <Button href={heroCourse ? `/courses/${heroCourse.slug}` : "/courses"} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
-                  <FileText className={heroButtonIconClass} aria-hidden="true" focusable="false" />
-                  <span>{heroCourse ? "تفاصيل الدورة" : "استعرض الدورات"}</span>
-                </Button>
-              </div>
+            <div className="relative px-6 pb-6 pt-4 sm:px-10 sm:pb-10 sm:pt-6 lg:px-6 lg:pb-6 lg:pt-4 xl:px-8 xl:pb-8 xl:pt-5 2xl:px-10 2xl:pb-10">
+              <div aria-hidden="true" className="absolute top-0 inset-x-6 sm:inset-x-10 lg:inset-x-6 xl:inset-x-8 2xl:inset-x-10 border-t border-[#173A7C]/8" />
+              <Button href={heroCourse ? `/courses/${heroCourse.slug}` : "/courses"} variant="secondary" className="bg-white/80 backdrop-blur-md border border-slate-200 text-[#173A7C] hover:bg-white text-sm sm:text-lg lg:text-[11px] xl:text-sm 2xl:text-lg font-bold h-12 sm:h-14 lg:h-10 xl:h-14 2xl:h-16 shadow-md w-full transition-transform hover:scale-[1.02] whitespace-nowrap flex items-center justify-center">
+                <FileText className={heroButtonIconClass} aria-hidden="true" focusable="false" />
+                <span>{heroCourse ? "تفاصيل الدورة" : "استعرض الدورات"}</span>
+              </Button>
+            </div>
 
-              {/* Badges positioned cleanly on all screen sizes */}
-              <div className="absolute top-2 right-2 sm:-top-5 sm:-right-5 lg:-top-3 lg:-right-3 xl:-top-5 xl:-right-5 px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 bg-white/90 backdrop-blur-[30px] rounded-xl sm:rounded-2xl lg:rounded-lg xl:rounded-xl shadow-[0_15px_40px_rgba(23,58,124,0.15)] border border-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30">
-                <img src="/tabby.webp" alt="Tabby" className="h-6 sm:h-8 lg:h-4 xl:h-6 2xl:h-8 w-auto object-contain drop-shadow-sm" />
-              </div>
-              <div className="absolute bottom-2 left-2 sm:-bottom-5 sm:-left-5 lg:-bottom-3 lg:-left-3 xl:-bottom-5 xl:-left-5 px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 bg-white/90 backdrop-blur-[30px] rounded-xl sm:rounded-2xl lg:rounded-lg xl:rounded-xl shadow-[0_15px_40px_rgba(23,58,124,0.15)] border border-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30">
-                <img src="/Tamara.webp" alt="Tamara" className="h-6 sm:h-8 lg:h-4 xl:h-6 2xl:h-8 w-auto object-contain drop-shadow-sm" />
-              </div>
-            </motion.div>
-          </AnimatePresence>
+            {/* Badges positioned cleanly on all screen sizes */}
+            <div className="absolute top-2 right-2 sm:-top-5 sm:-right-5 lg:-top-3 lg:-right-3 xl:-top-5 xl:-right-5 px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 bg-white/90 backdrop-blur-[30px] rounded-xl sm:rounded-2xl lg:rounded-lg xl:rounded-xl shadow-[0_15px_40px_rgba(23,58,124,0.15)] border border-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30">
+              <img src="/tabby.webp" alt="Tabby" className="h-6 sm:h-8 lg:h-4 xl:h-6 2xl:h-8 w-auto object-contain drop-shadow-sm" />
+            </div>
+            <div className="absolute bottom-2 left-2 sm:-bottom-5 sm:-left-5 lg:-bottom-3 lg:-left-3 xl:-bottom-5 xl:-left-5 px-3 sm:px-5 lg:px-2 xl:px-4 py-1.5 sm:py-2 lg:py-1 xl:py-1.5 bg-white/90 backdrop-blur-[30px] rounded-xl sm:rounded-2xl lg:rounded-lg xl:rounded-xl shadow-[0_15px_40px_rgba(23,58,124,0.15)] border border-white hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center z-30">
+              <img src="/Tamara.webp" alt="Tamara" className="h-6 sm:h-8 lg:h-4 xl:h-6 2xl:h-8 w-auto object-contain drop-shadow-sm" />
+            </div>
+          </motion.div>
         </div>
 
       </div>
