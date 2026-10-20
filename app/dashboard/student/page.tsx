@@ -3,28 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, Variants } from 'framer-motion';
-import { 
-  Play, 
-  BookOpen, 
-  ArrowLeft, 
-  Clock, 
-  ShieldCheck, 
-  Award, 
-  Radio, 
-  ExternalLink, 
-  Video, 
-  GraduationCap, 
-  PlayCircle,
-  Sparkles,
-  Loader2,
-  CheckCircle2,
-  Compass
-} from 'lucide-react';
+import { BookOpen, ArrowLeft, Clock, Loader2, Compass } from 'lucide-react';
 import { ProgressCard } from '@/components/student/progress-card';
 import { createClient } from '@/utils/supabase/client';
 import { findCourseByIdentifier, fetchPublicCourses } from "@/lib/public-courses";
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
-import { CardImage } from '@/components/ui/CardImage';
+import { StudentCourseCard } from '@/components/student/student-course-card';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -110,10 +94,10 @@ export default function StudentDashboardPage() {
             // Deduplicate by clean slug, taking the highest progress
             const courseMap = new Map<string, EnrolledCourseItem>();
 
-            enrollmentsData.forEach((e: any, idx: number) => {
+            enrollmentsData.forEach((e, idx: number) => {
               const cleanSlug = (e.course_id || '').replace(/^course-/, '');
               const matchedCatalog = findCourseByIdentifier(liveCatalog, cleanSlug) ||
-                liveCatalog.find((c: any) => c.title === e.course_title) ||
+                liveCatalog.find((c) => c.title === e.course_title) ||
                 null;
               // Keep enrollment records in storage; only offer currently published courses.
               if (!matchedCatalog) return;
@@ -271,81 +255,7 @@ export default function StudentDashboardPage() {
             </motion.h2>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover group student-card-accent">
-            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-white to-transparent z-10" />
-            <div className="absolute -top-20 -right-20 w-52 h-52 bg-[#173A7C]/8 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-16 -left-16 w-44 h-44 bg-[#5CB07C]/10 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="flex flex-col md:flex-row items-stretch relative z-10">
-              <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-gradient-to-br from-slate-50 to-blue-50/40 md:w-1/3 md:border-b-0 md:border-l">
-                <div className="relative w-full md:absolute md:inset-0 md:h-full">
-                  <CardImage
-                    src={topCourse.thumbnailUrl || '/logo.webp'}
-                    alt={topCourse.title}
-                    sizes="(max-width: 767px) 100vw, 33vw"
-                    className="md:aspect-auto md:h-full"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-white/20 via-transparent to-transparent pointer-events-none" />
-                <span className="absolute top-2.5 right-2.5 text-[10px] sm:text-[11px] font-black text-white px-3 py-1 rounded-full border border-white/30 shadow-lg"
-                  style={{ background: 'rgba(23, 58, 124, 0.85)', backdropFilter: 'blur(14px)' }}
-                >
-                  🔒 مشغل محمي ومشفر
-                </span>
-              </div>
-
-              <div className="p-5 sm:p-7 min-w-0 flex-1 flex flex-col justify-between space-y-4 sm:space-y-5">
-                <div className="space-y-3.5 sm:space-y-4">
-                  <motion.div variants={textItemVariants}>
-                    <span className="inline-flex items-center gap-1.5 text-xs font-black text-[#0D5C3A] mb-2.5">
-                      <PlayCircle className="w-3.5 h-3.5 text-[#0D5C3A]" />
-                      <span>{topCourse.progressPercent >= 100 ? '🎉 دورة مكتملة بنجاح' : 'الدرس الحالي للمتابعة'}</span>
-                    </span>
-                  </motion.div>
-
-                  <motion.h3 variants={textItemVariants} className="student-heading-h3 pt-1">
-                    {topCourse.title}
-                  </motion.h3>
-
-                  <motion.p variants={textItemVariants} className="student-text-body pt-1">
-                    المدرب: {topCourse.instructor} · {topCourse.lessonsCount} درس تفاعلي
-                  </motion.p>
-                </div>
-
-                <motion.div variants={textItemVariants} className="space-y-2 pt-1">
-                  <div className="flex items-center justify-between text-xs sm:text-sm font-black">
-                    <span className="text-slate-900 flex items-center gap-1">
-                      <span>إنجاز الدورة:</span>
-                      <span className="text-[#173A7C] font-black">%{topCourse.progressPercent}</span>
-                    </span>
-                  </div>
-                  <div className="w-full h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-200/60"
-                    style={{ background: 'rgba(241,245,249,0.8)' }}
-                  >
-                    <div
-                      className="h-full bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] rounded-full transition-all duration-700 shadow-sm"
-                      style={{ width: `${topCourse.progressPercent}%` }}
-                    />
-                  </div>
-                </motion.div>
-
-                <motion.div variants={textItemVariants} className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5">
-                  <div className="flex items-center gap-1.5 text-xs text-[#0D5C3A] font-black">
-                    <ShieldCheck className="w-4 h-4 text-[#0D5C3A]" />
-                    مشغل محمي ومشفر بأحدث التقنيات
-                  </div>
-
-                  <Link
-                    href={`/dashboard/student/courses/${topCourse.slug}/lessons/lesson-1`}
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-[#173A7C]/20 hover:shadow-lg hover:shadow-[#173A7C]/30 hover:-translate-y-0.5 active:scale-95 cursor-pointer"
-                  >
-                    <span>{topCourse.progressPercent >= 100 ? 'مراجعة الدورة والدروس' : topCourse.progressPercent > 0 ? 'متابعة الدرس الآن' : 'دخول الدرس الآن'}</span>
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                  </Link>
-                </motion.div>
-              </div>
-            </div>
-          </div>
+          <StudentCourseCard course={topCourse} featured />
         </motion.section>
       )}
 
@@ -399,7 +309,7 @@ export default function StudentDashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             {enrolledCourses.map((course, idx) => (
               <motion.div
                 key={course.id}
@@ -407,64 +317,9 @@ export default function StudentDashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35 + idx * 0.14, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -4 }}
-                className="relative overflow-hidden rounded-2xl sm:rounded-[24px] flex flex-col justify-between group min-h-[310px] sm:min-h-[330px] shadow-xl border border-white/30 transition-all duration-300 hover:shadow-2xl"
+                className="h-full min-w-0"
               >
-                <img
-                  src={course.thumbnailUrl}
-                  alt={course.title}
-                  className="absolute inset-0 w-full h-full object-contain"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent" />
-                <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/80 to-transparent z-10" />
-
-                <div className="relative z-10 p-4 flex justify-between items-start">
-                  <span
-                    className="text-[10px] sm:text-[11px] font-black text-white px-3 py-1 rounded-full border border-white/30 shadow-lg"
-                    style={{ background: 'rgba(23, 58, 124, 0.85)', backdropFilter: 'blur(12px)' }}
-                  >
-                    {course.lessonsCount} درس معتمد
-                  </span>
-
-                  <div
-                    className="px-3 py-1 rounded-full text-xs font-black text-emerald-300 border border-emerald-400/40 shadow-lg flex items-center gap-1"
-                    style={{ background: 'rgba(5, 46, 22, 0.85)', backdropFilter: 'blur(12px)' }}
-                  >
-                    <span>مكتمل:</span>
-                    <span className="text-emerald-400 font-black text-sm">%{course.progressPercent}</span>
-                  </div>
-                </div>
-
-                <div className="relative z-10 p-5 space-y-3.5 pt-12">
-                  <div className="space-y-1.5">
-                    <h3 className="font-extrabold text-white text-xs sm:text-base leading-snug drop-shadow-xs line-clamp-2">
-                      {course.title}
-                    </h3>
-                    <p className="text-xs text-emerald-300/90 font-bold flex items-center gap-1.5">
-                      <GraduationCap className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
-                      <span>{course.instructor}</span>
-                    </p>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="w-full h-2 rounded-full overflow-hidden p-0.5 border border-white/20 bg-slate-900/80">
-                      <div
-                        className="h-full bg-gradient-to-r from-[#5CB07C] via-emerald-400 to-teal-300 rounded-full transition-all duration-700 shadow-xs"
-                        style={{ width: `${course.progressPercent}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="pt-1">
-                    <Link
-                      href={`/dashboard/student/courses/${course.slug}/lessons/lesson-1`}
-                      className="w-full py-2.5 rounded-xl bg-white/95 hover:bg-[#173A7C] text-[#173A7C] hover:text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all duration-300 border border-white/60 hover:border-[#173A7C] shadow-lg cursor-pointer active:scale-98"
-                    >
-                      <span>{course.progressPercent >= 100 ? 'مراجعة الدروس (مكتمل)' : course.progressPercent > 0 ? 'متابعة الدورة' : 'ابدأ الدورة الآن'}</span>
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                </div>
+                <StudentCourseCard course={course} />
               </motion.div>
             ))}
           </div>

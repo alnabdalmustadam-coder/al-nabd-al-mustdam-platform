@@ -43,8 +43,7 @@ test('content cards use the shared responsive image frame without local cropping
     'components/ui/CourseCard.tsx',
     'app/dashboard/admin/courses/page.tsx',
     'app/dashboard/instructor/courses/page.tsx',
-    'app/dashboard/student/courses/page.tsx',
-    'app/dashboard/student/page.tsx',
+    'components/student/student-course-card.tsx',
     'app/dashboard/student/wishlist/page.tsx',
     'app/dashboard/student/pathways/page.tsx',
     'app/dashboard/admin/articles/page.tsx',
@@ -69,19 +68,8 @@ test('content cards use the shared responsive image frame without local cropping
         const container = node.parent;
         assert.ok(ts.isJsxElement(container), path);
         const className = container.openingElement.attributes.properties.find(attribute => attribute.name?.getText(file) === 'className');
-        if (path === 'app/dashboard/student/page.tsx' && attributes.includes('className')) {
-          // The featured horizontal course keeps the artwork in a full-height, one-third column.
-          const frame = node.attributes.properties.find(attribute => attribute.name?.getText(file) === 'className');
-          assert.equal(frame?.initializer?.text, 'md:aspect-auto md:h-full', path);
-          assert.equal(className?.initializer?.text, 'relative w-full md:absolute md:inset-0 md:h-full', path);
-          const column = container.parent;
-          assert.ok(ts.isJsxElement(column), path);
-          const columnClass = column.openingElement.attributes.properties.find(attribute => attribute.name?.getText(file) === 'className');
-          assert.match(columnClass?.initializer?.text || '', /\bmd:w-1\/3\b/, path);
-        } else {
-          assert.ok(!attributes.includes('className'), path);
-          assert.doesNotMatch(className?.initializer?.getText(file) || '', /(?:^|[ "'])(?:sm:|md:)?(?:max-|min-)?h-(?:\d|\[)|absolute/, path);
-        }
+        assert.ok(!attributes.includes('className'), path);
+        assert.doesNotMatch(className?.initializer?.getText(file) || '', /(?:^|[ "'])(?:sm:|md:)?(?:max-|min-)?h-(?:\d|\[)|absolute/, path);
       }
       ts.forEachChild(node, inspect);
     };

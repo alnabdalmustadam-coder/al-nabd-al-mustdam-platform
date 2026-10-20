@@ -181,6 +181,7 @@ function mountPage(filename, initialCourses = []) {
     '@/components/student/course-document-viewer': { CourseDocumentViewer: 'CourseDocumentViewer', AttachmentPreview: 'AttachmentPreview' },
     '@/components/student/satisfaction-heart': { SatisfactionHeart: 'SatisfactionHeart' },
     '@/components/student/progress-card': { ProgressCard: 'ProgressCard' },
+    '@/components/student/student-course-card': { StudentCourseCard: 'StudentCourseCard' },
     '@/utils/supabase/client': { createClient: () => db },
     '@/context/CartContext': { useCart: () => ({ cart: [], clearCart() {} }) },
     '@/lib/actions/student-actions': { getLessonNotes: () => [], saveCompletedLessons() {}, saveLessonNote() {}, saveQuizAttempt() {}, getCourseAllLessons: course => course.curriculum },

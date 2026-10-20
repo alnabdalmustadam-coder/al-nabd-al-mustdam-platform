@@ -5,22 +5,15 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion, Variants } from 'framer-motion';
 import {
-  ArrowLeft,
   Search,
   BookOpen,
-  GraduationCap,
   Loader2,
-  PlayCircle,
-  Clock,
-  Sparkles,
-  CheckCircle2,
   Library,
-  BookCheck,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { findCourseByIdentifier, fetchPublicCourses } from '@/lib/public-courses';
 import { getCourseAllLessons } from '@/lib/actions/student-actions';
-import { CardImage } from '@/components/ui/CardImage';
+import { StudentCourseCard } from '@/components/student/student-course-card';
 
 const sectionFadeVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -111,11 +104,11 @@ function StudentCoursesContent() {
           if (enrollmentsData && enrollmentsData.length > 0) {
             const courseMap = new Map<string, EnrolledCourseItem>();
 
-            enrollmentsData.forEach((e: any, idx: number) => {
+            enrollmentsData.forEach((e, idx: number) => {
               const cleanSlug = (e.course_id || '').replace(/^course-/, '').toLowerCase().trim();
               const matchedCatalog =
                 findCourseByIdentifier(liveList, cleanSlug) ||
-                liveList.find((c: any) => c.title === e.course_title) ||
+                liveList.find((c) => c.title === e.course_title) ||
                 null;
 
               // Keep enrollment records in storage; only offer currently published courses.
@@ -327,75 +320,9 @@ function StudentCoursesContent() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + idx * 0.08, duration: 0.55 }}
-                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-3xl p-5 border border-slate-200/90 shadow-xs hover:shadow-xl transition-all duration-300 bg-white/95"
+                  className="h-full min-w-0"
                 >
-                  <div>
-                    {/* Top Image Section with Clean Light Glow */}
-                    <div className="relative mb-4 overflow-hidden rounded-2xl border border-slate-100/90 bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 transition-colors group-hover:border-blue-100">
-                      <div className="relative w-full">
-                        <CardImage
-                          src={course.thumbnailUrl || '/logo.webp'}
-                          alt={course.title}
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                      </div>
-
-                      {/* Lessons Badge on Top-Right */}
-                      <div className="absolute top-3 right-3 z-20">
-                        <span className="px-3 py-1 rounded-full text-[11px] font-black bg-white/90 text-[#173A7C] border border-blue-100/80 shadow-xs backdrop-blur-md">
-                          {course.completedLessons} من {course.lessonsCount} درس
-                        </span>
-                      </div>
-
-                      {/* Progress Badge on Top-Left */}
-                      <div className="absolute top-3 left-3 z-20">
-                        <span className="px-3 py-1 rounded-full text-[11px] font-black bg-emerald-600 text-white shadow-xs backdrop-blur-md">
-                          مكتمل: %{course.progressPercent}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Title & Instructor */}
-                    <div className="space-y-1.5">
-                      <h3 className="text-base font-black text-slate-900 group-hover:text-[#173A7C] transition-colors leading-snug line-clamp-2">
-                        {course.title}
-                      </h3>
-                      <p className="text-xs text-slate-500 font-bold flex items-center gap-1.5">
-                        <GraduationCap className="w-3.5 h-3.5 text-[#173A7C] shrink-0" />
-                        <span>{course.instructor}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Progress Bar & Actions */}
-                  <div className="space-y-3.5 pt-4 mt-4 border-t border-slate-100">
-                    <div className="space-y-1.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                      <div className="flex items-center justify-between text-[11px] font-black">
-                        <span className="text-slate-700">مستوى الإنجاز</span>
-                        <span className="text-[#173A7C]">%{course.progressPercent}</span>
-                      </div>
-                      <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full transition-all duration-500"
-                          style={{ width: `${course.progressPercent}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <Link
-                      href={`/dashboard/student/courses/${course.slug}/lessons/lesson-1`}
-                      className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#2A65C7] text-white font-black text-xs flex items-center justify-center gap-2 transition-all duration-300 shadow-xs hover:shadow-md active:scale-98"
-                    >
-                      <PlayCircle className="w-4 h-4 text-emerald-300" />
-                      <span>
-                        {course.progressPercent >= 100
-                          ? 'مراجعة الدروس (مكتمل)'
-                          : course.progressPercent > 0
-                          ? 'متابعة الدراسة (دخول المشغل)'
-                          : 'بدء المساق الآن'}
-                      </span>
-                    </Link>
-                  </div>
+                  <StudentCourseCard course={course} />
                 </motion.div>
               ))}
             </div>
