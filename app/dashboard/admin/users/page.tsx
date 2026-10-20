@@ -263,39 +263,6 @@ function AdminUsersPageContent() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const toggleUserStatus = async (id: string) => {
-    const user = users.find((u) => u.id === id);
-    if (!user) return;
-    const newStatus = user.status === 'active' ? 'suspended' : 'active';
-
-    // Optimistic update
-    setUsers((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, status: newStatus } : u))
-    );
-
-    try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: id, status: newStatus }),
-      });
-      if (!res.ok) {
-        // Revert on failure
-        setUsers((prev) =>
-          prev.map((u) => (u.id === id ? { ...u, status: user.status } : u))
-        );
-        const data = await res.json().catch(() => ({}));
-        alert(data.message || 'فشل تغيير حالة المستخدم');
-      }
-    } catch {
-      // Revert on error
-      setUsers((prev) =>
-        prev.map((u) => (u.id === id ? { ...u, status: user.status } : u))
-      );
-      alert('حدث خطأ في الاتصال بالخادم');
-    }
-  };
-
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
       u.name.includes(searchQuery) || u.email.includes(searchQuery) || u.phone.includes(searchQuery);
@@ -389,36 +356,38 @@ function AdminUsersPageContent() {
           </div>
           <div className="liquid-glass-inset p-3.5 rounded-xl border border-white/70">
             <p className="text-[11px] text-slate-500 font-bold">الحسابات النشطة</p>
-            <p className="text-base sm:text-lg font-black text-emerald-700">{activeCount} نشط 🟢</p>
+            <p className="text-base sm:text-lg font-black text-emerald-700">{activeCount}</p>
           </div>
         </div>
       </motion.div>
 
       {/* Filter Tabs & Search Bar */}
-      <div className="liquid-glass-card rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/60 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-        <div className="premium-tabs flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+      <div className="liquid-glass-card rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/60 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
+        <div className="premium-tabs flex items-center gap-1.5 sm:gap-2 w-full md:w-auto">
           {[
-            { id: 'all', label: 'الجميع' },
-            { id: 'طالب', label: 'الطلاب والمتدربين 🎓' },
-            { id: 'مدرب', label: 'المحاضرين 👨‍🏫' },
+            { id: 'all', label: 'الجميع', mobileLabel: 'الجميع' },
+            { id: 'طالب', label: 'الطلاب والمتدربين 🎓', mobileLabel: 'الطلاب' },
+            { id: 'مدرب', label: 'المحاضرين 👨‍🏫', mobileLabel: 'المدربون' },
           ].map((tab) => {
             const isActive = roleFilter === tab.id;
             return (
               <button
                 key={tab.id}
+                type="button"
+                aria-pressed={isActive}
                 onClick={() => setRoleFilter(tab.id as any)}
-                className={`premium-tab flex-1 sm:flex-none px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${isActive
+                className={`premium-tab min-w-0 flex-1 md:flex-none px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${isActive
                     ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-[#173A7C]'
                     : 'bg-white/80 text-slate-700 hover:bg-white hover:text-[#173A7C] border border-slate-200/80'
                   }`}
               >
-                <span className="premium-tab-label">{tab.label}</span>
+                <span className="premium-tab-label"><span className="md:hidden">{tab.mobileLabel}</span><span className="hidden md:inline">{tab.label}</span></span>
               </button>
             );
           })}
         </div>
 
-        <div className="relative w-full sm:w-80">
+        <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute top-3.5 right-3.5" />
           <input
             type="text"
@@ -444,7 +413,6 @@ function AdminUsersPageContent() {
                 <th className="p-4">المساقات المسجلة</th>
                 <th className="p-4">نسبة الحضور والتفاعل</th>
                 <th className="p-4">آخر نشاط</th>
-                <th className="p-4">الحالة</th>
                 <th className="p-4 text-center">الإجراءات</th>
               </tr>
             </thead>
@@ -499,18 +467,7 @@ function AdminUsersPageContent() {
                     </span>
                   </td>
                   <td className="p-4 text-slate-500 font-medium">
-                    {user.lastActive}
-                  </td>
-                  <td className="p-4">
-                    <button
-                      onClick={() => toggleUserStatus(user.id)}
-                      className={`px-3 py-1 rounded-full text-[10px] font-black border cursor-pointer transition-all ${user.status === 'active'
-                          ? 'bg-emerald-500/10 text-emerald-800 border-emerald-500/30 hover:bg-emerald-500/20'
-                          : 'bg-rose-500/10 text-rose-800 border-rose-500/30 hover:bg-rose-500/20'
-                        }`}
-                    >
-                      {user.status === 'active' ? 'نشط 🟢' : 'معلق 🔴'}
-                    </button>
+                    {user.lastActive === 'نشط' ? '—' : user.lastActive || '—'}
                   </td>
                   <td className="p-4 text-center">
                     <div className="flex items-center justify-center gap-1.5">
@@ -547,102 +504,89 @@ function AdminUsersPageContent() {
         </div>
 
         {/* Mobile Cards - visible only on mobile */}
-        <div className="md:hidden divide-y divide-[#173A7C]/8">
+        <div className="md:hidden divide-y-2 divide-[#173A7C]/20">
           {filteredUsers.map((user) => (
-            <div key={user.id} className="p-4 space-y-3">
-              {/* User Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+            <article key={user.id} aria-label={'حساب ' + user.name} className="space-y-3 p-4">
+              <header className="flex min-w-0 items-start justify-between gap-3">
+                <div className="flex min-w-0 flex-1 items-start gap-3">
                   {user.avatarUrl ? (
                     <img
                       src={user.avatarUrl}
                       alt={user.name}
-                      className="w-10 h-10 rounded-xl object-cover shadow-md border border-white/60 shrink-0 bg-slate-100"
+                      className="h-10 w-10 shrink-0 rounded-xl border border-white/60 bg-slate-100 object-cover shadow-md"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white font-black flex items-center justify-center shrink-0 text-sm shadow-md shadow-[#173A7C]/20 border border-white/20">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-sm font-black text-white shadow-md shadow-[#173A7C]/20">
                       {user.name.charAt(0)}
                     </div>
                   )}
-                  <div>
-                    <div className="font-extrabold text-[#152C5B] text-sm student-heading-h3">
-                      {user.name}
-                    </div>
-                    <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                      user.role === 'طالب' ? 'bg-[#173A7C]/10 text-[#173A7C] border-[#173A7C]/20' :
-                      user.role === 'مدرب' ? 'bg-amber-500/10 text-amber-800 border-amber-500/20' :
-                      'bg-rose-500/10 text-rose-800 border-rose-500/20'
-                    }`}>
-                      {user.role}
-                    </span>
+                  <div className="min-w-0 flex-1 break-words pt-1 text-sm font-bold leading-6 text-[#152C5B]">
+                    {user.name}
                   </div>
                 </div>
+                <span className={'inline-flex min-h-6 shrink-0 items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ' + (
+                  user.role === 'طالب' ? 'border-[#173A7C]/20 bg-[#173A7C]/10 text-[#173A7C]' :
+                  user.role === 'مدرب' ? 'border-amber-500/20 bg-amber-500/10 text-amber-800' :
+                  'border-rose-500/20 bg-rose-500/10 text-rose-800'
+                )}>
+                  {user.role}
+                </span>
+              </header>
+
+              <div className="space-y-2 rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2.5 text-[11px]">
+                <div className="flex min-w-0 items-start gap-2 text-slate-600">
+                  <Mail aria-hidden="true" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#173A7C]" />
+                  <span className="min-w-0 break-all font-mono leading-5" dir="ltr">{user.email}</span>
+                </div>
+                <div className="flex min-w-0 items-center gap-2 text-slate-500">
+                  <Phone aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                  <span className="min-w-0 font-mono leading-5" dir="ltr">{user.phone}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="liquid-glass-inset rounded-lg border border-white/60 p-2 text-center">
+                  <p className="text-[10px] font-medium text-slate-500">المساقات</p>
+                  <p className="text-sm font-bold tabular-nums text-[#173A7C]">{user.enrolledCourses}</p>
+                </div>
+                <div className="liquid-glass-inset rounded-lg border border-white/60 p-2 text-center">
+                  <p className="text-[10px] font-medium text-slate-500">الحضور</p>
+                  <p className="font-mono text-sm font-bold text-emerald-700">{user.attendanceRate}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] gap-2 border-t border-[#173A7C]/10 pt-3">
                 <button
-                  onClick={() => toggleUserStatus(user.id)}
-                  className={`px-3 py-1 rounded-full text-[10px] font-black border cursor-pointer shrink-0 ${user.status === 'active'
-                      ? 'bg-emerald-500/10 text-emerald-800 border-emerald-500/30'
-                      : 'bg-rose-500/10 text-rose-800 border-rose-500/30'
-                    }`}
-                >
-                  {user.status === 'active' ? 'نشط 🟢' : 'معلق 🔴'}
-                </button>
-              </div>
-
-              {/* Contact Info */}
-              <div className="space-y-1.5 text-[11px]">
-                <div className="flex items-center gap-1.5 text-slate-600">
-                  <Mail className="w-3.5 h-3.5 text-[#173A7C] shrink-0" />
-                  <span className="font-mono">{user.email}</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-slate-500">
-                  <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span className="font-mono" dir="ltr">{user.phone}</span>
-                </div>
-              </div>
-
-              {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-2">
-                <div className="liquid-glass-inset p-2 rounded-lg border border-white/60 text-center">
-                  <p className="text-[9px] text-slate-500 font-bold">المساقات</p>
-                  <p className="text-sm font-black text-[#173A7C]">{user.enrolledCourses}</p>
-                </div>
-                <div className="liquid-glass-inset p-2 rounded-lg border border-white/60 text-center">
-                  <p className="text-[9px] text-slate-500 font-bold">الحضور</p>
-                  <p className="text-sm font-black text-emerald-700 font-mono">{user.attendanceRate}</p>
-                </div>
-                <div className="liquid-glass-inset p-2 rounded-lg border border-white/60 text-center">
-                  <p className="text-[9px] text-slate-500 font-bold">آخر نشاط</p>
-                  <p className="text-[10px] font-bold text-slate-600">{user.lastActive}</p>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-2 pt-1">
-                <button
+                  type="button"
                   onClick={() => {
                     setUserToEditName(user);
                     setEditStudentFullName(user.name);
                   }}
-                  className="px-3 py-2 rounded-lg bg-blue-50 hover:bg-[#173A7C] text-[#173A7C] hover:text-white transition-all cursor-pointer border border-blue-200 shadow-xs flex items-center justify-center"
+                  aria-label={'تعديل اسم ' + user.name}
+                  className="flex min-h-11 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-[#173A7C] shadow-xs transition-colors hover:bg-[#173A7C] hover:text-white"
                   title="تعديل وتصحيح اسم المتدرب"
                 >
-                  <Pencil className="w-4 h-4" />
+                  <Pencil aria-hidden="true" className="h-4 w-4" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => setSelectedUserForLogs(user)}
-                  className="flex-1 py-2 rounded-lg bg-white hover:bg-[#173A7C] hover:text-white text-[#173A7C] font-bold text-[11px] transition-all cursor-pointer border border-[#173A7C]/20 shadow-xs text-center"
+                  className="flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-xl border border-[#173A7C]/20 bg-white px-2 text-xs font-semibold text-[#173A7C] shadow-xs transition-colors hover:bg-[#173A7C] hover:text-white"
                 >
-                  سجل الأنشطة 📋
+                  <Activity aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+                  <span>سجل الأنشطة</span>
                 </button>
                 <button
+                  type="button"
                   onClick={() => setUserToDelete(user)}
-                  className="px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white transition-all cursor-pointer border border-rose-200 shadow-xs flex items-center justify-center"
+                  aria-label={'حذف حساب ' + user.name}
+                  className="flex min-h-11 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600 shadow-xs transition-colors hover:bg-rose-600 hover:text-white"
                   title="حذف الحساب"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 aria-hidden="true" className="h-4 w-4" />
                 </button>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>

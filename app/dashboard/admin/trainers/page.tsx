@@ -353,28 +353,27 @@ export default function AdminTrainersPage() {
   return (
     <div className="space-y-6 sm:space-y-8" dir="rtl">
       {/* Page Header */}
-      <div className="p-6 sm:p-8 rounded-3xl liquid-glass border border-white/60 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-2 z-10">
+      <div className="p-4 sm:p-6 md:p-8 rounded-3xl liquid-glass border border-white/60 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+        <div className="min-w-0 w-full space-y-2 z-10 md:w-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#173A7C]/10 text-[#173A7C] text-xs font-black">
             <GraduationCap className="w-4 h-4" />
             <span>الهيئة التدريبية والأكاديمية</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-            <span>إدارة المدربين والمحاضرين</span>
-            <span>👨‍🏫</span>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+            إدارة المدربين والمحاضرين
           </h1>
-          <p className="text-xs sm:text-sm font-bold text-slate-500 max-w-xl">
+          <p className="text-xs md:text-sm font-medium text-slate-500 leading-6 md:font-bold md:max-w-xl">
             إدارة حسابات المدربين، تحديث الصور والبيانات، تعيين الدورات المعتمدة، وإحصائيات الطلاب الحية.
           </p>
         </div>
 
-        <div className="z-10 flex items-center gap-3">
+        <div className="z-10 flex w-full items-center gap-3 md:w-auto md:shrink-0">
           <button
             onClick={() => {
               setNewTrainerPassword(generatePassword());
               setShowAddModal(true);
             }}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs sm:text-sm flex items-center gap-2.5 shadow-lg shadow-[#173A7C]/25 transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
+            className="min-h-11 w-full justify-center px-4 py-2.5 rounded-xl md:w-auto md:px-5 md:py-3 md:rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs sm:text-sm flex items-center gap-2.5 shadow-lg shadow-[#173A7C]/25 transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>إضافة وتفعيل مدرب جديد</span>
@@ -383,8 +382,8 @@ export default function AdminTrainersPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="relative min-w-0 w-full flex-1 md:max-w-md">
           <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
@@ -395,22 +394,25 @@ export default function AdminTrainersPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="grid grid-cols-3 gap-2 md:flex md:items-center">
           {[
-            { key: 'all', label: 'جميع المدربين' },
-            { key: 'active', label: 'على رأس العمل' },
-            { key: 'on_leave', label: 'إجازة / غير متاح' },
+            { key: 'all', label: 'جميع المدربين', mobileLabel: 'الجميع' },
+            { key: 'active', label: 'على رأس العمل', mobileLabel: 'على رأس العمل' },
+            { key: 'on_leave', label: 'إجازة / غير متاح', mobileLabel: 'إجازة' },
           ].map((st) => (
             <button
               key={st.key}
+              type="button"
+              aria-pressed={statusFilter === st.key}
+              title={st.label}
               onClick={() => setStatusFilter(st.key as any)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`min-h-11 min-w-0 px-2 py-2 rounded-xl text-[11px] font-bold whitespace-nowrap md:min-h-0 md:px-3.5 md:text-xs transition-all cursor-pointer ${
                 statusFilter === st.key
                   ? 'bg-[#173A7C] text-white shadow-xs'
                   : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
               }`}
             >
-              {st.label}
+              <span className="md:hidden">{st.mobileLabel}</span><span className="hidden md:inline">{st.label}</span>
             </button>
           ))}
         </div>
@@ -433,16 +435,16 @@ export default function AdminTrainersPage() {
           {filteredTrainers.map((t) => (
             <div
               key={t.id}
-              className="p-6 rounded-3xl liquid-glass-card liquid-glass-hover space-y-5 student-card-accent transition-all duration-300 border border-white/70 shadow-lg hover:shadow-xl"
+              className="min-w-0 p-4 rounded-2xl liquid-glass-card liquid-glass-hover space-y-4 student-card-accent transition-all duration-300 border border-white/70 shadow-lg hover:shadow-xl md:p-6 md:rounded-3xl md:space-y-5"
             >
               {/* Header: Avatar, Name, Specialty, and Actions */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-4">
+              <div className="flex min-w-0 flex-col items-stretch gap-3 md:flex-row md:items-start md:justify-between">
+                <div className="flex min-w-0 w-full items-start gap-3 md:w-auto md:items-center md:gap-4">
                   {t.avatarUrl ? (
                     <img
                       src={t.avatarUrl}
                       alt={t.name}
-                      className="w-20 h-20 rounded-2xl object-cover shadow-md border-2 border-white/80 shrink-0 bg-slate-100"
+                      className="h-16 w-16 shrink-0 rounded-2xl border-2 border-white/80 bg-slate-100 object-cover shadow-md md:h-20 md:w-20"
                     />
                   ) : (
                     <img
@@ -452,55 +454,58 @@ export default function AdminTrainersPage() {
                           : '/trainer-default-male.webp'
                       }
                       alt={t.name}
-                      className="w-20 h-20 rounded-2xl object-cover shadow-md border-2 border-white/80 shrink-0 bg-slate-100"
+                      className="h-16 w-16 shrink-0 rounded-2xl border-2 border-white/80 bg-slate-100 object-cover shadow-md md:h-20 md:w-20"
                     />
                   )}
-                  <div className="space-y-0.5">
-                    <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug">{t.name}</h3>
-                    <p className="text-xs text-[#0D5C3A] font-bold">{t.specialty}</p>
+                  <div className="min-w-0 flex-1 space-y-1 md:space-y-0.5">
+                    <h3 className="break-words text-sm font-bold leading-6 text-slate-900 md:text-base md:font-black md:leading-snug">{t.name}</h3>
+                    <p className="break-words text-xs font-medium leading-6 text-[#0D5C3A] md:font-bold">{t.specialty}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex w-full shrink-0 items-center gap-1.5 border-t border-slate-200/80 pt-3 md:w-auto md:border-t-0 md:pt-0">
                   <span
-                    className={`px-3 py-1 rounded-full text-[10px] font-black border ${
+                    className={'me-auto inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-[10px] font-semibold md:me-0 md:font-black ' + (
                       t.status === 'active'
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                        : 'bg-amber-50 text-amber-800 border-amber-300'
-                    }`}
+                        ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                        : 'border-amber-300 bg-amber-50 text-amber-800'
+                    )}
                   >
-                    {t.status === 'active' ? 'على رأس العمل 🟢' : 'إجازة 🟡'}
+                    <span aria-hidden="true" className={'h-1.5 w-1.5 rounded-full ' + (t.status === 'active' ? 'bg-emerald-600' : 'bg-amber-500')} />
+                    {t.status === 'active' ? 'على رأس العمل' : 'إجازة'}
                   </span>
 
-                  {/* Edit Button */}
                   <button
+                    type="button"
                     onClick={() => handleOpenEdit(t)}
-                    className="p-2 rounded-xl bg-[#173A7C]/10 hover:bg-[#173A7C] text-[#173A7C] hover:text-white transition-all cursor-pointer border border-[#173A7C]/20 shadow-xs"
+                    aria-label={'تعديل بيانات ' + t.name}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#173A7C]/20 bg-[#173A7C]/10 text-[#173A7C] shadow-xs transition-colors hover:bg-[#173A7C] hover:text-white md:h-auto md:w-auto md:p-2"
                     title="تعديل بيانات المدرب والصورة"
                   >
-                    <Pencil className="w-3.5 h-3.5" />
+                    <Pencil aria-hidden="true" className="h-3.5 w-3.5" />
                   </button>
 
-                  {/* Delete Button */}
                   <button
+                    type="button"
                     onClick={() => setTrainerToDelete(t)}
-                    className="p-2 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white transition-all cursor-pointer border border-rose-200 shadow-xs"
+                    aria-label={'حذف حساب ' + t.name}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600 shadow-xs transition-colors hover:bg-rose-600 hover:text-white md:h-auto md:w-auto md:p-2"
                     title="حذف حساب المدرب"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 aria-hidden="true" className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
 
               {/* Contact Information */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600 font-bold bg-white/50 p-2.5 rounded-xl border border-slate-100">
-                <div className="flex items-center gap-2 truncate">
-                  <Mail className="w-3.5 h-3.5 text-[#173A7C] shrink-0" />
-                  <span className="truncate font-mono" dir="ltr">{t.email}</span>
+              <div className="grid min-w-0 grid-cols-1 gap-2 rounded-xl border border-slate-100 bg-white/50 p-2.5 text-xs font-medium text-slate-600 md:grid-cols-2 md:font-bold">
+                <div className="flex min-w-0 items-start gap-2 md:items-center">
+                  <Mail aria-hidden="true" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#173A7C] md:mt-0" />
+                  <span className="min-w-0 break-all font-mono leading-5 md:truncate" dir="ltr">{t.email}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span className="font-mono" dir="ltr">{t.phone}</span>
+                <div className="flex min-w-0 items-center gap-2">
+                  <Phone aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                  <span className="min-w-0 font-mono leading-5" dir="ltr">{t.phone}</span>
                 </div>
               </div>
 
@@ -512,7 +517,7 @@ export default function AdminTrainersPage() {
                     {t.assignedCourseTitles.map((title, idx) => (
                       <span
                         key={idx}
-                        className="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200/80 truncate max-w-xs"
+                        className="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200/80 truncate max-w-full md:max-w-xs"
                       >
                         📚 {title}
                       </span>
