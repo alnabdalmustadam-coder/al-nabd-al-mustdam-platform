@@ -11,10 +11,18 @@ const all = (tree, predicate) => { const found = []; function visit(node) { if (
 // boundaries. The portal belongs to the dialog, not a separate focus scope.
 function mount(patch = {}) {
   const slots = [], pending = [], changes = [], portalHosts = [];
-  let cursor = 0, tree, focus, prevented = 0, stopped = 0;
+  let cursor = 0, tree, focus, prevented = 0, stopped = 0, documentState;
   const rect = { top: 200, bottom: 248, left: 320, right: 560, width: 240 };
   const viewport = { offsetTop: 0, offsetLeft: 0, width: 900, height: 800 };
-  class Node { getClientRects() { return [rect]; } focus() { focus = this.name; } contains(value) { return value === this; } }
+  class Node {
+    getClientRects() { return [rect]; }
+    focus(options) {
+      focus = this.name; documentState.activeElement = this;
+      // Model the browser scrolling the dialog to reveal a portalled input.
+      if (patch.scrollOnFocus && !options?.preventScroll) Object.assign(rect, { top: -100, bottom: -52 });
+    }
+    contains(value) { return value === this; }
+  }
   const before = Object.assign(new Node(), { name: 'before' }), after = Object.assign(new Node(), { name: 'after' });
   const search = Object.assign(new Node(), { name: 'search', insidePopup: true });
   const trigger = Object.assign(new Node(), { name: 'trigger', getBoundingClientRect: () => rect, matches: () => Boolean(patch.disabled), closest: () => dialog });
@@ -23,6 +31,8 @@ function mount(patch = {}) {
   const dialog = { querySelectorAll: () => [before, trigger, after, search] };
   const listeners = new Map();
   const surface = prefix => ({ addEventListener(name, callback) { const key = `${prefix}:${name}`; if (!listeners.has(key)) listeners.set(key, new Set()); listeners.get(key).add(callback); }, removeEventListener(name, callback) { listeners.get(`${prefix}:${name}`)?.delete(callback); } });
+  documentState = { body: dialog, activeElement: trigger, ...surface('document') };
+  const visualViewport = { ...viewport, ...surface('viewport') };
   const react = {
     useId() { cursor++; return 'select-fixture'; },
     useRef(initial) { const i = cursor++; slots[i] ??= { current: initial }; return slots[i]; },
@@ -38,7 +48,7 @@ function mount(patch = {}) {
   const source = readFileSync(new URL('../components/courses/editor/editor-select.tsx', import.meta.url), 'utf8');
   const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText;
   vm.runInNewContext(code, { exports, require: name => { assert.ok(name in modules, name); return modules[name]; }, Node,
-    document: { body: dialog, ...surface('document') }, window: { innerWidth: 900, innerHeight: 800, visualViewport: { ...viewport, ...surface('viewport') }, ...surface('window') },
+    document: documentState, window: { innerWidth: 900, innerHeight: 800, visualViewport, ...surface('window') },
     requestAnimationFrame: callback => { callback(); return 1; }, cancelAnimationFrame() {},
   });
   let props = { label: 'المستوى', value: 'all', options, onChange: value => { changes.push(value); props = { ...props, value }; }, ...patch };
@@ -47,7 +57,7 @@ function mount(patch = {}) {
   const clickTrigger = () => { all(tree, node => node.type === 'button')[0].props.onClick(); render(); };
   const emit = (name, event) => { for (const fn of listeners.get(name) || []) fn(event); render(); };
   render();
-  return { render, clickTrigger, sendKey, emit, rect, list, changes, portalHosts, dialog, search, trigger, before, after,
+  return { render, clickTrigger, sendKey, emit, rect, visualViewport, list, changes, portalHosts, dialog, search, trigger, before, after,
     tree: () => tree, focus: () => focus, prevented: () => prevented, stopped: () => stopped,
     popup: () => all(tree, node => node.props?.['data-editor-select-popup'] !== undefined)[0],
     options: () => all(tree, node => node.props?.role === 'option'),
@@ -105,6 +115,44 @@ test('the popup flips above a lower field, follows scrolling, and closes when it
   f.rect.top = 500; f.rect.bottom = 548; f.emit('document:scroll', { target: f.before });
   assert.notEqual(f.popup().props.style.top, style.top);
   f.rect.top = -100; f.rect.bottom = -52; f.emit('document:scroll', { target: f.before }); assert.equal(f.popup(), undefined);
+});
+
+test('opening and choosing a trainer near the bottom preserves the dialog scroll position', () => {
+  const f = mount({ searchable: true, scrollOnFocus: true });
+  Object.assign(f.rect, { top: 700, bottom: 748 });
+  f.clickTrigger(); f.emit('document:scroll', { type: 'scroll', target: f.dialog });
+  assert.ok(f.popup(), 'focusing search must not scroll its trigger out of view and dismiss the menu');
+  assert.equal(f.rect.top, 700); assert.equal(f.focus(), 'search');
+  f.options()[1].props.onClick(); f.render();
+  assert.deepEqual(f.changes, ['beginner']); assert.equal(f.focus(), 'trigger');
+  assert.equal(f.rect.top, 700); assert.equal(f.popup(), undefined);
+});
+
+test('the mobile keyboard keeps trainer search open and the menu above the visible viewport edge', () => {
+  const f = mount({ searchable: true });
+  f.visualViewport.width = 390;
+  Object.assign(f.rect, { top: 700, bottom: 748, left: 16, right: 374, width: 358 }); f.clickTrigger();
+  f.visualViewport.height = 420;
+  f.emit('viewport:resize', { type: 'resize', target: f.visualViewport });
+  assert.ok(f.popup(), 'opening the keyboard must not dismiss the focused trainer search');
+  let style = f.popup().props.style;
+  assert.equal(style.transform, 'translateY(-100%)'); assert.ok(style.top <= 408);
+  assert.ok(style.left >= 12); assert.ok(style.left + style.width <= 378);
+  assert.ok(style.top - style.maxHeight >= 12);
+  f.visualViewport.offsetTop = 100; f.visualViewport.height = 320;
+  f.emit('viewport:scroll', { type: 'scroll', target: f.visualViewport });
+  style = f.popup().props.style;
+  assert.ok(style.top <= 408); assert.ok(style.top - style.maxHeight >= 112);
+  f.searchInput().props.onChange({ target: { value: 'متقدم' } }); f.render();
+  f.sendKey('Enter', { target: f.search });
+  assert.deepEqual(f.changes, ['advanced']); assert.equal(f.popup(), undefined);
+});
+
+test('scrolling a trainer field off screen still dismisses its focused search menu', () => {
+  const f = mount({ searchable: true }); f.clickTrigger();
+  Object.assign(f.rect, { top: -100, bottom: -52 });
+  f.emit('document:scroll', { type: 'scroll', target: f.dialog });
+  assert.equal(f.popup(), undefined); assert.deepEqual(f.changes, []);
 });
 
 test('existing custom values remain selectable and disabled selects cannot open', () => {

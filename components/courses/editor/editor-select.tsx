@@ -13,12 +13,14 @@ function menuPosition(trigger: HTMLElement, rows: number, searchable: boolean): 
   const viewTop = viewport?.offsetTop || 0, viewLeft = viewport?.offsetLeft || 0;
   const viewBottom = viewTop + (viewport?.height || window.innerHeight);
   const viewRight = viewLeft + (viewport?.width || window.innerWidth);
-  const below = Math.max(0, viewBottom - rect.bottom - 16), aboveSpace = Math.max(0, rect.top - viewTop - 16);
+  const belowTop = Math.max(viewTop + 12, rect.bottom + 8);
+  const aboveBottom = Math.min(viewBottom - 12, rect.top - 8);
+  const below = Math.max(0, viewBottom - belowTop - 12), aboveSpace = Math.max(0, aboveBottom - viewTop - 12);
   const desired = Math.min(320, Math.max(1, rows) * 48 + 16 + (searchable ? 59 : 0));
   const above = below < desired && aboveSpace > below;
   const width = Math.min(Math.max(rect.width, 220), viewRight - viewLeft - 24);
   return { width, left: Math.max(viewLeft + 12, Math.min(rect.right - width, viewRight - width - 12)),
-    top: above ? rect.top - 8 : rect.bottom + 8, above, maxHeight: Math.min(320, above ? aboveSpace : below) };
+    top: above ? aboveBottom : belowTop, above, maxHeight: Math.min(320, above ? aboveSpace : below) };
 }
 
 /** A select-only combobox, with an optional searchable list for long catalogs. */
@@ -36,7 +38,7 @@ export function EditorSelect({ label, value, options, onChange, disabled = false
   const filtered = choices.filter((option) => option.label.toLocaleLowerCase('ar').includes(query.trim().toLocaleLowerCase('ar')));
   const activeId = filtered[active] ? `${listId}-${active}` : undefined;
 
-  const close = (restore = false) => { setOpen(false); if (restore) trigger.current?.focus(); };
+  const close = (restore = false) => { setOpen(false); if (restore) trigger.current?.focus({ preventScroll: true }); };
   const show = (index = choices.findIndex((option) => option.id === value)) => {
     if (disabled || !trigger.current || trigger.current.matches(':disabled')) return;
     setQuery(''); setActive(Math.max(0, index));
@@ -56,10 +58,13 @@ export function EditorSelect({ label, value, options, onChange, disabled = false
       if (!trigger.current || (event?.target instanceof Node && popup.current?.contains(event.target))) return;
       const rect = trigger.current.getBoundingClientRect();
       const view = window.visualViewport, top = view?.offsetTop || 0, bottom = top + (view?.height || window.innerHeight);
-      if (rect.bottom < top || rect.top > bottom) { setOpen(false); return; }
+      // A mobile keyboard can cover the trigger while search is still in use.
+      // Keep the popup inside the visible area; actual form scrolling still dismisses it.
+      const focusedViewportChange = document.activeElement === search.current && (event?.target === view || event?.target === window);
+      if ((rect.bottom < top || rect.top > bottom) && !focusedViewportChange) { setOpen(false); return; }
       setPosition(menuPosition(trigger.current, choices.length, searchable));
     };
-    const frame = requestAnimationFrame(() => { if (searchable) search.current?.focus(); });
+    const frame = requestAnimationFrame(() => { if (searchable) search.current?.focus({ preventScroll: true }); });
     document.addEventListener('pointerdown', outside, true); document.addEventListener('scroll', reposition, true);
     window.addEventListener('resize', reposition); window.visualViewport?.addEventListener('resize', reposition); window.visualViewport?.addEventListener('scroll', reposition);
     return () => {
