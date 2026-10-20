@@ -93,13 +93,116 @@
 }
 
 .footer {
+  padding: 12px 32px max(12px, env(safe-area-inset-bottom));
   box-shadow: 0 -5px 20px -12px rgb(23 58 124 / 15%);
 }
 
+.footerActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.footerActions > button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.fullLabel {
+  display: inline;
+}
+
+.compactLabel {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .navigation .fullLabel {
+    display: none;
+  }
+
+  .navigation .compactLabel {
+    display: inline;
+  }
+}
+
 @media (max-width: 639px) {
+  .navigation {
+    padding: 8px 12px;
+  }
+
+  .navItem {
+    min-height: 52px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 4px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .navItem[aria-current='step']::before {
+    inset-block: 10px;
+  }
+
   .navIcon {
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+  }
+
+  .navIcon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .navLabel {
+    font-size: 11px;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+
+  .fullLabel {
+    display: none;
+  }
+
+  .compactLabel {
+    display: inline;
+  }
+
+  .footer {
+    padding: 8px 12px max(8px, env(safe-area-inset-bottom));
+  }
+
+  .footerActions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.35fr);
+    gap: 8px;
+  }
+
+  .footerActions > button {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    gap: 4px;
+    padding: 8px 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .footerActions > button svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .dialog [data-editor-add-lessons] > button {
+    width: 100%;
+    min-width: 0;
+    gap: 6px;
+    padding: 8px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 }

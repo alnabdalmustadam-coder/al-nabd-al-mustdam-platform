@@ -33,24 +33,24 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
       subItems: [{ id: `lesson-${crypto.randomUUID()}`, title: '', duration: '', videoUrl: '', type: 'video', isLocked: false, attachments: [] }] }]);
   };
   const busy = disabled || Boolean(videoUpload);
-  return <div className="space-y-7">
+  return <div className="space-y-5 sm:space-y-7">
     <EditorSectionHeading kind="curriculum" eyebrow="المحتوى التعليمي" title="الوحدات والدروس" description="أضف فيديو أو محتوى تفاعليًا أو مستندًا أو اختبارًا داخل أي وحدة، وأرفق ملفاتها ومراجعها. اضغط على زر الحفظ عند الانتهاء."
       action={<button type="button" onClick={addSection} disabled={busy} className={editorPrimary}><Plus className="h-4 w-4" />إضافة وحدة</button>} />
     <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600"><span className="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-white px-3 py-2.5 shadow-sm"><Layers aria-hidden="true" className="h-4 w-4 text-blue-700" /><strong className="font-semibold text-blue-950">{value.length}</strong> وحدات</span>
       <span className="inline-flex items-center gap-2 rounded-xl border border-emerald-100 bg-white px-3 py-2.5 shadow-sm"><BookOpen aria-hidden="true" className="h-4 w-4 text-emerald-700" /><strong className="font-semibold text-slate-900">{value.reduce((total, section) => total + section.subItems.length, 0)}</strong> دروس</span></div>
-    <div className="space-y-6">{value.map((section, sectionIndex) => {
+    <div className="space-y-5 sm:space-y-6">{value.map((section, sectionIndex) => {
       const open = !collapsed.has(section.id);
       return <section key={section.id} data-editor-panel className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-        <header className={`flex items-center gap-3 bg-linear-to-l from-blue-50/70 via-white to-white px-5 py-4 sm:px-6 sm:py-5 ${open ? 'border-b border-slate-100' : ''}`}>
-          <span className={`flex h-12 w-12 shrink-0 flex-col items-center justify-center gap-1 rounded-2xl border text-sm font-semibold ${open ? 'border-blue-800 bg-linear-to-br from-blue-600 to-blue-950 text-white shadow-[0_4px_10px_rgba(23,58,124,0.15)]' : 'border-blue-100 bg-blue-50 text-blue-700'}`}><Layers aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={1.6} /><span className="text-[10px] leading-none">{String(sectionIndex + 1).padStart(2, '0')}</span></span>
+        <header className={`flex items-center gap-3 bg-linear-to-l from-blue-50/70 via-white to-white px-4 py-3 sm:px-6 sm:py-5 ${open ? 'border-b border-slate-100' : ''}`}>
+          <span className={`flex h-10 w-10 shrink-0 flex-col sm:h-12 sm:w-12 items-center justify-center gap-1 rounded-2xl border text-sm font-semibold ${open ? 'border-blue-800 bg-linear-to-br from-blue-600 to-blue-950 text-white shadow-[0_4px_10px_rgba(23,58,124,0.15)]' : 'border-blue-100 bg-blue-50 text-blue-700'}`}><Layers aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={1.6} /><span className="text-[10px] leading-none">{String(sectionIndex + 1).padStart(2, '0')}</span></span>
           <button type="button" disabled={busy} aria-expanded={open} aria-controls={`unit-${section.id}`} className="flex min-h-11 min-w-0 flex-1 items-center justify-between gap-3 text-right" onClick={() => setCollapsed((current) => { const next = new Set(current); if (next.has(section.id)) next.delete(section.id); else next.add(section.id); return next; })}>
-            <span className="min-w-0"><span className="block truncate text-base font-semibold text-slate-900">{section.title || `الوحدة ${sectionIndex + 1}`}</span><span className="mt-1 block text-xs font-normal text-slate-400">{section.subItems.length} دروس · {section.attachments?.length || 0} ملفات للوحدة</span></span>
+            <span className="min-w-0"><span className="block truncate text-sm font-semibold text-slate-900 sm:text-base">{section.title || `الوحدة ${sectionIndex + 1}`}</span><span className="mt-1 block text-xs font-normal text-slate-400">{section.subItems.length} دروس · {section.attachments?.length || 0} ملفات للوحدة</span></span>
             {open ? <ChevronUp className="h-4 w-4 shrink-0 text-slate-400" /> : <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />}
           </button>
           {value.length > 1 && <button type="button" disabled={busy} aria-label={`حذف الوحدة ${sectionIndex + 1}`} onClick={() => onChange((current) => current.filter((item) => item.id !== section.id))}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>}
         </header>
-        {open && <div id={`unit-${section.id}`} className="space-y-7 p-5 sm:p-6">
+        {open && <div id={`unit-${section.id}`} className="space-y-5 p-4 sm:space-y-7 sm:p-6">
           <div className="grid gap-x-5 gap-y-5 sm:grid-cols-[minmax(0,1fr)_160px]">
             <EditorField icon={Layers} label="عنوان الوحدة"><input required value={section.title} onChange={(event) => patchSection(section.id, { title: event.target.value })} placeholder="مثال: مدخل إلى المفاهيم الأساسية" className={editorInput} /></EditorField>
             <EditorField icon={Clock3} label="مدة الوحدة"><input value={section.duration} onChange={(event) => patchSection(section.id, { duration: event.target.value })} placeholder="مثال: 45 دقيقة" className={editorInput} /></EditorField>
@@ -59,7 +59,7 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
             <span className={`relative block h-5 w-9 rounded-full transition-colors ${section.isLocked ? 'bg-slate-300' : 'bg-emerald-600'}`}><span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm ${section.isLocked ? 'right-0.5' : 'left-0.5'}`} /></span>
             المعاينة المجانية للوحدة <span className="font-semibold">{section.isLocked ? 'غير مفعّلة' : 'مفعّلة'}</span>
           </button>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3 sm:p-5">
             <CourseFilesEditor title="ملفات الوحدة" description="مراجع وملخصات تخص هذه الوحدة بالكامل؛ يمكنك إضافة أكثر من ملف PDF أو Word أو PowerPoint." files={section.attachments || []} onChange={(update) => updateFiles(section.id, null, update)} onBusyChange={onFileBusyChange} />
             {section.fileUrl && (!section.legacySingle || section.subItems[0]?.type === 'video') && <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-3 text-xs"><a href={section.fileUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-800">{section.fileName || 'ملف الوحدة السابق'}</a><button type="button" disabled={busy} onClick={() => onChange((current) => current.map((item) => item.id === section.id ? { ...item, fileUrl: undefined, fileName: undefined, fileSize: undefined, subItems: item.legacySingle ? item.subItems.map((lesson) => ({ ...lesson, fileUrl: undefined, fileName: undefined, fileSize: undefined })) : item.subItems } : item))} className="min-h-10 px-3 text-rose-600">إزالة من الوحدة</button></div>}
           </div>
@@ -67,7 +67,7 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
             {section.subItems.map((lesson, lessonIndex) => {
               const uploading = videoUpload?.secIdx === sectionIndex && videoUpload.subIdx === lessonIndex;
               const LessonIcon = lesson.type === 'quiz' ? HelpCircle : lesson.type === 'video' ? Video : FileText;
-              return <article key={lesson.id} className="min-w-0 space-y-5 rounded-2xl border border-slate-200 bg-[#fafbfd] p-4 sm:p-5">
+              return <article key={lesson.id} className="min-w-0 space-y-5 rounded-2xl border border-slate-200 bg-[#fafbfd] p-3 sm:p-5">
                 <div className="flex items-center justify-between gap-3"><p className="flex items-center gap-2 text-xs font-semibold text-slate-600"><span className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-100 bg-white text-blue-800 shadow-sm"><LessonIcon aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={1.7} /></span><span className="rounded-md bg-blue-50 px-2 py-1 tabular-nums text-blue-800">{sectionIndex + 1}.{lessonIndex + 1}</span>{lesson.type === 'quiz' ? 'اختبار' : lesson.type === 'video' ? 'درس فيديو' : 'محتوى مكتوب'}</p>
                   {section.subItems.length > 1 && <button type="button" disabled={busy} aria-label={`حذف الدرس ${lessonIndex + 1} من الوحدة ${sectionIndex + 1}`} onClick={() => onChange((current) => current.map((item) => item.id === section.id ? { ...item, subItems: item.subItems.filter((entry) => entry.id !== lesson.id) } : item))} className="flex h-11 w-11 items-center justify-center rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>}
                 </div>
@@ -91,8 +91,8 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
             })}
           </div>
           {section.quizData && !(section.legacySingle && section.subItems[0]?.type === 'quiz') && <details className="rounded-2xl border border-slate-200 p-5"><summary className="cursor-pointer text-sm font-semibold text-slate-800">إعدادات اختبار الوحدة الحالي</summary><div className="pt-5"><CourseQuizEditor value={section.quizData} onChange={(quizData) => patchSection(section.id, { quizData })} /></div></details>}
-          <div className="flex flex-wrap gap-3 border-t border-slate-100 pt-5">
-            {([{ type: 'video', label: 'إضافة درس فيديو', Icon: Video }, { type: 'article', label: 'إضافة محتوى تفاعلي', Icon: BookOpen }, { type: 'pdf', label: 'إضافة درس مستند', Icon: FileText }, { type: 'quiz', label: 'إضافة اختبار', Icon: HelpCircle }] as const).map(({ type, label, Icon }) => <button key={type} type="button" disabled={busy} onClick={() => addLesson(section.id, type)} className={editorButton}><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50"><Icon aria-hidden="true" className="h-4 w-4 text-blue-800" /></span>{label}</button>)}
+          <div data-editor-add-lessons className="grid grid-cols-2 gap-2 border-t border-slate-100 pt-4 sm:flex sm:flex-wrap sm:gap-3 sm:pt-5">
+            {([{ type: 'video', label: 'إضافة درس فيديو', mobileLabel: 'إضافة فيديو', Icon: Video }, { type: 'article', label: 'إضافة محتوى تفاعلي', mobileLabel: 'محتوى تفاعلي', Icon: BookOpen }, { type: 'pdf', label: 'إضافة درس مستند', mobileLabel: 'إضافة مستند', Icon: FileText }, { type: 'quiz', label: 'إضافة اختبار', mobileLabel: 'إضافة اختبار', Icon: HelpCircle }] as const).map(({ type, label, mobileLabel, Icon }) => <button key={type} type="button" disabled={busy} aria-label={label} title={label} onClick={() => addLesson(section.id, type)} className={editorButton}><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-blue-50 sm:h-7 sm:w-7"><Icon aria-hidden="true" className="h-3.5 w-3.5 text-blue-800 sm:h-4 sm:w-4" /></span><span className="sm:hidden">{mobileLabel}</span><span className="hidden sm:inline">{label}</span></button>)}
           </div>
         </div>}
       </section>;
