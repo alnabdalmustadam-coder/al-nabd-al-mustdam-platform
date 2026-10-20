@@ -19,6 +19,7 @@ import { QuizData, CourseAttachment, LearningJourneySettings } from '@/types';
 import { CardImage } from '@/components/ui/CardImage';
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
 import { createClient } from '@/utils/supabase/client';
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
 
 interface CourseItem {
   id: string;
@@ -709,33 +710,37 @@ export default function AdminCoursesPage() {
       </AnimatePresence>
 
       {/* Header Banner - Unified Liquid Glass Brand Theme */}
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-9 liquid-glass-hero border border-white/80 shadow-[0_10px_35px_-10px_rgba(23,58,124,0.08)]">
+      <div className={`${heroStyles.hero} relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-9 liquid-glass-hero border border-white/80 shadow-[0_10px_35px_-10px_rgba(23,58,124,0.08)]`}>
         {/* Subtle Ambient Reflections */}
         <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#173A7C]/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#5CB07C]/8 rounded-full blur-3xl pointer-events-none" />
         <div className="specular-card-reflection" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2.5">
-            <div className="admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15">
+        <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6`}>
+          <div className={`${heroStyles.intro} space-y-2.5`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15`}>
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
-              <span>إدارة المساقات ومكتبة الفيديو الذكية</span>
+              <span className="sm:hidden">المساقات والمحتوى التدريبي</span>
+              <span className="hidden sm:inline">إدارة المساقات ومكتبة الفيديو الذكية</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#173A7C]">
-              إدارة الدورات والمحتوى الأكاديمي 📚
+            <h1 className={`${heroStyles.title} text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#173A7C]`}>
+              <BookOpen aria-hidden="true" className="sm:hidden" />
+              <span className="sm:hidden">إدارة الدورات والمحتوى</span>
+              <span className="hidden sm:inline">إدارة الدورات والمحتوى الأكاديمي 📚</span>
             </h1>
-            <p className="text-slate-600 text-xs sm:text-sm font-medium max-w-2xl leading-relaxed">
+            <p className={`${heroStyles.description} text-slate-600 text-xs sm:text-sm font-medium max-w-2xl leading-relaxed`}>
               تحكم كامل في البرامج التدريبية المعتمدة ({courses.length} دورات نشطة). أضف برامج جديدة، عدل الأسعار، الصور والأغلفة، وارفع فيديوهات مشفرة فورياً للمنصة.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className={`${heroStyles.actions} ${heroStyles.refreshActions} flex items-center gap-3 shrink-0`}>
             <button
               onClick={openCreateModal}
               className="px-5 py-3 rounded-xl sm:rounded-2xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs sm:text-sm font-black shadow-lg shadow-[#173A7C]/20 transition-all flex items-center gap-2 cursor-pointer hover:-translate-y-0.5 active:scale-95"
             >
               <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-300" />
-              <span>إضافة دورة تدريبية جديدة</span>
+              <span className="sm:hidden">إضافة دورة جديدة</span>
+              <span className="hidden sm:inline">إضافة دورة تدريبية جديدة</span>
             </button>
             <button
               onClick={loadCourses}

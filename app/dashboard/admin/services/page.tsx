@@ -32,6 +32,7 @@ import { createClient } from '@/utils/supabase/client';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
 import { CardImage } from '@/components/ui/CardImage';
 import { useMobileDialogScrollLock } from '@/components/dashboard/useMobileDialogScrollLock';
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
 
 interface AdminServiceItem {
   id: string;
@@ -322,32 +323,35 @@ export default function AdminServicesPage() {
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl p-6 sm:p-8 liquid-glass-hero border border-white/80 student-card-accent"
+        className={`${heroStyles.hero} relative overflow-hidden rounded-3xl p-6 sm:p-8 liquid-glass-hero border border-white/80 student-card-accent`}
       >
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+        <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
+          <div className={`${heroStyles.intro} space-y-2`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200`}>
               <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>لوحة الإدارة العليا • متجر الخدمات والاستشارات</span>
+              <span className="sm:hidden">الخدمات والاستشارات</span>
+              <span className="hidden sm:inline">لوحة الإدارة العليا • متجر الخدمات والاستشارات</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-              <span>إدارة باقات الخدمات والاستشارات</span>
+            <h1 className={`${heroStyles.title} text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3`}>
+              <span className="sm:hidden">إدارة الخدمات والاستشارات</span>
+              <span className="hidden sm:inline">إدارة باقات الخدمات والاستشارات</span>
               <Store className="w-7 h-7 text-[#173A7C] shrink-0" />
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-2xl leading-relaxed">
+            <p className={`${heroStyles.description} text-xs sm:text-sm text-slate-600 font-bold max-w-2xl leading-relaxed`}>
               تحكم كامل في إضافة، تسعير، ونشر باقات الاستشارات الأكاديمية والمهنية، تعيين مقدمي الخدمة، ومتابعة الطلبات المكتملة في المتجر العام.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className={`${heroStyles.actions} flex flex-wrap items-center gap-3 shrink-0`}>
             <Link
               href="/marketplace"
               target="_blank"
               className="px-4 py-3 rounded-2xl bg-white hover:bg-slate-50 text-[#173A7C] font-black text-xs flex items-center gap-2 border border-slate-200 shadow-sm transition-all"
             >
               <Eye className="w-4 h-4" />
-              <span>معاينة المتجر العام</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
+              <span className="sm:hidden">معاينة المتجر</span>
+              <span className="hidden sm:inline">معاينة المتجر العام</span>
+              <ArrowUpRight className="hidden sm:block w-3.5 h-3.5 text-slate-400" />
             </Link>
 
             <button
@@ -355,7 +359,8 @@ export default function AdminServicesPage() {
               className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#132F64] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all hover:scale-[1.02]"
             >
               <Plus className="w-4 h-4" />
-              <span>إضافة خدمة جديدة</span>
+              <span className="sm:hidden">خدمة جديدة</span>
+              <span className="hidden sm:inline">إضافة خدمة جديدة</span>
             </button>
           </div>
         </div>

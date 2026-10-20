@@ -21,6 +21,7 @@ import {
   Building,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
 
 // Client-side WebP converter to reduce storage footprint and maximize performance
 async function convertImageToWebP(file: File, maxDimension = 600, quality = 0.82): Promise<{ blob: Blob; dataUrl: string }> {
@@ -85,7 +86,7 @@ export default function AdminProfilePage() {
     email: 'admin@sustainpulse.org',
     phone: '+966 50 123 4567',
     bio: 'المدير التنفيذي والمشرف العام على المنصة الأكاديمية ونظم التدريب وتراخيص المركز الوطني للتعليم الإلكتروني.',
-    roleTitle: 'مدير المنصة الرئيسي (Super Admin)',
+    roleTitle: 'مدير المنصة الرئيسي',
     department: 'الإدارة العليا والشؤون الأكاديمية',
     avatarUrl: null as string | null,
     joinedDate: 'يناير 2026',
@@ -130,7 +131,7 @@ export default function AdminProfilePage() {
             email: profile?.email || userEmail || 'admin@sustainpulse.org',
             phone: profile?.phone || user.user_metadata?.phone || '+966 50 123 4567',
             bio: profile?.bio || 'المدير التنفيذي والمشرف العام على المنصة الأكاديمية ونظم التدريب وتراخيص المركز الوطني للتعليم الإلكتروني.',
-            roleTitle: 'مدير المنصة الرئيسي (Super Admin)',
+            roleTitle: 'مدير المنصة الرئيسي',
             department: 'الإدارة العليا والشؤون الأكاديمية',
             avatarUrl: resolvedAvatar,
             joinedDate: user.created_at ? new Date(user.created_at).toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' }) : 'يناير 2026',
@@ -313,6 +314,8 @@ export default function AdminProfilePage() {
     }
   };
 
+  const displayName = adminData.fullName.replace(/\s*\(Super Admin\)/gi, '').trim() || 'المدير العام';
+
   const glassCard = {
     background: 'linear-gradient(145deg, rgba(255,255,255,0.92) 0%, rgba(248,250,252,0.85) 100%)',
     backdropFilter: 'blur(24px) saturate(1.8)',
@@ -336,13 +339,13 @@ export default function AdminProfilePage() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative overflow-hidden rounded-3xl p-6 sm:p-8 liquid-glass-hero border border-white/80 student-card-accent"
+        className={`${heroStyles.hero} relative overflow-hidden rounded-3xl p-6 sm:p-8 liquid-glass-hero border border-white/80 student-card-accent`}
       >
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-4 sm:gap-6">
+        <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
+          <div className={`${heroStyles.profileIdentity} flex items-center gap-4 sm:gap-6`}>
             {/* Prominent Admin Avatar Container with Camera Overlay */}
             <div className="relative shrink-0 group">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-3xl overflow-hidden shadow-xl ring-4 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center relative transition-transform duration-300 group-hover:scale-[1.02]">
+              <div className={`${heroStyles.avatar} w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-3xl overflow-hidden shadow-xl ring-4 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center relative transition-transform duration-300 group-hover:scale-[1.02]`}>
                 {adminData.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -365,51 +368,42 @@ export default function AdminProfilePage() {
                   </div>
                 )}
 
-                {/* Hover Trigger Button */}
+                {/* The photo itself opens the existing upload picker. */}
                 <button
                   type="button"
                   disabled={isUploadingAvatar}
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute inset-0 bg-slate-900/65 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer z-10"
+                  aria-label="تغيير صورة المدير العام"
+                  className="absolute inset-0 bg-slate-900/65 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-white focus-visible:-outline-offset-4 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer z-10"
                   title="تغيير صورة المدير"
                 >
                   <Camera className="w-6 h-6 text-white drop-shadow-md" />
                   <span className="text-[10px] font-black mt-1">تغيير الصورة</span>
                 </button>
+                <span aria-hidden="true" className="absolute bottom-1 right-1 rounded-lg bg-[#173A7C]/90 p-1.5 text-white pointer-events-none sm:hidden">
+                  <Camera className="w-3 h-3" />
+                </span>
               </div>
 
               {/* Online Dot */}
               <span className="absolute -bottom-1 -left-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
             </div>
 
-            <div className="space-y-1.5">
-              <div className="admin-hero-tag bg-amber-50 text-amber-800 border border-amber-200">
+            <div className={`${heroStyles.profileIntro} space-y-1.5`}>
+              <div className={`${heroStyles.badge} admin-hero-tag bg-amber-50 text-amber-800 border border-amber-200`}>
                 <Crown className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>{adminData.roleTitle}</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                <span>{adminData.fullName}</span>
+              <h1 className={`${heroStyles.title} text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2`}>
+                <span className={heroStyles.profileName}>{displayName}</span>
                 <ShieldCheck className="w-6 h-6 text-emerald-600 shrink-0" />
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 font-bold">
+              <p className={`${heroStyles.description} text-xs sm:text-sm text-slate-600 font-bold`}>
                 مشرف النظام والمنصة الأكاديمية منذ {adminData.joinedDate}
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            disabled={isUploadingAvatar}
-            onClick={() => fileInputRef.current?.click()}
-            className="px-5 py-3 rounded-2xl bg-white hover:bg-slate-50 text-[#173A7C] font-black text-xs flex items-center gap-2 border border-slate-200 shadow-sm hover:shadow-md cursor-pointer transition-all shrink-0 self-start md:self-center"
-          >
-            {isUploadingAvatar ? (
-              <Loader2 className="w-4 h-4 animate-spin text-[#173A7C]" />
-            ) : (
-              <Camera className="w-4 h-4 text-[#173A7C]" />
-            )}
-            <span>{isUploadingAvatar ? 'جاري التحويل والرفع...' : 'تغيير صورة المدير'}</span>
-          </button>
         </div>
       </motion.div>
 

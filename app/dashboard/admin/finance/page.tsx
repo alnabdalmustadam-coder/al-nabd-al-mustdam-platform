@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
 import { motion } from 'framer-motion';
 import {
   CreditCard,
@@ -90,25 +91,27 @@ export default function AdminFinancePage() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 liquid-glass-hero border border-white/80 student-card-accent"
+        className={`${heroStyles.hero} relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 liquid-glass-hero border border-white/80 student-card-accent`}
       >
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-2">
-            <div className="admin-hero-tag bg-emerald-50 text-emerald-800 border border-emerald-200">
+        <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6`}>
+          <div className={`${heroStyles.intro} space-y-2`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-emerald-50 text-emerald-800 border border-emerald-200`}>
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>المعاملات المالية والفواتير الضريبية</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
-              السجل المالي و<span className="student-name-gradient">الفواتير الضريبية المعتمدة</span> 💳
+            <h1 className={`${heroStyles.title} text-xl sm:text-2xl font-black student-heading-h1`}>
+              <CreditCard aria-hidden="true" className="sm:hidden" />
+              <span className="sm:hidden">السجل المالي والفواتير</span>
+              <span className="hidden sm:inline">السجل المالي و<span className="student-name-gradient">الفواتير الضريبية المعتمدة</span> 💳</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+            <p className={`${heroStyles.description} text-xs sm:text-sm text-slate-600 font-bold max-w-xl`}>
               إدارة الإيرادات، تتبع المدفوعات عبر بوابات الدفع (مدى، تمارا، تابي، Apple Pay)، وإصدار الفواتير.
             </p>
           </div>
 
-          <div className="p-4 sm:p-5 rounded-2xl bg-white/90 border border-white/80 shadow-sm text-right shrink-0 min-w-48">
+          <div className={`${heroStyles.financeSummary} p-4 sm:p-5 rounded-2xl bg-white/90 border border-white/80 shadow-sm text-right shrink-0 min-w-48`}>
             <span className="text-[11px] font-black text-slate-500 block">إجمالي الإيرادات المحصلة</span>
-            <span className="text-xl sm:text-2xl font-black text-[#173A7C]">
+            <span className={`${heroStyles.financeAmount} text-xl sm:text-2xl font-black text-[#173A7C]`}>
               {totalRevenue.toLocaleString('en-US')} ر.س
             </span>
             <span className="text-[10px] font-extrabold text-[#0D5C3A] flex items-center gap-1 mt-1">

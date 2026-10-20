@@ -24,6 +24,7 @@ function fixture(overrides = {}) {
   function load(name, parent = '') {
     if (name in stubs) return stubs[name];
     if (name === 'node:crypto') return crypto;
+    if (name.endsWith('.css')) return { default: new Proxy({}, { get: (_, key) => key }) };
     const resolved = name.startsWith('@/') ? name.slice(2) : path.posix.join(path.posix.dirname(parent), name);
     if (loaded.has(resolved)) return loaded.get(resolved);
     const filename = `${resolved}.${existsSync(new URL(`../${resolved}.ts`, import.meta.url)) ? 'ts' : 'tsx'}`;

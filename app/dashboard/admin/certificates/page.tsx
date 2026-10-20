@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Award,
@@ -660,29 +661,33 @@ export default function AdminCertificatesPage() {
       </AnimatePresence>
 
       {/* ── HERO BANNER: CERTIFICATE STUDIO ── */}
-      <div className="liquid-glass-hero rounded-xl sm:rounded-2xl p-6 sm:p-8 relative overflow-hidden text-slate-900 border border-white/80 shadow-lg student-card-accent">
+      <div className={`${heroStyles.hero} liquid-glass-hero rounded-xl sm:rounded-2xl p-6 sm:p-8 relative overflow-hidden text-slate-900 border border-white/80 shadow-lg student-card-accent`}>
         <div className="specular-card-reflection" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="admin-hero-tag bg-[#173A7C]/10 border border-[#173A7C]/20 text-[#173A7C]">
+        <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6`}>
+          <div className={`${heroStyles.intro} space-y-2`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-[#173A7C]/10 border border-[#173A7C]/20 text-[#173A7C]`}>
               <Award className="w-4 h-4 text-amber-600 shrink-0" />
-              <span>استوديو الشهادات والاعتمادات الرسمية</span>
+              <span className="sm:hidden">الشهادات والاعتمادات</span>
+              <span className="hidden sm:inline">استوديو الشهادات والاعتمادات الرسمية</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-[#152C5B] student-heading-h1">
-              إدارة وتصميم قوالب الشهادات
+            <h1 className={`${heroStyles.title} text-xl sm:text-2xl font-black text-[#152C5B] student-heading-h1`}>
+              <Award aria-hidden="true" className="sm:hidden" />
+              <span className="sm:hidden">إدارة قوالب الشهادات</span>
+              <span className="hidden sm:inline">إدارة وتصميم قوالب الشهادات</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+            <p className={`${heroStyles.description} text-xs sm:text-sm text-slate-600 font-bold max-w-xl`}>
               صمم وعدل قوالب الشهادات الرسمية بدقة متناهية، خصص الخلفيات والنصوص والأختام، مع الحفظ التلقائي الفوري وإصدار الشهادات المعتمدة.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className={`${heroStyles.actions} flex flex-wrap items-center gap-3`}>
             <button
               onClick={handleOpenNewTemplate}
               className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] hover:from-[#0F2D69] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/25 transition-all cursor-pointer border border-white/20 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Palette className="w-4 h-4 text-amber-300" />
-              <span>تصميم قالب شهادة جديد</span>
+              <span className="sm:hidden">قالب جديد</span>
+              <span className="hidden sm:inline">تصميم قالب شهادة جديد</span>
             </button>
 
             <button
@@ -690,13 +695,14 @@ export default function AdminCertificatesPage() {
               className="px-4 py-2.5 rounded-xl bg-white/90 hover:bg-white text-[#173A7C] border border-[#173A7C]/30 text-xs font-black flex items-center gap-2 shadow-xs transition-all cursor-pointer hover:shadow-md"
             >
               <UserPlus className="w-4 h-4 text-emerald-600" />
-              <span>إصدار شهادة يدوية</span>
+              <span className="sm:hidden">إصدار شهادة</span>
+              <span className="hidden sm:inline">إصدار شهادة يدوية</span>
             </button>
           </div>
         </div>
 
         {/* Quick Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-[#173A7C]/15">
+        <div className={`${heroStyles.quickStats} grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-[#173A7C]/15`}>
           <div className="liquid-glass-inset p-3 rounded-xl border border-white/60">
             <span className="block text-[11px] text-slate-500 font-bold">إجمالي الشهادات الصادرة</span>
             <span className="text-lg sm:text-xl font-black text-[#152C5B]">

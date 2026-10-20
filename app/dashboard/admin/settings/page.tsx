@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
 
 export default function AdminSettingsPage() {
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -113,18 +114,21 @@ export default function AdminSettingsPage() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 liquid-glass-hero border border-white/80 student-card-accent"
+        className={`${heroStyles.hero} relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 liquid-glass-hero border border-white/80 student-card-accent`}
       >
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-2">
-            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+        <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6`}>
+          <div className={`${heroStyles.intro} space-y-2`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200`}>
               <Settings className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>إعدادات وتكاملات منصة النبض المستدام</span>
+              <span className="sm:hidden">إعدادات وتكاملات المنصة</span>
+              <span className="hidden sm:inline">إعدادات وتكاملات منصة النبض المستدام</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
-              إعدادات النظام <span className="student-name-gradient">والهوية والتراخيص ⚙️</span>
+            <h1 className={`${heroStyles.title} text-xl sm:text-2xl font-black student-heading-h1`}>
+              <Settings aria-hidden="true" className="sm:hidden" />
+              <span className="sm:hidden">النظام والهوية والتراخيص</span>
+              <span className="hidden sm:inline">إعدادات النظام <span className="student-name-gradient">والهوية والتراخيص ⚙️</span></span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+            <p className={`${heroStyles.description} text-xs sm:text-sm text-slate-600 font-bold max-w-xl`}>
               إدارة الهوية الرسمية، تراخيص المركز الوطني للتعليم الإلكتروني (NELC)، وخصائص الأمان.
             </p>
           </div>
@@ -132,7 +136,7 @@ export default function AdminSettingsPage() {
           <button
             disabled={saving}
             onClick={handleSave}
-            className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 cursor-pointer transition-all shrink-0 whitespace-nowrap disabled:opacity-60"
+            className={`${heroStyles.soloAction} px-6 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 cursor-pointer transition-all shrink-0 whitespace-nowrap disabled:opacity-60`}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             <span>{saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}</span>
