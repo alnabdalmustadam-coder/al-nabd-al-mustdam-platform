@@ -25,13 +25,15 @@ test('content editors fill mobile viewports while retaining desktop dialog bound
 });
 
 test('course editor footers sit outside the mobile scrolling content', async () => {
+  const styles = await readSource('components/courses/editor/course-editor.module.css');
+  assert.match(styles, /\.footer\s*\{[^}]*padding:[^;]*env\(safe-area-inset-bottom\)/);
   for (const role of ['admin', 'instructor']) {
     const page = await readSource(`app/dashboard/${role}/courses/page.tsx`);
     assert.match(page, /<CourseEditorFrame/);
     const source = await readSource('components/courses/editor/course-editor-frame.tsx');
     assert.match(source, /flex min-h-0 flex-1 flex-col overflow-hidden/);
     assert.match(source, /overflow-y-auto overscroll-contain/);
-    assert.match(source, /env\(safe-area-inset-bottom\)/);
+    assert.match(source, /styles\.footer/);
     assert.match(source, /\{children\}<\/fieldset><\/div>[\s\S]*<\/div>\s*<footer/);
   }
 });
@@ -63,11 +65,23 @@ test('content cards use the shared responsive image frame without local cropping
         images++;
         const attributes = node.attributes.properties.map(attribute => attribute.name?.getText(file));
         assert.ok(attributes.includes('sizes'), path);
-        assert.ok(!attributes.includes('fill') && !attributes.includes('className'), path);
+        assert.ok(!attributes.includes('fill'), path);
         const container = node.parent;
         assert.ok(ts.isJsxElement(container), path);
         const className = container.openingElement.attributes.properties.find(attribute => attribute.name?.getText(file) === 'className');
-        assert.doesNotMatch(className?.initializer?.getText(file) || '', /(?:^|[ "'])(?:sm:|md:)?(?:max-|min-)?h-(?:\d|\[)|absolute/, path);
+        if (path === 'app/dashboard/student/page.tsx' && attributes.includes('className')) {
+          // The featured horizontal course keeps the artwork in a full-height, one-third column.
+          const frame = node.attributes.properties.find(attribute => attribute.name?.getText(file) === 'className');
+          assert.equal(frame?.initializer?.text, 'md:aspect-auto md:h-full', path);
+          assert.equal(className?.initializer?.text, 'relative w-full md:absolute md:inset-0 md:h-full', path);
+          const column = container.parent;
+          assert.ok(ts.isJsxElement(column), path);
+          const columnClass = column.openingElement.attributes.properties.find(attribute => attribute.name?.getText(file) === 'className');
+          assert.match(columnClass?.initializer?.text || '', /\bmd:w-1\/3\b/, path);
+        } else {
+          assert.ok(!attributes.includes('className'), path);
+          assert.doesNotMatch(className?.initializer?.getText(file) || '', /(?:^|[ "'])(?:sm:|md:)?(?:max-|min-)?h-(?:\d|\[)|absolute/, path);
+        }
       }
       ts.forEachChild(node, inspect);
     };
