@@ -436,29 +436,27 @@ export default function AdminDashboardPage() {
           <div className="specular-card-reflection" />
 
           {/* Chart Header Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 sm:pb-3 border-b border-slate-200/60">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 pb-3 border-b border-slate-200/60">
             <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-blue-50 text-[#173A7C] border border-blue-200/80 flex items-center justify-center shadow-xs shrink-0">
-                <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#173A7C]" />
+                <BarChart3 aria-hidden="true" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#173A7C]" />
               </div>
-              <div className="min-w-0">
-                <h3 className="student-heading-h3 text-xs sm:text-sm font-black truncate">مخطط نمو الإيرادات والمبيعات</h3>
-                <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold truncate">
-                  {timeRange === 'year'
-                    ? 'إحصاءات شهرية متكاملة من يناير حتى ديسمبر'
-                    : timeRange === 'month'
-                    ? 'إحصاءات أسابيع الشهر الحالي'
-                    : timeRange === 'week'
-                    ? 'إحصاءات أيام الأسبوع الجاري'
-                    : 'إحصاءات ساعات التفاعل اليومية'}
-                </p>
-              </div>
+              <h3 className="min-w-0 whitespace-nowrap text-xs sm:text-sm font-semibold leading-5 text-[#173A7C]">نمو الإيرادات</h3>
             </div>
 
-            <div className="self-start sm:self-auto flex items-center gap-1.5 text-[10px] sm:text-xs font-black text-emerald-800 bg-emerald-50 px-2.5 sm:px-3.5 py-1 rounded-full border border-emerald-200 shadow-2xs shrink-0 whitespace-nowrap">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>+24.8% نمو قياسي</span>
+            <div aria-label="نمو الإيرادات بنسبة 24.8%" className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] sm:text-[11px] font-semibold text-emerald-800 whitespace-nowrap">
+              <TrendingUp aria-hidden="true" className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span className="tabular-nums" dir="ltr">+24.8%</span>
             </div>
+            <p className="col-span-2 text-[10px] sm:text-[11px] font-medium leading-5 text-slate-500">
+              {timeRange === 'year'
+                ? 'إحصاءات شهرية من يناير إلى ديسمبر'
+                : timeRange === 'month'
+                ? 'إحصاءات أسابيع الشهر الحالي'
+                : timeRange === 'week'
+                ? 'إحصاءات أيام الأسبوع الجاري'
+                : 'إحصاءات ساعات التفاعل اليومية'}
+            </p>
           </div>
 
           {/* Selected Deep Stats Banner (Instant Live Insight) */}
@@ -467,62 +465,33 @@ export default function AdminDashboardPage() {
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="flex flex-wrap items-center justify-between gap-2 p-2.5 sm:p-3.5 rounded-xl bg-gradient-to-r from-[#173A7C]/5 via-[#1E4D9D]/5 to-[#5CB07C]/10 border border-[#173A7C]/15 shadow-2xs"
+            className="grid grid-cols-2 items-center gap-x-3 gap-y-2.5 p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-[#173A7C]/5 via-[#1E4D9D]/5 to-[#5CB07C]/10 border border-[#173A7C]/15 shadow-2xs"
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0 font-mono">
-                {selectedPoint.id}
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-black text-xs sm:text-sm text-[#173A7C]">
-                    إحصاءات:{' '}
-                    {timeRange === 'year'
-                      ? `شهر ${selectedPoint.name}`
-                      : timeRange === 'month'
-                      ? selectedPoint.name
-                      : timeRange === 'week'
-                      ? `يوم ${selectedPoint.name}`
-                      : `توقيت ${selectedPoint.name}`}
-                  </span>
-                  <span
-                    className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[9.5px] font-black border shrink-0 whitespace-nowrap ${
-                      selectedPoint.status === 'completed'
-                        ? 'bg-blue-50 text-[#173A7C] border-blue-200'
-                        : selectedPoint.status === 'current'
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300 animate-pulse'
-                        : 'bg-amber-50 text-amber-800 border-amber-300'
-                    }`}
-                  >
-                    {selectedPoint.status === 'completed'
-                      ? 'إيراد فعلي ✓'
-                      : selectedPoint.status === 'current'
-                      ? timeRange === 'year'
-                        ? 'الشهر الحالي ⚡'
-                        : timeRange === 'month'
-                        ? 'الأسبوع الحالي ⚡'
-                        : timeRange === 'week'
-                        ? 'اليوم الحالي ⚡'
-                        : 'التوقيت الحالي ⚡'
-                      : 'مستهدف متوقع 🎯'}
-                  </span>
+            <div className="col-span-2 flex min-w-0 items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center gap-2">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0 font-mono">
+                  {selectedPoint.id}
                 </div>
-                <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold truncate">
-                  {selectedPoint.txCount} عملية سداد • {selectedPoint.studentsCount}
-                </p>
+                <h4 className="min-w-0 text-xs sm:text-sm font-semibold leading-5 text-[#173A7C]">
+                  إحصاءات {selectedPoint.name}
+                </h4>
+              </div>
+              <div dir="ltr" className="px-2 py-1 rounded-lg bg-emerald-100/90 text-emerald-800 border border-emerald-300 text-[10px] sm:text-[11px] font-semibold font-mono tabular-nums shrink-0 whitespace-nowrap">
+                {selectedPoint.growth}
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-3 mr-auto sm:mr-0">
-              <div className="text-right">
-                <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold block">إجمالي الإيراد</span>
-                <span className="text-xs sm:text-base font-black font-mono text-emerald-700 block leading-tight">
-                  {selectedPoint.amount}
-                </span>
-              </div>
-              <div className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-emerald-100/90 text-emerald-800 border border-emerald-300 text-[10px] sm:text-xs font-black font-mono shadow-2xs shrink-0 whitespace-nowrap">
-                {selectedPoint.growth}
-              </div>
+            <div className="min-w-0 space-y-0.5">
+              <span className="text-[10px] text-slate-500 font-medium block">
+                {selectedPoint.status === 'forecast' ? 'الإيراد المتوقع' : 'إجمالي الإيراد'}
+              </span>
+              <span className="text-xs sm:text-base font-semibold font-mono tabular-nums text-emerald-700 block leading-5 whitespace-nowrap">
+                <bdi>{selectedPoint.amount}</bdi>
+              </span>
+            </div>
+            <div className="min-w-0 flex flex-col items-end gap-0.5 text-[10px] sm:text-[11px] text-slate-500 font-medium leading-5">
+              <span className="whitespace-nowrap"><bdi>{selectedPoint.txCount}</bdi> عملية سداد</span>
+              <span className="whitespace-nowrap">{selectedPoint.studentsCount}</span>
             </div>
           </motion.div>
 
@@ -643,53 +612,31 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          {/* Payment Gateways Split Row - Compressed with Inline Percentage */}
-          <div className="pt-2.5 border-t border-slate-200/60 space-y-1.5">
-            <h4 className="student-heading-h3 text-xs flex items-center gap-1.5">
-              <PieChart className="w-3.5 h-3.5 text-emerald-600" />
-              <span>توزيع عمليات السداد عبر بوابات الدفع الإلكتروني المعتمدة</span>
+          {/* Payment Gateways Distribution */}
+          <div className="pt-3 border-t border-slate-200/60 space-y-2.5">
+            <h4 className="flex items-center gap-2 whitespace-nowrap text-xs sm:text-sm font-medium leading-5 text-[#173A7C]">
+              <PieChart aria-hidden="true" className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+              <span>توزيع وسائل الدفع</span>
             </h4>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <div className="p-2 sm:p-2.5 rounded-lg bg-white/75 border border-slate-200/70 shadow-2xs flex items-center justify-between">
-                <div>
-                  <span className="text-slate-500 font-bold text-[10px] block">بطاقات مدى</span>
-                  <span className="text-[10px] text-emerald-700 font-black font-mono block">188,055 ر.س</span>
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-2.5">
+              {[
+                { name: 'بطاقات مدى', amount: '188,055', share: 45, badge: 'bg-[#173A7C]/10 text-[#173A7C]' },
+                { name: 'أقساط تمارا', amount: '125,370', share: 30, badge: 'bg-emerald-500/10 text-emerald-800' },
+                { name: 'أقساط تابي', amount: '62,685', share: 15, badge: 'bg-indigo-500/10 text-indigo-700' },
+                { name: 'Visa / Master', amount: '41,790', share: 10, badge: 'bg-amber-500/10 text-amber-800' },
+              ].map((method) => (
+                <div key={method.name} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-0.5 rounded-xl border border-slate-200/70 bg-white/75 p-2.5 shadow-2xs">
+                  <span className="min-w-0 whitespace-nowrap text-[10px] font-medium leading-4 text-slate-600">{method.name}</span>
+                  <span dir="ltr" className={`row-span-2 shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums ${method.badge}`}>
+                    {method.share}%
+                  </span>
+                  <p className="flex items-baseline gap-1 whitespace-nowrap leading-4 text-[#173A7C]">
+                    <bdi className="font-mono text-[11px] sm:text-xs font-semibold tabular-nums">{method.amount}</bdi>
+                    <span className="text-[9px] font-medium text-slate-500">ر.س</span>
+                  </p>
                 </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/20">
-                  45%
-                </span>
-              </div>
-
-              <div className="p-2 sm:p-2.5 rounded-lg bg-white/75 border border-slate-200/70 shadow-2xs flex items-center justify-between">
-                <div>
-                  <span className="text-slate-500 font-bold text-[10px] block">أقساط تمارا</span>
-                  <span className="text-[10px] text-emerald-700 font-black font-mono block">125,370 ر.س</span>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-800 border border-emerald-500/20">
-                  30%
-                </span>
-              </div>
-
-              <div className="p-2 sm:p-2.5 rounded-lg bg-white/75 border border-slate-200/70 shadow-2xs flex items-center justify-between">
-                <div>
-                  <span className="text-slate-500 font-bold text-[10px] block">أقساط تابي</span>
-                  <span className="text-[10px] text-indigo-600 font-black font-mono block">62,685 ر.س</span>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-indigo-500/10 text-indigo-700 border border-indigo-500/20">
-                  15%
-                </span>
-              </div>
-
-              <div className="p-2 sm:p-2.5 rounded-lg bg-white/75 border border-slate-200/70 shadow-2xs flex items-center justify-between">
-                <div>
-                  <span className="text-slate-500 font-bold text-[10px] block">Visa / Master</span>
-                  <span className="text-[10px] text-amber-600 font-black font-mono block">41,790 ر.س</span>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-800 border border-amber-500/20">
-                  10%
-                </span>
-              </div>
+              ))}
             </div>
           </div>
         </div>
