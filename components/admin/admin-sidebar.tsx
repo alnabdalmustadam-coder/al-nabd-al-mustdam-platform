@@ -363,31 +363,20 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             </motion.nav>
           </div>
 
-          {/* Block 3: Desktop Sidebar Footer Action Blocks */}
-          <div className="pt-2.5 border-t border-slate-200/80 space-y-1.5 relative z-10">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <button
-                onClick={handleLogout}
-                className={`w-full flex items-center rounded-xl font-bold text-xs transition-all border border-red-200/70 bg-red-50/80 hover:bg-red-100/90 text-red-600 shadow-2xs cursor-pointer ${
-                  isCollapsed ? 'p-2.5 justify-center' : 'p-2.5 gap-2.5'
-                }`}
-                title={isCollapsed ? 'تسجيل الخروج' : undefined}
-              >
-                <div className="p-1.5 rounded-lg bg-red-500/15 text-red-600 shrink-0">
-                  <LogOut className="w-4 h-4" />
-                </div>
-                {!isCollapsed && <span className="truncate font-extrabold text-xs">تسجيل الخروج</span>}
-              </button>
-            </motion.div>
-
-            {!isCollapsed && (
-              <div className="pt-1 text-center">
-                <p className="text-[10px] text-slate-500 font-bold flex items-center justify-center gap-1">
-                  <span>لوحة الإدارة المركزية</span>
-                  <span className="font-mono text-emerald-600 font-black">• v2.4</span>
-                </p>
-              </div>
-            )}
+          {/* Desktop Footer */}
+          <div className="relative z-10 shrink-0 border-t border-slate-200/80 pt-2">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className={`flex min-h-11 w-full items-center rounded-xl bg-slate-100/70 py-2 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200/70 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173A7C]/50 cursor-pointer ${
+                isCollapsed ? 'justify-center px-2' : 'gap-2.5 px-3'
+              }`}
+              aria-label="تسجيل الخروج"
+              title={isCollapsed ? 'تسجيل الخروج' : undefined}
+            >
+              <LogOut className="h-4 w-4 shrink-0 text-[#173A7C]" aria-hidden="true" />
+              {!isCollapsed && <span className="truncate">تسجيل الخروج</span>}
+            </button>
           </div>
         </div>
       </aside>
@@ -405,7 +394,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
           {/* Mobile Drawer Body */}
           <aside
-            className="fixed top-0 bottom-0 right-0 z-[1001] w-[340px] max-w-[90vw] h-full flex flex-col justify-between p-5 overflow-y-auto no-scrollbar lg:hidden font-[family-name:var(--font-cairo)] animate-in slide-in-from-right duration-300 shadow-2xl"
+            className="fixed top-0 bottom-0 right-0 z-[1001] w-[340px] max-w-[90vw] h-full flex flex-col justify-between px-5 pt-5 pb-3 overflow-y-auto no-scrollbar lg:hidden font-[family-name:var(--font-cairo)] animate-in slide-in-from-right duration-300 shadow-2xl"
             style={{
               background: 'rgba(255, 255, 255, 0.94)',
               backdropFilter: 'blur(28px) saturate(1.8)',
@@ -543,23 +532,17 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               </nav>
             </div>
 
-            {/* Mobile Footer Action Blocks */}
-            <div className="pt-3 border-t border-slate-200/80 space-y-1.5 shrink-0">
+            {/* Mobile Footer */}
+            <div className="shrink-0 border-t border-slate-200/80 pt-2">
               <button
+                type="button"
                 onClick={() => { onCloseMobile?.(); handleLogout(); }}
-                className="w-full flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-bold text-red-600 bg-red-50/80 hover:bg-red-100/90 border border-red-200/70 transition-all cursor-pointer"
+                className="flex min-h-11 w-full items-center gap-2.5 rounded-xl bg-slate-100/70 px-3 py-2 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200/70 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173A7C]/50 cursor-pointer"
+                aria-label="تسجيل الخروج"
               >
-                <div className="p-1.5 rounded-lg bg-red-500/15 text-red-600 shrink-0">
-                  <LogOut className="w-4 h-4" />
-                </div>
+                <LogOut className="h-4 w-4 shrink-0 text-[#173A7C]" aria-hidden="true" />
                 <span>تسجيل الخروج</span>
               </button>
-
-              <div className="pt-1 text-center">
-                <p className="text-[10px] text-slate-500 font-bold">
-                  Sustain Pulse Admin • v2.4
-                </p>
-              </div>
             </div>
           </aside>
         </>
