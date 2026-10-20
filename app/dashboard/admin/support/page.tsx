@@ -1,5 +1,7 @@
 'use client';
 
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -162,17 +164,19 @@ export default function AdminSupportPage() {
   return (
     <div className="space-y-6 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
       {/* Hero Header */}
-      <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200">
+      <div className={`${heroStyles.hero} relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent`}>
+        <div className={`${heroStyles.layout} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
+          <div className={`${heroStyles.intro} space-y-2`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200`}>
               <Headphones className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>خدمة العملاء والدعم الأكاديمي والتقني</span>
+              <span className="sm:hidden">الدعم الأكاديمي والتقني</span>
+              <span className="hidden sm:inline">خدمة العملاء والدعم الأكاديمي والتقني</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
-              إدارة <span className="student-name-gradient">تذاكر واستفسارات المتدربين</span> 🎧
+              <span className="sm:hidden">الدعم والاستفسارات</span>
+              <span className="hidden sm:inline">إدارة <span className="student-name-gradient">تذاكر واستفسارات المتدربين</span> 🎧</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+            <p className={`${heroStyles.description} text-xs sm:text-sm text-slate-600 font-bold max-w-xl`}>
               متابعة استفسارات الطلاب، حل المشكلات التقنية والأكاديمية، والرد السريع على التذاكر.
             </p>
           </div>

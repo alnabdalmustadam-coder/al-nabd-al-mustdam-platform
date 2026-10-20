@@ -1,5 +1,7 @@
 'use client';
 
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -144,24 +146,26 @@ export default function AdminLiveSessionsPage() {
   return (
     <div className="space-y-6 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
       {/* Hero Header */}
-      <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="admin-hero-tag bg-red-50 text-red-700 border border-red-200">
+      <div className={`${heroStyles.hero} relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent`}>
+        <div className={`${heroStyles.layout} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
+          <div className={`${heroStyles.intro} space-y-2`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-red-50 text-red-700 border border-red-200`}>
               <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping shrink-0" />
-              <span>القاعات الافتراضية واللقاءات الحية</span>
+              <span className="sm:hidden">القاعات واللقاءات الحية</span>
+              <span className="hidden sm:inline">القاعات الافتراضية واللقاءات الحية</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
-              إدارة <span className="student-name-gradient">البث المباشر والورش الحية</span> 🔴
+              <span className="sm:hidden">البث المباشر والورش</span>
+              <span className="hidden sm:inline">إدارة <span className="student-name-gradient">البث المباشر والورش الحية</span> 🔴</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 font-bold max-w-xl">
+            <p className={`${heroStyles.description} text-xs sm:text-sm text-slate-600 font-bold max-w-xl`}>
               جدولة اللقاءات التفاعلية، ربط قاعات Zoom / Teams، وإدارة روابط البث المباشر للمتدربين.
             </p>
           </div>
 
           <button
             onClick={() => setIsScheduleModalOpen(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer whitespace-nowrap"
+            className={`${heroStyles.soloAction} px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer whitespace-nowrap`}
           >
             <Plus className="w-4 h-4" />
             <span>جدولة لقاء مباشر</span>

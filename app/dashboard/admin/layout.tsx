@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { AdminHeader } from '@/components/admin/admin-header';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
 
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -38,7 +39,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         />
 
         {/* Workspace Content (Compact, balanced padding to prevent vertical cut-offs) */}
-        <main className="flex-1 min-w-0 p-3 sm:p-4 lg:p-5 xl:p-6">
+        <main className={`${heroStyles.workspace} flex-1 min-w-0 p-3 sm:p-4 lg:p-5 xl:p-6`}>
           {children}
         </main>
       </div>

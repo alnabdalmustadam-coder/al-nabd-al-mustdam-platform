@@ -1,5 +1,7 @@
 'use client';
 
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
+
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -287,26 +289,27 @@ function AdminUsersPageContent() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative overflow-hidden rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-7 liquid-glass-hero border border-white/80 student-card-accent"
+        className={`${heroStyles.hero} relative overflow-hidden rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-7 liquid-glass-hero border border-white/80 student-card-accent`}
       >
         <div className="specular-card-reflection" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-3 sm:space-y-3.5">
+        <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6`}>
+          <div className={`${heroStyles.intro} space-y-3 sm:space-y-3.5`}>
             <div className="flex flex-col items-start">
-              <div className="admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15">
+              <div className={`${heroStyles.badge} admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15`}>
                 <Users className="w-4 h-4 text-[#173A7C] shrink-0" />
                 <span>إدارة المتدربين وسجلات الحضور</span>
               </div>
               <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">
-                سجل الطلاب والمتدربين <span className="inline-block whitespace-nowrap">والأنشطة 👥</span>
+                <span className="sm:hidden">إدارة الطلاب والمتدربين</span>
+                <span className="hidden sm:inline">سجل الطلاب والمتدربين <span className="inline-block whitespace-nowrap">والأنشطة 👥</span></span>
               </h1>
             </div>
-            <p className="text-[11px] sm:text-xs lg:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
+            <p className={`${heroStyles.description} text-[11px] sm:text-xs lg:text-sm text-slate-600 font-medium max-w-2xl leading-relaxed`}>
               متابعة دقيقة لحضور المتدربين، نسب التفاعل والتسليمات الأكاديمية، إدارة الصلاحيات وتصدير التقارير الرسمية المعتمدة.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto shrink-0">
+          <div className={`${heroStyles.actions} flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto shrink-0`}>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -326,7 +329,8 @@ function AdminUsersPageContent() {
               className="flex-1 sm:flex-none px-3.5 sm:px-4.5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 shadow-2xs cursor-pointer transition-all shrink-0 whitespace-nowrap"
             >
               <Download className="w-4 h-4 text-[#173A7C] shrink-0" />
-              <span>تصدير البيانات 📊</span>
+              <span className="sm:hidden">تصدير البيانات</span>
+              <span className="hidden sm:inline">تصدير البيانات 📊</span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -335,7 +339,8 @@ function AdminUsersPageContent() {
               className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-[#173A7C]/20 cursor-pointer border border-white/25 transition-all shrink-0 whitespace-nowrap"
             >
               <Plus className="w-4 h-4 shrink-0" />
-              <span>تسجيل متدرب جديد ⚡</span>
+              <span className="sm:hidden">متدرب جديد</span>
+              <span className="hidden sm:inline">تسجيل متدرب جديد ⚡</span>
             </motion.button>
           </div>
         </div>

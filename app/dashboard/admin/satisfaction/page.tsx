@@ -44,11 +44,11 @@ export default function SatisfactionPage() {
   return <div className={`${styles.page} mx-auto min-w-0 max-w-[1440px] space-y-4 px-0 py-1 sm:space-y-6 sm:px-2 sm:py-3 lg:p-5`} dir="rtl">
     <header className={`${styles.hero} rounded-2xl sm:rounded-3xl`}>
       <div className="p-4 sm:p-7">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3 sm:gap-4"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-700 sm:h-14 sm:w-14 sm:rounded-2xl"><HeartHandshake aria-hidden="true" className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.6} /></span>
             <div><p className="mb-1 hidden text-xs font-semibold text-emerald-700 sm:block">تجربة التعلّم</p><h1 className="text-xl font-bold leading-8 text-[#173A7C] sm:text-3xl sm:leading-9">رضا الطلاب</h1></div>
           </div>
-          <div className="flex shrink-0 items-center gap-3"><span className="hidden xl:block"><SatisfactionArtwork /></span><button type="button" disabled={loading} onClick={refresh} aria-label={loading ? 'جاري تحديث بيانات الرضا' : 'تحديث بيانات الرضا'} className={`${action} ${styles.heroRefresh} w-11 px-0! sm:w-auto sm:px-4!`}><RefreshCw aria-hidden="true" className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /><span className="hidden sm:inline">{loading ? 'جاري التحديث' : 'تحديث البيانات'}</span></button></div>
+          <div className="flex w-full shrink-0 items-center gap-3 sm:w-auto"><span className="hidden xl:block"><SatisfactionArtwork /></span><button type="button" disabled={loading} onClick={refresh} aria-label={loading ? 'جاري تحديث بيانات الرضا' : 'تحديث بيانات الرضا'} className={`${action} ${styles.heroRefresh} w-full px-3! sm:w-auto sm:px-4!`}><RefreshCw aria-hidden="true" className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /><span>{loading ? 'جاري التحديث' : 'تحديث البيانات'}</span></button></div>
         </div>
         <p className="mt-3 max-w-xl text-xs leading-6 text-slate-500 sm:mt-4 sm:text-sm sm:leading-7">تابع رضا الطلاب عن دروس الدورات واختباراتها.</p>
       </div>

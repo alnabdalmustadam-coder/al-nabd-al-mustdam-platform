@@ -733,7 +733,7 @@ export default function AdminCoursesPage() {
             </p>
           </div>
 
-          <div className={`${heroStyles.actions} ${heroStyles.refreshActions} flex items-center gap-3 shrink-0`}>
+          <div className={`${heroStyles.actions} flex items-center gap-3 shrink-0`}>
             <button
               onClick={openCreateModal}
               className="px-5 py-3 rounded-xl sm:rounded-2xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs sm:text-sm font-black shadow-lg shadow-[#173A7C]/20 transition-all flex items-center gap-2 cursor-pointer hover:-translate-y-0.5 active:scale-95"
@@ -744,10 +744,11 @@ export default function AdminCoursesPage() {
             </button>
             <button
               onClick={loadCourses}
-              className="p-3 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 shadow-xs transition-all cursor-pointer hover:rotate-180 duration-500"
+              className="group p-3 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/80 shadow-xs transition-all cursor-pointer duration-500"
               title="تحديث البيانات"
             >
-              <RefreshCw className="w-4 h-4 text-slate-500" />
+              <RefreshCw className="w-4 h-4 text-slate-500 transition-transform duration-500 group-hover:rotate-180" />
+              <span className="sm:hidden">تحديث البيانات</span>
             </button>
           </div>
         </div>

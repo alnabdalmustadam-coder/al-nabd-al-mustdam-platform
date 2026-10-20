@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
 import { motion, Variants } from 'framer-motion';
 import {
   TrendingUp,
@@ -326,7 +327,7 @@ export default function AdminDashboardPage() {
         initial="hidden"
         animate="visible"
         custom={0}
-        className="relative z-20 liquid-glass-hero p-4 sm:p-6 lg:p-7 min-h-[145px] sm:min-h-[185px] flex flex-col justify-center liquid-glass-hover overflow-hidden student-card-accent rounded-lg sm:rounded-xl lg:rounded-2xl"
+        className={`${heroStyles.hero} relative z-20 liquid-glass-hero p-4 sm:p-6 lg:p-7 min-h-[145px] sm:min-h-[185px] flex flex-col justify-center liquid-glass-hover overflow-hidden student-card-accent rounded-lg sm:rounded-xl lg:rounded-2xl`}
       >
         {/* Specular line */}
         <div className="specular-card-reflection" />
@@ -335,27 +336,28 @@ export default function AdminDashboardPage() {
         <div className="absolute -top-16 -right-16 w-56 h-56 bg-gradient-to-br from-[#173A7C]/20 to-[#1E4D9D]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-gradient-to-br from-[#5CB07C]/20 to-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-6">
-          <div className="space-y-1.5 sm:space-y-2.5 pr-0.5 sm:pr-2">
+        <div className={`${heroStyles.layout} relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-6`}>
+          <div className={`${heroStyles.intro} space-y-1.5 sm:space-y-2.5 pr-0.5 sm:pr-2`}>
             <motion.div variants={textItemVariants} className="flex flex-col items-start">
-              <div className="admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15">
+              <div className={`${heroStyles.badge} admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15`}>
                 <Crown className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>مركز التحليلات الذكية والأداء المؤسسي</span>
               </div>
               <h1 className="text-sm sm:text-xl lg:text-2xl font-black student-heading-h1 leading-snug">
-                مركز التحليلات وإدارة الأداء المالي والأكاديمي <span className="student-name-gradient">Sustain Pulse</span>
+                <span className="sm:hidden">مركز التحليلات والأداء</span>
+                <span className="hidden sm:inline">مركز التحليلات وإدارة الأداء المالي والأكاديمي Sustain Pulse</span>
               </h1>
             </motion.div>
 
-            <motion.p variants={textItemVariants} className="text-[11px] sm:text-[13px] text-slate-600 font-medium max-w-2xl pr-0.5 leading-relaxed">
+            <motion.p variants={textItemVariants} className={`${heroStyles.description} text-[11px] sm:text-[13px] text-slate-600 font-medium max-w-2xl pr-0.5 leading-relaxed`}>
               مؤشرات شاملة وفورية للمبيعات، معدلات إنجاز البرامج الأكاديمية، توزيع المتدربين الجغرافي، وإصدار الشهادات المعتمدة.
             </motion.p>
           </div>
 
           {/* Time Range Filter Controls - Single Row Grid on 360px Mobile */}
-          <motion.div variants={textItemVariants} className="premium-tabs grid grid-cols-4 sm:flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-slate-200/80 bg-white/90 backdrop-blur-md w-full sm:w-auto shrink-0 shadow-xs">
+          <motion.div variants={textItemVariants} className={`${heroStyles.timeFilters} premium-tabs grid grid-cols-4 sm:flex items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-slate-200/80 bg-white/90 backdrop-blur-md w-full sm:w-auto shrink-0 shadow-xs`}>
             {[
-              { key: 'year', label: 'العام (12ش)', desktopLabel: 'هذا العام (12 شهراً)' },
+              { key: 'year', label: 'العام', desktopLabel: 'هذا العام (12 شهراً)' },
               { key: 'month', label: 'الشهر', desktopLabel: 'هذا الشهر' },
               { key: 'week', label: 'الأسبوع', desktopLabel: 'هذا الأسبوع' },
               { key: 'today', label: 'اليوم', desktopLabel: 'اليوم' },

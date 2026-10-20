@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import heroStyles from '@/components/admin/admin-page-hero.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   UserCheck,
@@ -353,21 +354,21 @@ export default function AdminTrainersPage() {
   return (
     <div className="space-y-6 sm:space-y-8" dir="rtl">
       {/* Page Header */}
-      <div className="p-4 sm:p-6 md:p-8 rounded-3xl liquid-glass border border-white/60 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
-        <div className="min-w-0 w-full space-y-2 z-10 md:w-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#173A7C]/10 text-[#173A7C] text-xs font-black">
+      <div className={`${heroStyles.hero} p-4 sm:p-6 md:p-8 rounded-3xl liquid-glass border border-white/60 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6`}>
+        <div className={`${heroStyles.intro} min-w-0 w-full space-y-2 z-10 md:w-auto`}>
+          <div className={`${heroStyles.badge} inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#173A7C]/10 text-[#173A7C] text-xs font-black`}>
             <GraduationCap className="w-4 h-4" />
             <span>الهيئة التدريبية والأكاديمية</span>
           </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
             إدارة المدربين والمحاضرين
           </h1>
-          <p className="text-xs md:text-sm font-medium text-slate-500 leading-6 md:font-bold md:max-w-xl">
+          <p className={`${heroStyles.description} text-xs md:text-sm font-medium text-slate-500 leading-6 md:font-bold md:max-w-xl`}>
             إدارة حسابات المدربين، تحديث الصور والبيانات، تعيين الدورات المعتمدة، وإحصائيات الطلاب الحية.
           </p>
         </div>
 
-        <div className="z-10 flex w-full items-center gap-3 md:w-auto md:shrink-0">
+        <div className={`${heroStyles.actions} z-10 flex w-full items-center gap-3 md:w-auto md:shrink-0`}>
           <button
             onClick={() => {
               setNewTrainerPassword(generatePassword());
