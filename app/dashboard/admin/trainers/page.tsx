@@ -438,8 +438,8 @@ export default function AdminTrainersPage() {
               className="min-w-0 p-4 rounded-2xl liquid-glass-card liquid-glass-hover space-y-4 student-card-accent transition-all duration-300 border border-white/70 shadow-lg hover:shadow-xl md:p-6 md:rounded-3xl md:space-y-5"
             >
               {/* Header: Avatar, Name, Specialty, and Actions */}
-              <div className="flex min-w-0 flex-col items-stretch gap-3 md:flex-row md:items-start md:justify-between">
-                <div className="flex min-w-0 w-full items-start gap-3 md:w-auto md:items-center md:gap-4">
+              <div className="flex min-w-0 flex-col items-stretch gap-3">
+                <div className="flex min-w-0 w-full items-start gap-3 md:items-center md:gap-4">
                   {t.avatarUrl ? (
                     <img
                       src={t.avatarUrl}
@@ -463,9 +463,9 @@ export default function AdminTrainersPage() {
                   </div>
                 </div>
 
-                <div className="flex w-full shrink-0 items-center gap-1.5 border-t border-slate-200/80 pt-3 md:w-auto md:border-t-0 md:pt-0">
+                <div className="flex w-full shrink-0 items-center gap-1.5 border-t border-slate-200/80 pt-3">
                   <span
-                    className={'me-auto inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-[10px] font-semibold md:me-0 md:font-black ' + (
+                    className={'me-auto inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-[10px] font-semibold md:font-black ' + (
                       t.status === 'active'
                         ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
                         : 'border-amber-300 bg-amber-50 text-amber-800'
