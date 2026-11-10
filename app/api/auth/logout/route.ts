@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
+import { DEMO_COOKIE } from "@/lib/demo/fixtures";
 
 export async function POST() {
   try {
@@ -11,8 +12,9 @@ export async function POST() {
 
   const response = NextResponse.json({ success: true, redirectUrl: "/auth/login" });
 
-  response.cookies.delete("nabd_session_email");
-  response.cookies.delete("nabd_session_name");
+  response.cookies.delete(DEMO_COOKIE);
+  response.cookies.delete("madar_demo_session_email");
+  response.cookies.delete("madar_demo_session_name");
 
   return response;
 }

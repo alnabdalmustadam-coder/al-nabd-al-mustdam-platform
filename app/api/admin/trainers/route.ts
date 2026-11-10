@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest,NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { requireAdmin } from '@/lib/security/auth';
-import { getAllCoursesAsync, saveCourseAsync } from '@/lib/courses-store';
+import { getAllCoursesAsync } from '@/lib/courses-store';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,126 +74,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: true, trainers });
   } catch (err: any) {
     console.error('Admin trainers GET error:', err);
-    return NextResponse.json({ success: false, message: err.message || 'حدث خطأ في الخادم' }, { status: 500 });
-  }
-}
-
-export async function PATCH(req: NextRequest) {
-  try {
-    const auth = await requireAdmin(req);
-    if (!auth.ok) return auth.response;
-    const supabaseAdmin = getSupabaseAdmin();
-
-    const body = await req.json();
-    const {
-      id,
-      name,
-      fullName,
-      specialty,
-      bio,
-      email,
-      phone,
-      password,
-      avatarUrl,
-      status,
-      assignedCourseSlugs,
-    } = body;
-
-    const trainerId = id;
-    if (!trainerId) {
-      return NextResponse.json({ success: false, message: 'معرف المدرب مطلوب' }, { status: 400 });
-    }
-
-    const updatedName = (fullName || name || '').trim();
-    const updatedBio = (specialty !== undefined ? specialty : bio !== undefined ? bio : undefined)?.trim();
-    const cleanEmail = email ? email.toLowerCase().trim() : undefined;
-
-    // 1. Update Supabase Auth if email or password changed
-    if (cleanEmail || password) {
-      const authUpdatePayload: { email?: string; password?: string; user_metadata?: Record<string, any> } = {};
-      if (cleanEmail) authUpdatePayload.email = cleanEmail;
-      if (password && password.trim()) authUpdatePayload.password = password.trim();
-      if (updatedName) {
-        authUpdatePayload.user_metadata = { full_name: updatedName };
-      }
-
-      try {
-        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(trainerId, authUpdatePayload);
-        if (authError) {
-          console.warn('Auth admin update notice:', authError);
-        }
-      } catch (authErr: any) {
-        console.warn('Auth admin update warning:', authErr);
-      }
-    }
-
-    // 2. Update profiles record
-    const profileUpdate: Record<string, any> = {
-      updated_at: new Date().toISOString(),
-    };
-
-    if (updatedName) profileUpdate.full_name = updatedName;
-    if (cleanEmail) profileUpdate.email = cleanEmail;
-    if (phone !== undefined) profileUpdate.phone = phone ? phone.trim() : null;
-    if (updatedBio !== undefined) {
-      profileUpdate.bio = updatedBio;
-      profileUpdate.specialty = updatedBio;
-    }
-    if (status !== undefined && ['active', 'on_leave'].includes(status)) {
-      profileUpdate.status = status;
-    }
-    if (avatarUrl !== undefined) {
-      profileUpdate.avatar_url = avatarUrl || null;
-    }
-
-    const { error: updateError } = await supabaseAdmin
-      .from('profiles')
-      .update(profileUpdate)
-      .eq('id', trainerId);
-
-    if (updateError) {
-      console.error('Error updating trainer profile:', updateError);
-      return NextResponse.json({ success: false, message: updateError.message }, { status: 500 });
-    }
-
-    // 3. Update Course Assignments if assignedCourseSlugs provided
-    if (Array.isArray(assignedCourseSlugs)) {
-      const allCourses = await getAllCoursesAsync({ includeUnpublished: true });
-      const targetSlugs = new Set(assignedCourseSlugs.map((s: string) => String(s).toLowerCase().trim()));
-
-      for (const course of allCourses) {
-        const isSelected = targetSlugs.has(course.slug.toLowerCase());
-        const isCurrentlyAssigned = String(course.trainerId) === String(trainerId);
-
-        if (isSelected && !isCurrentlyAssigned) {
-          // Assign course to this trainer
-          await saveCourseAsync(
-            {
-              ...course,
-              instructor: updatedName || course.instructor,
-              trainerId,
-            },
-            trainerId
-          );
-        } else if (!isSelected && isCurrentlyAssigned) {
-          // Unassign course from this trainer
-          await saveCourseAsync(
-            {
-              ...course,
-              trainerId: '',
-            },
-            trainerId
-          );
-        }
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'تم تحديث بيانات المدرب بنجاح',
-    });
-  } catch (err: any) {
-    console.error('Admin trainers PATCH error:', err);
     return NextResponse.json({ success: false, message: err.message || 'حدث خطأ في الخادم' }, { status: 500 });
   }
 }

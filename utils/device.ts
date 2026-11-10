@@ -9,7 +9,7 @@ export interface DeviceInfo {
   userAgent: string;
 }
 
-const STORAGE_DEVICE_KEY = 'nabd_device_id';
+const STORAGE_DEVICE_KEY = 'madar_demo_device_id';
 
 export function getOrCreateDeviceId(): string {
   if (typeof window === 'undefined') return 'unknown-device';
@@ -21,7 +21,7 @@ export function getOrCreateDeviceId(): string {
       localStorage.setItem(STORAGE_DEVICE_KEY, id);
     }
     // Also save in cookie for SSR / middleware
-    document.cookie = `nabd_device_id=${id}; path=/; max-age=31536000; SameSite=Lax`;
+    document.cookie = `madar_demo_device_id=${id}; path=/; max-age=31536000; SameSite=Lax`;
     return id;
   } catch (e) {
     return 'dev_fallback_' + Math.random().toString(36).substring(2, 9);

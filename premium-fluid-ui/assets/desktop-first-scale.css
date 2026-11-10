@@ -1,0 +1,152 @@
+/* Premium Fluid UI v1.5.0 — Two-Tier Desktop-First Scaling, Mobile Reflow & Anti-Distortion Guards */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%;
+  overflow-x: hidden;
+  /* Prevent 17px Windows scrollbar jump when opening modals/drawers */
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  overflow-x: hidden;
+}
+
+/* 1. TIER 1: Proportional 2D Desktop Scaling for Smaller PC Screens (1024x600 .. 1600x900)
+ * Scales 1rem smoothly down to 60% (9.6px) on 1024x600 and 64% (10.24px) on 1024x768
+ * so the desktop design never looks huge or bloated on small laptops/monitors.
+ */
+@media (min-width: 64rem) {
+  html {
+    font-size: clamp(
+      60%,
+      min(calc(0.1rem + 0.9vw), calc(0.1rem + 1.5dvh)),
+      100%
+    );
+  }
+}
+
+/* 2. Low-Res Readability Floor on 1024x600 / 1366x768:
+ * While layout containers, cards, and headings shrink to 60%-64% on 1024px screens,
+ * protect small body and metadata text from dropping below crisp 1dpr legibility (12px / 11px).
+ */
+@media (min-width: 64rem) and (max-width: 86rem) {
+  .pf-type-body, p {
+    font-size: max(var(--pf-type-body, 0.9375rem), 12px);
+  }
+  .pf-type-caption, .pf-type-micro, small {
+    font-size: max(var(--pf-type-caption, 0.8125rem), 11px);
+  }
+}
+
+
+/* 2b. Font-Weight & Dark-Background Halation Guard:
+ * Prevent faux-bold disconnection in Arabic, soften 800/900 weights on small/low-res screens,
+ * and prevent thin 100-300 weights from disappearing on 1024x600 / 1366x768 displays.
+ */
+html, body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;
+}
+@media (max-width: 39.99rem), (min-width: 64rem) and (max-width: 86rem), (max-resolution: 1.25dppx) {
+  h1, h2, h3, .font-black, .font-extrabold {
+    font-weight: 600;
+  }
+  small, .text-xs, .pf-type-caption, .pf-type-micro, .font-light, .font-thin {
+    font-weight: 500;
+  }
+}
+
+/* 3. Ultra-Wide & 2K/4K Protection (>= 1920px):
+ * Prevent header/hero elements from drifting to extreme screen edges on 2560px/3440px monitors.
+ */
+.pf-container-ultrawide-safe {
+  inline-size: min(100% - 2 * var(--page-gutter, 2rem), var(--content-max, 90rem));
+  margin-inline: auto;
+}
+
+/* 4. Equal-Height Card Row & Dynamic Data Stability (Auctions / Prices / Timers):
+ * Keep sibling cards the exact same height even when titles wrap to 2 lines,
+ * and lock numeral widths so live countdown timers and big prices never jitter or wrap.
+ */
+.pf-card-equal {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.pf-card-equal__footer,
+.pf-card-equal__cta {
+  margin-block-start: auto;
+}
+.pf-tabular-nums,
+[data-pf-price],
+[data-pf-timer] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 5. Media & SVG Proportional Guard:
+ * Prevent inline SVGs with hardcoded px attributes or un-aspect-ratioed images from staying huge.
+ */
+img, video {
+  max-inline-size: 100%;
+  block-size: auto;
+  display: block;
+}
+svg {
+  flex-shrink: 0;
+  max-inline-size: 100%;
+}
+
+/* 6. TIER 2: Structural Reflow below 1024px (Tablet Portrait & Mobile) */
+@media (max-width: 63.99rem) {
+  html {
+    font-size: 100%;
+  }
+  .pf-desktop-only-actions {
+    display: none !important;
+  }
+  .pf-desktop-floating-card {
+    position: static !important;
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+    inset: auto !important;
+    transform: none !important;
+    margin-block-start: 1rem;
+  }
+}
+
+/* Mobile Portrait (< 640px): single-column cards & vertical steppers */
+@media (max-width: 39.99rem) {
+  .pf-responsive-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .pf-responsive-stepper {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+}
+
+/* Mobile Landscape (< 960px wide AND <= 500px tall): compact 2-column split */
+@media (orientation: landscape) and (max-width: 59.99rem) and (max-height: 31.25rem) {
+  .pf-hero-landscape-split {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr) !important;
+    align-items: center !important;
+    gap: 1rem !important;
+  }
+  .pf-hero-landscape-split img,
+  .pf-hero-landscape-split video {
+    max-block-size: 48dvh !important;
+    object-fit: contain !important;
+  }
+}

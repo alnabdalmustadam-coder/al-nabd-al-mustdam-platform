@@ -1,36 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# مَدار للتعلّم
 
-## Getting Started
+مشروع عرض مستقل مبني على واجهات Next.js للمنصة. تستخدم جولة العرض بيانات ثابتة مضمّنة لعرض الدورات والتقدّم والتقييمات والواجبات والشهادات.
 
-First, run the development server:
+## التشغيل
+
+استخدم Node.js 24 أو أحدث.
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+افتح `http://localhost:3000/demo` واختر المتدرّب أو المدرّب أو الإدارة. «ابدأ من درس الفيديو» يفتح محطة مشاهدة جاهزة في دورة الجودة. تجد شهادة نموذجية في صفحة شهادات المتدرّب.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+تُقرأ البيانات من `data/courses-db.json` و`lib/demo/fixtures.ts`. الجلسة تحدد دور العرض فقط. التصفية والمعاينة وتشغيل المواد والتنزيلات تعمل على البيانات المضمّنة. واجهات الحفظ محجوبة في جولة العرض.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+يعمل المشروع ببيانات العرض المحلية.
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## النشر على Vercel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+استورد مستودع مَدار كمشروع Next.js مستقل. استخدم Node.js 24.x واترك متغيرات البيئة فارغة. تبدأ جولة الأدوار من `/demo`.

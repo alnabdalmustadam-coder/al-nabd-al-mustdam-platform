@@ -11,7 +11,7 @@ import NewsletterSection from "@/components/sections/NewsletterSection";
 
 export default function HomePage() {
   return (
-    <>
+    <div className="home-page">
       <HeroSection />
       <CoursesShowcase />
       <PremiumCourseHighlights />
@@ -22,6 +22,6 @@ export default function HomePage() {
       <LatestBlogSection />
       <CtaSection />
       <NewsletterSection />
-    </>
+    </div>
   );
 }

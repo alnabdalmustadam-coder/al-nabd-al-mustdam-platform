@@ -11,7 +11,6 @@ import {
   Play,
   Library,
   Clock,
-  Sparkles,
   Search,
   FileText,
   Eye,
@@ -62,7 +61,7 @@ const digitalBooks = [
     category: 'أعمال مكتبية وإدارة',
     fileSize: '18.4 MB',
     pagesCount: 220,
-    coverGradient: 'from-[#173A7C] to-[#1E4D9D]',
+    coverGradient: 'from-[#0B3766] to-[#168AD3]',
     description: 'دليل تدريبي مرجعي يغطي احتراف أنظمة التشغيل، تحرير المستندات في Word، الجداول المحاسبية في Excel، وتصميم العروض التفاعلية.',
   },
   {
@@ -231,15 +230,15 @@ export default function StudentPathwaysPage() {
 
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', handleStorage);
-      window.addEventListener('nabd_progress_updated', handleStorage);
-      window.addEventListener('nabd_courses_updated', handleStorage);
+      window.addEventListener('madar_demo_progress_updated', handleStorage);
+      window.addEventListener('madar_demo_courses_updated', handleStorage);
     }
 
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('storage', handleStorage);
-        window.removeEventListener('nabd_progress_updated', handleStorage);
-        window.removeEventListener('nabd_courses_updated', handleStorage);
+        window.removeEventListener('madar_demo_progress_updated', handleStorage);
+        window.removeEventListener('madar_demo_courses_updated', handleStorage);
       }
     };
   }, [accreditedCourses]);
@@ -275,8 +274,8 @@ export default function StudentPathwaysPage() {
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
           <div className="space-y-2.5 sm:space-y-3 pr-1">
-            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50 text-[#173A7C] border border-blue-200/80 shadow-xs">
-              <Library className="w-3.5 h-3.5 text-[#173A7C]" />
+            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50 text-[#0B3766] border border-blue-200/80 shadow-xs">
+              <Library className="w-3.5 h-3.5 text-[#0B3766]" />
               <span>المحتوى والمناهج الأكاديمية</span>
             </motion.div>
 
@@ -291,15 +290,15 @@ export default function StudentPathwaysPage() {
 
           <motion.div variants={textItemVariants} className="flex items-center justify-around gap-1.5 sm:gap-3 p-3 sm:p-4 rounded-2xl bg-white/90 border border-white/80 backdrop-blur-md shadow-sm shrink-0">
             <div className="text-center px-3 border-l border-slate-200">
-              <span className="block text-base sm:text-lg font-black text-[#173A7C]">9</span>
-              <span className="text-[9px] sm:text-[10px] text-slate-600 font-bold whitespace-nowrap">دورات معتمدة</span>
+              <span className="block text-base sm:text-lg font-bold text-[#0B3766]">9</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-600 font-bold whitespace-nowrap">دورات مهنية</span>
             </div>
             <div className="text-center px-3 border-l border-slate-200">
-              <span className="block text-base sm:text-lg font-black text-[#0D5C3A]">{enrolledCount}</span>
+              <span className="block text-base sm:text-lg font-bold text-[#0D5C3A]">{enrolledCount}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-600 font-bold whitespace-nowrap">دورات مشتركة</span>
             </div>
             <div className="text-center px-3">
-              <span className="block text-base sm:text-lg font-black text-amber-600">9</span>
+              <span className="block text-base sm:text-lg font-bold text-amber-600">9</span>
               <span className="text-[9px] sm:text-[10px] text-slate-600 font-bold whitespace-nowrap">كتب وحقائب</span>
             </div>
           </motion.div>
@@ -312,10 +311,10 @@ export default function StudentPathwaysPage() {
         <div className="premium-tabs flex items-center gap-2 p-1.5 rounded-2xl border border-white/80 bg-white/90 backdrop-blur-md shadow-sm">
           <button
             onClick={() => setActiveSection('courses')}
-            className={`premium-tab px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none ${
+            className={`premium-tab px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none ${
               activeSection === 'courses'
-                ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60'
+                ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                : 'text-slate-600 hover:text-[#0B3766] hover:bg-slate-100/60'
             }`}
           >
             <GraduationCap className="w-4 h-4 shrink-0" />
@@ -324,10 +323,10 @@ export default function StudentPathwaysPage() {
 
           <button
             onClick={() => setActiveSection('books')}
-            className={`premium-tab px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none ${
+            className={`premium-tab px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none ${
               activeSection === 'books'
-                ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60'
+                ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                : 'text-slate-600 hover:text-[#0B3766] hover:bg-slate-100/60'
             }`}
           >
             <BookOpen className="w-4 h-4 shrink-0" />
@@ -342,7 +341,7 @@ export default function StudentPathwaysPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={activeSection === 'courses' ? 'ابحث عن دورة تدريبية...' : 'ابحث في الكتب والمراجع...'}
-            className="w-full pl-4 pr-10 py-2.5 rounded-2xl bg-white/90 border border-slate-200/80 text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all shadow-xs"
+            className="w-full pl-4 pr-10 py-2.5 rounded-2xl bg-white/90 border border-slate-200/80 text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0B3766]/20 focus:border-[#0B3766] transition-all shadow-xs"
           />
           <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
@@ -351,7 +350,7 @@ export default function StudentPathwaysPage() {
       {activeSection === 'courses' && (coursesLoading || coursesError || accreditedCourses.length === 0) && (
         <div role={coursesError ? 'alert' : 'status'} className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-600">
           <p>{coursesLoading ? 'جارٍ تحميل الدورات…' : coursesError || 'لا توجد دورات متاحة حاليًا.'}</p>
-          {coursesError && !coursesLoading && <button type="button" onClick={reload} className="mt-3 font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
+          {coursesError && !coursesLoading && <button type="button" onClick={reload} className="mt-3 font-bold text-[#0B3766] underline">إعادة المحاولة</button>}
         </div>
       )}
       {/* ── SECTION 1: COURSES CONTENT ── */}
@@ -384,7 +383,7 @@ export default function StudentPathwaysPage() {
 
                     {/* Category Badge on Top-Right */}
                     <div className="absolute top-3 right-3 z-20">
-                      <span className="px-3 py-1 rounded-full text-[11px] font-black bg-white/90 text-[#173A7C] border border-blue-100/80 shadow-xs backdrop-blur-md">
+                      <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-white/90 text-[#0B3766] border border-blue-100/80 shadow-xs backdrop-blur-md">
                         {course.category === 'admin' ? 'أعمال مكتبية' : course.category === 'data' ? 'إدخال بيانات' : course.category === 'languages' ? 'لغات' : course.category === 'corporate' ? 'إدارة وأعمال' : 'تقنية وحاسب'}
                       </span>
                     </div>
@@ -392,12 +391,12 @@ export default function StudentPathwaysPage() {
                     {/* Enrollment Status Badge on Top-Left */}
                     <div className="absolute top-3 left-3 z-20">
                       {isEnrolled ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-600/90 text-white shadow-xs backdrop-blur-md">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-600/90 text-white shadow-xs backdrop-blur-md">
                           <CheckCircle className="w-3.5 h-3.5 text-emerald-200" />
                           <span>مشترك</span>
                         </span>
                       ) : (
-                        <span className="px-3 py-1 rounded-full text-[11px] font-black bg-slate-900/75 text-white shadow-xs backdrop-blur-md">
+                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-900/75 text-white shadow-xs backdrop-blur-md">
                           معتمدة
                         </span>
                       )}
@@ -406,7 +405,7 @@ export default function StudentPathwaysPage() {
 
                   {/* Title and description */}
                   <div className="space-y-2">
-                    <h3 className="text-base font-black text-slate-900 group-hover:text-[#173A7C] transition-colors leading-snug line-clamp-2">
+                    <h3 className="text-base font-bold text-slate-900 group-hover:text-[#0B3766] transition-colors leading-snug line-clamp-2">
                       {course.title}
                     </h3>
 
@@ -420,7 +419,7 @@ export default function StudentPathwaysPage() {
                 <div className="space-y-3.5 pt-4 mt-4 border-t border-slate-100">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500">
                     <span className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[#173A7C]" />
+                      <Clock className="w-3.5 h-3.5 text-[#0B3766]" />
                       <span>{course.duration}</span>
                     </span>
                     <span className="flex items-center gap-1.5">
@@ -432,13 +431,13 @@ export default function StudentPathwaysPage() {
                   {/* If enrolled: Real Progress Bar */}
                   {isEnrolled && (
                     <div className="space-y-1.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                      <div className="flex items-center justify-between text-[11px] font-black">
+                      <div className="flex items-center justify-between text-[11px] font-bold">
                         <span className="text-slate-700">مستوى الإنجاز</span>
-                        <span className="text-[#173A7C]">%{progress}</span>
+                        <span className="text-[#0B3766]">%{progress}</span>
                       </div>
                       <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full transition-all duration-500"
+                          className="h-full bg-gradient-to-r from-[#0B3766] to-[#19B6C7] rounded-full transition-all duration-500"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -450,7 +449,7 @@ export default function StudentPathwaysPage() {
                     {isEnrolled ? (
                       <Link
                         href={`/dashboard/student/courses/${course.slug}/lessons/lesson-1`}
-                        className="w-full py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center justify-center gap-2 transition-all shadow-md shadow-[#173A7C]/20 hover:shadow-lg active:scale-95 cursor-pointer"
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-[#0B3766]/20 hover:shadow-lg active:scale-95 cursor-pointer"
                       >
                         <Play className="w-3.5 h-3.5 fill-white" />
                         <span>متابعة التعلم (دخول المشغل)</span>
@@ -458,7 +457,7 @@ export default function StudentPathwaysPage() {
                     ) : (
                       <Link
                         href={`/checkout?slug=${course.slug}`}
-                        className="w-full py-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/80 hover:border-[#173A7C]/30 text-[#173A7C] text-xs font-black flex items-center justify-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
+                        className="w-full py-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/80 hover:border-[#0B3766]/30 text-[#0B3766] text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
                       >
                         <span>استعراض والاشتراك في الدورة</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -488,14 +487,14 @@ export default function StudentPathwaysPage() {
                 <div className={`h-36 rounded-2xl bg-gradient-to-br ${book.coverGradient} p-5 flex flex-col justify-between text-white relative overflow-hidden shadow-md group-hover:scale-[1.02] transition-transform duration-300`}>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
                   <div className="flex items-center justify-between relative z-10">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30">
                       {book.category}
                     </span>
                     <BookOpen className="w-5 h-5 text-white/80" />
                   </div>
                   <div className="relative z-10">
                     <span className="text-[10px] text-white/70 font-bold block">{book.courseTitle}</span>
-                    <h4 className="text-sm font-black text-white line-clamp-2 leading-snug">{book.title}</h4>
+                    <h4 className="text-sm font-bold text-white line-clamp-2 leading-snug">{book.title}</h4>
                   </div>
                 </div>
 
@@ -511,7 +510,7 @@ export default function StudentPathwaysPage() {
               <div className="space-y-4 pt-4 mt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-500">
                   <span className="flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-[#173A7C]" />
+                    <FileText className="w-3.5 h-3.5 text-[#0B3766]" />
                     <span>{book.pagesCount} صفحة</span>
                   </span>
                   <span className="text-slate-400">{book.fileSize} · PDF</span>
@@ -532,7 +531,7 @@ export default function StudentPathwaysPage() {
                       e.preventDefault();
                       alert(`جاري تجهيز تحميل حقيبة: ${book.title}`);
                     }}
-                    className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-[#173A7C]/20 active:scale-95 cursor-pointer"
+                    className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-[#0B3766]/20 active:scale-95 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>تحميل PDF</span>
@@ -556,10 +555,10 @@ export default function StudentPathwaysPage() {
             >
               <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
-                  <span className="text-xs font-black text-[#0D5C3A] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 inline-block mb-2">
+                  <span className="text-xs font-bold text-[#0D5C3A] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 inline-block mb-2">
                     {selectedBookPreview.category}
                   </span>
-                  <h3 className="text-lg font-black text-slate-900 leading-snug">
+                  <h3 className="text-lg font-bold text-slate-900 leading-snug">
                     {selectedBookPreview.title}
                   </h3>
                   <span className="text-xs font-bold text-slate-500 mt-1 block">
@@ -575,7 +574,7 @@ export default function StudentPathwaysPage() {
               </div>
 
               <div className="space-y-3 text-xs text-slate-600 font-medium leading-relaxed">
-                <h4 className="font-black text-slate-800 text-sm">مقدمة ومحتويات الحقيبة الأكاديمية:</h4>
+                <h4 className="font-bold text-slate-800 text-sm">مقدمة ومحتويات الحقيبة الأكاديمية:</h4>
                 <p>{selectedBookPreview.description}</p>
                 <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
                   <span className="font-bold text-slate-800 block text-xs">تتضمن الحقيبة:</span>
@@ -599,7 +598,7 @@ export default function StudentPathwaysPage() {
                     alert(`جاري بدء تحميل الحقيبة التدريبية: ${selectedBookPreview.title}`);
                     setSelectedBookPreview(null);
                   }}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 transition-all shadow-md shadow-[#173A7C]/20 cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-[#0B3766]/20 cursor-pointer"
                 >
                   <Download className="w-4 h-4" />
                   <span>تحميل النسخة الكاملة PDF</span>

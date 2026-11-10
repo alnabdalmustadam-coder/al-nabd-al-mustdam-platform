@@ -13,7 +13,6 @@ import {
   Radio,
   User,
   LogOut,
-  Sparkles,
   ShieldCheck,
   GraduationCap,
   FileCheck,
@@ -157,11 +156,11 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
             isCollapsed ? 'p-2 pt-2' : 'px-3.5 py-3'
           }`}
           style={{
-            background: 'rgba(255, 255, 255, 0.96)',
+            background: 'rgba(255, 255, 255, 0.94)',
             backdropFilter: 'blur(28px) saturate(1.8)',
             WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-            boxShadow: '0 0 40px rgba(23, 58, 124, 0.06), 0 4px 20px rgba(0, 0, 0, 0.04)',
-            borderLeft: '1px solid rgba(23, 58, 124, 0.08)',
+            boxShadow: '0 0 40px rgba(11, 55, 102, 0.06), 0 4px 20px rgba(11, 55, 102, 0.04)',
+            borderLeft: '1px solid rgba(11, 55, 102, 0.08)',
           }}
         >
           <div className="space-y-3.5 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1">
@@ -171,14 +170,14 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                 isCollapsed ? 'p-2 flex flex-col items-center justify-center' : 'p-3.5'
               }`}
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
-                boxShadow: '0 4px 14px rgba(23, 58, 124, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+                boxShadow: '0 4px 14px rgba(11, 55, 102, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
               }}
             >
               <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3.5'}`}>
                 {/* Prominent Large Avatar Frame */}
                 <div className="relative shrink-0">
-                  <div className={`${isCollapsed ? 'w-12 h-12' : 'w-14 h-14 sm:w-15 sm:h-15'} rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center`}>
+                  <div className={`${isCollapsed ? 'w-12 h-12' : 'w-14 h-14 sm:w-15 sm:h-15'} rounded-2xl overflow-hidden shadow-md ring-2 ring-[#0B3766]/20 border-2 border-white bg-gradient-to-br from-[#0B3766] to-[#2563EB] flex items-center justify-center`}>
                     {userProfile.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -187,7 +186,7 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                         className="w-full h-full object-cover object-top"
                       />
                     ) : (
-                      <span className="text-lg sm:text-xl font-black text-white">
+                      <span className="text-lg sm:text-xl font-bold text-white">
                         {userProfile.fullName.charAt(0)}
                       </span>
                     )}
@@ -198,19 +197,19 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                 {!isCollapsed && (
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <h3 className="font-black text-sm sm:text-[15px] text-slate-900 truncate leading-tight" title={userProfile.fullName}>
+                      <h3 className="font-bold text-sm sm:text-[15px] text-slate-900 truncate leading-tight" title={userProfile.fullName}>
                         {userProfile.fullName}
                       </h3>
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <ShieldCheck className="w-4 h-4 text-[#168AD3] shrink-0" />
                     </div>
-                    <p className="text-xs text-emerald-700 font-extrabold truncate">مدرب ومحاضر معتمد</p>
+                    <p className="text-xs text-[#0B3766] font-semibold truncate">مدرب ومحاضر معتمد</p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Navigation Links */}
-            <nav className="space-y-2 px-0.5 py-0.5">
+            <nav className="space-y-1 px-0.5 py-0.5">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
@@ -219,25 +218,25 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`dashboard-nav-tab relative flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer group ${
+                    className={`dashboard-nav-tab relative flex items-center justify-between gap-2 py-1.5 px-2.5 rounded-xl text-[11.5px] font-semibold transition-all cursor-pointer group ${
                       isActive
-                        ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-lg shadow-[#173A7C]/25 border border-blue-400/40'
-                        : 'text-slate-800 hover:text-[#173A7C] hover:bg-white border border-slate-200/90 shadow-xs'
+                        ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20 border border-blue-400/40'
+                        : 'text-[#0B3766] hover:text-[#168AD3] bg-white hover:bg-[#F4F9FD] border border-slate-200/80 shadow-xs'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
                       <div
-                        className={`p-1.5 rounded-lg shrink-0 flex items-center justify-center ${
-                          isActive ? 'bg-white/20 text-white' : 'bg-[#173A7C]/10 text-[#173A7C] group-hover:bg-[#173A7C] group-hover:text-white'
+                        className={`w-6.5 h-6.5 rounded-lg shrink-0 flex items-center justify-center ${
+                          isActive ? 'bg-white/20 text-white' : 'bg-[#0B3766]/10 text-[#0B3766] group-hover:bg-[#0B3766] group-hover:text-white'
                         }`}
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className="w-3.5 h-3.5" />
                       </div>
-                      {!isCollapsed && <span className={`dashboard-nav-tab-label truncate font-extrabold ${isActive ? 'text-white' : 'text-slate-800 group-hover:text-[#173A7C]'}`}>{item.label}</span>}
+                      {!isCollapsed && <span className={`dashboard-nav-tab-label truncate text-[11.5px] font-semibold ${isActive ? 'text-white' : 'text-[#0B3766] group-hover:text-[#168AD3]'}`}>{item.label}</span>}
                     </div>
 
                     {!isCollapsed && item.count && (
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 inline-flex items-center gap-1 whitespace-nowrap shrink-0">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 inline-flex items-center gap-1 whitespace-nowrap shrink-0">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
                         <span>{item.count}</span>
                       </span>
@@ -250,25 +249,25 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
 
           {/* ── Brand Logo & Academy Verification Card ── */}
           {!isCollapsed && (
-            <div className="mt-4 pt-4 border-t border-slate-200/70 space-y-3">
-              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-white/90 via-blue-50/60 to-emerald-50/40 border border-slate-200/80 shadow-xs space-y-2.5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white p-1.5 shadow-sm border border-slate-200/80 flex items-center justify-center shrink-0">
+            <div className="mt-3 pt-3 border-t border-slate-200/70 space-y-2.5">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-white/95 via-blue-50/50 to-cyan-50/40 border border-slate-200/80 shadow-xs space-y-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-white p-1.5 shadow-sm border border-slate-200/80 flex items-center justify-center shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/logo.webp" alt="النبض المستدام" className="w-full h-full object-contain" />
+                    <img src="/madar-learning-logo-compact.svg" alt="المدار ليرنينج" className="w-full h-full object-contain" />
                   </div>
                   <div className="min-w-0">
-                    <h5 className="font-black text-xs text-[#173A7C] truncate">منصة النبض المستدام</h5>
-                    <p className="text-[10px] text-slate-500 font-bold">البوابة الأكاديمية المعتمدة</p>
+                    <h5 className="font-bold text-xs text-[#0B3766] truncate">منصة مَدار للتعلّم</h5>
+                    <p className="text-[10px] text-slate-500 font-semibold">البوابة الأكاديمية المعتمدة</p>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 text-[10px] font-bold text-slate-500">
-                  <span className="flex items-center gap-1 text-emerald-700">
-                    <ShieldCheck className="w-3.5 h-3.5" />
+                <div className="flex items-center justify-between pt-1.5 border-t border-slate-200/60 text-[10px] font-semibold text-slate-500">
+                  <span className="flex items-center gap-1 text-[#0B3766]">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#168AD3]" />
                     <span>نظام متكامل 2026</span>
                   </span>
-                  <Link href="/" className="hover:text-[#173A7C] flex items-center gap-0.5 text-[#173A7C] font-black">
+                  <Link href="/" className="hover:text-[#0B3766] flex items-center gap-0.5 text-[#0B3766] font-bold">
                     <span>الموقع</span>
                     <ChevronLeft className="w-3 h-3" />
                   </Link>
@@ -301,8 +300,8 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-3 border-b">
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5 text-[#173A7C]" />
-                  <span className="font-black text-sm text-[#173A7C]">لوحة تحكم المدرب</span>
+                  <GraduationCap className="w-5 h-5 text-[#0B3766]" />
+                  <span className="font-bold text-sm text-[#0B3766]">لوحة تحكم المدرب</span>
                 </div>
                 <button onClick={onCloseMobile} className="p-1 rounded-lg hover:bg-slate-100">
                   <X className="w-5 h-5 text-slate-500" />
@@ -312,12 +311,12 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
               <div
                 className="flex items-center gap-3.5 p-3.5 rounded-2xl border border-slate-200/90"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
-                  boxShadow: '0 4px 12px rgba(23, 58, 124, 0.06)',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+                  boxShadow: '0 4px 12px rgba(11, 55, 102, 0.08)',
                 }}
               >
                 <div className="relative shrink-0">
-                  <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md ring-2 ring-[#0B3766]/20 border-2 border-white bg-gradient-to-br from-[#0B3766] to-[#2563EB] flex items-center justify-center">
                     {userProfile.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -326,7 +325,7 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                         className="w-full h-full object-cover object-top"
                       />
                     ) : (
-                      <span className="text-lg font-black text-white">
+                      <span className="text-lg font-bold text-white">
                         {userProfile.fullName.charAt(0)}
                       </span>
                     )}
@@ -334,12 +333,12 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                   <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h4 className="text-sm font-black text-slate-900 mb-0.5 truncate">{userProfile.fullName}</h4>
-                  <p className="text-xs text-emerald-700 font-extrabold truncate">مدرب ومحاضر معتمد</p>
+                  <h4 className="text-sm font-bold text-slate-900 mb-0.5 truncate">{userProfile.fullName}</h4>
+                  <p className="text-xs text-[#0B3766] font-semibold truncate">مدرب ومحاضر معتمد</p>
                 </div>
               </div>
 
-              <nav className="space-y-2">
+              <nav className="space-y-1">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
@@ -348,18 +347,18 @@ export const InstructorSidebar: React.FC<InstructorSidebarProps> = ({
                       key={item.href}
                       href={item.href}
                       onClick={onCloseMobile}
-                      className={`dashboard-nav-tab flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                      className={`dashboard-nav-tab flex items-center justify-between gap-2 py-1.5 px-2.5 rounded-xl text-[11.5px] font-semibold transition-all ${
                         isActive
-                          ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-blue-400/40'
-                          : 'text-slate-800 hover:text-[#173A7C] hover:bg-white border border-slate-200/90 shadow-xs'
+                          ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20 border border-blue-400/40'
+                          : 'text-[#0B3766] hover:text-[#168AD3] bg-white hover:bg-[#F4F9FD] border border-slate-200/80 shadow-xs'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <Icon className="w-4 h-4" />
-                        <span className="dashboard-nav-tab-label">{item.label}</span>
+                      <div className="flex items-center gap-2">
+                        <Icon className="w-3.5 h-3.5 text-[#0B3766]" />
+                        <span className={`dashboard-nav-tab-label truncate text-[11.5px] font-semibold ${isActive ? 'text-white' : 'text-[#0B3766]'}`}>{item.label}</span>
                       </div>
                       {item.count && (
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
                           {item.count}
                         </span>
                       )}

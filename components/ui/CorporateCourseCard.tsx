@@ -1,8 +1,13 @@
-import Link from "next/link";
-import { MonitorPlay, ArrowRight, Shield, Cloud, Monitor, Code, FileText, BarChart3, Users, Brain, ShieldCheck, Briefcase, Target, Speaker, BookOpen, Heart, Activity } from "lucide-react";
-import { CorporateCourse } from "@/data/corporateCourses";
+"use client";
 
-// Map our simple string types to actual Lucide solid components
+import Link from "next/link";
+import {
+  MonitorPlay, ArrowRight, Shield, Cloud, Monitor, Code, FileText,
+  BarChart3, Users, Brain, ShieldCheck, Briefcase, Target, Speaker,
+  BookOpen, Heart, Activity
+} from "lucide-react";
+import type { CorporateCourse } from "@/data/corporateCourses";
+
 const iconMap = {
   shield: Shield,
   cloud: Cloud,
@@ -26,44 +31,43 @@ export default function CorporateCourseCard({ course }: { course: CorporateCours
 
   return (
     <div className="group relative h-full">
-      <Link href="/contact" className="block h-full">
-        {/* Outer glow on hover */}
-        <div className="absolute -inset-[1px] rounded-[2rem] bg-gradient-to-br from-[#173A7C] to-[#5CB07C] opacity-[0.03] group-hover:opacity-[0.1] blur-sm transition-opacity duration-500 z-0"></div>
-        
-        {/* Card */}
-        <div className="relative bg-white rounded-[1.75rem] p-7 border border-slate-100 shadow-[0_4px_20px_-5px_rgba(23,58,124,0.05)] group-hover:shadow-[0_20px_60px_-10px_rgba(23,58,124,0.18)] group-hover:border-slate-200 hover:-translate-y-2 transition-all duration-500 overflow-hidden z-10 h-full flex flex-col text-start">
+      <Link
+        href={`/corporate/${course.slug}`}
+        className="block h-full"
+        aria-label={`تفاصيل برنامج ${course.title}`}
+      >
+        {/* Card Container — Clean, lightweight Home-style card */}
+        <div className="relative bg-white rounded-[1.75rem] p-6 sm:p-7 border border-[#0B3766]/10 shadow-[0_4px_20px_-5px_rgba(11,55,102,0.08)] group-hover:shadow-[0_20px_50px_-10px_rgba(11,55,102,0.14)] group-hover:border-[#168AD3]/30 hover:-translate-y-1.5 transition-all duration-400 overflow-hidden h-full flex flex-col justify-between pf-card-equal">
           
-          {/* Top accent gradient bar */}
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#5CB07C] to-[#173A7C] opacity-30 group-hover:opacity-100 transition-opacity duration-500"></div>
+          {/* Top accent hairline */}
+          <div className="absolute top-0 left-0 w-full h-[2.5px] bg-gradient-to-r from-transparent via-[#168AD3] to-transparent opacity-40 group-hover:opacity-100 transition-opacity duration-400" />
 
-          {/* Decorative corner gradient */}
-          <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-[#173A7C] to-[#5CB07C] opacity-[0.03] group-hover:opacity-[0.07] rounded-full blur-2xl transition-opacity duration-700"></div>
-
-          {/* Icon area */}
-          <div className="flex items-start justify-between w-full mb-6 relative z-10">
-            <div className="flex items-center gap-1.5 text-[10px] font-black tracking-widest text-[#173A7C] uppercase bg-gradient-to-br from-[#173A7C]/[0.05] to-transparent px-3 py-1.5 rounded-lg border border-[#173A7C]/10">
-              <MonitorPlay className="w-3 h-3 text-[#5CB07C]" strokeWidth={2.5} />
-              مؤسسات
+          {/* Top Row: Category tag + Icon */}
+          <div className="flex items-start justify-between w-full mb-4 relative z-10">
+            <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#0B3766] bg-[#0B3766]/[0.05] px-3 py-1.5 rounded-xl border border-[#0B3766]/10">
+              <MonitorPlay className="w-3.5 h-3.5 text-[#19B6C7]" strokeWidth={2.2} />
+              <span>برنامج شركات</span>
             </div>
-            <div className="w-14 h-14 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:scale-110 group-hover:text-[#5CB07C] group-hover:bg-[#5CB07C]/10 group-hover:shadow-lg transition-all duration-500 border border-black/[0.03]">
-              <Icon className="w-7 h-7" strokeWidth={1.8} />
+
+            <div className="w-12 h-12 rounded-2xl bg-slate-50 text-[#0B3766] group-hover:text-white group-hover:bg-gradient-to-br group-hover:from-[#0B3766] group-hover:to-[#168AD3] flex items-center justify-center transition-all duration-400 border border-slate-100 shadow-2xs group-hover:shadow-md">
+              <Icon className="w-6 h-6 transition-transform duration-400 group-hover:scale-110" strokeWidth={1.8} />
             </div>
           </div>
 
-          {/* Title */}
-          <h3 className="card-title-royal-blue text-[1.05rem] leading-[1.7] transition-colors relative z-10 mb-auto pb-5">
+          {/* Title — Clean Royal Navy */}
+          <h3 className="card-title-royal-blue text-[1.02rem] sm:text-[1.08rem] font-bold leading-[1.65] text-[#0B3766] group-hover:text-[#168AD3] transition-colors my-auto py-2">
             {course.title}
           </h3>
 
-          {/* Separator */}
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-5 mt-auto"></div>
+          {/* Separator hairline */}
+          <div className="h-px w-full bg-slate-100 my-4" />
 
-          {/* CTA Button */}
+          {/* Bottom Action Pill — Home aesthetic */}
           <div className="w-full relative z-10">
-            <div className="w-full bg-white text-slate-600 border border-slate-200 text-[13px] font-bold py-3 px-4 rounded-xl flex items-center justify-between group-hover:bg-gradient-to-l group-hover:from-[rgba(23,58,124,0.05)] group-hover:to-transparent group-hover:text-[#173A7C] group-hover:border-[#173A7C]/30 transition-all duration-500 shadow-sm group-hover:shadow-md">
-              <span>اشترك الآن</span>
-              <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-400 group-hover:bg-[#173A7C] group-hover:text-white flex items-center justify-center shadow-sm transition-all duration-500">
-                <ArrowRight className="w-3.5 h-3.5 rtl:-scale-x-100 -rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+            <div className="w-full bg-[#F8FAFC] group-hover:bg-gradient-to-l group-hover:from-[#0B3766] group-hover:to-[#168AD3] text-[#0B3766] group-hover:text-white border border-slate-200/80 group-hover:border-transparent text-xs sm:text-[13px] font-bold py-2.5 px-4 rounded-xl flex items-center justify-between transition-all duration-300 shadow-2xs">
+              <span>استعرض تفاصيل البرنامج</span>
+              <div className="w-6 h-6 rounded-lg bg-white/90 group-hover:bg-white/20 text-[#0B3766] group-hover:text-white flex items-center justify-center transition-colors">
+                <ArrowRight className="w-3.5 h-3.5 rtl:-scale-x-100" />
               </div>
             </div>
           </div>

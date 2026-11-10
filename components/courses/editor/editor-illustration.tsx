@@ -8,10 +8,10 @@ export function EditorIllustration({ kind = 'course', className = '' }: { kind?:
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   return <svg viewBox="0 0 200 144" fill="none" aria-hidden="true" focusable="false" className={className}>
     <defs>
-      <linearGradient id={`${id}-blue`} x1="56" y1="30" x2="156" y2="124" gradientUnits="userSpaceOnUse"><stop stopColor="#315bd0" /><stop offset="1" stopColor="#173a7c" /></linearGradient>
+      <linearGradient id={`${id}-blue`} x1="56" y1="30" x2="156" y2="124" gradientUnits="userSpaceOnUse"><stop stopColor="#315bd0" /><stop offset="1" stopColor="#0B3766" /></linearGradient>
       <linearGradient id={`${id}-green`} x1="134" y1="16" x2="174" y2="70" gradientUnits="userSpaceOnUse"><stop stopColor="#33c4a0" /><stop offset="1" stopColor="#0b8b70" /></linearGradient>
     </defs>
-    <ellipse cx="104" cy="132" rx="65" ry="6" fill="#173a7c" opacity=".06" />
+    <ellipse cx="104" cy="132" rx="65" ry="6" fill="#0B3766" opacity=".06" />
     <circle cx="103" cy="73" r="60" fill="#edf3ff" />
     <circle cx="103" cy="73" r="48" stroke="#d6e3fc" strokeDasharray="3 5" />
     <path d="M22 72h16m-8-8v16m135 29h14m-7-7v14" stroke="#9fb7e5" strokeWidth="2" strokeLinecap="round" />

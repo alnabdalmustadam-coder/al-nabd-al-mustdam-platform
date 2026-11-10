@@ -4,8 +4,8 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import WhatsAppFloat from '@/components/ui/WhatsAppFloat';
 import MarketplaceFloat from '@/components/ui/MarketplaceFloat';
+import WhatsAppFloat from '@/components/ui/WhatsAppFloat';
 
 export default function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -24,7 +24,6 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
         </div>
         <main className="flex-1 w-full max-w-full overflow-x-clip flex flex-col justify-center">{children}</main>
         <div className="hidden sm:block">
-          <WhatsAppFloat />
           <MarketplaceFloat />
         </div>
       </>
@@ -36,8 +35,8 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
       <Navbar />
       <main className="flex-1 w-full max-w-full overflow-x-clip">{children}</main>
       <Footer />
-      <WhatsAppFloat />
       <MarketplaceFloat />
+      <WhatsAppFloat />
     </>
   );
 }

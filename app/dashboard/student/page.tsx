@@ -152,8 +152,8 @@ export default function StudentDashboardPage() {
 
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', handleStorage);
-      window.addEventListener('nabd_progress_updated', handleStorage);
-      window.addEventListener('nabd_courses_updated', handleStorage);
+      window.addEventListener('madar_demo_progress_updated', handleStorage);
+      window.addEventListener('madar_demo_courses_updated', handleStorage);
       window.addEventListener('focus', handleStorage);
     }
 
@@ -161,8 +161,8 @@ export default function StudentDashboardPage() {
       active = false;
       if (typeof window !== 'undefined') {
         window.removeEventListener('storage', handleStorage);
-        window.removeEventListener('nabd_progress_updated', handleStorage);
-        window.removeEventListener('nabd_courses_updated', handleStorage);
+        window.removeEventListener('madar_demo_progress_updated', handleStorage);
+        window.removeEventListener('madar_demo_courses_updated', handleStorage);
         window.removeEventListener('focus', handleStorage);
       }
     };
@@ -186,8 +186,8 @@ export default function StudentDashboardPage() {
         custom={0}
         className="relative z-20 liquid-glass-hero p-6 sm:p-8 md:p-9 space-y-4 sm:space-y-6 liquid-glass-hover overflow-hidden student-card-accent rounded-2xl sm:rounded-3xl"
       >
-        <div className="absolute -top-16 -right-16 w-56 h-56 bg-gradient-to-br from-emerald-400/20 to-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-gradient-to-br from-blue-600/15 to-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-16 -right-16 w-56 h-56 bg-gradient-to-br from-[#19B6C7]/20 to-[#168AD3]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-gradient-to-br from-[#0B3766]/15 to-[#168AD3]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-3 sm:space-y-4 pr-1 sm:pr-2">
@@ -205,15 +205,15 @@ export default function StudentDashboardPage() {
           <motion.div variants={textItemVariants} className="flex items-center gap-3">
             <Link
               href="/dashboard/student/courses"
-              className="px-5 py-3 rounded-2xl bg-white/90 hover:bg-white text-[#173A7C] font-extrabold text-xs flex items-center gap-2 transition-all shadow-md hover:shadow-lg border border-slate-200/80 active:scale-95"
+              className="px-5 py-3 rounded-2xl bg-white/90 hover:bg-white text-[#0B3766] font-bold text-xs flex items-center gap-2 transition-all shadow-md hover:shadow-lg border border-slate-200/80 active:scale-95"
             >
-              <BookOpen className="w-4 h-4 text-[#173A7C]" />
+              <BookOpen className="w-4 h-4 text-[#0B3766]" />
               <span>جميع دوراتي</span>
             </Link>
 
             <Link
               href="/courses"
-              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-md shadow-[#173A7C]/20 hover:shadow-lg hover:shadow-[#173A7C]/30 active:scale-95"
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-[#0B3766]/20 hover:shadow-lg hover:shadow-[#0B3766]/30 active:scale-95"
             >
               <Compass className="w-4 h-4" />
               <span>استكشف الدورات</span>
@@ -247,8 +247,8 @@ export default function StudentDashboardPage() {
           className="space-y-5 sm:space-y-6"
         >
           <div className="flex items-center justify-between pb-1">
-            <motion.h2 variants={textItemVariants} className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]">
-              <div className="p-2 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
+            <motion.h2 variants={textItemVariants} className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#19B6C7]">
+              <div className="p-2 rounded-xl text-[#0B3766] bg-[#0B3766]/10 border border-[#0B3766]/20 shadow-xs">
                 <Clock className="w-4 h-4" />
               </div>
               <span>{topCourse.progressPercent >= 100 ? 'الدورة التدريبية المكتملة' : 'واصل التعلم من حيث توقفت'}</span>
@@ -268,15 +268,15 @@ export default function StudentDashboardPage() {
         className="space-y-5 sm:space-y-6"
       >
         <div className="flex items-center justify-between pb-1">
-          <motion.h2 variants={textItemVariants} className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]">
-            <div className="p-2 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
+          <motion.h2 variants={textItemVariants} className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#19B6C7]">
+            <div className="p-2 rounded-xl text-[#0B3766] bg-[#0B3766]/10 border border-[#0B3766]/20 shadow-xs">
               <BookOpen className="w-4 h-4" />
             </div>
             <span>دوراتي التدريبية المعتمدة ({enrolledCourses.length})</span>
           </motion.h2>
           {enrolledCourses.length > 0 && (
             <motion.div variants={textItemVariants}>
-              <Link href="/dashboard/student/courses" className="text-xs text-[#173A7C] hover:text-[#1E4D9D] font-black flex items-center gap-1 transition-colors">
+              <Link href="/dashboard/student/courses" className="text-xs text-[#0B3766] hover:text-[#168AD3] font-bold flex items-center gap-1 transition-colors">
                 <span>عرض جميع الدورات</span>
                 <ArrowLeft className="w-3.5 h-3.5" />
               </Link>
@@ -286,23 +286,23 @@ export default function StudentDashboardPage() {
 
         {loading ? (
           <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+            <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
             <p className="text-xs font-bold text-slate-500">جاري مزامنة دوراتك من قاعدة البيانات...</p>
           </div>
         ) : enrolledCourses.length === 0 ? (
           <div className="p-10 sm:p-14 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-4">
-            <div className="w-16 h-16 rounded-3xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center mx-auto">
+            <div className="w-16 h-16 rounded-3xl bg-[#0B3766]/10 text-[#0B3766] flex items-center justify-center mx-auto">
               <Compass className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-lg font-black text-slate-900">لم تقم بالتسجيل في أي دورة بعد</h3>
+              <h3 className="text-lg font-bold text-slate-900">لم تقم بالتسجيل في أي دورة بعد</h3>
               <p className="text-xs font-bold text-slate-500 max-w-md mx-auto">
                 استكشف مكتبة البرامج التدريبية المعتمدة واشترك لتبدأ مسيرتك المهنية فوراً.
               </p>
             </div>
             <Link
               href="/courses"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white font-black text-xs shadow-md hover:shadow-lg transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white font-bold text-xs shadow-md hover:shadow-lg transition-all"
             >
               <span>استكشاف الدورات المتاحة</span>
               <ArrowLeft className="w-4 h-4" />

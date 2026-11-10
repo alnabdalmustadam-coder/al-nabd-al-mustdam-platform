@@ -1,5 +1,3 @@
-import { CourseCategory } from "@/types";
-
 export interface CorporateCourse {
   id: number;
   title: string;
@@ -19,7 +17,7 @@ export const corporateCategories: { key: string, label: string }[] = [
 ];
 
 export const corporateCourses: CorporateCourse[] = [
-  // Image 1 & Tech overlaps
+  // Static catalog adapted from the training-program structure in Sustainable Pulse.
   { id: 1, title: "التدريب على اساسيات لينكس كومبتيا", slug: "linux-comptia-basics", category: "tech", iconType: "computer" },
   { id: 2, title: "التدريب على أساسيات مايكروسوفت أزور Microsoft Azure Fundamentals", slug: "azure-fundamentals", category: "tech", iconType: "cloud" },
   { id: 3, title: "التدريب على مهارات مدقق نظم معلومات معتمد Certified Information Systems Auditor", slug: "cisa-training", category: "tech", iconType: "shield" },
@@ -29,13 +27,13 @@ export const corporateCourses: CorporateCourse[] = [
   { id: 7, title: "مايكروسوفت ويندوز اكس بي", slug: "ms-windows-xp", category: "admin", iconType: "computer" },
   { id: 8, title: "مايكروسوفت اكسل", slug: "ms-excel", category: "admin", iconType: "chart" },
   { id: 9, title: "التدريب على برمجة فيجوال بيسك دوت نت وقواعد البيانات", slug: "vb-net-databases", category: "tech", iconType: "code" },
-  { id: 10, title: "التدريب على برنامج فوتوشوب", slug: "photoshop-training", category: "tech", iconType: "target" }, // or design
+  { id: 10, title: "التدريب على برنامج فوتوشوب", slug: "photoshop-training", category: "tech", iconType: "target" }, // Design program
   { id: 11, title: "مدخل بيانات", slug: "data-entry", category: "admin", iconType: "file" },
   { id: 12, title: "تطوير مهارات اخصائي موارد بشرية", slug: "hr-specialist-skills", category: "management", iconType: "users" },
   { id: 13, title: "التدريب على صيانة الحاسب عمل الشبكة بين جهازين", slug: "pc-maintenance-networking", category: "tech", iconType: "computer" },
   { id: 14, title: "الطباعة بالعربي", slug: "arabic-typing", category: "admin", iconType: "file" },
   
-  // Image 2
+  // Program category
   { id: 15, title: "مهارات البيع الفعال", slug: "effective-sales", category: "marketing", iconType: "target" },
   { id: 16, title: "اساسيات إدارة الأعمال الاحترافية", slug: "pro-business-admin", category: "management", iconType: "briefcase" },
   { id: 17, title: "مهارات التواصل الفعال", slug: "effective-communication", category: "soft-skills", iconType: "speaker" },
@@ -53,7 +51,7 @@ export const corporateCourses: CorporateCourse[] = [
   { id: 29, title: "التخطيط الاستراتيجي", slug: "strategic-planning", category: "management", iconType: "chart" },
   { id: 30, title: "دورة القدرات العامة لطلاب الثانوية العامة", slug: "general-aptitude-test", category: "general", iconType: "book" },
 
-  // Image 3
+  // Program category
   { id: 31, title: "إدارة النزاعات في العمل", slug: "workplace-conflict-management", category: "management", iconType: "users" },
   { id: 32, title: "إدارة الجودة في المنشآت الصحية", slug: "healthcare-quality-management", category: "management", iconType: "check" },
   { id: 33, title: "مفاهيم التجارة الإلكترونية", slug: "ecommerce-concepts", category: "marketing", iconType: "chart" },
@@ -66,7 +64,7 @@ export const corporateCourses: CorporateCourse[] = [
   { id: 40, title: "التميز في خدمة العملاء", slug: "customer-service-excellence", category: "marketing", iconType: "target" },
   { id: 41, title: "استراتيجيات التعليم الإبداعي", slug: "creative-teaching-strategies", category: "general", iconType: "brain" },
   { id: 42, title: "الإدارة اليابانية ( كايزن)", slug: "japanese-management-kaizen", category: "management", iconType: "check" },
-  { id: 43, title: "فن الادارة الصفية", slug: "classroom-management-art", category: "general", iconType: "board" as any },
+  { id: 43, title: "فن الادارة الصفية", slug: "classroom-management-art", category: "general", iconType: "book" },
   { id: 44, title: "تقنيات التعليم الالكتروني", slug: "elearning-technologies", category: "general", iconType: "computer" },
   { id: 45, title: "المقاييس الاجتماعية", slug: "social-metrics", category: "soft-skills", iconType: "users" },
   { id: 46, title: "فنيات المقابلة الارشادية", slug: "counseling-interview-techniques", category: "soft-skills", iconType: "speaker" },
@@ -75,7 +73,7 @@ export const corporateCourses: CorporateCourse[] = [
   { id: 49, title: "إدارة المهام المتعددة و ترتيب الاولويات", slug: "multitasking-prioritization", category: "soft-skills", iconType: "check" },
   { id: 50, title: "الأمن السيبراني", slug: "cybersecurity-basics", category: "tech", iconType: "shield" },
 
-  // Image 4 & 5 Extra Unique
+  // Program category
   { id: 51, title: "إدارة التغيير الذاتي", slug: "self-change-management", category: "soft-skills", iconType: "brain" },
   { id: 52, title: "الإعداد لاختبار الرخصة المهنية في علم الاجتماع", slug: "pro-license-sociology", category: "general", iconType: "book" },
   { id: 53, title: "السلامة والصحة المهنية طبقاً لمعايير نيبوش IGC", slug: "nebosh-igc", category: "general", iconType: "shield" },
@@ -103,3 +101,7 @@ export const corporateCourses: CorporateCourse[] = [
   { id: 75, title: "أساسيات الحماية لسلامة المنشآت", slug: "facility-safety-basics", category: "general", iconType: "shield" },
   { id: 76, title: "مهارات التحقيق الاداري", slug: "admin-investigation-skills", category: "management", iconType: "briefcase" },
 ];
+
+/** Demo-only catalogue: no enrollment, accreditation, or availability is implied. */
+export const findCorporateCourse = (slug: string): CorporateCourse | undefined =>
+  corporateCourses.find(course => course.slug === slug);

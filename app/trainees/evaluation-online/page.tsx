@@ -8,7 +8,6 @@ import {
   ClipboardCheck, Users, MessageSquare, Globe,
   ChevronLeft, ChevronRight, Award, Mail, BookOpen, MonitorPlay, Lightbulb, UsersRound
 } from "lucide-react";
-import { submitToGHL } from "@/lib/ghl";
 
 type Rating = "عالي" | "متوسط" | "منخفض" | "";
 
@@ -152,9 +151,6 @@ export default function OnlineEvaluationPage() {
         body: JSON.stringify({ type: "evaluation-online", ...form }),
       });
 
-      // Submit to GHL from client-side
-      await submitToGHL(form);
-
       if (res.ok) {
         setSubmitted(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -201,11 +197,11 @@ export default function OnlineEvaluationPage() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.85, y: 20 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="relative bg-white rounded-[2rem] p-8 sm:p-10 max-w-sm w-full shadow-[0_30px_80px_-15px_rgba(23,58,124,0.3)] border border-slate-100 text-center overflow-hidden"
+            className="relative bg-white rounded-[2rem] p-8 sm:p-10 max-w-sm w-full shadow-[0_30px_80px_-15px_rgba(11,55,102,0.12)] border border-slate-100 text-center overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Decorative gradient */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#173A7C] via-[#2E5EA6] to-[#5CB07C]" />
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0B3766] via-[#2E5EA6] to-[#19B6C7]" />
             <div className={`absolute top-0 right-0 w-40 h-40 rounded-bl-full pointer-events-none ${alertModal.type === "error" ? "bg-gradient-to-bl from-red-500/[0.04]" : "bg-gradient-to-bl from-amber-500/[0.04]"} to-transparent`} />
 
             {/* Logo */}
@@ -230,7 +226,7 @@ export default function OnlineEvaluationPage() {
               )}
             </div>
 
-            <h3 className="text-xl font-black text-slate-900 mb-3">
+            <h3 className="text-xl font-bold text-slate-900 mb-3">
               {alertModal.type === "error" ? "خطأ!" : "تنبيه!"}
             </h3>
             <p className="text-sm text-slate-500 font-medium leading-relaxed mb-7">
@@ -238,7 +234,7 @@ export default function OnlineEvaluationPage() {
             </p>
             <button
               onClick={() => setAlertModal((p) => ({ ...p, open: false }))}
-              className="w-full py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#173A7C] to-[#2E5EA6] shadow-lg shadow-[#173A7C]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all"
+              className="w-full py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#0B3766] to-[#2E5EA6] shadow-lg shadow-[#0B3766]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all"
             >
               حسناً، فهمت
             </button>
@@ -264,9 +260,9 @@ export default function OnlineEvaluationPage() {
         transition={{ delay: index * 0.06, duration: 0.4 }}
         className="group relative"
       >
-        <div className="flex flex-col md:flex-row md:items-center justify-between py-5 px-5 -mx-5 rounded-[20px] hover:bg-slate-50/80 transition-all duration-300 gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between py-4 px-3 sm:px-4 rounded-[16px] hover:bg-slate-50/80 transition-all duration-300 gap-4">
           <div className="flex items-start gap-3 md:max-w-[55%]">
-            <span className="w-7 h-7 rounded-xl bg-[#173A7C]/5 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black text-[#173A7C]/60">
+            <span className="w-7 h-7 rounded-xl bg-[#0B3766]/5 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold text-[#0B3766]/60">
               {index + 1}
             </span>
             <span className="text-slate-700 font-bold text-[15px] leading-relaxed">{label}</span>
@@ -309,7 +305,7 @@ export default function OnlineEvaluationPage() {
   };
 
   /* ═══ Input field helper ═══ */
-  const inputClass = "w-full px-5 py-4 rounded-[20px] bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 outline-none transition-all duration-300 text-[15px] font-medium shadow-sm hover:border-slate-300";
+  const inputClass = "w-full px-5 py-4 rounded-[20px] bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#0B3766] focus:ring-2 focus:ring-[#0B3766]/15 outline-none transition-all duration-300 text-[15px] font-medium shadow-sm hover:border-slate-300";
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -320,8 +316,8 @@ export default function OnlineEvaluationPage() {
         <img src="/bg.webp" alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.92] via-slate-50/[0.88] to-blue-50/[0.85]" />
       </div>
-      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-[#5CB07C]/[0.06] rounded-full blur-[200px] pointer-events-none -translate-y-1/2 translate-x-1/3 z-0" />
-      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-[#173A7C]/[0.06] rounded-full blur-[180px] pointer-events-none translate-y-1/2 -translate-x-1/3 z-0" />
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-[#19B6C7]/[0.06] rounded-full blur-[200px] pointer-events-none -translate-y-1/2 translate-x-1/3 z-0" />
+      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-[#0B3766]/[0.06] rounded-full blur-[180px] pointer-events-none translate-y-1/2 -translate-x-1/3 z-0" />
 
       <div className="relative z-10 pb-24 pt-20 md:pt-28">
         {/* ═══════════ HERO HEADER ═══════════ */}
@@ -347,11 +343,11 @@ export default function OnlineEvaluationPage() {
             <div className="mt-8 max-w-sm mx-auto">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-slate-400">نسبة الإكمال</span>
-                <span className="text-xs font-black text-[#5CB07C]">{progress}%</span>
+                <span className="text-xs font-bold text-[#19B6C7]">{progress}%</span>
               </div>
               <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full"
+                  className="h-full bg-gradient-to-r from-[#0B3766] to-[#19B6C7] rounded-full"
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
                 />
@@ -370,8 +366,8 @@ export default function OnlineEvaluationPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="max-w-2xl mx-auto px-4 sm:px-6"
             >
-              <div className="bg-white rounded-[2.5rem] p-10 sm:p-16 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.1)] text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/[0.02] to-[#5CB07C]/[0.03] pointer-events-none" />
+              <div className="bg-white rounded-[2.5rem] p-10 sm:p-16 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/[0.02] to-[#19B6C7]/[0.03] pointer-events-none" />
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-emerald-500/[0.04] to-transparent rounded-bl-full pointer-events-none" />
 
                 <motion.div
@@ -380,10 +376,10 @@ export default function OnlineEvaluationPage() {
                   transition={{ delay: 0.2, type: "spring" }}
                   className="relative z-10"
                 >
-                  <div className="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-emerald-500 to-[#5CB07C] flex items-center justify-center shadow-2xl shadow-emerald-500/25">
+                  <div className="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-emerald-500 to-[#19B6C7] flex items-center justify-center shadow-2xl shadow-emerald-500/25">
                     <Award className="w-14 h-14 text-white" />
                   </div>
-                  <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">شكراً لك!</h2>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">شكراً لك!</h2>
                   <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-md mx-auto mb-8">
                     تم استلام تقييمك بنجاح، نقدر وقتك ومساهمتك في تطوير برامجنا التدريبية.
                   </p>
@@ -415,7 +411,7 @@ export default function OnlineEvaluationPage() {
                         type="button"
                         onClick={() => { setActiveStep(i); window.scrollTo({ top: 200, behavior: "smooth" }); }}
                         className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2.5 px-2 sm:px-4 py-3 sm:py-3.5 rounded-[1.25rem] text-xs sm:text-sm font-bold transition-all duration-300 whitespace-nowrap ${isActive
-                            ? "bg-gradient-to-r from-[#173A7C] to-[#2E5EA6] text-white shadow-lg shadow-[#173A7C]/20"
+                            ? "bg-gradient-to-r from-[#0B3766] to-[#2E5EA6] text-white shadow-lg shadow-[#0B3766]/20"
                             : isPast
                               ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                               : "text-slate-400 hover:bg-slate-50 hover:text-slate-600"
@@ -444,16 +440,16 @@ export default function OnlineEvaluationPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -30 }}
                     transition={{ duration: 0.4 }}
-                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] relative overflow-hidden"
+                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden"
                   >
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#173A7C]/[0.03] to-transparent rounded-bl-full pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#0B3766]/[0.03] to-transparent rounded-bl-full pointer-events-none" />
 
                     <div className="flex items-center gap-4 mb-10 relative z-10">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#2F66D6] flex items-center justify-center shadow-lg shadow-[#173A7C]/20">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] flex items-center justify-center shadow-lg shadow-[#0B3766]/20">
                         <User className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-black text-slate-900">البيانات الشخصية</h2>
+                        <h2 className="text-2xl font-bold text-slate-900">البيانات الشخصية</h2>
                         <p className="text-sm text-slate-400 font-medium mt-1">يرجى إدخال بياناتك الأساسية</p>
                       </div>
                     </div>
@@ -461,7 +457,7 @@ export default function OnlineEvaluationPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
                       <div>
                         <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
-                          <User className="w-4 h-4 text-[#173A7C]" /> اسم المتدرب <span className="text-red-500">*</span>
+                          <User className="w-4 h-4 text-[#0B3766]" /> اسم المتدرب <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text" required value={form.name} onChange={(e) => updateForm("name", e.target.value)}
@@ -470,7 +466,7 @@ export default function OnlineEvaluationPage() {
                       </div>
                       <div>
                         <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
-                          <Phone className="w-4 h-4 text-[#173A7C]" /> رقم الجوال <span className="text-red-500">*</span>
+                          <Phone className="w-4 h-4 text-[#0B3766]" /> رقم الجوال <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="tel" required value={form.phone} onChange={(e) => updateForm("phone", e.target.value)} dir="ltr"
@@ -479,7 +475,7 @@ export default function OnlineEvaluationPage() {
                       </div>
                       <div>
                         <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
-                          <Briefcase className="w-4 h-4 text-[#173A7C]" /> الوظيفة
+                          <Briefcase className="w-4 h-4 text-[#0B3766]" /> الوظيفة
                         </label>
                         <input
                           type="text" value={form.jobTitle} onChange={(e) => updateForm("jobTitle", e.target.value)}
@@ -488,7 +484,7 @@ export default function OnlineEvaluationPage() {
                       </div>
                       <div>
                         <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
-                          <Building className="w-4 h-4 text-[#173A7C]" /> جهة العمل
+                          <Building className="w-4 h-4 text-[#0B3766]" /> جهة العمل
                         </label>
                         <input
                           type="text" value={form.employer} onChange={(e) => updateForm("employer", e.target.value)}
@@ -497,7 +493,7 @@ export default function OnlineEvaluationPage() {
                       </div>
                       <div>
                         <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
-                          <Mail className="w-4 h-4 text-[#173A7C]" /> البريد الإلكتروني
+                          <Mail className="w-4 h-4 text-[#0B3766]" /> البريد الإلكتروني
                         </label>
                         <input
                           type="email" value={form.email} onChange={(e) => updateForm("email", e.target.value)}
@@ -506,7 +502,7 @@ export default function OnlineEvaluationPage() {
                       </div>
                       <div>
                         <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2.5">
-                          <BookOpen className="w-4 h-4 text-[#173A7C]" /> الدورة المراد تقييمها <span className="text-red-500">*</span>
+                          <BookOpen className="w-4 h-4 text-[#0B3766]" /> الدورة المراد تقييمها <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text" required value={form.courseName} onChange={(e) => updateForm("courseName", e.target.value)}
@@ -525,7 +521,7 @@ export default function OnlineEvaluationPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -30 }}
                     transition={{ duration: 0.4 }}
-                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] relative overflow-hidden"
+                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden"
                   >
                     <div className="absolute top-0 left-0 w-48 h-48 bg-gradient-to-br from-blue-500/[0.03] to-transparent rounded-br-full pointer-events-none" />
 
@@ -534,7 +530,7 @@ export default function OnlineEvaluationPage() {
                         <ClipboardCheck className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-black text-slate-900">تقييم البرنامج التدريبي والأداء التدريبي</h2>
+                        <h2 className="text-2xl font-bold text-slate-900">تقييم البرنامج التدريبي والأداء التدريبي</h2>
                         <p className="text-sm text-slate-400 font-medium mt-1">تقييم المدرب والمحتوى</p>
                       </div>
                     </div>
@@ -557,7 +553,7 @@ export default function OnlineEvaluationPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -30 }}
                     transition={{ duration: 0.4 }}
-                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] relative overflow-hidden"
+                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-emerald-500/[0.03] to-transparent rounded-bl-full pointer-events-none" />
 
@@ -566,7 +562,7 @@ export default function OnlineEvaluationPage() {
                         <Users className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-black text-slate-900">تقييم فريق الإشراف والاستقبال</h2>
+                        <h2 className="text-2xl font-bold text-slate-900">تقييم فريق الإشراف والاستقبال</h2>
                         <p className="text-sm text-slate-400 font-medium mt-1">المركز وفريق الدعم</p>
                       </div>
                     </div>
@@ -587,7 +583,7 @@ export default function OnlineEvaluationPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -30 }}
                     transition={{ duration: 0.4 }}
-                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] relative overflow-hidden"
+                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden"
                   >
                     <div className="absolute top-0 left-0 w-48 h-48 bg-gradient-to-br from-purple-500/[0.03] to-transparent rounded-br-full pointer-events-none" />
 
@@ -596,7 +592,7 @@ export default function OnlineEvaluationPage() {
                         <MonitorPlay className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-black text-slate-900">تقييم مستوى التطبيق او القاعة الالكترونية</h2>
+                        <h2 className="text-2xl font-bold text-slate-900">تقييم مستوى التطبيق او القاعة الالكترونية</h2>
                         <p className="text-sm text-slate-400 font-medium mt-1">المنصة التعليمية والتجربة التقنية</p>
                       </div>
                     </div>
@@ -617,7 +613,7 @@ export default function OnlineEvaluationPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -30 }}
                     transition={{ duration: 0.4 }}
-                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] relative overflow-hidden"
+                    className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-amber-500/[0.03] to-transparent rounded-bl-full pointer-events-none" />
 
@@ -629,14 +625,14 @@ export default function OnlineEvaluationPage() {
                             <MessageSquare className="w-7 h-7 text-white" />
                           </div>
                           <div>
-                            <h2 className="text-2xl font-black text-slate-900">أبرز الملاحظات والإقتراحات</h2>
+                            <h2 className="text-2xl font-bold text-slate-900">أبرز الملاحظات والإقتراحات</h2>
                           </div>
                         </div>
                         <textarea
                           rows={4}
                           value={form.notes}
                           onChange={(e) => updateForm("notes", e.target.value)}
-                          className="w-full px-6 py-5 rounded-[20px] bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 outline-none transition-all text-[15px] font-medium resize-none leading-relaxed shadow-sm hover:border-slate-300"
+                          className="w-full px-6 py-5 rounded-[20px] bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#0B3766] focus:ring-2 focus:ring-[#0B3766]/15 outline-none transition-all text-[15px] font-medium resize-none leading-relaxed shadow-sm hover:border-slate-300"
                           placeholder="اكتب ملاحظاتك واقتراحاتك هنا..."
                         />
                       </div>
@@ -644,11 +640,11 @@ export default function OnlineEvaluationPage() {
                       {/* Future Courses */}
                       <div>
                         <div className="flex items-center gap-4 mb-6">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#2E5EA6] flex items-center justify-center shadow-lg shadow-[#173A7C]/20">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#2E5EA6] flex items-center justify-center shadow-lg shadow-[#0B3766]/20">
                             <BookOpen className="w-7 h-7 text-white" />
                           </div>
                           <div>
-                            <h2 className="text-2xl font-black text-slate-900">الدورات المستقبلية</h2>
+                            <h2 className="text-2xl font-bold text-slate-900">الدورات المستقبلية</h2>
                             <p className="text-sm text-slate-400 font-medium mt-1">ما هي الدورات التي ترغب بالإشتراك بها خلال الفترة القادمة؟</p>
                           </div>
                         </div>
@@ -675,7 +671,7 @@ export default function OnlineEvaluationPage() {
                             <Globe className="w-7 h-7 text-white" />
                           </div>
                           <div>
-                            <h2 className="text-2xl font-black text-slate-900">مصدر المعرفة</h2>
+                            <h2 className="text-2xl font-bold text-slate-900">مصدر المعرفة</h2>
                             <p className="text-sm text-slate-400 font-medium mt-1">كيف تعرفت على الدورة؟</p>
                           </div>
                         </div>
@@ -690,8 +686,8 @@ export default function OnlineEvaluationPage() {
                               transition={{ delay: i * 0.04 }}
                               onClick={() => updateForm("source", src)}
                               className={`px-5 py-3 rounded-full text-sm font-bold transition-all duration-300 ${form.source === src
-                                ? "bg-gradient-to-r from-[#173A7C] to-[#2E5EA6] text-white shadow-lg shadow-[#173A7C]/20 scale-[1.02]"
-                                : "bg-white border border-slate-200 text-slate-600 hover:border-[#173A7C]/30 hover:bg-slate-50 hover:shadow-sm"
+                                ? "bg-gradient-to-r from-[#0B3766] to-[#2E5EA6] text-white shadow-lg shadow-[#0B3766]/20 scale-[1.02]"
+                                : "bg-white border border-slate-200 text-slate-600 hover:border-[#0B3766]/30 hover:bg-slate-50 hover:shadow-sm"
                                 }`}
                             >
                               {src}
@@ -703,11 +699,11 @@ export default function OnlineEvaluationPage() {
                       {/* Nominees */}
                       <div>
                         <div className="flex items-center gap-4 mb-6">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#5CB07C] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#19B6C7] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                             <UsersRound className="w-7 h-7 text-white" />
                           </div>
                           <div>
-                            <h2 className="text-2xl font-black text-slate-900">جهات الاتصال المقترحة</h2>
+                            <h2 className="text-2xl font-bold text-slate-900">جهات الاتصال المقترحة</h2>
                             <p className="text-sm text-slate-400 font-medium mt-1">أذكر أسماء أشخاص ترشحهم لحضور هذه الدورة مستقبلاً</p>
                           </div>
                         </div>
@@ -731,7 +727,7 @@ export default function OnlineEvaluationPage() {
                       {/* Terms & Conditions */}
                       <div className="flex items-start gap-3 py-2 px-1 justify-end mt-4">
                         <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
-                          أوافق على <span className="text-[#173A7C] font-bold">الشروط والأحكام</span> و <span className="text-[#173A7C] font-bold">سياسة الخصوصية</span>
+                          أوافق على <span className="text-[#0B3766] font-bold">الشروط والأحكام</span> و <span className="text-[#0B3766] font-bold">سياسة الخصوصية</span>
                         </label>
                         <input
                           type="checkbox"
@@ -739,7 +735,7 @@ export default function OnlineEvaluationPage() {
                           required
                           checked={agreed}
                           onChange={(e) => setAgreed(e.target.checked)}
-                          className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                          className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#0B3766] focus:ring-[#0B3766]"
                         />
                       </div>
 
@@ -769,7 +765,7 @@ export default function OnlineEvaluationPage() {
                   {steps.map((_, i) => (
                     <div
                       key={i}
-                      className={`h-2 rounded-full transition-all duration-500 ${activeStep === i ? "w-8 bg-[#173A7C]" : "w-2 bg-slate-200"
+                      className={`h-2 rounded-full transition-all duration-500 ${activeStep === i ? "w-8 bg-[#0B3766]" : "w-2 bg-slate-200"
                         }`}
                     />
                   ))}
@@ -779,7 +775,7 @@ export default function OnlineEvaluationPage() {
                   <button
                     type="button"
                     onClick={goNext}
-                    className="flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#173A7C] to-[#2E5EA6] transition-all shadow-lg shadow-[#173A7C]/20 hover:shadow-xl hover:-translate-y-0.5"
+                    className="flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#0B3766] to-[#2E5EA6] transition-all shadow-lg shadow-[#0B3766]/20 hover:shadow-xl hover:-translate-y-0.5"
                   >
                     التالي <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -787,7 +783,7 @@ export default function OnlineEvaluationPage() {
                   <Button
                     type="submit"
                     size="lg"
-                    className="px-10 shadow-xl shadow-[#173A7C]/20 group rounded-full"
+                    className="px-10 shadow-xl shadow-[#0B3766]/20 group rounded-full"
                     disabled={loading || !agreed}
                   >
                     {loading ? (

@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/security/auth';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import {
-  getStudentEnrollments,
-  isEnrollmentActive,
-  normalizeCourseId,
+getStudentEnrollments,
+isEnrollmentActive,
+normalizeCourseId,
 } from '@/lib/security/student-access';
 
 type AttemptRow = {

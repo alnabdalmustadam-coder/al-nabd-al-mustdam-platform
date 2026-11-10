@@ -7,7 +7,8 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { logger } from '@/lib/observability/logger';
 import { findCourseByIdentifier } from '@/lib/public-courses';
 import { parseQuizQuestions } from '@/lib/quizzes/model';
-import { getCourseContent, extractBunnyVideoId } from '@/lib/learning/course-content';
+import { getCourseContent } from '@/lib/learning/course-content';
+import { isDemoVideoUrl } from '@/lib/demo/media';
 import type { Course, CourseCategory, CourseLevel, CurriculumSection } from '@/types';
 
 type CourseStatus = 'draft' | 'published' | 'archived';
@@ -271,7 +272,7 @@ export async function saveCourseAsync(courseData: CourseInput, actorId?: string,
     if (new Set(content.map((lesson) => lesson.id)).size !== content.length || content.some((lesson) => lesson.id.length > 160)) {
       throw new CourseAccessError('معرفات الدروس يجب أن تكون مختلفة وصالحة لتتبع الإكمال بالترتيب.', 400);
     }
-    if (content.some((lesson) => lesson.type === 'video' && !extractBunnyVideoId(lesson.videoUrl))) {
+    if (content.some((lesson) => lesson.type === 'video' && !isDemoVideoUrl(lesson.videoUrl))) {
       throw new CourseAccessError('أرفق فيديو من داخل المنصة لكل درس فيديو قبل تفعيل وضع التطوير المهني ونشر الدورة.', 400);
     }
     if (content.some((lesson) => lesson.type === 'quiz' && !lesson.requiredQuiz)) {

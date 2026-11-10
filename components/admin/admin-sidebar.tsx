@@ -198,16 +198,16 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             isCollapsed ? 'p-2 pt-2' : 'px-3.5 py-3'
           }`}
           style={{
-            background: 'rgba(255, 255, 255, 0.96)',
+            background: 'rgba(255, 255, 255, 0.94)',
             backdropFilter: 'blur(28px) saturate(1.8)',
             WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-            boxShadow: '0 0 40px rgba(23, 58, 124, 0.06), 0 4px 20px rgba(0, 0, 0, 0.04)',
-            borderLeft: '1px solid rgba(23, 58, 124, 0.08)',
+            boxShadow: '0 0 40px rgba(11, 55, 102, 0.06), 0 4px 20px rgba(11, 55, 102, 0.04)',
+            borderLeft: '1px solid rgba(11, 55, 102, 0.08)',
           }}
         >
           {/* Ambient Subtle Fluid Light */}
-          <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#173A7C]/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-[#5CB07C]/8 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#0B3766]/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-[#19B6C7]/8 rounded-full blur-3xl pointer-events-none" />
 
           {/* Top & Scrollable Nav Block */}
           <div
@@ -220,18 +220,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className={`rounded-2xl border border-slate-200/90 hover:border-[#173A7C]/40 transition-all duration-300 relative group overflow-hidden ${
+                className={`rounded-2xl border border-slate-200/90 hover:border-[#0B3766]/40 transition-all duration-300 relative group overflow-hidden ${
                   isCollapsed ? 'p-2 flex flex-col items-center justify-center' : 'p-3.5'
                 }`}
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
-                  boxShadow: '0 4px 14px rgba(23, 58, 124, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+                  boxShadow: '0 4px 14px rgba(11, 55, 102, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
                 }}
               >
                 <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3.5'}`}>
                   {/* Large Prominent Avatar Frame */}
                   <div className="relative shrink-0">
-                    <div className={`${isCollapsed ? 'w-12 h-12' : 'w-14 h-14 sm:w-15 sm:h-15'} rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center`}>
+                    <div className={`${isCollapsed ? 'w-12 h-12' : 'w-14 h-14 sm:w-15 sm:h-15'} rounded-2xl overflow-hidden shadow-md ring-2 ring-[#0B3766]/20 border-2 border-white bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#0F2D69] flex items-center justify-center`}>
                       {adminProfile.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -249,12 +249,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   {!isCollapsed && (
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 mb-0.5">
-                        <h3 className="font-black text-sm sm:text-[15px] text-slate-900 truncate leading-tight group-hover:text-[#173A7C] transition-colors">
+                        <h3 className="font-bold text-sm sm:text-[15px] text-slate-900 truncate leading-tight group-hover:text-[#0B3766] transition-colors">
                           {adminProfile.fullName}
                         </h3>
-                        <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <ShieldCheck className="w-4 h-4 text-[#168AD3] shrink-0" />
                       </div>
-                      <p className="text-xs text-amber-700 font-extrabold truncate flex items-center gap-1">
+                      <p className="text-xs text-amber-700 font-bold truncate flex items-center gap-1">
                         <span>مدير المنصة الرئيسي</span>
                         <span className="text-xs">👑</span>
                       </p>
@@ -269,7 +269,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               initial="hidden"
               animate="visible"
               variants={navContainerVariants}
-              className="space-y-2 px-0.5 py-0.5"
+              className="space-y-1 px-0.5 py-0.5"
             >
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -279,43 +279,43 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   <motion.div
                     key={item.href}
                     variants={navItemVariants}
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <Link
                       href={item.href}
                       title={isCollapsed ? item.label : undefined}
-                      className={`dashboard-nav-tab relative flex items-center rounded-xl font-bold text-xs transition-all duration-200 group cursor-pointer ${
-                        isCollapsed ? 'p-2.5 justify-center' : 'p-2.5 justify-between'
+                      className={`dashboard-nav-tab relative flex items-center rounded-xl text-[11.5px] font-semibold transition-all duration-200 group cursor-pointer ${
+                        isCollapsed ? 'p-1.5 justify-center' : 'py-1.5 px-2.5 justify-between'
                       } ${
                         isActive
-                          ? 'text-white bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] border border-blue-400/40 shadow-lg shadow-[#173A7C]/25'
-                          : 'text-slate-800 hover:text-[#173A7C] hover:bg-white border border-slate-200/90 shadow-xs'
+                          ? 'text-white bg-gradient-to-r from-[#0B3766] to-[#168AD3] border border-blue-400/40 shadow-md shadow-[#0B3766]/20'
+                          : 'text-[#0B3766] hover:text-[#168AD3] bg-white hover:bg-[#F4F9FD] border border-slate-200/80 shadow-2xs'
                       }`}
                     >
-                      <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3 min-w-0 flex-1'}`}>
+                      <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-2 min-w-0 flex-1'}`}>
                         {/* Styled Icon Container Block */}
                         <div
                           className={`rounded-lg transition-all shrink-0 flex items-center justify-center relative ${
-                            isCollapsed ? 'w-8 h-8 p-0' : 'p-2'
+                            isCollapsed ? 'w-6 h-6 p-0' : 'w-6.5 h-6.5 p-0'
                           } ${
                             isActive
                               ? 'bg-white/20 text-white shadow-xs'
                               : item.highlight
                               ? 'bg-amber-500/15 text-amber-600 group-hover:bg-amber-500 group-hover:text-white'
-                              : 'bg-[#173A7C]/10 text-[#173A7C] group-hover:bg-[#173A7C] group-hover:text-white'
+                              : 'bg-[#0B3766]/[0.08] text-[#0B3766] group-hover:bg-[#0B3766] group-hover:text-white'
                           }`}
                         >
-                          <Icon className="w-4 h-4" />
+                          <Icon className="w-3.5 h-3.5" />
                           {isCollapsed && item.count && (
-                            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white" />
+                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#19B6C7] rounded-full border-2 border-white" />
                           )}
                         </div>
 
                         {!isCollapsed && (
                           <span
-                            className={`dashboard-nav-tab-label truncate font-extrabold text-xs ${
-                              isActive ? 'text-white' : 'text-slate-800 group-hover:text-[#173A7C]'
+                            className={`dashboard-nav-tab-label truncate text-[11.5px] font-semibold ${
+                              isActive ? 'text-white' : 'text-[#0B3766] group-hover:text-[#168AD3]'
                             }`}
                           >
                             {item.label}
@@ -327,7 +327,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                       {!isCollapsed && (
                         <div className="flex items-center gap-1.5 shrink-0 pr-1">
                           {item.badge && (
-                            <span className="text-[10px] font-black text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300 shrink-0 shadow-xs animate-pulse">
+                            <span className="text-[10px] font-bold text-[#0B3766] bg-[#0B3766]/10 px-2 py-0.5 rounded-full border border-[#0B3766]/15 shrink-0 shadow-2xs">
                               {item.badge}
                             </span>
                           )}
@@ -345,7 +345,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                           )}
 
                           {item.highlight && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black text-amber-900 bg-amber-200 border border-amber-300">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold text-amber-900 bg-amber-200 border border-amber-300">
                               👑
                             </span>
                           )}
@@ -368,13 +368,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             <button
               type="button"
               onClick={handleLogout}
-              className={`flex min-h-11 w-full items-center rounded-xl bg-slate-100/70 py-2 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200/70 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173A7C]/50 cursor-pointer ${
+              className={`flex min-h-11 w-full items-center rounded-xl bg-slate-100/70 py-2 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200/70 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0B3766]/50 cursor-pointer ${
                 isCollapsed ? 'justify-center px-2' : 'gap-2.5 px-3'
               }`}
               aria-label="تسجيل الخروج"
               title={isCollapsed ? 'تسجيل الخروج' : undefined}
             >
-              <LogOut className="h-4 w-4 shrink-0 text-[#173A7C]" aria-hidden="true" />
+              <LogOut className="h-4 w-4 shrink-0 text-[#0B3766]" aria-hidden="true" />
               {!isCollapsed && <span className="truncate">تسجيل الخروج</span>}
             </button>
           </div>
@@ -399,8 +399,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               background: 'rgba(255, 255, 255, 0.94)',
               backdropFilter: 'blur(28px) saturate(1.8)',
               WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-              borderLeft: '1px solid rgba(255, 255, 255, 0.60)',
-              boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.25)',
+              borderLeft: '1px solid rgba(11, 55, 102, 0.08)',
+              boxShadow: '-10px 0 40px rgba(11, 55, 102, 0.08)',
             }}
             dir="rtl"
           >
@@ -414,15 +414,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   title="الرئيسية"
                 >
                   <img
-                    src="/logo.svg"
-                    alt="شعار منصة النبض المستدام"
+                    src="/madar-learning-logo-compact.svg"
+                    alt="شعار منصة مَدار للتعلّم"
                     className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
                   />
                   <div>
-                    <h2 className="font-extrabold text-sm text-slate-900 group-hover:text-[#173A7C] transition-colors">
+                    <h2 className="font-bold text-sm text-slate-900 group-hover:text-[#0B3766] transition-colors">
                       الإدارة العليا
                     </h2>
-                    <p className="text-[10px] text-slate-500 font-bold">منصة النبض المستدام</p>
+                    <p className="text-[10px] text-slate-500 font-bold">منصة مَدار للتعلّم</p>
                   </div>
                 </Link>
 
@@ -440,12 +440,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 <div
                   className="rounded-2xl border border-slate-200/90 p-3.5 flex items-center gap-3.5"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
-                    boxShadow: '0 4px 12px rgba(23, 58, 124, 0.06)',
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+                    boxShadow: '0 4px 12px rgba(11, 55, 102, 0.08)',
                   }}
                 >
                   <div className="relative shrink-0">
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md ring-2 ring-[#0B3766]/20 border-2 border-white bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#0F2D69] flex items-center justify-center">
                       {adminProfile.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -461,16 +461,16 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <h3 className="font-black text-sm text-slate-900 truncate leading-tight">{adminProfile.fullName}</h3>
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <h3 className="font-bold text-sm text-slate-900 truncate leading-tight">{adminProfile.fullName}</h3>
+                      <ShieldCheck className="w-4 h-4 text-[#168AD3] shrink-0" />
                     </div>
-                    <p className="text-xs text-amber-700 font-extrabold truncate">مدير المنصة الرئيسي 👑</p>
+                    <p className="text-xs text-amber-700 font-bold truncate">مدير المنصة الرئيسي 👑</p>
                   </div>
                 </div>
               </Link>
 
               {/* Mobile Scrollable Nav Links */}
-              <nav className="space-y-2 overflow-y-auto flex-1 py-1" style={{ scrollbarWidth: 'none' }}>
+              <nav className="space-y-1 overflow-y-auto flex-1 py-1" style={{ scrollbarWidth: 'none' }}>
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
@@ -480,30 +480,30 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                       key={item.href}
                       href={item.href}
                       onClick={onCloseMobile}
-                      className={`dashboard-nav-tab flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all ${
+                      className={`dashboard-nav-tab flex items-center justify-between py-1.5 px-2.5 rounded-xl text-[11.5px] font-semibold transition-all ${
                         isActive
-                          ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-blue-400/40'
-                          : 'text-slate-800 hover:text-[#173A7C] hover:bg-white border border-slate-200/90 shadow-xs'
+                          ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20 border border-blue-400/40'
+                          : 'text-[#0B3766] hover:text-[#168AD3] bg-white hover:bg-[#F4F9FD] border border-slate-200/80 shadow-xs'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2">
                         <div
                           className={`p-1.5 rounded-lg shrink-0 flex items-center justify-center ${
                             isActive
                               ? 'bg-white/20 text-white'
                               : item.highlight
                               ? 'bg-amber-500/15 text-amber-600'
-                              : 'bg-[#173A7C]/10 text-[#173A7C]'
+                              : 'bg-[#0B3766]/10 text-[#0B3766]'
                           }`}
                         >
-                          <Icon className="w-4 h-4" />
+                          <Icon className="w-3.5 h-3.5" />
                         </div>
-                        <span className="dashboard-nav-tab-label truncate">{item.label}</span>
+                        <span className={`dashboard-nav-tab-label truncate text-[11.5px] font-semibold ${isActive ? 'text-white' : 'text-[#0B3766]'}`}>{item.label}</span>
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
                         {item.badge && (
-                          <span className="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
                             {item.badge}
                           </span>
                         )}
@@ -521,7 +521,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                         )}
 
                         {item.highlight && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black text-amber-900 bg-amber-200 border border-amber-300">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold text-amber-900 bg-amber-200 border border-amber-300">
                             👑
                           </span>
                         )}
@@ -537,10 +537,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               <button
                 type="button"
                 onClick={() => { onCloseMobile?.(); handleLogout(); }}
-                className="flex min-h-11 w-full items-center gap-2.5 rounded-xl bg-slate-100/70 px-3 py-2 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200/70 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#173A7C]/50 cursor-pointer"
+                className="flex min-h-11 w-full items-center gap-2.5 rounded-xl bg-slate-100/70 px-3 py-2 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200/70 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0B3766]/50 cursor-pointer"
                 aria-label="تسجيل الخروج"
               >
-                <LogOut className="h-4 w-4 shrink-0 text-[#173A7C]" aria-hidden="true" />
+                <LogOut className="h-4 w-4 shrink-0 text-[#0B3766]" aria-hidden="true" />
                 <span>تسجيل الخروج</span>
               </button>
             </div>

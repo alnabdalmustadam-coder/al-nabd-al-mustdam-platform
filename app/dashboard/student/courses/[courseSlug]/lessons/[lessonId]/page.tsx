@@ -100,7 +100,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
     {
       id: 'c1',
       author: courseData?.instructor || 'د. محمد القحطاني',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+      avatar: '/demo/madar/quality.svg',
       role: 'المدرب المعتمد',
       content: 'أهلاً بكم جميعاً في هذا البرنامج التدريبي المعتمد. يسرني الإجابة على استفساراتكم ومتابعة تقدمكم.',
       date: 'منذ ساعتين',
@@ -109,7 +109,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
     {
       id: 'c2',
       author: 'سارة خالد',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      avatar: '/demo/madar/quality.svg',
       role: 'متدربة',
       content: 'شرح متميز وواضح جداً! شكراً لكم.',
       date: 'منذ 45 دقيقة',
@@ -421,7 +421,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
     const newC = {
       id: `c_${Date.now()}`,
       author: 'متدرب معتمد',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      avatar: '/demo/madar/quality.svg',
       role: 'متدرب',
       content: newCommentText.trim(),
       date: 'الآن',
@@ -434,7 +434,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
   if (isLoadingCourse) {
     return (
       <div className="w-full min-h-[50vh] flex flex-col items-center justify-center space-y-4 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
-        <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
         <p className="text-sm font-bold text-slate-600">جاري تحميل محتوى الدورة التدريبية...</p>
       </div>
     );
@@ -447,18 +447,18 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
           <AlertCircle className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-black text-slate-900">{courseError ? 'تعذر تحميل الدورة' : 'الدورة التدريبية غير متاحة'}</h2>
+          <h2 className="text-xl font-bold text-slate-900">{courseError ? 'تعذر تحميل الدورة' : 'الدورة التدريبية غير متاحة'}</h2>
           <p className="text-xs text-slate-500 font-bold leading-relaxed">
             {courseError || 'لم نتمكن من العثور على الدورة التدريبية المطلوبة. يرجى التحقق من صحة الرابط أو الرجوع إلى قائمة دوراتك المسجلة.'}
           </p>
         </div>
         <Link
           href="/dashboard/student/courses"
-          className="px-6 py-3 rounded-xl bg-[#173A7C] text-white text-xs font-black hover:bg-[#122e62] transition-colors shadow-md"
+          className="px-6 py-3 rounded-xl bg-[#0B3766] text-white text-xs font-bold hover:bg-[#122e62] transition-colors shadow-md"
         >
           العودة إلى دوراتي
         </Link>
-        {courseError && <button type="button" onClick={reload} className="font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
+        {courseError && <button type="button" onClick={reload} className="font-bold text-[#0B3766] underline">إعادة المحاولة</button>}
       </div>
     );
   }
@@ -466,11 +466,11 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
   if (!currentLesson) {
     return (
       <div className="w-full min-h-[60vh] flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto space-y-5 font-[family-name:var(--font-cairo)] text-slate-800" dir="rtl">
-        <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#173A7C] shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0B3766] shadow-sm">
           <BookOpen className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-black text-slate-900">الدرس المطلوب غير موجود</h2>
+          <h2 className="text-xl font-bold text-slate-900">الدرس المطلوب غير موجود</h2>
           <p className="text-xs text-slate-500 font-bold leading-relaxed">
             لم يتم العثور على الدرس المطلوب في هذه الدورة. قد يكون تم تحديث خطة الدورة التدريبية أو تعديل ترتيب المحتوى.
           </p>
@@ -479,7 +479,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
           {allLessons.length > 0 && (
             <Link
               href={`/dashboard/student/courses/${courseSlug}/lessons/${allLessons[0].id}`}
-              className="px-5 py-2.5 rounded-xl bg-[#173A7C] text-white text-xs font-black hover:bg-[#122e62] transition-colors shadow-md"
+              className="px-5 py-2.5 rounded-xl bg-[#0B3766] text-white text-xs font-bold hover:bg-[#122e62] transition-colors shadow-md"
             >
               الانتقال إلى أول درس متاح
             </Link>
@@ -501,18 +501,18 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
       <div className="flex items-center justify-between gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold mb-2.5 sm:mb-3.5 min-w-0">
         <Link
           href="/dashboard/student"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white text-[#173A7C] hover:text-[#1E4D9D] border border-slate-200/80 shadow-xs transition-all whitespace-nowrap shrink-0 font-black"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white text-[#0B3766] hover:text-[#168AD3] border border-slate-200/80 shadow-xs transition-all whitespace-nowrap shrink-0 font-bold"
         >
-          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#173A7C] shrink-0" />
+          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0B3766] shrink-0" />
           <span>العودة للوحة التحكم</span>
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-1.5 text-slate-700 min-w-0 font-bold bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-xs">
-          <Link href="/dashboard/student/courses" className="text-slate-700 hover:text-[#173A7C] transition-colors whitespace-nowrap shrink-0">
+          <Link href="/dashboard/student/courses" className="text-slate-700 hover:text-[#0B3766] transition-colors whitespace-nowrap shrink-0">
             الدورات التدريبية
           </Link>
           <ChevronLeft className="w-3 h-3 text-slate-400 shrink-0" />
-          <span className="text-[#173A7C] font-black truncate max-w-[130px] xs:max-w-[180px] sm:max-w-none whitespace-nowrap">
+          <span className="text-[#0B3766] font-bold truncate max-w-[130px] xs:max-w-[180px] sm:max-w-none whitespace-nowrap">
             {courseData?.title || 'الدورة التدريبية'}
           </span>
         </div>
@@ -527,7 +527,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
             <div className="space-y-3 pb-3 border-b border-slate-200 shrink-0">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="p-2 rounded-xl bg-[#173A7C] text-white shrink-0">
+                  <div className="p-2 rounded-xl bg-[#0B3766] text-white shrink-0">
                     <BookOpen className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
@@ -535,7 +535,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                     <p className="text-[11px] text-slate-500 font-bold">{completedLessons} من {totalLessons} مكتمل</p>
                   </div>
                 </div>
-                <span className="text-xs font-black text-[#173A7C] bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg shrink-0">
+                <span className="text-xs font-bold text-[#0B3766] bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg shrink-0">
                   %{progressPercent}
                 </span>
               </div>
@@ -543,7 +543,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
               {/* Progress Bar */}
               <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-[#5CB07C] transition-all duration-500"
+                  className="h-full rounded-full bg-[#19B6C7] transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -556,7 +556,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="ابحث في الدروس والمقاطع..."
-                  className="w-full text-xs font-bold py-2 pr-9 pl-3 rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#173A7C]"
+                  className="w-full text-xs font-bold py-2 pr-9 pl-3 rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0B3766]"
                 />
                 {searchQuery && (
                   <button
@@ -585,7 +585,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                       className="w-full p-2.5 text-right flex items-center justify-between gap-2 bg-slate-100/90 hover:bg-slate-100 transition-colors cursor-pointer border-b border-slate-200"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="flex items-center justify-center w-5 h-5 rounded-lg bg-[#173A7C] text-white text-[10px] font-black shrink-0">
+                        <span className="flex items-center justify-center w-5 h-5 rounded-lg bg-[#0B3766] text-white text-[10px] font-bold shrink-0">
                           {chIdx + 1}
                         </span>
                         <span className="text-xs font-bold text-slate-800 truncate">
@@ -613,7 +613,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                               key={les.id}
                               className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
                                 isCurrent
-                                  ? 'bg-[#173A7C] text-white border-[#173A7C] shadow-xs'
+                                  ? 'bg-[#0B3766] text-white border-[#0B3766] shadow-xs'
                                   : isDone
                                   ? 'bg-emerald-50/90 text-slate-800 border-emerald-200/90'
                                   : 'bg-white text-slate-800 border-slate-200 hover:border-slate-300'
@@ -646,7 +646,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                                   ) : (
                                     <VideoIcon className={`w-3.5 h-3.5 shrink-0 ${isCurrent ? 'text-blue-200' : 'text-slate-400'}`} />
                                   )}
-                                  <span className={`text-xs font-bold truncate ${isCurrent ? 'text-white font-extrabold' : 'text-slate-800'}`}>
+                                  <span className={`text-xs font-bold truncate ${isCurrent ? 'text-white font-bold' : 'text-slate-800'}`}>
                                     {les.title}
                                   </span>
                                 </div>
@@ -668,8 +668,8 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
             </div>
 
             <div className="pt-2 border-t border-slate-200 text-center shrink-0">
-              <span className="text-[11px] font-bold text-[#5CB07C]">
-                النبض المستدام — تسجيل التقدم ومزامنته تلقائياً ✓
+              <span className="text-[11px] font-bold text-[#19B6C7]">
+                مَدار للتعلّم — تسجيل التقدم ومزامنته تلقائياً ✓
               </span>
             </div>
           </div>
@@ -678,22 +678,22 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
           <div className={workspace.content}>
             {cpd && currentAllowed && lessonContent?.requiredQuiz && <p className="mb-3 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs font-bold leading-6 text-blue-900">يتطلب إكمال هذا الدرس اجتياز الاختبار المرتبط به من تبويب «الاختبار والتقييم».</p>}
             {!currentAllowed ? <div className="flex aspect-video flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
-              <Lock className="h-10 w-10 text-blue-900" /><h3 className="text-base font-black text-slate-900">{progressLoaded ? 'هذا الدرس مغلق حالياً' : completionError ? 'تعذر تحميل تقدمك' : 'جاري التحقق من تقدمك'}</h3>
+              <Lock className="h-10 w-10 text-blue-900" /><h3 className="text-base font-bold text-slate-900">{progressLoaded ? 'هذا الدرس مغلق حالياً' : completionError ? 'تعذر تحميل تقدمك' : 'جاري التحقق من تقدمك'}</h3>
               <p className="text-sm text-slate-600">{progressLoaded ? 'أكمل الدروس السابقة بالترتيب لفتح المحتوى.' : completionError || 'يتم تحميل تقدم الدورة من حسابك.'}</p>
               {completionError && !progressLoaded && <button type="button" onClick={() => window.location.reload()} className="min-h-11 rounded-xl bg-blue-900 px-5 py-3 text-xs font-bold text-white">إعادة تحميل الدرس</button>}
             </div> : currentLesson?.type === 'quiz' ? (
-              <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900 via-[#173A7C] to-slate-900 p-6 text-center text-white shadow-xl">
+              <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900 via-[#0B3766] to-slate-900 p-6 text-center text-white shadow-xl">
                 <HelpCircle className="h-12 w-12 text-amber-300" />
-                <h3 className="text-lg font-black">{currentLesson.title}</h3>
+                <h3 className="text-lg font-bold">{currentLesson.title}</h3>
                 <p className="text-xs leading-6 text-blue-100">أجب عن أسئلة الدرس وراجع نتيجتك بعد التسليم.</p>
-                <button type="button" className="min-h-11 rounded-xl bg-white px-6 py-3 text-xs font-black text-blue-900"
+                <button type="button" className="min-h-11 rounded-xl bg-white px-6 py-3 text-xs font-bold text-blue-900"
                   onClick={() => { setActiveTab('quiz'); requestAnimationFrame(() => document.getElementById('internal-assessment')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); }}>فتح الاختبار</button>
                 {cpd && <button type="button" disabled={completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id} onClick={() => void handleToggleComplete(currentLesson.id)} className="min-h-11 rounded-xl border border-white/30 px-5 py-3 text-xs font-bold disabled:opacity-50">{completedSet.has(currentLesson.id) ? 'الدرس مكتمل' : 'إكمال الدرس بعد اجتياز الاختبار'}</button>}
               </div>
             ) : currentLesson?.type === 'article' ? <div className="space-y-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-8">{lessonContent?.description && <p className="whitespace-pre-wrap text-sm leading-8 text-slate-600">{lessonContent.description}</p>}<LessonContentBlocks key={currentLesson.id} blocks={lessonContent?.contentBlocks || []} onReady={setArticleReady} /><button type="button" disabled={!articleReady || completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id} onClick={() => void handleToggleComplete(currentLesson.id)} className="min-h-11 rounded-xl bg-blue-900 px-5 py-3 text-xs font-semibold text-white disabled:opacity-50">{completedSet.has(currentLesson.id) ? 'المحتوى مكتمل' : 'إكمال المحتوى'}</button></div> : currentLesson?.fileUrl && ['pdf', 'doc', 'ppt'].includes(currentLesson.type || '') ? (
               <div className="space-y-3">
                 <CourseDocumentViewer fileUrl={currentLesson.fileUrl} title={currentLesson.title} type={currentLesson.type} />
-                <button type="button" onClick={() => void handleToggleComplete(currentLesson.id)} disabled={completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id} className="min-h-11 rounded-xl bg-blue-900 px-5 py-3 text-xs font-black text-white disabled:opacity-50">{completedSet.has(currentLesson.id) ? 'تمت القراءة' : 'أتممت قراءة المحتوى'}</button>
+                <button type="button" onClick={() => void handleToggleComplete(currentLesson.id)} disabled={completedSet.has(currentLesson.id) || savingLessonId === currentLesson.id} className="min-h-11 rounded-xl bg-blue-900 px-5 py-3 text-xs font-bold text-white disabled:opacity-50">{completedSet.has(currentLesson.id) ? 'تمت القراءة' : 'أتممت قراءة المحتوى'}</button>
               </div>
             ) : (
               <StudentVideoPlayer
@@ -733,7 +733,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
             onClick={() => setActiveTab('notes')}
             className={`premium-tab w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'notes'
-                ? 'bg-[#173A7C] text-white shadow-xs'
+                ? 'bg-[#0B3766] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -745,7 +745,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
             onClick={() => setActiveTab('attachments')}
             className={`premium-tab w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'attachments'
-                ? 'bg-[#173A7C] text-white shadow-xs'
+                ? 'bg-[#0B3766] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -757,7 +757,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
             onClick={() => setActiveTab('quiz')}
             className={`premium-tab w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'quiz'
-                ? 'bg-[#173A7C] text-white shadow-xs'
+                ? 'bg-[#0B3766] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -769,7 +769,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
             onClick={() => setActiveTab('discussion')}
             className={`premium-tab w-full h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'discussion'
-                ? 'bg-[#173A7C] text-white shadow-xs'
+                ? 'bg-[#0B3766] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -782,7 +782,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
         {activeTab === 'notes' && (
           <div className="space-y-4">
             <h4 className="student-heading-h3 !text-xs sm:!text-sm flex items-center gap-2">
-              <Bookmark className="w-4 h-4 text-[#5CB07C]" />
+              <Bookmark className="w-4 h-4 text-[#19B6C7]" />
               تدوين ملاحظات خاصة بهذا الدرس
             </h4>
 
@@ -792,13 +792,13 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                 value={userNote}
                 onChange={(e) => setUserNote(e.target.value)}
                 placeholder="اكتب ملاحظاتك الهامة هنا... يمكنك الاستعانة برابط الدقيقة لحفظ وقت الملاحظة."
-                className="w-full text-xs sm:text-sm font-medium p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#173A7C] min-h-[90px] resize-y"
+                className="w-full text-xs sm:text-sm font-medium p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0B3766] min-h-[90px] resize-y"
               />
               <div className="flex justify-end">
                 <button
                   onClick={handleAddNote}
                   disabled={!userNote.trim()}
-                  className="px-5 py-2 bg-[#5CB07C] hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2 bg-[#19B6C7] hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>حفظ الملاحظة</span>
@@ -857,13 +857,13 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
                 placeholder="اطرح سؤالك هنا على المدرب وزملائك..."
-                className="w-full text-xs font-medium p-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#173A7C] min-h-[70px]"
+                className="w-full text-xs font-medium p-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0B3766] min-h-[70px]"
               />
               <div className="flex justify-end">
                 <button
                   onClick={handlePostComment}
                   disabled={!newCommentText.trim()}
-                  className="px-4 py-2 bg-[#173A7C] text-white rounded-lg text-xs font-bold hover:bg-[#1E4D9D] transition-colors disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                  className="px-4 py-2 bg-[#0B3766] text-white rounded-lg text-xs font-bold hover:bg-[#168AD3] transition-colors disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>نشر التعليق</span>
@@ -878,8 +878,8 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                     <div className="flex items-center gap-2">
                       <img src={c.avatar} alt={c.author} className="w-7 h-7 rounded-full object-cover border border-slate-200" />
                       <div>
-                        <h6 className="text-xs font-bold text-[#173A7C]">{c.author}</h6>
-                        <span className="text-[10px] font-bold text-[#5CB07C]">{c.role}</span>
+                        <h6 className="text-xs font-bold text-[#0B3766]">{c.author}</h6>
+                        <span className="text-[10px] font-bold text-[#19B6C7]">{c.role}</span>
                       </div>
                     </div>
                     <span className="text-[10px] text-slate-400 font-mono">{c.date}</span>
@@ -888,7 +888,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                     {c.content}
                   </p>
                   <div className="flex justify-end pt-1">
-                    <button className="text-[10px] text-slate-400 hover:text-[#173A7C] font-bold flex items-center gap-1 cursor-pointer">
+                    <button className="text-[10px] text-slate-400 hover:text-[#0B3766] font-bold flex items-center gap-1 cursor-pointer">
                       <ThumbsUp className="w-3.5 h-3.5" />
                       <span>{c.likes} إعجاب</span>
                     </button>
@@ -907,7 +907,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
           <div className="bg-white rounded-t-3xl border-t border-slate-200 max-h-[80vh] flex flex-col p-4 shadow-2xl space-y-3">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-[#173A7C] text-white">
+                <div className="p-2 rounded-xl bg-[#0B3766] text-white">
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <div>
@@ -944,7 +944,7 @@ function LegacyStudentLessonPage({ courseData, isLoadingCourse, courseError, rel
                           onClick={(event) => { if (!lessonAllowed(les.id)) { event.preventDefault(); setCompletionError('أكمل الدروس السابقة أولاً'); } else setIsMobilePlaylistOpen(false); }}
                           className={`flex items-center justify-between p-2 rounded-lg border text-xs font-bold ${
                             isCurrent
-                              ? 'bg-[#173A7C] text-white border-[#173A7C]'
+                              ? 'bg-[#0B3766] text-white border-[#0B3766]'
                               : isDone
                               ? 'bg-emerald-50 text-slate-800 border-emerald-200'
                               : 'bg-white text-slate-700 border-slate-200'

@@ -8,7 +8,6 @@ import {
   Briefcase, Building2, UserPlus, Star, Trophy, Award,
   BadgeCheck, MessageSquare, Info
 } from "lucide-react";
-import { submitToGHL } from "@/lib/ghl";
 
 interface FormState {
   name: string;
@@ -110,9 +109,6 @@ export default function MembershipPage() {
         body: JSON.stringify({ type: "membership", ...form }),
       });
 
-      // Submit to GHL from client-side
-      await submitToGHL(form);
-
       if (res.ok) {
         setSubmitted(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -143,10 +139,10 @@ export default function MembershipPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.85, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: 20 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="relative bg-white rounded-[2rem] p-8 sm:p-10 max-w-sm w-full shadow-[0_30px_80px_-15px_rgba(23,58,124,0.3)] border border-slate-100 text-center overflow-hidden"
+            className="relative bg-white rounded-[2rem] p-8 sm:p-10 max-w-sm w-full shadow-[0_30px_80px_-15px_rgba(11,55,102,0.12)] border border-slate-100 text-center overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#173A7C] via-[#2E5EA6] to-[#5CB07C]" />
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0B3766] via-[#2E5EA6] to-[#19B6C7]" />
             <div className={`absolute top-0 right-0 w-40 h-40 rounded-bl-full pointer-events-none ${alertModal.type === "error" ? "bg-gradient-to-bl from-red-500/[0.04]" : "bg-gradient-to-bl from-amber-500/[0.04]"} to-transparent`} />
             <div className="mb-5"><img src="/logo.svg" alt="Logo" className="h-10 mx-auto object-contain" /></div>
             <div className={`w-16 h-16 mx-auto mb-5 rounded-2xl flex items-center justify-center shadow-lg ${
@@ -160,9 +156,9 @@ export default function MembershipPage() {
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
               )}
             </div>
-            <h3 className="text-xl font-black text-slate-900 mb-3">{alertModal.type === "error" ? "خطأ!" : "تنبيه!"}</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-3">{alertModal.type === "error" ? "خطأ!" : "تنبيه!"}</h3>
             <p className="text-sm text-slate-500 font-medium leading-relaxed mb-7">{alertModal.message}</p>
-            <button onClick={() => setAlertModal((p) => ({ ...p, open: false }))} className="w-full py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#173A7C] to-[#2E5EA6] shadow-lg shadow-[#173A7C]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all">حسناً، فهمت</button>
+            <button onClick={() => setAlertModal((p) => ({ ...p, open: false }))} className="w-full py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#0B3766] to-[#2E5EA6] shadow-lg shadow-[#0B3766]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all">حسناً، فهمت</button>
           </motion.div>
         </motion.div>
       )}
@@ -170,7 +166,7 @@ export default function MembershipPage() {
   );
 
   /* ═══ Input field helper ═══ */
-  const inputClass = "w-full px-5 py-4 rounded-[20px] bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 outline-none transition-all duration-300 text-[15px] font-medium shadow-sm hover:border-slate-300";
+  const inputClass = "w-full px-5 py-4 rounded-[20px] bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#0B3766] focus:ring-2 focus:ring-[#0B3766]/15 outline-none transition-all duration-300 text-[15px] font-medium shadow-sm hover:border-slate-300";
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -181,8 +177,8 @@ export default function MembershipPage() {
         <img src="/bg.webp" alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.92] via-slate-50/[0.88] to-blue-50/[0.85]" />
       </div>
-      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-[#5CB07C]/[0.06] rounded-full blur-[200px] pointer-events-none -translate-y-1/2 translate-x-1/3 z-0" />
-      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-[#173A7C]/[0.06] rounded-full blur-[180px] pointer-events-none translate-y-1/2 -translate-x-1/3 z-0" />
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-[#19B6C7]/[0.06] rounded-full blur-[200px] pointer-events-none -translate-y-1/2 translate-x-1/3 z-0" />
+      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-[#0B3766]/[0.06] rounded-full blur-[180px] pointer-events-none translate-y-1/2 -translate-x-1/3 z-0" />
 
       <div className="relative z-10 pb-24 pt-20 md:pt-28">
         {/* ═══════════ HERO HEADER ═══════════ */}
@@ -190,7 +186,7 @@ export default function MembershipPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="mb-6">
               <span className="section-badge-glass">
-                <BadgeCheck aria-hidden="true" className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+                <BadgeCheck aria-hidden="true" className="w-4 h-4 text-[#0B3766] ml-1 inline" />
                 عضوية التميز
               </span>
             </div>
@@ -208,11 +204,11 @@ export default function MembershipPage() {
             <div className="mt-8 max-w-sm mx-auto">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-slate-400">بدء الاستمارة</span>
-                <span className="text-xs font-black text-[#5CB07C]">{progress}%</span>
+                <span className="text-xs font-bold text-[#19B6C7]">{progress}%</span>
               </div>
               <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full"
+                  className="h-full bg-gradient-to-r from-[#0B3766] to-[#19B6C7] rounded-full"
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
                 />
@@ -225,13 +221,13 @@ export default function MembershipPage() {
           {submitted ? (
             /* ═══════════ SUCCESS STATE ═══════════ */
             <motion.section key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="max-w-2xl mx-auto px-4 sm:px-6">
-              <div className="bg-white rounded-[2.5rem] p-10 sm:p-16 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.1)] text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#173A7C]/[0.02] to-[#5CB07C]/[0.03] pointer-events-none" />
+              <div className="bg-white rounded-[2.5rem] p-10 sm:p-16 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0B3766]/[0.02] to-[#19B6C7]/[0.03] pointer-events-none" />
                 <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: "spring" }} className="relative z-10">
-                  <div className="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-[#173A7C] to-[#5CB07C] flex items-center justify-center shadow-2xl shadow-[#173A7C]/25">
+                  <div className="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-[#0B3766] to-[#19B6C7] flex items-center justify-center shadow-2xl shadow-[#0B3766]/25">
                     <UserPlus className="w-14 h-14 text-white" />
                   </div>
-                  <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">تم إرسال طلبك!</h2>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">تم إرسال طلبك!</h2>
                   <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-md mx-auto mb-8">
                     مرحباً بك في أسرة المركز. سيقوم فريقنا بمراجعة طلبك وتفعيل العضوية قريباً جداً. تواصل معنا لمزيد من التفاصيل.
                   </p>
@@ -247,37 +243,37 @@ export default function MembershipPage() {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-12 border border-white/60 shadow-xl relative text-right">
                   <div className="flex items-center gap-4 mb-10 justify-end">
                     <div className="text-right">
-                      <h2 className="text-2xl font-black text-slate-900">البيانات الشخصية والمهنية</h2>
+                      <h2 className="text-2xl font-bold text-slate-900">البيانات الشخصية والمهنية</h2>
                       <p className="text-sm text-slate-400 font-medium mt-1">يُرجى تعبئة الحقول الأساسية بالأرقام المعتادة (123)</p>
                     </div>
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#2F66D6] flex items-center justify-center shadow-lg shadow-[#173A7C]/20 shrink-0">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] flex items-center justify-center shadow-lg shadow-[#0B3766]/20 shrink-0">
                       <User className="w-7 h-7 text-white" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">الاسم بالكامل <User className="w-4 h-4 text-[#173A7C]" /></label>
+                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">الاسم بالكامل <User className="w-4 h-4 text-[#0B3766]" /></label>
                       <input type="text" value={form.name} onChange={(e) => updateForm("name", e.target.value)} className={inputClass} placeholder="أدخل اسمك الثلاثي" />
                     </div>
                     <div>
-                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">رقم الجوال <Phone className="w-4 h-4 text-[#173A7C]" /></label>
+                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">رقم الجوال <Phone className="w-4 h-4 text-[#0B3766]" /></label>
                       <input type="tel" value={form.phone} onChange={(e) => updateForm("phone", e.target.value)} dir="ltr" className={`${inputClass} text-right`} placeholder="05XXXXXXXX" />
                     </div>
                     <div>
-                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">البريد الإلكتروني <Mail className="w-4 h-4 text-[#173A7C]" /></label>
+                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">البريد الإلكتروني <Mail className="w-4 h-4 text-[#0B3766]" /></label>
                       <input type="email" value={form.email} onChange={(e) => updateForm("email", e.target.value)} className={inputClass} placeholder="example@domain.com" />
                     </div>
                     <div>
-                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">المؤهل <GraduationCap className="w-4 h-4 text-[#173A7C]" /></label>
+                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">المؤهل <GraduationCap className="w-4 h-4 text-[#0B3766]" /></label>
                       <input type="text" value={form.qualification} onChange={(e) => updateForm("qualification", e.target.value)} className={inputClass} placeholder="ماجستير، بكالوريوس..." />
                     </div>
                     <div>
-                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">المسمى الوظيفي <Briefcase className="w-4 h-4 text-[#173A7C]" /></label>
+                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">المسمى الوظيفي <Briefcase className="w-4 h-4 text-[#0B3766]" /></label>
                       <input type="text" value={form.jobTitle} onChange={(e) => updateForm("jobTitle", e.target.value)} className={inputClass} placeholder="أدخل وظيفتك الحالية" />
                     </div>
                     <div>
-                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">جهة العمل <Building2 className="w-4 h-4 text-[#173A7C]" /></label>
+                      <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">جهة العمل <Building2 className="w-4 h-4 text-[#0B3766]" /></label>
                       <input type="text" value={form.employer} onChange={(e) => updateForm("employer", e.target.value)} className={inputClass} placeholder="اسم الشركة أو المؤسسة" />
                     </div>
                     <div className="md:col-span-2">
@@ -292,24 +288,24 @@ export default function MembershipPage() {
                   <div className="space-y-10">
                     <div>
                       <label className="block text-[15px] font-bold text-slate-800 mb-3">الوظائف التي أطمح في الوصول إليها خلال ثلاث (3) سنوات</label>
-                      <textarea rows={3} value={form.aspirations} onChange={(e) => updateForm("aspirations", e.target.value)} className="w-full px-6 py-5 rounded-[20px] bg-slate-50/50 border border-slate-200 text-slate-900 focus:border-[#173A7C] outline-none text-[15px] resize-none leading-relaxed text-right" placeholder="أدخل رؤيتك المهنية..." />
+                      <textarea rows={3} value={form.aspirations} onChange={(e) => updateForm("aspirations", e.target.value)} className="w-full px-6 py-5 rounded-[20px] bg-slate-50/50 border border-slate-200 text-slate-900 focus:border-[#0B3766] outline-none text-[15px] resize-none leading-relaxed text-right" placeholder="أدخل رؤيتك المهنية..." />
                     </div>
                     <div>
                       <label className="block text-[15px] font-bold text-slate-800 mb-3">مجالات الاهتمام في مجال التنمية البشرية خارج إطار الوظيفة</label>
-                      <textarea rows={3} value={form.interests} onChange={(e) => updateForm("interests", e.target.value)} className="w-full px-6 py-5 rounded-[20px] bg-slate-50/50 border border-slate-200 text-slate-900 focus:border-[#173A7C] outline-none text-[15px] resize-none leading-relaxed text-right" placeholder="مثال: القيادة، التطوع..." />
+                      <textarea rows={3} value={form.interests} onChange={(e) => updateForm("interests", e.target.value)} className="w-full px-6 py-5 rounded-[20px] bg-slate-50/50 border border-slate-200 text-slate-900 focus:border-[#0B3766] outline-none text-[15px] resize-none leading-relaxed text-right" placeholder="مثال: القيادة، التطوع..." />
                     </div>
                     <div>
                       <label className="block text-[15px] font-bold text-slate-800 mb-3">ملاحظات إضافية</label>
-                      <textarea rows={2} value={form.notes} onChange={(e) => updateForm("notes", e.target.value)} className="w-full px-6 py-5 rounded-[20px] bg-slate-50/50 border border-slate-200 text-slate-900 focus:border-[#173A7C] outline-none text-[15px] resize-none leading-relaxed text-right" placeholder="أي معلومات أخرى تود إضافتها" />
+                      <textarea rows={2} value={form.notes} onChange={(e) => updateForm("notes", e.target.value)} className="w-full px-6 py-5 rounded-[20px] bg-slate-50/50 border border-slate-200 text-slate-900 focus:border-[#0B3766] outline-none text-[15px] resize-none leading-relaxed text-right" placeholder="أي معلومات أخرى تود إضافتها" />
                     </div>
                   </div>
                 </motion.div>
 
                 {/* ─── Part 3: Membership Tiers & Badges ─── */}
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-12 border border-[#173A7C]/10 shadow-[0_30px_100px_-20px_rgba(23,58,124,0.1)] relative overflow-hidden text-right">
-                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-[#173A7C]/[0.03] to-transparent pointer-events-none" />
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-12 border border-[#0B3766]/10 shadow-[0_30px_100px_-20px_rgba(11,55,102,0.12)] relative overflow-hidden text-right">
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-[#0B3766]/[0.03] to-transparent pointer-events-none" />
                   
-                  <h2 className="text-2xl font-black text-slate-900 mb-8 flex items-center justify-end gap-3">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center justify-end gap-3">
                     فئات العضوية المناسبة
                     <Star className="w-6 h-6 text-amber-500" />
                   </h2>
@@ -326,15 +322,15 @@ export default function MembershipPage() {
                           className={`relative group p-6 rounded-[2rem] border-2 transition-all duration-500 text-center ${
                             isActive 
                               ? `bg-gradient-to-br ${tier.color} border-transparent text-white shadow-2xl ${tier.glow} scale-[1.03]` 
-                              : "bg-white border-slate-100 text-slate-600 hover:border-[#173A7C]/20 hover:bg-slate-50 shadow-sm"
+                              : "bg-white border-slate-100 text-slate-600 hover:border-[#0B3766]/20 hover:bg-slate-50 shadow-sm"
                           }`}
                         >
                           <div className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-all duration-500 ${
-                            isActive ? "bg-white/20" : "bg-slate-50 text-slate-400 group-hover:text-[#173A7C]"
+                            isActive ? "bg-white/20" : "bg-slate-50 text-slate-400 group-hover:text-[#0B3766]"
                           }`}>
                             <Icon className={`w-8 h-8 ${isActive ? "text-white" : ""}`} />
                           </div>
-                          <h3 className={`text-lg font-black mb-1 ${isActive ? "text-white" : "text-slate-800"}`}>{tier.label}</h3>
+                          <h3 className={`text-lg font-bold mb-1 ${isActive ? "text-white" : "text-slate-800"}`}>{tier.label}</h3>
                           <span className={`text-xs font-bold px-3 py-1 rounded-full ${isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-400"}`}>{tier.badge}</span>
                           
                           {isActive && (
@@ -350,7 +346,7 @@ export default function MembershipPage() {
 
                 {/* ─── Part 4: Important Notes ─── */}
                 <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }} className="bg-slate-950/90 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-12 text-right relative overflow-hidden">
-                  <div className="absolute top-0 right-1/2 translate-x-1/2 w-40 h-1.5 bg-[#173A7C] rounded-full opacity-50" />
+                  <div className="absolute top-0 right-1/2 translate-x-1/2 w-40 h-1.5 bg-[#0B3766] rounded-full opacity-50" />
                   <h3 className="text-xl font-bold text-white mb-6 flex items-center justify-end gap-3">
                     ملاحظات هامة
                     <Info className="w-5 h-5 text-blue-400" />
@@ -367,7 +363,7 @@ export default function MembershipPage() {
                 {/* Terms & Conditions */}
                 <div className="flex items-start gap-3 py-4 px-1 justify-end">
                   <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
-                    أوافق على <span className="text-[#173A7C] font-bold">الشروط والأحكام</span> و <span className="text-[#173A7C] font-bold">سياسة الخصوصية</span>
+                    أوافق على <span className="text-[#0B3766] font-bold">الشروط والأحكام</span> و <span className="text-[#0B3766] font-bold">سياسة الخصوصية</span>
                   </label>
                   <input
                     type="checkbox"
@@ -375,13 +371,13 @@ export default function MembershipPage() {
                     required
                     checked={agreed}
                     onChange={(e) => setAgreed(e.target.checked)}
-                    className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                    className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#0B3766] focus:ring-[#0B3766]"
                   />
                 </div>
 
                 {/* Submit button */}
                 <div className="flex justify-start">
-                  <Button type="submit" size="lg" className="px-14 shadow-2xl shadow-[#173A7C]/30 group rounded-full" disabled={loading || !agreed}>
+                  <Button type="submit" size="lg" className="px-14 shadow-2xl shadow-[#0B3766]/30 group rounded-full" disabled={loading || !agreed}>
                     {loading ? "جاري المعالجة..." : <span className="flex items-center gap-3">إرسال الطلب <Send className="w-5 h-5 rtl:rotate-180" /></span>}
                   </Button>
                 </div>

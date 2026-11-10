@@ -13,7 +13,7 @@ const sections = [
     iconColor: "text-blue-600",
     bgColor: "bg-blue-50",
     title: "نظرة عامة على سياسة الحضور",
-    content: "تلتزم إدارة معهد النبض المستدام للتدريب بتطبيق سياسة حضور صارمة وشفافة تهدف إلى ضمان تحقيق أعلى معايير الجودة في العملية التدريبية. تُعد سياسة الحضور جزءاً لا يتجزأ من الإطار التنظيمي المعتمد، وتسري على جميع البرامج التدريبية (الحضورية والافتراضية) المقدمة عبر المعهد.",
+    content: "تلتزم إدارة أكاديمية مَدار للتعلّم بتطبيق سياسة حضور صارمة وشفافة تهدف إلى ضمان تحقيق أعلى معايير الجودة في العملية التدريبية. تُعد سياسة الحضور جزءاً لا يتجزأ من الإطار التنظيمي المعتمد، وتسري على جميع البرامج التدريبية (الحضورية والافتراضية) المقدمة عبر المعهد.",
     list: [
       "تسري هذه السياسة على كافة المتدربين المسجلين في البرامج التدريبية المعتمدة.",
       "يتم احتساب الحضور بشكل آلي ودقيق عبر نظام المنصة الإلكتروني المتكامل.",
@@ -109,7 +109,7 @@ export default function AttendancePolicyPage() {
         >
           <div className="mb-8">
             <span className="section-badge-glass">
-              <CalendarCheck className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              <CalendarCheck className="w-4 h-4 text-[#0B3766] ml-1 inline" />
               الانضباط أساس النجاح
             </span>
           </div>
@@ -120,15 +120,15 @@ export default function AttendancePolicyPage() {
           </h1>
           
           <p className="section-desc-premium text-base sm:text-lg max-w-3xl mx-auto mb-10">
-            نؤمن في معهد النبض المستدام بأن الالتزام والانضباط ركيزتان أساسيتان لاكتساب المعرفة وتحقيق الأهداف التدريبية. لذا وضعنا هذه السياسة الشاملة لتنظيم حضور المتدربين وضمان بيئة تعليمية فعالة ومثمرة للجميع.
+            نؤمن في معهد مَدار للتعلّم بأن الالتزام والانضباط ركيزتان أساسيتان لاكتساب المعرفة وتحقيق الأهداف التدريبية. لذا وضعنا هذه السياسة الشاملة لتنظيم حضور المتدربين وضمان بيئة تعليمية فعالة ومثمرة للجميع.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-bold text-slate-400">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> حد أدنى 75% حضور</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> حد أدنى 75% حضور</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> رصد آلي ودقيق</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> رصد آلي ودقيق</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> إجراءات شفافة</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> إجراءات شفافة</span>
           </div>
         </motion.div>
       </section>
@@ -144,14 +144,14 @@ export default function AttendancePolicyPage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="w-full lg:w-1/3 lg:sticky lg:top-32 order-2 lg:order-1"
           >
-            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(23,58,124,0.08)]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(11,55,102,0.12)]">
               {/* Logo Area */}
               <div className="flex justify-center mb-8 pb-6 border-b border-slate-100/80">
-                <img src="/logo.svg" alt="Sustain Pulse Logo" className="h-[4.5rem] w-auto object-contain hover:scale-105 transition-transform duration-300" />
+                <img src="/logo.svg" alt="Madar Learning Logo" className="h-[4.5rem] w-auto object-contain hover:scale-105 transition-transform duration-300" />
               </div>
 
               <h3 className="card-title-royal-blue text-lg mb-6 flex items-center gap-3">
-                <ShieldHalf className="w-5 h-5 text-[#173A7C]" />
+                <ShieldHalf className="w-5 h-5 text-[#0B3766]" />
                 أقسام سياسة الحضور
               </h3>
               <div className="space-y-2">
@@ -164,16 +164,16 @@ export default function AttendancePolicyPage() {
                     }}
                     className={`w-full text-right px-4 lg:px-5 py-3.5 lg:py-4 rounded-2xl transition-all duration-300 font-bold text-sm flex items-center justify-between group ${
                       activeSection === p.id 
-                        ? "bg-slate-50 text-[#173A7C] border border-slate-200 shadow-sm" 
+                        ? "bg-slate-50 text-[#0B3766] border border-slate-200 shadow-sm"
                         : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-transparent"
                     }`}
                   >
                     <span className="flex items-center gap-3">
-                      <p.icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${activeSection === p.id ? "text-[#173A7C]" : "text-slate-400 group-hover:text-slate-600"}`} />
+                      <p.icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${activeSection === p.id ? "text-[#0B3766]" : "text-slate-400 group-hover:text-slate-600"}`} />
                       {p.title.split(' ').slice(0, 3).join(' ') + (p.title.split(' ').length > 3 ? "..." : "")}
                     </span>
                     {activeSection === p.id && (
-                      <motion.div layoutId="activeIndicator" className="w-1.5 h-1.5 rounded-full bg-[#173A7C]" />
+                      <motion.div layoutId="activeIndicator" className="w-1.5 h-1.5 rounded-full bg-[#0B3766]" />
                     )}
                   </button>
                 ))}
@@ -181,25 +181,25 @@ export default function AttendancePolicyPage() {
             </div>
             
             {/* Summary Widget */}
-            <div className="mt-6 bg-gradient-to-br from-[#173A7C] to-[#2F66D6] rounded-3xl p-8 text-white text-center shadow-lg shadow-[#173A7C]/20">
+            <div className="mt-6 bg-gradient-to-br from-[#0B3766] to-[#168AD3] rounded-3xl p-8 text-white text-center shadow-lg shadow-[#0B3766]/20">
               <FileWarning className="w-12 h-12 text-white/80 mx-auto mb-4" />
-              <h4 className="font-black text-lg mb-2">ملخص نسب الحضور</h4>
+              <h4 className="font-bold text-lg mb-2">ملخص نسب الحضور</h4>
               <div className="space-y-3 mt-6 text-right">
                 <div className="flex items-center justify-between bg-white/10 rounded-xl px-4 py-3">
                   <span className="text-sm font-bold text-blue-100">الحد الأدنى المطلوب</span>
-                  <span className="text-lg font-black text-white" dir="ltr">75%</span>
+                  <span className="text-lg font-bold text-white" dir="ltr">75%</span>
                 </div>
                 <div className="flex items-center justify-between bg-white/10 rounded-xl px-4 py-3">
                   <span className="text-sm font-bold text-blue-100">تنبيه أولي عند</span>
-                  <span className="text-lg font-black text-amber-300" dir="ltr">15%</span>
+                  <span className="text-lg font-bold text-amber-300" dir="ltr">15%</span>
                 </div>
                 <div className="flex items-center justify-between bg-white/10 rounded-xl px-4 py-3">
                   <span className="text-sm font-bold text-blue-100">إنذار رسمي عند</span>
-                  <span className="text-lg font-black text-orange-300" dir="ltr">20%</span>
+                  <span className="text-lg font-bold text-orange-300" dir="ltr">20%</span>
                 </div>
                 <div className="flex items-center justify-between bg-white/10 rounded-xl px-4 py-3">
                   <span className="text-sm font-bold text-blue-100">حرمان نهائي عند</span>
-                  <span className="text-lg font-black text-red-300" dir="ltr">25%+</span>
+                  <span className="text-lg font-bold text-red-300" dir="ltr">25%+</span>
                 </div>
               </div>
             </div>
@@ -219,7 +219,7 @@ export default function AttendancePolicyPage() {
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                   onViewportEnter={() => setActiveSection(sec.id)}
                   className={`relative bg-white rounded-[2.5rem] p-8 sm:p-12 border transition-all duration-500 overflow-hidden group ${
-                    activeSection === sec.id ? "border-[#173A7C]/20 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.12)] ring-1 ring-[#173A7C]/5" : "border-slate-100 shadow-sm hover:shadow-md"
+                    activeSection === sec.id ? "border-[#0B3766]/20 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] ring-1 ring-[#0B3766]/5" : "border-slate-100 shadow-sm hover:shadow-md"
                   }`}
                 >
                   <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${sec.color} opacity-[0.03] rounded-bl-full pointer-events-none transition-transform duration-700 group-hover:scale-150`} />

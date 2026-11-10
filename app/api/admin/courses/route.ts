@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
-import { CourseAccessError, CoursePersistenceError, getAllCoursesAsync, saveCourseAsync, deleteCourseAsync } from '@/lib/courses-store';
+import { getAllCoursesAsync } from '@/lib/courses-store';
 import { requireAdmin } from '@/lib/security/auth';
-import { recordAdminAudit } from '@/lib/admin/audit';
-import { cleanNumber, cleanString, readJsonObject, safeErrorMessage, ValidationError } from '@/lib/security/validation';
-import type { Course } from '@/types';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -68,62 +65,5 @@ export async function GET(req: Request) {
   } catch (err: unknown) {
     console.error('Admin GET courses error:', err);
     return NextResponse.json({ success: false, error: 'تعذر تحميل الدورات' }, { status: 500 });
-  }
-}
-
-export async function POST(req: Request) {
-  try {
-    const auth = await requireAdmin(req);
-    if (!auth.ok) return auth.response;
-    const body = await readJsonObject(req);
-    const title = cleanString(body.title, 'عنوان الدورة', { max: 200 })!;
-    if (body.price !== undefined) body.price = cleanNumber(body.price, 'السعر', { min: 0, max: 1_000_000 });
-
-    const saved = await saveCourseAsync({ ...body, title } as Partial<Course> & { title: string }, auth.user.id);
-    await recordAdminAudit({ request: req, actor: auth.user, action: 'course.upsert', resourceType: 'course', resourceId: saved.id, metadata: { fields: Object.keys(body) } });
-    return NextResponse.json(
-      { success: true, course: saved },
-      {
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate',
-        },
-      }
-    );
-  } catch (err: unknown) {
-    console.error('Admin POST course error:', err);
-    return NextResponse.json(
-      {
-        success: false,
-        error: err instanceof CoursePersistenceError || err instanceof CourseAccessError
-          ? err.message
-          : safeErrorMessage(err, 'تعذر حفظ الدورة'),
-      },
-      { status: err instanceof CourseAccessError ? err.status : err instanceof ValidationError ? 400 : err instanceof CoursePersistenceError ? 503 : 500 },
-    );
-  }
-}
-
-export async function DELETE(req: Request) {
-  try {
-    const auth = await requireAdmin(req);
-    if (!auth.ok) return auth.response;
-    const { searchParams } = new URL(req.url);
-    const slug = searchParams.get('slug') || searchParams.get('id');
-    
-    if (!slug) {
-      return NextResponse.json({ success: false, error: 'معرّف الدورة مطلوب' }, { status: 400 });
-    }
-
-    const deleted = await deleteCourseAsync(slug);
-    if (deleted) {
-      await recordAdminAudit({ request: req, actor: auth.user, action: 'course.delete', resourceType: 'course', resourceId: slug });
-    }
-    return NextResponse.json({ success: deleted });
-  } catch (err: unknown) {
-    console.error('Admin DELETE course error:', err);
-    return NextResponse.json(
-      { success: false, error: err instanceof CourseAccessError || err instanceof CoursePersistenceError ? err.message : 'تعذر حذف الدورة' },
-      { status: err instanceof CourseAccessError ? err.status : err instanceof CoursePersistenceError ? 503 : 500 },
-    );
   }
 }

@@ -18,7 +18,6 @@ import {
   Filter,
   Download,
   Users,
-  Sparkles,
   X,
   GraduationCap,
   Loader2,
@@ -324,7 +323,7 @@ export default function AdminTrainersPage() {
 
   const handleCopyCredentials = () => {
     if (!createdCredentials) return;
-    const text = `بيانات الدخول لحساب المدرب - منصة النبض المستدام:
+    const text = `بيانات الدخول لحساب المدرب - منصة مَدار للتعلّم:
 الاسم: ${createdCredentials.name}
 البريد الإلكتروني: ${createdCredentials.email}
 كلمة المرور: ${createdCredentials.password}
@@ -356,11 +355,11 @@ export default function AdminTrainersPage() {
       {/* Page Header */}
       <div className={`${heroStyles.hero} p-4 sm:p-6 md:p-8 rounded-3xl liquid-glass border border-white/60 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6`}>
         <div className={`${heroStyles.intro} min-w-0 w-full space-y-2 z-10 md:w-auto`}>
-          <div className={`${heroStyles.badge} inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#173A7C]/10 text-[#173A7C] text-xs font-black`}>
+          <div className={`${heroStyles.badge} inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0B3766]/10 text-[#0B3766] text-xs font-bold`}>
             <GraduationCap className="w-4 h-4" />
             <span>الهيئة التدريبية والأكاديمية</span>
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight leading-snug">
             إدارة المدربين والمحاضرين
           </h1>
           <p className={`${heroStyles.description} text-xs md:text-sm font-medium text-slate-500 leading-6 md:font-bold md:max-w-xl`}>
@@ -374,7 +373,7 @@ export default function AdminTrainersPage() {
               setNewTrainerPassword(generatePassword());
               setShowAddModal(true);
             }}
-            className="min-h-11 w-full justify-center px-4 py-2.5 rounded-xl md:w-auto md:px-5 md:py-3 md:rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs sm:text-sm flex items-center gap-2.5 shadow-lg shadow-[#173A7C]/25 transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
+            className="min-h-11 w-full justify-center px-4 py-2.5 rounded-xl md:w-auto md:px-5 md:py-3 md:rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs sm:text-sm flex items-center gap-2.5 shadow-lg shadow-[#0B3766]/25 transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>إضافة وتفعيل مدرب جديد</span>
@@ -391,7 +390,7 @@ export default function AdminTrainersPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="بحث بالاسم، التخصص، أو البريد الإلكتروني..."
-            className="w-full pr-10 pl-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#173A7C] shadow-xs"
+            className="w-full pr-10 pl-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#0B3766] shadow-xs"
           />
         </div>
 
@@ -409,7 +408,7 @@ export default function AdminTrainersPage() {
               onClick={() => setStatusFilter(st.key as any)}
               className={`min-h-11 min-w-0 px-2 py-2 rounded-xl text-[11px] font-bold whitespace-nowrap md:min-h-0 md:px-3.5 md:text-xs transition-all cursor-pointer ${
                 statusFilter === st.key
-                  ? 'bg-[#173A7C] text-white shadow-xs'
+                  ? 'bg-[#0B3766] text-white shadow-xs'
                   : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -422,13 +421,13 @@ export default function AdminTrainersPage() {
       {/* Trainers Grid */}
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل بيانات المدربين المعتمدين...</p>
         </div>
       ) : filteredTrainers.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
-          <Users className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
-          <h3 className="text-base font-black text-slate-900">لا يوجد مدربون يطابقون معايير البحث</h3>
+          <Users className="w-12 h-12 text-[#0B3766]/30 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">لا يوجد مدربون يطابقون معايير البحث</h3>
           <p className="text-xs text-slate-500 font-bold">يمكنك إضافة مدرب جديد بالنقر على زر الإضافة أعلاه.</p>
         </div>
       ) : (
@@ -451,22 +450,22 @@ export default function AdminTrainersPage() {
                     <img
                       src={
                         /أمال|ميسون|عهود|سارة|نورة|فاطمة|المدربة|دكتورة|محامية/.test(t.name)
-                          ? '/trainer-default-female.webp'
-                          : '/trainer-default-male.webp'
+                          ? '/demo/madar/avatar.svg'
+                          : '/demo/madar/avatar.svg'
                       }
                       alt={t.name}
                       className="h-16 w-16 shrink-0 rounded-2xl border-2 border-white/80 bg-slate-100 object-cover shadow-md md:h-20 md:w-20"
                     />
                   )}
                   <div className="min-w-0 flex-1 space-y-1 md:space-y-0.5">
-                    <h3 className="break-words text-sm font-bold leading-6 text-slate-900 md:text-base md:font-black md:leading-snug">{t.name}</h3>
+                    <h3 className="break-words text-sm font-bold leading-6 text-slate-900 md:text-base md:font-bold md:leading-snug">{t.name}</h3>
                     <p className="break-words text-xs font-medium leading-6 text-[#0D5C3A] md:font-bold">{t.specialty}</p>
                   </div>
                 </div>
 
                 <div className="flex w-full shrink-0 items-center gap-1.5 border-t border-slate-200/80 pt-3">
                   <span
-                    className={'me-auto inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-[10px] font-semibold md:font-black ' + (
+                    className={'me-auto inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-[10px] font-semibold md:font-bold ' + (
                       t.status === 'active'
                         ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
                         : 'border-amber-300 bg-amber-50 text-amber-800'
@@ -480,7 +479,7 @@ export default function AdminTrainersPage() {
                     type="button"
                     onClick={() => handleOpenEdit(t)}
                     aria-label={'تعديل بيانات ' + t.name}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#173A7C]/20 bg-[#173A7C]/10 text-[#173A7C] shadow-xs transition-colors hover:bg-[#173A7C] hover:text-white md:h-auto md:w-auto md:p-2"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#0B3766]/20 bg-[#0B3766]/10 text-[#0B3766] shadow-xs transition-colors hover:bg-[#0B3766] hover:text-white md:h-auto md:w-auto md:p-2"
                     title="تعديل بيانات المدرب والصورة"
                   >
                     <Pencil aria-hidden="true" className="h-3.5 w-3.5" />
@@ -501,7 +500,7 @@ export default function AdminTrainersPage() {
               {/* Contact Information */}
               <div className="grid min-w-0 grid-cols-1 gap-2 rounded-xl border border-slate-100 bg-white/50 p-2.5 text-xs font-medium text-slate-600 md:grid-cols-2 md:font-bold">
                 <div className="flex min-w-0 items-start gap-2 md:items-center">
-                  <Mail aria-hidden="true" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#173A7C] md:mt-0" />
+                  <Mail aria-hidden="true" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#0B3766] md:mt-0" />
                   <span className="min-w-0 break-all font-mono leading-5 md:truncate" dir="ltr">{t.email}</span>
                 </div>
                 <div className="flex min-w-0 items-center gap-2">
@@ -528,18 +527,18 @@ export default function AdminTrainersPage() {
               )}
 
               {/* Dynamic Statistics Row */}
-              <div className="grid grid-cols-3 p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80 text-center text-xs font-black text-slate-800">
+              <div className="grid grid-cols-3 p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80 text-center text-xs font-bold text-slate-800">
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold block">الدورات</span>
-                  <span className="text-sm font-black text-[#173A7C]">{t.coursesCount}</span>
+                  <span className="text-sm font-bold text-[#0B3766]">{t.coursesCount}</span>
                 </div>
                 <div className="border-r border-l border-slate-200">
                   <span className="text-[10px] text-slate-400 font-bold block">إجمالي الطلاب</span>
-                  <span className="text-sm font-black text-emerald-700">{t.studentsCount}</span>
+                  <span className="text-sm font-bold text-emerald-700">{t.studentsCount}</span>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold block">التقييم</span>
-                  <span className="text-amber-600 flex items-center justify-center gap-1 font-black text-sm">
+                  <span className="text-amber-600 flex items-center justify-center gap-1 font-bold text-sm">
                     <Star className="w-3.5 h-3.5 fill-current" />
                     <span>{t.rating}</span>
                   </span>
@@ -595,8 +594,8 @@ export default function AdminTrainersPage() {
                       <img
                         src={
                           /أمال|ميسون|عهود|سارة|نورة|فاطمة|المدربة|دكتورة|محامية/.test(editName)
-                            ? '/trainer-default-female.webp'
-                            : '/trainer-default-male.webp'
+                            ? '/demo/madar/avatar.svg'
+                            : '/demo/madar/avatar.svg'
                         }
                         alt="Default preview"
                         className="w-20 h-20 rounded-2xl object-cover shadow-md border-2 border-white"
@@ -610,7 +609,7 @@ export default function AdminTrainersPage() {
                   </div>
 
                   <div className="space-y-1.5 flex-1">
-                    <p className="text-xs font-black text-slate-800">صورة المدرب الرسمية</p>
+                    <p className="text-xs font-bold text-slate-800">صورة المدرب الرسمية</p>
                     <p className="text-[11px] text-slate-500 font-medium">يتم ضغطها وتحويلها لـ WebP فائق السرعة تلقائياً</p>
                     <div className="flex items-center gap-2 pt-1">
                       <input
@@ -627,7 +626,7 @@ export default function AdminTrainersPage() {
                         type="button"
                         onClick={() => editFileInputRef.current?.click()}
                         disabled={isUploadingEditAvatar}
-                        className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-[#173A7C] border border-[#173A7C]/30 text-xs font-black flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                        className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-[#0B3766] border border-[#0B3766]/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
                       >
                         <Camera className="w-3.5 h-3.5" />
                         <span>{editAvatarUrl ? 'تغيير الصورة' : 'رفع صورة'}</span>
@@ -648,24 +647,24 @@ export default function AdminTrainersPage() {
                 {/* Name & Specialty */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">الاسم الكامل / اللقب</label>
+                    <label className="text-xs font-bold text-slate-700">الاسم الكامل / اللقب</label>
                     <input
                       type="text"
                       required
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">التخصص والمسمى التدريبي</label>
+                    <label className="text-xs font-bold text-slate-700">التخصص والمسمى التدريبي</label>
                     <input
                       type="text"
                       value={editSpecialty}
                       onChange={(e) => setEditSpecialty(e.target.value)}
                       placeholder="مثال: استشاري الحوار والمسؤولية المجتمعية"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                 </div>
@@ -673,24 +672,24 @@ export default function AdminTrainersPage() {
                 {/* Email & Phone */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">البريد الإلكتروني</label>
+                    <label className="text-xs font-bold text-slate-700">البريد الإلكتروني</label>
                     <input
                       type="email"
                       required
                       value={editEmail}
                       onChange={(e) => setEditEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">رقم الهاتف</label>
+                    <label className="text-xs font-bold text-slate-700">رقم الهاتف</label>
                     <input
                       type="text"
                       value={editPhone}
                       onChange={(e) => setEditPhone(e.target.value)}
                       placeholder="+966 50 000 0000"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                 </div>
@@ -698,7 +697,7 @@ export default function AdminTrainersPage() {
                 {/* Password Reset & Status */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">
+                    <label className="text-xs font-bold text-slate-700">
                       تغيير كلمة المرور <span className="text-slate-400 font-normal">(اتركها فارغة إذا لم ترغب بالتغيير)</span>
                     </label>
                     <input
@@ -706,16 +705,16 @@ export default function AdminTrainersPage() {
                       value={editPassword}
                       onChange={(e) => setEditPassword(e.target.value)}
                       placeholder="كلمة مرور جديدة..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">حالة الحساب</label>
+                    <label className="text-xs font-bold text-slate-700">حالة الحساب</label>
                     <select
                       value={editStatus}
                       onChange={(e) => setEditStatus(e.target.value as any)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white"
                     >
                       <option value="active">على رأس العمل (نشط ومتاح)</option>
                       <option value="on_leave">إجازة / غير متاح حالياً</option>
@@ -726,8 +725,8 @@ export default function AdminTrainersPage() {
                 {/* Assigned Courses Section */}
                 <div className="space-y-2 pt-2 border-t border-slate-100">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-black text-slate-800 flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5 text-[#173A7C]" />
+                    <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-[#0B3766]" />
                       <span>تخصيص وإسناد الدورات للمدرب:</span>
                     </label>
                     <span className="text-[11px] text-slate-400 font-bold">
@@ -745,7 +744,7 @@ export default function AdminTrainersPage() {
                           <label
                             key={c.slug}
                             className={`flex items-center gap-2 p-2 rounded-xl text-xs font-bold cursor-pointer transition-colors ${
-                              checked ? 'bg-[#173A7C]/10 text-[#173A7C]' : 'hover:bg-white text-slate-700'
+                              checked ? 'bg-[#0B3766]/10 text-[#0B3766]' : 'hover:bg-white text-slate-700'
                             }`}
                           >
                             <input
@@ -758,7 +757,7 @@ export default function AdminTrainersPage() {
                                   setEditAssignedCourses((prev) => prev.filter((s) => s !== c.slug));
                                 }
                               }}
-                              className="rounded text-[#173A7C] focus:ring-0"
+                              className="rounded text-[#0B3766] focus:ring-0"
                             />
                             <span className="flex-1 truncate">{c.title}</span>
                           </label>
@@ -776,14 +775,14 @@ export default function AdminTrainersPage() {
                       setShowEditModal(false);
                       setEditingTrainer(null);
                     }}
-                    className="px-5 py-2.5 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                    className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer disabled:opacity-60"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all cursor-pointer disabled:opacity-60"
                   >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                     <span>{saving ? 'جاري الحفظ...' : 'حفظ التعديلات'}</span>
@@ -837,8 +836,8 @@ export default function AdminTrainersPage() {
                       <img
                         src={
                           /أمال|ميسون|عهود|سارة|نورة|فاطمة|المدربة|دكتورة|محامية/.test(newTrainerName)
-                            ? '/trainer-default-female.webp'
-                            : '/trainer-default-male.webp'
+                            ? '/demo/madar/avatar.svg'
+                            : '/demo/madar/avatar.svg'
                         }
                         alt="Default trainer avatar"
                         className="w-20 h-20 rounded-2xl object-cover shadow-md border-2 border-white opacity-85"
@@ -852,7 +851,7 @@ export default function AdminTrainersPage() {
                   </div>
 
                   <div className="space-y-1 flex-1">
-                    <p className="text-xs font-black text-slate-800">صورة المدرب (اختيارية)</p>
+                    <p className="text-xs font-bold text-slate-800">صورة المدرب (اختيارية)</p>
                     <p className="text-[11px] text-slate-500 font-medium">يمكنك رفعها الآن، أو يمكن للمدرب إضافتها بنفسه لاحقاً</p>
                     <div className="flex items-center gap-2 pt-1">
                       <input
@@ -869,7 +868,7 @@ export default function AdminTrainersPage() {
                         type="button"
                         onClick={() => newFileInputRef.current?.click()}
                         disabled={isUploadingNewAvatar}
-                        className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-[#173A7C] border border-[#173A7C]/30 text-xs font-black flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                        className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-[#0B3766] border border-[#0B3766]/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
                       >
                         <Camera className="w-3.5 h-3.5" />
                         <span>{newTrainerAvatarUrl ? 'تغيير الصورة' : 'رفع صورة الآن'}</span>
@@ -890,25 +889,25 @@ export default function AdminTrainersPage() {
                 {/* Name & Specialty */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">الاسم الكامل / اللقب الأكاديمي</label>
+                    <label className="text-xs font-bold text-slate-700">الاسم الكامل / اللقب الأكاديمي</label>
                     <input
                       type="text"
                       required
                       value={newTrainerName}
                       onChange={(e) => setNewTrainerName(e.target.value)}
                       placeholder="مثال: د. محمد بن إبراهيم القحطاني"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">التخصص والمسمى التدريبي</label>
+                    <label className="text-xs font-bold text-slate-700">التخصص والمسمى التدريبي</label>
                     <input
                       type="text"
                       value={newTrainerSpecialty}
                       onChange={(e) => setNewTrainerSpecialty(e.target.value)}
                       placeholder="مثال: استشاري الحوار والمسؤولية المجتمعية"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                 </div>
@@ -916,46 +915,46 @@ export default function AdminTrainersPage() {
                 {/* Email & Password */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">البريد الإلكتروني (لتسجيل الدخول)</label>
+                    <label className="text-xs font-bold text-slate-700">البريد الإلكتروني (لتسجيل الدخول)</label>
                     <input
                       type="email"
                       required
                       value={newTrainerEmail}
                       onChange={(e) => setNewTrainerEmail(e.target.value)}
-                      placeholder="trainer@sustainpulse.org"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      placeholder="trainer@madar-learning.org"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">كلمة المرور للحساب</label>
+                    <label className="text-xs font-bold text-slate-700">كلمة المرور للحساب</label>
                     <input
                       type="text"
                       required
                       value={newTrainerPassword}
                       onChange={(e) => setNewTrainerPassword(e.target.value)}
                       placeholder="8 أحرف على الأقل"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                 </div>
 
                 {/* Phone */}
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">رقم الهاتف (اختياري)</label>
+                  <label className="text-xs font-bold text-slate-700">رقم الهاتف (اختياري)</label>
                   <input
                     type="text"
                     value={newTrainerPhone}
                     onChange={(e) => setNewTrainerPhone(e.target.value)}
                     placeholder="+966 50 000 0000"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
                 {/* Assigned Courses Section */}
                 <div className="space-y-2 pt-2 border-t border-slate-100">
-                  <label className="text-xs font-black text-slate-800 flex items-center gap-1.5">
-                    <Layers className="w-3.5 h-3.5 text-[#173A7C]" />
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-[#0B3766]" />
                     <span>إسناد دورات مبدئية للمدرب (اختياري):</span>
                   </label>
 
@@ -969,7 +968,7 @@ export default function AdminTrainersPage() {
                           <label
                             key={c.slug}
                             className={`flex items-center gap-2 p-2 rounded-xl text-xs font-bold cursor-pointer transition-colors ${
-                              checked ? 'bg-[#173A7C]/10 text-[#173A7C]' : 'hover:bg-white text-slate-700'
+                              checked ? 'bg-[#0B3766]/10 text-[#0B3766]' : 'hover:bg-white text-slate-700'
                             }`}
                           >
                             <input
@@ -982,7 +981,7 @@ export default function AdminTrainersPage() {
                                   setNewTrainerCourses((prev) => prev.filter((s) => s !== c.slug));
                                 }
                               }}
-                              className="rounded text-[#173A7C] focus:ring-0"
+                              className="rounded text-[#0B3766] focus:ring-0"
                             />
                             <span className="flex-1 truncate">{c.title}</span>
                           </label>
@@ -997,14 +996,14 @@ export default function AdminTrainersPage() {
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="px-5 py-2.5 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                    className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer disabled:opacity-60"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all cursor-pointer disabled:opacity-60"
                   >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     <span>{saving ? 'جاري الإنشاء والتفعيل...' : 'إنشاء وتفعيل حساب المدرب'}</span>
@@ -1045,22 +1044,22 @@ export default function AdminTrainersPage() {
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold space-y-2 text-right">
                 <div>
                   <span className="text-slate-400 block text-[10px]">البريد الإلكتروني:</span>
-                  <span className="font-mono text-[#173A7C] font-black">{createdCredentials.email}</span>
+                  <span className="font-mono text-[#0B3766] font-bold">{createdCredentials.email}</span>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">كلمة المرور:</span>
-                  <span className="font-mono text-slate-900 font-black">{createdCredentials.password}</span>
+                  <span className="font-mono text-slate-900 font-bold">{createdCredentials.password}</span>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">الصلاحية:</span>
-                  <span className="text-emerald-700 font-black">مدرب ومحاضر معتمد (INSTRUCTOR)</span>
+                  <span className="text-emerald-700 font-bold">مدرب ومحاضر معتمد (INSTRUCTOR)</span>
                 </div>
               </div>
 
               <div className="space-y-2 pt-2">
                 <button
                   onClick={handleCopyCredentials}
-                  className="w-full py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                   <span>{copied ? 'تم نسخ بيانات الدخول!' : 'نسخ بيانات الدخول للمدرب'}</span>
@@ -1069,14 +1068,14 @@ export default function AdminTrainersPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setCreatedCredentials(null)}
-                    className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black cursor-pointer"
+                    className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
                   >
                     إغلاق
                   </button>
                   <a
                     href="/auth/login"
                     target="_blank"
-                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center justify-center gap-1.5 shadow-md hover:opacity-95"
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md hover:opacity-95"
                   >
                     <span>صفحة الدخول</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -1108,7 +1107,7 @@ export default function AdminTrainersPage() {
                   <AlertTriangle className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg text-slate-900">تأكيد حذف حساب المدرب</h3>
+                  <h3 className="font-bold text-lg text-slate-900">تأكيد حذف حساب المدرب</h3>
                   <p className="text-xs text-rose-600 font-bold">هذا الإجراء سيحذف حساب المعلم بالكامل</p>
                 </div>
               </div>
@@ -1121,7 +1120,7 @@ export default function AdminTrainersPage() {
                 <button
                   onClick={handleDeleteTrainer}
                   disabled={isDeleting}
-                  className="flex-1 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-600/25 transition-all cursor-pointer disabled:opacity-50"
+                  className="flex-1 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-600/25 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isDeleting ? (
                     <>

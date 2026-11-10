@@ -327,15 +327,15 @@ export default function AdminServicesPage() {
       >
         <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
           <div className={`${heroStyles.intro} space-y-2`}>
-            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#0B3766] border border-blue-200`}>
               <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
               <span className="sm:hidden">الخدمات والاستشارات</span>
               <span className="hidden sm:inline">لوحة الإدارة العليا • متجر الخدمات والاستشارات</span>
             </div>
-            <h1 className={`${heroStyles.title} text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3`}>
+            <h1 className={`${heroStyles.title} text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3`}>
               <span className="sm:hidden">إدارة الخدمات والاستشارات</span>
               <span className="hidden sm:inline">إدارة باقات الخدمات والاستشارات</span>
-              <Store className="w-7 h-7 text-[#173A7C] shrink-0" />
+              <Store className="w-7 h-7 text-[#0B3766] shrink-0" />
             </h1>
             <p className={`${heroStyles.description} text-xs sm:text-sm text-slate-600 font-bold max-w-2xl leading-relaxed`}>
               تحكم كامل في إضافة، تسعير، ونشر باقات الاستشارات الأكاديمية والمهنية، تعيين مقدمي الخدمة، ومتابعة الطلبات المكتملة في المتجر العام.
@@ -346,7 +346,7 @@ export default function AdminServicesPage() {
             <Link
               href="/marketplace"
               target="_blank"
-              className="px-4 py-3 rounded-2xl bg-white hover:bg-slate-50 text-[#173A7C] font-black text-xs flex items-center gap-2 border border-slate-200 shadow-sm transition-all"
+              className="px-4 py-3 rounded-2xl bg-white hover:bg-slate-50 text-[#0B3766] font-bold text-xs flex items-center gap-2 border border-slate-200 shadow-sm transition-all"
             >
               <Eye className="w-4 h-4" />
               <span className="sm:hidden">معاينة المتجر</span>
@@ -356,7 +356,7 @@ export default function AdminServicesPage() {
 
             <button
               onClick={handleOpenCreateModal}
-              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#132F64] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all hover:scale-[1.02]"
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#132F64] hover:to-[#0B3766] text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#0B3766]/25 cursor-pointer transition-all hover:scale-[1.02]"
             >
               <Plus className="w-4 h-4" />
               <span className="sm:hidden">خدمة جديدة</span>
@@ -373,13 +373,13 @@ export default function AdminServicesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md">
               <Briefcase className="w-5 h-5" />
             </div>
-            <span className="px-3 py-1 rounded-xl text-xs font-black border bg-blue-50 text-blue-800 border-blue-200">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold border bg-blue-50 text-blue-800 border-blue-200">
               إجمالي المعروض
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي الخدمات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#173A7C] tracking-tight">{services.length} خدمة</h3>
+            <span className="text-xs text-slate-500 font-bold block">إجمالي الخدمات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-[#0B3766] tracking-tight">{services.length} خدمة</h3>
           </div>
         </div>
 
@@ -388,13 +388,13 @@ export default function AdminServicesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <span className="px-3 py-1 rounded-xl text-xs font-black border bg-emerald-50 text-emerald-800 border-emerald-200">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold border bg-emerald-50 text-emerald-800 border-emerald-200">
               منشورة ومتاحة
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">الخدمات النشطة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">{activeCount} خدمة</h3>
+            <span className="text-xs text-slate-500 font-bold block">الخدمات النشطة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-emerald-700 tracking-tight">{activeCount} خدمة</h3>
           </div>
         </div>
 
@@ -403,13 +403,13 @@ export default function AdminServicesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md">
               <Users className="w-5 h-5" />
             </div>
-            <span className="px-3 py-1 rounded-xl text-xs font-black border bg-amber-50 text-amber-900 border-amber-300">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold border bg-amber-50 text-amber-900 border-amber-300">
               الطلبات المكتملة
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي المستفيدين</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-amber-700 tracking-tight">{totalOrders} مستفيد</h3>
+            <span className="text-xs text-slate-500 font-bold block">إجمالي المستفيدين</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-amber-700 tracking-tight">{totalOrders} مستفيد</h3>
           </div>
         </div>
 
@@ -418,13 +418,13 @@ export default function AdminServicesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-md">
               <TrendingUp className="w-5 h-5" />
             </div>
-            <span className="px-3 py-1 rounded-xl text-xs font-black border bg-indigo-50 text-indigo-800 border-indigo-200">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold border bg-indigo-50 text-indigo-800 border-indigo-200">
               عائدات المتجر
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي المبيعات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">إجمالي المبيعات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-indigo-700 tracking-tight">
               {totalRevenue.toLocaleString()} <span className="text-xs font-bold">ر.س</span>
             </h3>
           </div>
@@ -442,7 +442,7 @@ export default function AdminServicesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="البحث باسم الخدمة، مقدم الخدمة، التصنيف، أو الكلمات المفتاحية..."
-              className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+              className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
             />
             {searchQuery && (
               <button
@@ -458,9 +458,9 @@ export default function AdminServicesPage() {
           <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100/90 rounded-2xl border border-slate-200/80">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === 'all'
-                  ? 'bg-white text-[#173A7C] shadow-xs'
+                  ? 'bg-white text-[#0B3766] shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -468,7 +468,7 @@ export default function AdminServicesPage() {
             </button>
             <button
               onClick={() => setStatusFilter('active')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === 'active'
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-emerald-700'
@@ -478,7 +478,7 @@ export default function AdminServicesPage() {
             </button>
             <button
               onClick={() => setStatusFilter('featured')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === 'featured'
                   ? 'bg-amber-500 text-white shadow-xs'
                   : 'text-slate-600 hover:text-amber-700'
@@ -488,7 +488,7 @@ export default function AdminServicesPage() {
             </button>
             <button
               onClick={() => setStatusFilter('inactive')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === 'inactive'
                   ? 'bg-slate-700 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -501,15 +501,15 @@ export default function AdminServicesPage() {
 
         {/* Category Pills */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2 border-t border-slate-100">
-          <span className="text-[11px] font-black text-slate-500 shrink-0 flex items-center gap-1">
-            <Filter className="w-3 h-3 text-[#173A7C]" />
+          <span className="text-[11px] font-bold text-slate-500 shrink-0 flex items-center gap-1">
+            <Filter className="w-3 h-3 text-[#0B3766]" />
             <span>التصنيف:</span>
           </span>
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 cursor-pointer ${
+            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
               selectedCategory === 'all'
-                ? 'bg-[#173A7C] text-white shadow-xs'
+                ? 'bg-[#0B3766] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -519,9 +519,9 @@ export default function AdminServicesPage() {
             <button
               key={idx}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 selectedCategory === cat
-                  ? 'bg-[#173A7C] text-white shadow-xs'
+                  ? 'bg-[#0B3766] text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -534,23 +534,23 @@ export default function AdminServicesPage() {
       {/* ── 4. SERVICES GRID ── */}
       {loading ? (
         <div className="p-16 text-center rounded-3xl liquid-glass-card border border-slate-200 space-y-3">
-          <Loader2 className="w-8 h-8 text-[#173A7C] animate-spin mx-auto" />
-          <p className="text-xs font-black text-slate-600">جارٍ مزامنة وتحميل خدمات المتجر من قاعدة البيانات...</p>
+          <Loader2 className="w-8 h-8 text-[#0B3766] animate-spin mx-auto" />
+          <p className="text-xs font-bold text-slate-600">جارٍ مزامنة وتحميل خدمات المتجر من قاعدة البيانات...</p>
         </div>
       ) : filteredServices.length === 0 ? (
         <div className="p-12 text-center rounded-3xl liquid-glass-card border border-slate-200 space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#173A7C] flex items-center justify-center mx-auto border border-blue-100">
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#0B3766] flex items-center justify-center mx-auto border border-blue-100">
             <Briefcase className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-black text-slate-900">لا توجد خدمات مطابقة لبحثك</h3>
+            <h3 className="text-base font-bold text-slate-900">لا توجد خدمات مطابقة لبحثك</h3>
             <p className="text-xs text-slate-500 font-bold">
               جرّب تغيير خيارات البحث أو تصفية الحالة، أو أضف خدمة استشارية جديدة.
             </p>
           </div>
           <button
             onClick={handleOpenCreateModal}
-            className="px-4 py-2.5 rounded-xl bg-[#173A7C] text-white text-xs font-black inline-flex items-center gap-2 cursor-pointer shadow-xs hover:bg-[#1E4D9D]"
+            className="px-4 py-2.5 rounded-xl bg-[#0B3766] text-white text-xs font-bold inline-flex items-center gap-2 cursor-pointer shadow-xs hover:bg-[#168AD3]"
           >
             <Plus className="w-4 h-4" />
             <span>إضافة خدمة جديدة الآن</span>
@@ -579,20 +579,20 @@ export default function AdminServicesPage() {
 
                   {/* Top Status Badges */}
                   <div className="absolute top-3 right-3 left-3 flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-xl text-[11px] font-black backdrop-blur-md bg-white/90 text-[#173A7C] border border-white shadow-xs">
+                    <span className="px-3 py-1 rounded-xl text-[11px] font-bold backdrop-blur-md bg-white/90 text-[#0B3766] border border-white shadow-xs">
                       {service.category}
                     </span>
 
                     <div className="flex items-center gap-1.5">
                       {service.isFeatured && (
-                        <span className="p-1.5 rounded-xl bg-amber-500 text-white shadow-md flex items-center gap-1 text-[10px] font-black">
+                        <span className="p-1.5 rounded-xl bg-amber-500 text-white shadow-md flex items-center gap-1 text-[10px] font-bold">
                           <Star className="w-3.5 h-3.5 fill-white" />
                           <span>مميزة</span>
                         </span>
                       )}
                       <button
                         onClick={(e) => handleToggleActive(service.id, e)}
-                        className={`px-2.5 py-1 rounded-xl text-[10px] font-black border flex items-center gap-1 backdrop-blur-md cursor-pointer transition-all ${
+                        className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border flex items-center gap-1 backdrop-blur-md cursor-pointer transition-all ${
                           service.isActive
                             ? 'bg-emerald-600 text-white border-emerald-500'
                             : 'bg-slate-800/90 text-slate-300 border-slate-700'
@@ -606,13 +606,13 @@ export default function AdminServicesPage() {
                   </div>
 
                   {/* Bottom Meta on Image */}
-                  <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between text-white text-xs font-black">
+                  <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between text-white text-xs font-bold">
                     <div className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md px-2.5 py-1 rounded-xl">
                       <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
                       <span className="truncate max-w-[150px]">{service.providerName}</span>
                     </div>
                     <div className="flex items-center gap-1 bg-emerald-600/90 backdrop-blur-md px-2.5 py-1 rounded-xl shadow-xs">
-                      <span className="text-sm font-black">{service.price}</span>
+                      <span className="text-sm font-bold">{service.price}</span>
                       <span className="text-[10px]">ر.س</span>
                     </div>
                   </div>
@@ -620,7 +620,7 @@ export default function AdminServicesPage() {
 
                 {/* Content Body */}
                 <div className="p-5 space-y-3.5">
-                  <h3 className="font-black text-sm sm:text-base text-slate-900 leading-snug line-clamp-2">
+                  <h3 className="font-bold text-sm sm:text-base text-slate-900 leading-snug line-clamp-2">
                     {service.title}
                   </h3>
 
@@ -631,7 +631,7 @@ export default function AdminServicesPage() {
                   {/* Deliverables List */}
                   {service.deliverables && service.deliverables.length > 0 && (
                     <div className="space-y-1.5 pt-1">
-                      <span className="text-[10px] font-extrabold text-slate-400 block">المخرجات والضمانات:</span>
+                      <span className="text-[10px] font-bold text-slate-400 block">المخرجات والضمانات:</span>
                       <div className="space-y-1">
                         {service.deliverables.slice(0, 2).map((deliv, i) => (
                           <div key={i} className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
@@ -662,7 +662,7 @@ export default function AdminServicesPage() {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleOpenEditModal(service)}
-                    className="p-2 rounded-xl text-[#173A7C] hover:bg-blue-50 border border-slate-200 bg-white shadow-2xs transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-[#0B3766] hover:bg-blue-50 border border-slate-200 bg-white shadow-2xs transition-colors cursor-pointer"
                     title="تعديل تفاصيل الخدمة"
                   >
                     <Edit3 className="w-4 h-4" />
@@ -690,7 +690,7 @@ export default function AdminServicesPage() {
                 <Link
                   href={`/marketplace#${service.id}`}
                   target="_blank"
-                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-[#173A7C] text-[11px] font-black border border-slate-200 flex items-center gap-1 shadow-2xs transition-colors"
+                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-[#0B3766] text-[11px] font-bold border border-slate-200 flex items-center gap-1 shadow-2xs transition-colors"
                 >
                   <span>عرض</span>
                   <ExternalLink className="w-3 h-3" />
@@ -714,11 +714,11 @@ export default function AdminServicesPage() {
               {/* Fixed Header */}
               <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-3 sm:px-6 sm:py-4">
                 <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md sm:h-10 sm:w-10">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md sm:h-10 sm:w-10">
                     <Briefcase className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="truncate text-sm font-black leading-tight text-slate-900 sm:text-base">
+                    <h3 className="truncate text-sm font-bold leading-tight text-slate-900 sm:text-base">
                       {editingService.id ? 'تعديل بيانات الخدمة' : 'إضافة خدمة أو استشارة جديدة'}
                     </h3>
                     <p className="mt-0.5 hidden text-[11px] font-bold text-slate-500 sm:block">
@@ -745,14 +745,14 @@ export default function AdminServicesPage() {
                     <div className="lg:col-span-7 space-y-4">
                       {/* Title */}
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">عنوان الخدمة أو الاستشارة *</label>
+                        <label className="text-slate-700 text-xs font-bold block">عنوان الخدمة أو الاستشارة *</label>
                         <input
                           type="text"
                           required
                           value={editingService.title || ''}
                           onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
                           placeholder="مثال: جلسة استشارية فردية في التخطيط الأكاديمي..."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#173A7C] transition-colors"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0B3766] transition-colors"
                         />
                       </div>
 
@@ -760,11 +760,11 @@ export default function AdminServicesPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">
-                            <label className="text-slate-700 text-xs font-black block">التصنيف *</label>
+                            <label className="text-slate-700 text-xs font-bold block">التصنيف *</label>
                             <button
                               type="button"
                               onClick={() => setIsAddingNewCat(!isAddingNewCat)}
-                              className="text-[10px] font-black text-[#173A7C] hover:underline cursor-pointer"
+                              className="text-[10px] font-bold text-[#0B3766] hover:underline cursor-pointer"
                             >
                               {isAddingNewCat ? 'إلغاء' : '+ تصنيف جديد'}
                             </button>
@@ -782,7 +782,7 @@ export default function AdminServicesPage() {
                               <button
                                 type="button"
                                 onClick={handleAddNewCategory}
-                                className="px-3 py-2 bg-[#173A7C] text-white rounded-xl text-xs font-black cursor-pointer"
+                                className="px-3 py-2 bg-[#0B3766] text-white rounded-xl text-xs font-bold cursor-pointer"
                               >
                                 إضافة
                               </button>
@@ -791,7 +791,7 @@ export default function AdminServicesPage() {
                             <select
                               value={editingService.category || categoriesList[0]}
                               onChange={(e) => setEditingService({ ...editingService, category: e.target.value })}
-                              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white text-slate-800"
+                              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white text-slate-800"
                             >
                               {categoriesList.map((c, i) => (
                                 <option key={i} value={c}>
@@ -803,14 +803,14 @@ export default function AdminServicesPage() {
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-slate-700 text-xs font-black block">مقدم الخدمة / المشرف *</label>
+                          <label className="text-slate-700 text-xs font-bold block">مقدم الخدمة / المشرف *</label>
                           <input
                             type="text"
                             required
                             value={editingService.providerName || ''}
                             onChange={(e) => setEditingService({ ...editingService, providerName: e.target.value })}
                             placeholder="اسم الدكتور أو المشرف الأكاديمي..."
-                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C]"
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#0B3766]"
                           />
                         </div>
                       </div>
@@ -818,7 +818,7 @@ export default function AdminServicesPage() {
                       {/* Price & Duration */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div className="space-y-1">
-                          <label className="text-slate-700 text-xs font-black block">السعر (ر.س) *</label>
+                          <label className="text-slate-700 text-xs font-bold block">السعر (ر.س) *</label>
                           <input
                             type="number"
                             required
@@ -826,39 +826,39 @@ export default function AdminServicesPage() {
                             value={editingService.price || ''}
                             onChange={(e) => setEditingService({ ...editingService, price: Number(e.target.value) })}
                             placeholder="750"
-                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-black text-[#173A7C] focus:outline-none focus:border-[#173A7C]"
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-[#0B3766] focus:outline-none focus:border-[#0B3766]"
                           />
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-slate-700 text-xs font-black block">مدة التنفيذ / الجلسة *</label>
+                          <label className="text-slate-700 text-xs font-bold block">مدة التنفيذ / الجلسة *</label>
                           <input
                             type="text"
                             required
                             value={editingService.duration || ''}
                             onChange={(e) => setEditingService({ ...editingService, duration: e.target.value })}
                             placeholder="مثال: 5 أيام عمل أو 60 دقيقة"
-                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C]"
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#0B3766]"
                           />
                         </div>
                       </div>
 
                       {/* Description */}
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">الوصف التعريفي للخدمة *</label>
+                        <label className="text-slate-700 text-xs font-bold block">الوصف التعريفي للخدمة *</label>
                         <textarea
                           rows={3}
                           required
                           value={editingService.description || ''}
                           onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
                           placeholder="اشرح بالتفصيل ما تتضمنه الخدمة ومن الفئة المستهدفة..."
-                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:border-[#173A7C] resize-none leading-relaxed text-slate-800"
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:border-[#0B3766] resize-none leading-relaxed text-slate-800"
                         />
                       </div>
 
                       {/* Deliverables Checklist */}
                       <div className="space-y-2">
-                        <label className="text-slate-700 text-xs font-black block">المخرجات والضمانات المستلمة</label>
+                        <label className="text-slate-700 text-xs font-bold block">المخرجات والضمانات المستلمة</label>
                         <div className="flex gap-2">
                           <input
                             type="text"
@@ -876,7 +876,7 @@ export default function AdminServicesPage() {
                           <button
                             type="button"
                             onClick={handleAddDeliverable}
-                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs cursor-pointer transition-colors"
+                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs cursor-pointer transition-colors"
                           >
                             إضافة
                           </button>
@@ -922,7 +922,7 @@ export default function AdminServicesPage() {
 
                       {/* Publishing & Visibility Settings */}
                       <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2.5">
-                        <span className="text-xs font-black text-slate-800 block">حالة النشر والظهور في المنصة</span>
+                        <span className="text-xs font-bold text-slate-800 block">حالة النشر والظهور في المنصة</span>
                         
                         <label className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-slate-300 transition-colors">
                           <div className="flex items-center gap-2.5">
@@ -933,7 +933,7 @@ export default function AdminServicesPage() {
                             type="checkbox"
                             checked={editingService.isActive || false}
                             onChange={(e) => setEditingService({ ...editingService, isActive: e.target.checked })}
-                            className="w-4 h-4 rounded text-[#173A7C] focus:ring-0 cursor-pointer"
+                            className="w-4 h-4 rounded text-[#0B3766] focus:ring-0 cursor-pointer"
                           />
                         </label>
 
@@ -953,7 +953,7 @@ export default function AdminServicesPage() {
 
                       {/* Live Preview Card */}
                       <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-50/50 to-slate-50 border border-blue-100 space-y-1.5">
-                        <div className="flex items-center justify-between text-[11px] font-black text-[#173A7C]">
+                        <div className="flex items-center justify-between text-[11px] font-bold text-[#0B3766]">
                           <span>معاينة فورية لبطاقة المتجر:</span>
                           <span className="text-[10px] font-mono text-slate-400">Live Card</span>
                         </div>
@@ -967,12 +967,12 @@ export default function AdminServicesPage() {
                             />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className="text-xs font-black text-slate-800 truncate">
+                            <h4 className="text-xs font-bold text-slate-800 truncate">
                               {editingService.title || 'عنوان الخدمة'}
                             </h4>
                             <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold mt-1">
                               <span className="truncate max-w-[120px]">{editingService.providerName || 'مقدم الخدمة'}</span>
-                              <span className="text-[#173A7C] font-black shrink-0">{editingService.price ? `${editingService.price} ر.س` : 'مجاناً'}</span>
+                              <span className="text-[#0B3766] font-bold shrink-0">{editingService.price ? `${editingService.price} ر.س` : 'مجاناً'}</span>
                             </div>
                           </div>
                         </div>
@@ -991,14 +991,14 @@ export default function AdminServicesPage() {
                     <button
                       type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="flex-1 cursor-pointer rounded-xl px-4 py-2.5 text-xs font-black text-slate-600 transition-colors hover:bg-slate-200/60 sm:flex-none sm:py-2"
+                      className="flex-1 cursor-pointer rounded-xl px-4 py-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200/60 sm:flex-none sm:py-2"
                     >
                       إلغاء
                     </button>
                     <button
                       type="submit"
                       disabled={isSaving}
-                      className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#173A7C] px-6 py-2.5 text-xs font-black text-white shadow-md transition-all hover:bg-[#1E4D9D] disabled:opacity-50 sm:flex-none sm:py-2"
+                      className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B3766] px-6 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:bg-[#168AD3] disabled:opacity-50 sm:flex-none sm:py-2"
                     >
                       {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                       <span>{editingService.id ? 'حفظ التعديلات' : 'إنشاء ونشر الخدمة'}</span>
@@ -1025,7 +1025,7 @@ export default function AdminServicesPage() {
                 <Trash2 className="w-7 h-7" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-black text-slate-900">هل أنت متأكد من حذف هذه الخدمة؟</h3>
+                <h3 className="text-base font-bold text-slate-900">هل أنت متأكد من حذف هذه الخدمة؟</h3>
                 <p className="text-xs font-bold text-slate-500">
                   سيتم حذف الخدمة نهائياً من المتجر ولن يتمكن المتدربون من طلبها بعد الآن.
                 </p>
@@ -1033,13 +1033,13 @@ export default function AdminServicesPage() {
               <div className="flex items-center justify-center gap-3 pt-2">
                 <button
                   onClick={() => setDeleteConfirmId(null)}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-black cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold cursor-pointer"
                 >
                   تراجع
                 </button>
                 <button
                   onClick={() => handleDeleteService(deleteConfirmId)}
-                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black cursor-pointer shadow-md"
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold cursor-pointer shadow-md"
                 >
                   تأكيد الحذف
                 </button>

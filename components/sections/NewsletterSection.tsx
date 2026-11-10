@@ -17,10 +17,10 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="py-28 relative overflow-hidden bg-gradient-to-br from-white via-slate-50 to-[#173A7C]/5">
+    <section className="py-28 relative overflow-hidden bg-gradient-to-br from-white via-slate-50 to-[#0B3766]/5">
       {/* Mail Icon Watermark */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <Mail className="w-[400px] h-[400px] text-[#173A7C] opacity-[0.01]" strokeWidth={0.5} />
+        <Mail className="w-[400px] h-[400px] text-[#0B3766] opacity-[0.01]" strokeWidth={0.5} />
       </div>
 
       {/* Noise */}
@@ -37,7 +37,7 @@ export default function NewsletterSection() {
         >
           {/* Badge */}
           <span className="section-badge-glass mb-6">
-            <Mail className="w-4 h-4 text-[#5CB07C]" />
+            <Mail className="w-4 h-4 text-[#19B6C7]" />
             النشرة البريدية
           </span>
 
@@ -62,14 +62,14 @@ export default function NewsletterSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="أدخل بريدك الإلكتروني"
-                className="w-full px-6 py-3 sm:py-4 rounded-full bg-slate-50 sm:bg-transparent border border-slate-100 sm:border-none text-[#173A7C] font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none text-base text-center sm:text-right shadow-inner sm:shadow-none"
+                className="w-full px-6 py-3 sm:py-4 rounded-full bg-slate-50 sm:bg-transparent border border-slate-100 sm:border-none text-[#0B3766] font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none text-base text-center sm:text-right shadow-inner sm:shadow-none"
                 dir="rtl"
                 required
               />
             </div>
             <button
               type="submit"
-              className="btn-ripple px-10 py-4 rounded-full bg-gradient-to-r from-[#173A7C] to-[#1a4490] text-white font-bold text-base shadow-xl shadow-[#173A7C]/15 hover:shadow-2xl hover:shadow-[#173A7C]/25 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer w-full sm:w-auto min-w-[180px]"
+              className="btn-ripple px-10 py-4 rounded-full bg-gradient-to-r from-[#0B3766] to-[#1a4490] text-white font-bold text-base shadow-xl shadow-[#0B3766]/15 hover:shadow-2xl hover:shadow-[#0B3766]/25 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer w-full sm:w-auto min-w-[180px]"
             >
               {submitted ? (
                 <>
@@ -87,7 +87,7 @@ export default function NewsletterSection() {
 
           {/* Trust line */}
           <p className="mt-6 text-slate-400 text-sm font-medium flex items-center justify-center gap-1.5">
-            <svg className="w-4 h-4 text-[#5CB07C]" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-4 h-4 text-[#19B6C7]" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
             </svg>
             بياناتك في أمان تام • لا نرسل رسائل مزعجة

@@ -16,12 +16,12 @@ function SectionAccent() {
       aria-hidden="true"
       className="pointer-events-none mx-auto mt-6 flex h-10 w-44 select-none items-center justify-center gap-4 sm:w-52"
     >
-      <span className="h-px flex-1 bg-gradient-to-r from-[#173A7C]/35 to-transparent" />
+      <span className="h-px flex-1 bg-gradient-to-r from-[#0B3766]/35 to-transparent" />
       <span className="relative grid h-8 w-8 shrink-0 place-items-center">
-        <span className="absolute inset-1 rotate-45 rounded-[4px] border border-[#173A7C]/15 bg-gradient-to-br from-white to-[#5CB07C]/10" />
-        <span className="relative h-2.5 w-2.5 rotate-45 rounded-[2px] bg-gradient-to-br from-[#173A7C] to-[#5CB07C]" />
+        <span className="absolute inset-1 rotate-45 rounded-[4px] border border-[#0B3766]/15 bg-gradient-to-br from-white to-[#19B6C7]/10" />
+        <span className="relative h-2.5 w-2.5 rotate-45 rounded-[2px] bg-gradient-to-br from-[#0B3766] to-[#19B6C7]" />
       </span>
-      <span className="h-px flex-1 bg-gradient-to-l from-[#5CB07C]/45 to-transparent" />
+      <span className="h-px flex-1 bg-gradient-to-l from-[#19B6C7]/45 to-transparent" />
     </div>
   );
 }
@@ -33,17 +33,17 @@ const features = [
     label: "خبرة موثوقة",
     description:
       "نخبة من المدربين المعتمدين دولياً بخبرات تزيد عن 15 عاماً في مجالاتهم لضمان أعلى جودة تعليمية.",
-    accent: "from-[#173A7C] to-[#2B5AAD]",
-    iconSurface: "from-[#173A7C] to-[#2757A7]",
+    accent: "from-[#0B3766] to-[#2B5AAD]",
+    iconSurface: "from-[#0B3766] to-[#2757A7]",
   },
   {
     icon: Users,
-    title: "شهادات معتمدة",
+    title: "شهادات إتمام",
     label: "اعتماد مهني",
     description:
       "شهادات معترف بها دولياً وإقليمياً تعزز سيرتك الذاتية وتفتح لك آفاقاً مهنية جديدة وواسعة.",
-    accent: "from-[#2B5AAD] to-[#5CB07C]",
-    iconSurface: "from-[#245194] to-[#3A8B78]",
+    accent: "from-[#2B5AAD] to-[#19B6C7]",
+    iconSurface: "from-[#245194] to-[#168DA9]",
   },
   {
     icon: Clock,
@@ -51,8 +51,8 @@ const features = [
     label: "مرونة كاملة",
     description:
       "دورات وباقات مصممة خصيصاً لتتناسب مع جدولك. تعلم في أي وقت وبالسرعة التي تتوافق معك.",
-    accent: "from-[#5CB07C] to-[#2E8B74]",
-    iconSurface: "from-[#55AB78] to-[#287A69]",
+    accent: "from-[#19B6C7] to-[#1596B4]",
+    iconSurface: "from-[#19B6C7] to-[#118EA6]",
   },
   {
     icon: HeadphonesIcon,
@@ -60,22 +60,22 @@ const features = [
     label: "معك دائماً",
     description:
       "فريق دعم متاح لمساعدتك في رحلتك التعليمية من البداية وحتى بعد التخرج والانضمام للعمل.",
-    accent: "from-[#2E8B74] to-[#173A7C]",
-    iconSurface: "from-[#347F71] to-[#173A7C]",
+    accent: "from-[#1596B4] to-[#0B3766]",
+    iconSurface: "from-[#157F9B] to-[#0B3766]",
   },
 ];
 
 export default function WhyUsSection() {
   return (
-    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_45%,#f4faf7_100%)] py-20 sm:py-24 lg:py-28">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#173A7C]/15 to-transparent" />
-      <div className="pointer-events-none absolute -right-48 top-12 h-[520px] w-[520px] rounded-full bg-[#173A7C]/[0.055] blur-[110px]" />
-      <div className="pointer-events-none absolute -left-40 bottom-0 h-[480px] w-[480px] rounded-full bg-[#5CB07C]/[0.08] blur-[110px]" />
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_45%,#F2F9FE_100%)] py-20 sm:py-24 lg:py-28">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0B3766]/15 to-transparent" />
+      <div className="pointer-events-none absolute -right-48 top-12 h-[520px] w-[520px] rounded-full bg-[#0B3766]/[0.055] blur-[110px]" />
+      <div className="pointer-events-none absolute -left-40 bottom-0 h-[480px] w-[480px] rounded-full bg-[#19B6C7]/[0.08] blur-[110px]" />
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.025]"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 1px 1px, #173A7C 1px, transparent 0)",
+            "radial-gradient(circle at 1px 1px, #0B3766 1px, transparent 0)",
           backgroundSize: "28px 28px",
         }}
       />
@@ -89,8 +89,8 @@ export default function WhyUsSection() {
           className="mx-auto mb-12 max-w-3xl text-center sm:mb-14"
         >
           <span className="section-badge-glass mb-5">
-            <CheckCircle2 className="h-4 w-4 text-[#5CB07C]" />
-            لماذا النبض المستدام؟
+            <CheckCircle2 className="h-4 w-4 text-[#19B6C7]" />
+            لماذا مَدار للتعلّم؟
           </span>
 
           <h2 className="section-main-title-premium mb-5 mt-1">
@@ -120,33 +120,33 @@ export default function WhyUsSection() {
                     delay: index * 0.08,
                     ease: [0.22, 1, 0.36, 1],
                   }}
-                  className="group relative min-h-[285px] overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(248,250,252,0.92))] p-5 text-right shadow-[0_12px_35px_-25px_rgba(15,23,42,0.4)] transition-all duration-500 hover:-translate-y-1.5 hover:border-[#5CB07C]/35 hover:shadow-[0_28px_55px_-28px_rgba(23,58,124,0.36)] sm:p-6"
+                  className="group relative min-h-[285px] pf-card-equal overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-[linear-gradient(145deg,rgba(11,55,102,0.08),rgba(11,55,102,0.08))] p-5 text-right shadow-[0_12px_35px_-25px_rgba(11,55,102,0.12)] transition-all duration-500 hover:-translate-y-1.5 hover:border-[#19B6C7]/35 hover:shadow-[0_28px_55px_-28px_rgba(11,55,102,0.18)] sm:p-6"
                 >
                   <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${feature.accent}`} />
-                  <div className="pointer-events-none absolute -left-16 -top-16 h-40 w-40 rounded-full bg-[#5CB07C]/[0.07] blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="pointer-events-none absolute -left-16 -top-16 h-40 w-40 rounded-full bg-[#19B6C7]/[0.07] blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
 
                   <div className="relative z-10 flex h-full flex-col">
                     <div className="mb-7 flex items-start justify-between gap-4">
-                      <div className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${feature.iconSurface} text-white shadow-[0_12px_24px_-12px_rgba(23,58,124,0.65)] ring-4 ring-white transition-transform duration-500 group-hover:-rotate-3 group-hover:scale-105`}>
+                      <div className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${feature.iconSurface} text-white shadow-[0_12px_24px_-12px_rgba(11,55,102,0.12)] ring-4 ring-white transition-transform duration-500 group-hover:-rotate-3 group-hover:scale-105`}>
                         <Icon className="h-6 w-6" strokeWidth={1.8} />
                       </div>
 
-                      <span className="font-mono text-3xl font-black tracking-tighter text-slate-200 transition-colors duration-500 group-hover:text-[#173A7C]/15">
+                      <span className="font-mono text-3xl font-bold tracking-tighter text-slate-200 transition-colors duration-500 group-hover:text-[#0B3766]/15">
                         {String(index + 1).padStart(2, "0")}
                       </span>
                     </div>
 
-                    <span className="mb-2 text-[11px] font-black tracking-wide text-[#2E8B68]">
+                    <span className="mb-2 text-[11px] font-bold tracking-wide text-[#16A0B6]">
                       {feature.label}
                     </span>
-                    <h3 className="mb-3 text-lg font-black text-[#173A7C] sm:text-xl">
+                    <h3 className="mb-3 text-base font-bold leading-[1.6] text-[#0B3766] sm:text-xl sm:leading-[1.4]">
                       {feature.title}
                     </h3>
-                    <p className="text-[13px] font-semibold leading-[1.9] text-slate-600">
+                    <p className="text-[14px] font-medium leading-[1.95] text-slate-600 sm:text-[13px] sm:leading-[1.9]">
                       {feature.description}
                     </p>
 
-                    <div className="mt-auto flex items-center justify-end pt-5 text-[#173A7C]/35 transition-colors duration-300 group-hover:text-[#5CB07C]">
+                    <div className="mt-auto pf-card-equal__cta flex items-center justify-end pt-5 text-[#0B3766]/35 transition-colors duration-300 group-hover:text-[#19B6C7]">
                       <ArrowUpLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
                     </div>
                   </div>

@@ -30,16 +30,16 @@ export function CartDrawer() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-              className="w-screen max-w-md bg-white/95 backdrop-blur-2xl shadow-2xl border-l border-slate-200/80 flex flex-col justify-between overflow-hidden"
+              className="w-full max-w-md bg-white/95 backdrop-blur-2xl shadow-2xl border-l border-slate-200/80 flex flex-col justify-between overflow-hidden"
             >
               {/* Header */}
               <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-l from-slate-50/80 to-white">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#173A7C] to-[#2F66D6] flex items-center justify-center text-white shadow-md shadow-[#173A7C]/20">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#0B3766] to-[#168AD3] flex items-center justify-center text-white shadow-md shadow-[#0B3766]/20">
                     <ShoppingBag className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-black text-slate-900 leading-tight">سلة المشتريات</h2>
+                    <h2 className="text-lg font-bold text-slate-900 leading-tight">سلة المشتريات</h2>
                     <p className="text-xs text-slate-500 font-bold">{cartCount} {cartCount === 1 ? 'دورة تدريبية' : 'دورات تدريبية'}</p>
                   </div>
                 </div>
@@ -61,7 +61,7 @@ export function CartDrawer() {
                       <ShoppingBag className="w-10 h-10 stroke-[1.5]" />
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-base font-black text-slate-800">سلتك فارغة حالياً</h3>
+                      <h3 className="text-base font-bold text-slate-800">سلتك فارغة حالياً</h3>
                       <p className="text-xs text-slate-500 max-w-xs font-medium">
                         تصفح أحدث البرامج والدبلومات المعتمدة وأضف ما يناسب أهدافك المهنية.
                       </p>
@@ -69,7 +69,7 @@ export function CartDrawer() {
                     <Link
                       href="/courses"
                       onClick={closeCart}
-                      className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#173A7C] text-white text-xs font-black shadow-md shadow-[#173A7C]/20 hover:bg-[#1E4D9D] transition-all cursor-pointer"
+                      className="mt-2 inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0B3766] text-white text-xs font-bold shadow-md shadow-[#0B3766]/20 hover:bg-[#168AD3] transition-all cursor-pointer"
                     >
                       <span>تصفح الدورات</span>
                       <ArrowLeft className="w-4 h-4" />
@@ -95,11 +95,11 @@ export function CartDrawer() {
                       </div>
 
                       <div className="flex-1 min-w-0 pr-1">
-                        <h4 className="text-xs sm:text-sm font-black text-slate-900 line-clamp-1 group-hover:text-[#173A7C] transition-colors">
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-900 line-clamp-1 group-hover:text-[#0B3766] transition-colors">
                           {item.title}
                         </h4>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs font-black text-[#0D5C3A]">
+                          <span className="text-xs font-bold text-[#168AD3]">
                             {Number(item.price) === 0 ? 'مجاناً' : `${item.price} ر.س`}
                           </span>
                           {item.duration && (
@@ -130,9 +130,9 @@ export function CartDrawer() {
                       <span>المجموع الفرعي:</span>
                       <span>{totalPrice} ر.س</span>
                     </div>
-                    <div className="flex items-center justify-between text-base font-black text-slate-900 pt-1 border-t border-slate-100">
+                    <div className="flex items-center justify-between text-base font-bold text-slate-900 pt-1 border-t border-slate-100">
                       <span>الإجمالي النهائي:</span>
-                      <span className="text-lg text-[#173A7C]">{totalPrice} ر.س</span>
+                      <span className="text-lg text-[#0B3766]">{totalPrice} ر.س</span>
                     </div>
                   </div>
 
@@ -140,7 +140,7 @@ export function CartDrawer() {
                     <Link
                       href={`/checkout?cart=true`}
                       onClick={closeCart}
-                      className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#0D5C3A] via-[#127A4D] to-[#0D5C3A] hover:from-[#127A4D] hover:to-[#0D5C3A] text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#0D5C3A]/25 hover:shadow-xl transition-all cursor-pointer"
+                      className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#0B3766] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#0B3766]/25 hover:shadow-xl transition-all cursor-pointer"
                     >
                       <ShoppingBag aria-hidden="true" className="w-4 h-4" />
                       <span>إتمام الطلب والتسجيل</span>

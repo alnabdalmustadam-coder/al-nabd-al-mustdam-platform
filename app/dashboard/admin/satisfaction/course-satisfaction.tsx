@@ -28,7 +28,7 @@ function FeedbackRow({ item }: { item: SatisfactionContent }) {
   const Icon = quiz ? ClipboardCheck : BookOpen;
   const title = item.title || (quiz ? 'اختبار الدورة' : 'درس الدورة');
   return <li className={styles.row}>
-    <span className={`flex h-7 w-7 items-center justify-center rounded-lg border border-white/80 ${quiz ? 'bg-amber-50/90 text-amber-700' : 'bg-blue-50/90 text-[#173A7C]'}`}><Icon aria-hidden="true" className="h-3.5 w-3.5" /><span className="sr-only">{quiz ? 'اختبار' : 'درس'}</span></span>
+    <span className={`flex h-7 w-7 items-center justify-center rounded-lg border border-white/80 ${quiz ? 'bg-amber-50/90 text-amber-700' : 'bg-blue-50/90 text-[#0B3766]'}`}><Icon aria-hidden="true" className="h-3.5 w-3.5" /><span className="sr-only">{quiz ? 'اختبار' : 'درس'}</span></span>
     <p title={title} className={styles.rowTitle}>{title}</p>
     <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-rose-100/70 bg-rose-50/90 px-2 py-1 text-[11px] font-semibold tabular-nums text-rose-700" aria-label={`${number(item.hearts)} قلب رضا`}><Heart aria-hidden="true" className="h-3 w-3" /><bdi>{number(item.hearts)}</bdi></span>
   </li>;

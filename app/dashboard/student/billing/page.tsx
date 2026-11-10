@@ -163,8 +163,8 @@ export default function StudentBillingPage() {
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2.5 sm:space-y-3 pr-2">
-            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50 text-[#173A7C] border border-blue-200/80 shadow-xs">
-              <CreditCard className="w-3.5 h-3.5 text-[#173A7C]" />
+            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50 text-[#0B3766] border border-blue-200/80 shadow-xs">
+              <CreditCard className="w-3.5 h-3.5 text-[#0B3766]" />
               <span>سجل المعاملات والعمليات المالية</span>
             </motion.div>
 
@@ -178,11 +178,11 @@ export default function StudentBillingPage() {
           </div>
 
           <motion.div variants={textItemVariants} className="p-4 sm:p-5 rounded-2xl bg-white/80 border border-white/90 backdrop-blur-md text-right shrink-0 min-w-48 shadow-sm">
-            <span className="text-[11px] font-black text-slate-500 block">إجمالي المدفوعات المسجلة</span>
-            <span className="text-xl sm:text-2xl font-black text-[#173A7C]">
+            <span className="text-[11px] font-bold text-slate-500 block">إجمالي المدفوعات المسجلة</span>
+            <span className="text-xl sm:text-2xl font-bold text-[#0B3766]">
               {loading ? '...' : formatAmount(totalPaid)}
             </span>
-            <span className="text-[10px] font-extrabold text-[#0D5C3A] flex items-center gap-1.5 mt-1">
+            <span className="text-[10px] font-bold text-[#0D5C3A] flex items-center gap-1.5 mt-1">
               <CheckCheck className="w-3.5 h-3.5 text-[#0D5C3A]" />
               <span>مكتملة وموثقة ضريبياً</span>
             </span>
@@ -199,17 +199,17 @@ export default function StudentBillingPage() {
         className="relative overflow-hidden rounded-2xl sm:rounded-[28px] p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 liquid-glass-card liquid-glass-hover student-card-accent"
       >
         <div className="flex items-center gap-4">
-          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 shrink-0">
+          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20 shrink-0">
             <ShieldCheck className="w-6 h-6 text-emerald-400" />
           </div>
           <div>
             <div className="flex items-center gap-2.5">
               <h3 className="student-heading-h3 text-xs sm:text-base">حساب المتدرب النشط</h3>
-              <span className="text-xs font-black text-white px-4 py-1.5 rounded-full bg-emerald-500 border border-emerald-400 shadow-xs whitespace-nowrap">
+              <span className="text-xs font-bold text-white px-4 py-1.5 rounded-full bg-emerald-500 border border-emerald-400 shadow-xs whitespace-nowrap">
                 عضوية نشطة
               </span>
             </div>
-            <p className="text-xs text-slate-600 font-extrabold mt-1.5 leading-relaxed">
+            <p className="text-xs text-slate-600 font-bold mt-1.5 leading-relaxed">
               جميع الاشتراكات والوصول للمواد التدريبية محدثة ومفعلة بشكل كامل.
             </p>
           </div>
@@ -225,7 +225,7 @@ export default function StudentBillingPage() {
           custom={2}
           className="flex items-center justify-between pr-1"
         >
-          <h2 className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]">
+          <h2 className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#19B6C7]">
             <div className="p-1.5 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
               <Receipt className="w-4 h-4" />
             </div>
@@ -235,16 +235,16 @@ export default function StudentBillingPage() {
 
         {loading ? (
           <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+            <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
             <p className="text-xs font-bold text-slate-500">جاري تحميل السجل المالي...</p>
           </div>
         ) : orders.length === 0 ? (
           <div className="p-10 sm:p-14 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-4">
-            <div className="w-16 h-16 rounded-3xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center mx-auto">
+            <div className="w-16 h-16 rounded-3xl bg-[#0B3766]/10 text-[#0B3766] flex items-center justify-center mx-auto">
               <CreditCard className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-lg font-black text-slate-900">لا توجد فواتير مسجلة بعد</h3>
+              <h3 className="text-lg font-bold text-slate-900">لا توجد فواتير مسجلة بعد</h3>
               <p className="text-xs font-bold text-slate-500 max-w-md mx-auto">
                 ستظهر هنا جميع الفواتير والمعاملات المالية بمجرد اشتراكك في أي برنامج تدريبي.
               </p>
@@ -266,13 +266,13 @@ export default function StudentBillingPage() {
                 >
                   <div className="space-y-3 flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2.5 text-xs">
-                      <span className="font-mono font-black text-xs text-[#173A7C] bg-blue-50/90 border border-blue-200/80 px-3.5 py-1.5 rounded-xl shadow-2xs">
+                      <span className="font-mono font-bold text-xs text-[#0B3766] bg-blue-50/90 border border-blue-200/80 px-3.5 py-1.5 rounded-xl shadow-2xs">
                         {order.order_number}
                       </span>
                       <span className="px-3.5 py-1.5 rounded-xl bg-slate-100/80 text-slate-600 font-bold text-xs border border-slate-200/60">
                         {formatDate(order.created_at)}
                       </span>
-                      <span className={`px-4 py-1.5 rounded-full font-black text-xs border shadow-xs flex items-center gap-1.5 whitespace-nowrap ${statusInfo.color}`}>
+                      <span className={`px-4 py-1.5 rounded-full font-bold text-xs border shadow-xs flex items-center gap-1.5 whitespace-nowrap ${statusInfo.color}`}>
                         <StatusIcon className="w-3.5 h-3.5" />
                         <span>{statusInfo.label}</span>
                       </span>
@@ -281,8 +281,8 @@ export default function StudentBillingPage() {
                     <h3 className="student-heading-h3 text-xs sm:text-base pt-0.5">
                       {getCourseName(order)}
                     </h3>
-                    <p className="text-xs text-slate-600 font-extrabold">
-                      طريقة الدفع: <strong className="text-[#173A7C]">{getPaymentMethodLabel(order.payment_gateway)}</strong>
+                    <p className="text-xs text-slate-600 font-bold">
+                      طريقة الدفع: <strong className="text-[#0B3766]">{getPaymentMethodLabel(order.payment_gateway)}</strong>
                       {order.discount_amount > 0 && (
                         <span className="mr-3 text-emerald-700">خصم: {formatAmount(order.discount_amount)}</span>
                       )}
@@ -291,13 +291,13 @@ export default function StudentBillingPage() {
 
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between md:justify-end gap-4 sm:gap-6 w-full md:w-auto shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-slate-200/60">
                     <div className="text-right">
-                      <span className="text-[11px] text-slate-500 font-black block">المبلغ المدفوع</span>
-                      <span className="text-base sm:text-xl font-black text-[#173A7C]">{formatAmount(order.final_amount)}</span>
+                      <span className="text-[11px] text-slate-500 font-bold block">المبلغ المدفوع</span>
+                      <span className="text-base sm:text-xl font-bold text-[#0B3766]">{formatAmount(order.final_amount)}</span>
                     </div>
 
                     <button
                       onClick={() => alert(`جاري تنزيل الفاتورة الضريبية رقم ${order.order_number}`)}
-                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-[#173A7C]/20 transition-all cursor-pointer whitespace-nowrap"
+                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-[#0B3766]/20 transition-all cursor-pointer whitespace-nowrap"
                     >
                       <Download className="w-4 h-4" />
                       <span>تنزيل الفاتورة PDF</span>

@@ -8,7 +8,6 @@ import {
   ShieldAlert, Globe, CreditCard, ChevronLeft, ChevronRight,
   UserPlus, ShieldCheck
 } from "lucide-react";
-import { submitToGHL } from "@/lib/ghl";
 
 interface FormState {
   firstName: string;
@@ -67,7 +66,7 @@ const CustomDropdown = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-5 py-4 rounded-[20px] bg-white border border-slate-200 text-slate-900 focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 outline-none transition-all duration-300 text-[15px] font-medium shadow-sm hover:border-slate-300 flex items-center justify-between text-right cursor-pointer"
+        className="w-full px-5 py-4 rounded-[20px] bg-white border border-slate-200 text-slate-900 focus:border-[#0B3766] focus:ring-2 focus:ring-[#0B3766]/15 outline-none transition-all duration-300 text-[15px] font-medium shadow-sm hover:border-slate-300 flex items-center justify-between text-right cursor-pointer"
       >
         <span className={value ? "text-slate-900 font-bold" : "text-slate-400"}>
           {displayValue}
@@ -97,8 +96,8 @@ const CustomDropdown = ({
                     }}
                     className={`w-full text-right px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                       value === item.value
-                        ? "bg-[#173A7C]/5 text-[#173A7C]"
-                        : "text-slate-700 hover:bg-slate-50 hover:text-[#173A7C]"
+                        ? "bg-[#0B3766]/5 text-[#0B3766]"
+                        : "text-slate-700 hover:bg-slate-50 hover:text-[#0B3766]"
                     }`}
                   >
                     {item.label}
@@ -150,13 +149,6 @@ export default function SubscriptionPage() {
         body: JSON.stringify({ type: "subscription", ...form }),
       });
 
-      // Submit to GHL from client-side
-      await submitToGHL({
-        name: `${form.firstName} ${form.surname}`,
-        email: form.email,
-        phone: form.phone,
-      });
-
       if (res.ok) {
         setSubmitted(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -187,10 +179,10 @@ export default function SubscriptionPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.85, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.85, y: 20 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="relative bg-white rounded-[2rem] p-8 sm:p-10 max-w-sm w-full shadow-[0_30px_80px_-15px_rgba(23,58,124,0.3)] border border-slate-100 text-center overflow-hidden"
+            className="relative bg-white rounded-[2rem] p-8 sm:p-10 max-w-sm w-full shadow-[0_30px_80px_-15px_rgba(11,55,102,0.12)] border border-slate-100 text-center overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#173A7C] via-[#2E5EA6] to-[#5CB07C]" />
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0B3766] via-[#2E5EA6] to-[#19B6C7]" />
             <div className={`absolute top-0 right-0 w-40 h-40 rounded-bl-full pointer-events-none ${alertModal.type === "error" ? "bg-gradient-to-bl from-red-500/[0.04]" : "bg-gradient-to-bl from-amber-500/[0.04]"} to-transparent`} />
             <div className="mb-5"><img src="/logo.svg" alt="Logo" className="h-10 mx-auto object-contain" /></div>
             <div className={`w-16 h-16 mx-auto mb-5 rounded-2xl flex items-center justify-center shadow-lg ${
@@ -204,9 +196,9 @@ export default function SubscriptionPage() {
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
               )}
             </div>
-            <h3 className="text-xl font-black text-slate-900 mb-3">{alertModal.type === "error" ? "خطأ!" : "تنبيه!"}</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-3">{alertModal.type === "error" ? "خطأ!" : "تنبيه!"}</h3>
             <p className="text-sm text-slate-500 font-medium leading-relaxed mb-7">{alertModal.message}</p>
-            <button onClick={() => setAlertModal((p) => ({ ...p, open: false }))} className="w-full py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#173A7C] to-[#2E5EA6] shadow-lg shadow-[#173A7C]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all">حسناً، فهمت</button>
+            <button onClick={() => setAlertModal((p) => ({ ...p, open: false }))} className="w-full py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#0B3766] to-[#2E5EA6] shadow-lg shadow-[#0B3766]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all">حسناً، فهمت</button>
           </motion.div>
         </motion.div>
       )}
@@ -214,7 +206,7 @@ export default function SubscriptionPage() {
   );
 
   /* ═══ Input field helper ═══ */
-  const inputClass = "w-full px-5 py-4 rounded-[20px] bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 outline-none transition-all duration-300 text-[15px] font-medium shadow-sm hover:border-slate-300";
+  const inputClass = "w-full px-5 py-4 rounded-[20px] bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#0B3766] focus:ring-2 focus:ring-[#0B3766]/15 outline-none transition-all duration-300 text-[15px] font-medium shadow-sm hover:border-slate-300";
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -232,15 +224,15 @@ export default function SubscriptionPage() {
         <section className="relative px-4 sm:px-6 mb-12 max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} className="mb-8">
             <div className="relative inline-block">
-                <div className="absolute inset-0 bg-[#173A7C]/10 blur-[50px] rounded-full" />
-                <img src="/logo.svg" alt="Sustain Pulse Logo" className="h-20 sm:h-28 mx-auto relative z-10 mb-6 drop-shadow-2xl" />
+                <div className="absolute inset-0 bg-[#0B3766]/10 blur-[50px] rounded-full" />
+                <img src="/logo.svg" alt="Madar Learning Logo" className="h-20 sm:h-28 mx-auto relative z-10 mb-6 drop-shadow-2xl" />
             </div>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
             <div className="mb-6">
               <span className="section-badge-glass">
-                <UserPlus aria-hidden="true" className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+                <UserPlus aria-hidden="true" className="w-4 h-4 text-[#0B3766] ml-1 inline" />
                 نموذج التسجيل بالموقع
               </span>
             </div>
@@ -259,11 +251,11 @@ export default function SubscriptionPage() {
                         <ShieldAlert className="w-6 h-6 text-red-500" />
                     </div>
                     <div>
-                        <h4 className="text-red-700 font-black text-lg mb-2">تنبيه هام جداً</h4>
+                        <h4 className="text-red-700 font-bold text-lg mb-2">تنبيه هام جداً</h4>
                         <div className="space-y-3 text-[14px] text-slate-600 font-bold leading-relaxed">
                             <p>• الرجاء التأكد من أن كل بياناتك مكتوبة بطريقة صحيحة، حيث أن تلك البيانات تحتاجها إدارة معهد القمة للتدريب من أجل إصدار الشهادات المعتمدة للدارسين.</p>
                             <p>• إدارة المعهد تعلن عدم مسئوليتها عن أية بيانات خاطئة من شأنها تعطيل إصدار شهادات الدورات أو إصدارها ببيانات خاطئة حيث أن ذلك يعود على المتدرب الذي لم يتأكد من إدخال بياناته بصورة صحيحة، وعليه ..</p>
-                            <p>• يتحمل المتدرب كافة التكاليف الخاصة بإعادة إصدار شهادة حضور دورة معتمدة مرة أخرى.</p>
+                            <p>• يتحمل المتدرب كافة التكاليف الخاصة بإعادة إصدار شهادة حضور دورة مهنية مرة أخرى.</p>
                         </div>
                     </div>
                 </div>
@@ -273,11 +265,11 @@ export default function SubscriptionPage() {
             <div className="mt-10 max-w-sm mx-auto">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-slate-400">بيانات الشهادة</span>
-                <span className="text-xs font-black text-[#5CB07C]">{progress}%</span>
+                <span className="text-xs font-bold text-[#19B6C7]">{progress}%</span>
               </div>
               <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full"
+                  className="h-full bg-gradient-to-r from-[#0B3766] to-[#19B6C7] rounded-full"
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.5 }}
                 />
@@ -290,13 +282,13 @@ export default function SubscriptionPage() {
           {submitted ? (
             /* ═══════════ SUCCESS STATE ═══════════ */
             <motion.section key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="max-w-2xl mx-auto px-4 sm:px-6">
-              <div className="bg-white rounded-[2.5rem] p-10 sm:p-16 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.1)] text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#173A7C]/[0.02] to-[#5CB07C]/[0.03] pointer-events-none" />
+              <div className="bg-white rounded-[2.5rem] p-10 sm:p-16 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0B3766]/[0.02] to-[#19B6C7]/[0.03] pointer-events-none" />
                 <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: "spring" }} className="relative z-10">
-                  <div className="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-[#173A7C] to-[#5CB07C] flex items-center justify-center shadow-2xl shadow-[#173A7C]/25">
+                  <div className="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-[#0B3766] to-[#19B6C7] flex items-center justify-center shadow-2xl shadow-[#0B3766]/25">
                     <ShieldCheck className="w-14 h-14 text-white" />
                   </div>
-                  <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">تم التسجيل بنجاح!</h2>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">تم التسجيل بنجاح!</h2>
                   <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-md mx-auto mb-8">
                     شكراً لتسجيلك في الموقع. تم حفظ بياناتك لدى إدارة معهد القمة للتدريب لاستخدامها في إصدار شهاداتك المعتمدة.
                   </p>
@@ -311,8 +303,8 @@ export default function SubscriptionPage() {
                 {/* ─── Part 1: Full Arabic Name ─── */}
                 <div className="mb-12">
                   <div className="flex items-center gap-3 mb-8 justify-end">
-                    <h2 className="text-xl font-black text-slate-900">المعلومات الشخصية</h2>
-                    <User className="w-6 h-6 text-[#173A7C]" />
+                    <h2 className="text-xl font-bold text-slate-900">المعلومات الشخصية</h2>
+                    <User className="w-6 h-6 text-[#0B3766]" />
                   </div>
 
                   <label className="block text-sm font-bold text-slate-700 mb-4">الاسم الرباعي باللغة العربية (كما يظهر في الهوية)</label>
@@ -335,7 +327,7 @@ export default function SubscriptionPage() {
                 {/* ─── Part 2: ID and Nationality ─── */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 relative">
                   <div className="relative z-[50]">
-                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">الجنسية <Globe className="w-4 h-4 text-[#173A7C]" /></label>
+                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">الجنسية <Globe className="w-4 h-4 text-[#0B3766]" /></label>
                     <CustomDropdown
                       value={form.nationality}
                       onChange={(val) => updateForm("nationality", val)}
@@ -344,7 +336,7 @@ export default function SubscriptionPage() {
                     />
                   </div>
                   <div>
-                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">رقم الهوية <CreditCard className="w-4 h-4 text-[#173A7C]" /></label>
+                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">رقم الهوية <CreditCard className="w-4 h-4 text-[#0B3766]" /></label>
                     <input type="text" value={form.idNumber} onChange={(e) => updateForm("idNumber", e.target.value)} className={inputClass} placeholder="أدخل رقم الهوية أو الإقامة" />
                   </div>
                 </div>
@@ -352,15 +344,15 @@ export default function SubscriptionPage() {
                 {/* ─── Part 3: Contact and Education ─── */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                   <div>
-                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">رقم الجوال <Phone className="w-4 h-4 text-[#173A7C]" /></label>
+                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">رقم الجوال <Phone className="w-4 h-4 text-[#0B3766]" /></label>
                     <input type="tel" value={form.phone} onChange={(e) => updateForm("phone", e.target.value)} dir="ltr" className={`${inputClass} text-right`} placeholder="05XXXXXXXX" />
                   </div>
                   <div>
-                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">المؤهل الدراسي <GraduationCap className="w-4 h-4 text-[#173A7C]" /></label>
+                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">المؤهل الدراسي <GraduationCap className="w-4 h-4 text-[#0B3766]" /></label>
                     <input type="text" value={form.qualification} onChange={(e) => updateForm("qualification", e.target.value)} className={inputClass} placeholder="أدخل مؤهلك الدراسي" />
                   </div>
                   <div>
-                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">البريد الإلكتروني <Mail className="w-4 h-4 text-[#173A7C]" /></label>
+                    <label className="flex items-center justify-end gap-2 text-sm font-bold text-slate-700 mb-2.5">البريد الإلكتروني <Mail className="w-4 h-4 text-[#0B3766]" /></label>
                     <input type="email" value={form.email} onChange={(e) => updateForm("email", e.target.value)} className={inputClass} placeholder="example@domain.com" />
                   </div>
                 </div>
@@ -368,7 +360,7 @@ export default function SubscriptionPage() {
                 {/* Terms & Conditions */}
                 <div className="flex items-start gap-3 py-4 px-1 justify-end">
                   <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
-                    أوافق على <span className="text-[#173A7C] font-bold">الشروط والأحكام</span> و <span className="text-[#173A7C] font-bold">سياسة الخصوصية</span>
+                    أوافق على <span className="text-[#0B3766] font-bold">الشروط والأحكام</span> و <span className="text-[#0B3766] font-bold">سياسة الخصوصية</span>
                   </label>
                   <input
                     type="checkbox"
@@ -376,13 +368,13 @@ export default function SubscriptionPage() {
                     required
                     checked={agreed}
                     onChange={(e) => setAgreed(e.target.checked)}
-                    className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                    className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#0B3766] focus:ring-[#0B3766]"
                   />
                 </div>
 
                 {/* Submit button */}
                 <div className="flex justify-start">
-                  <Button type="submit" size="lg" className="px-14 shadow-2xl shadow-[#173A7C]/30 group rounded-full" disabled={loading || !agreed}>
+                  <Button type="submit" size="lg" className="px-14 shadow-2xl shadow-[#0B3766]/30 group rounded-full" disabled={loading || !agreed}>
                     {loading ? "جاري الإرسال..." : <span className="flex items-center gap-3">إشتراك <Send className="w-5 h-5 rtl:rotate-180" /></span>}
                   </Button>
                 </div>

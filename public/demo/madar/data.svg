@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650">
+<defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" stroke="#FFF" stroke-opacity=".11" fill="none"/></pattern></defs>
+<rect width="1200" height="650" fill="#354961"/><rect width="1200" height="650" fill="url(#grid)"/>
+<g fill="none" stroke="#DDF579" stroke-width="4" opacity=".82"><path d="M310 435h560M370 402V315m110 87V245m110 157V284m110 118V190m110 212V127" stroke-width="24"/></g>
+<circle cx="1040" cy="115" r="51" fill="none" stroke="#B8D8C1" opacity=".6"/><circle cx="1040" cy="115" r="7" fill="#DDF579"/>
+<text x="64" y="589" fill="#D7E9DA" font-family="Arial,sans-serif" font-size="22" letter-spacing="4">MADAR LEARNING</text></svg>

@@ -17,7 +17,6 @@ import {
   AlertCircle,
   Copy,
   Check,
-  Sparkles,
   X,
   Trash2,
   Loader2,
@@ -94,7 +93,7 @@ export default function AdminLiveSessionsPage() {
       const { error } = await supabase.from('live_sessions').insert({
         title: sessionTitle,
         course_id: sessionCourse,
-        meeting_url: sessionUrl || 'https://zoom.us',
+        meeting_url: sessionUrl || '/demo',
         platform: sessionPlatform,
         scheduled_at: scheduledDateTime,
         duration_minutes: parseInt(sessionDuration) || 60,
@@ -154,7 +153,7 @@ export default function AdminLiveSessionsPage() {
               <span className="sm:hidden">القاعات واللقاءات الحية</span>
               <span className="hidden sm:inline">القاعات الافتراضية واللقاءات الحية</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
+            <h1 className="text-xl sm:text-2xl font-bold student-heading-h1">
               <span className="sm:hidden">البث المباشر والورش</span>
               <span className="hidden sm:inline">إدارة <span className="student-name-gradient">البث المباشر والورش الحية</span> 🔴</span>
             </h1>
@@ -165,7 +164,7 @@ export default function AdminLiveSessionsPage() {
 
           <button
             onClick={() => setIsScheduleModalOpen(true)}
-            className={`${heroStyles.soloAction} px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer whitespace-nowrap`}
+            className={`${heroStyles.soloAction} px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all cursor-pointer whitespace-nowrap`}
           >
             <Plus className="w-4 h-4" />
             <span>جدولة لقاء مباشر</span>
@@ -176,13 +175,13 @@ export default function AdminLiveSessionsPage() {
       {/* Sessions List */}
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل الجلسات المباشرة...</p>
         </div>
       ) : sessions.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
-          <Radio className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
-          <h3 className="text-base font-black text-slate-900">لا توجد جلسات مباشرة مجدولة</h3>
+          <Radio className="w-12 h-12 text-[#0B3766]/30 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">لا توجد جلسات مباشرة مجدولة</h3>
         </div>
       ) : (
         <div className="space-y-4">
@@ -206,16 +205,16 @@ export default function AdminLiveSessionsPage() {
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200/60 pb-3">
                   <div>
-                    <span className="text-xs font-black text-emerald-700">{s.course_id || 'عام'}</span>
+                    <span className="text-xs font-bold text-emerald-700">{s.course_id || 'عام'}</span>
                     <h3 className="student-heading-h3 pt-1">{s.title}</h3>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-black border ${
+                      className={`px-3 py-1 rounded-full text-xs font-bold border ${
                         s.status === 'live'
                           ? 'bg-red-50 text-red-700 border-red-300 animate-pulse'
-                          : 'bg-blue-50 text-[#173A7C] border-blue-300'
+                          : 'bg-blue-50 text-[#0B3766] border-blue-300'
                       }`}
                     >
                       {s.status === 'live' ? 'مباشر الآن 🔴' : 'مجدول 📅'}
@@ -233,11 +232,11 @@ export default function AdminLiveSessionsPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-bold text-slate-600">
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4 text-[#173A7C]" />
+                      <Calendar className="w-4 h-4 text-[#0B3766]" />
                       <span>{dateStr}</span>
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-[#173A7C]" />
+                      <Clock className="w-4 h-4 text-[#0B3766]" />
                       <span>{timeStr} ({s.duration_minutes} دقيقة)</span>
                     </span>
                   </div>
@@ -246,7 +245,7 @@ export default function AdminLiveSessionsPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleCopyLink(s.id, s.meeting_url)}
-                        className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-black flex items-center gap-1.5 cursor-pointer"
+                        className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                       >
                         {copiedId === s.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                         <span>نسخ الرابط</span>
@@ -255,7 +254,7 @@ export default function AdminLiveSessionsPage() {
                         href={s.meeting_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-1.5 rounded-xl bg-[#173A7C] text-white text-xs font-black flex items-center gap-1.5 hover:bg-[#1E4D9D]"
+                        className="px-4 py-1.5 rounded-xl bg-[#0B3766] text-white text-xs font-bold flex items-center gap-1.5 hover:bg-[#168AD3]"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>فتح القاعة ({s.platform || 'Zoom'})</span>
@@ -296,67 +295,67 @@ export default function AdminLiveSessionsPage() {
 
               <form onSubmit={handleCreateSession} className="space-y-3.5">
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">عنوان الجلسة / الورشة</label>
+                  <label className="text-xs font-bold text-slate-700">عنوان الجلسة / الورشة</label>
                   <input
                     type="text"
                     required
                     value={sessionTitle}
                     onChange={(e) => setSessionTitle(e.target.value)}
                     placeholder="مثال: ورشة التطبيقات العملية في الحوار"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">رمز الدورة / المسار</label>
+                  <label className="text-xs font-bold text-slate-700">رمز الدورة / المسار</label>
                   <input
                     type="text"
                     value={sessionCourse}
                     onChange={(e) => setSessionCourse(e.target.value)}
                     placeholder="diploma-tolerance-citizenship"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">تاريخ الجلسة</label>
+                    <label className="text-xs font-bold text-slate-700">تاريخ الجلسة</label>
                     <input
                       type="date"
                       required
                       value={sessionDate}
                       onChange={(e) => setSessionDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">وقت البدء</label>
+                    <label className="text-xs font-bold text-slate-700">وقت البدء</label>
                     <input
                       type="time"
                       value={sessionTime}
                       onChange={(e) => setSessionTime(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">المدة (بالدقائق)</label>
+                    <label className="text-xs font-bold text-slate-700">المدة (بالدقائق)</label>
                     <input
                       type="number"
                       min="15"
                       value={sessionDuration}
                       onChange={(e) => setSessionDuration(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">المنصة</label>
+                    <label className="text-xs font-bold text-slate-700">المنصة</label>
                     <select
                       value={sessionPlatform}
                       onChange={(e) => setSessionPlatform(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     >
                       <option value="Zoom">Zoom Meeting</option>
                       <option value="Microsoft Teams">Microsoft Teams</option>
@@ -367,13 +366,13 @@ export default function AdminLiveSessionsPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">رابط القاعة (URL)</label>
+                  <label className="text-xs font-bold text-slate-700">رابط القاعة (URL)</label>
                   <input
                     type="url"
                     value={sessionUrl}
                     onChange={(e) => setSessionUrl(e.target.value)}
-                    placeholder="https://zoom.us/j/1234567890"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    placeholder="/demo"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
@@ -381,14 +380,14 @@ export default function AdminLiveSessionsPage() {
                   <button
                     type="button"
                     onClick={() => setIsScheduleModalOpen(false)}
-                    className="px-4 py-2 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                    className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
                     disabled={creating}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-60"
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-60"
                   >
                     {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     <span>{creating ? 'جاري الحفظ...' : 'جدولة ونشر الجلسة'}</span>

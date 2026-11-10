@@ -117,7 +117,7 @@ export default function StudentLivePage() {
             scheduled_at: s.scheduled_at,
             status: s.status,
             isLiveNow,
-            joinUrl: s.meeting_url || 'https://zoom.us',
+            joinUrl: s.meeting_url || '/demo',
             platform: s.platform || 'Zoom Meeting',
             recording_url: s.recording_url,
           };
@@ -141,7 +141,7 @@ export default function StudentLivePage() {
             scheduled_at: new Date().toISOString(),
             status: 'scheduled',
             isLiveNow: false,
-            joinUrl: 'https://zoom.us',
+            joinUrl: '/demo',
             platform: 'Zoom Meeting',
           });
         }
@@ -205,20 +205,20 @@ export default function StudentLivePage() {
           <motion.div variants={textFadeVariants} className="premium-tabs grid grid-cols-2 sm:flex sm:flex-row items-center gap-2 p-1.5 rounded-2xl border border-white/80 bg-white/90 backdrop-blur-md shadow-sm w-full sm:w-auto shrink-0">
             <button
               onClick={() => setFilter('upcoming')}
-              className={`premium-tab px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer text-center flex-1 sm:flex-none ${
+              className={`premium-tab px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-center flex-1 sm:flex-none ${
                 filter === 'upcoming'
-                  ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                  : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60 bg-slate-50/60 sm:bg-transparent'
+                  ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                  : 'text-slate-600 hover:text-[#0B3766] hover:bg-slate-100/60 bg-slate-50/60 sm:bg-transparent'
               }`}
             >
               <span className="premium-tab-label">الجلسات المجدولة ({liveSessions.length})</span>
             </button>
             <button
               onClick={() => setFilter('past')}
-              className={`premium-tab px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer text-center flex-1 sm:flex-none ${
+              className={`premium-tab px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-center flex-1 sm:flex-none ${
                 filter === 'past'
-                  ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                  : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60 bg-slate-50/60 sm:bg-transparent'
+                  ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                  : 'text-slate-600 hover:text-[#0B3766] hover:bg-slate-100/60 bg-slate-50/60 sm:bg-transparent'
               }`}
             >
               <span className="premium-tab-label">أرشيف التسجيلات ({pastRecordings.length})</span>
@@ -229,7 +229,7 @@ export default function StudentLivePage() {
 
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل القاعات المباشرة...</p>
         </div>
       ) : filter === 'upcoming' ? (
@@ -249,7 +249,7 @@ export default function StudentLivePage() {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
                     </span>
-                    <span className="text-[10px] font-black text-red-400 tracking-wide">
+                    <span className="text-[10px] font-bold text-red-400 tracking-wide">
                       {activeLive.isLiveNow ? 'مباشر الآن' : 'جلسة مجدولة'}
                     </span>
                   </div>
@@ -266,14 +266,14 @@ export default function StudentLivePage() {
                       <div className="text-center p-8 space-y-4 text-white">
                         <Video className="w-16 h-16 text-emerald-400 mx-auto" />
                         <div className="space-y-1">
-                          <h3 className="text-lg font-black">{activeLive.title}</h3>
+                          <h3 className="text-lg font-bold">{activeLive.title}</h3>
                           <p className="text-xs text-slate-300">{activeLive.date} - {activeLive.time}</p>
                         </div>
                         <a
                           href={activeLive.joinUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-xs shadow-lg hover:shadow-xl transition-all"
+                          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs shadow-lg hover:shadow-xl transition-all"
                         >
                           <ExternalLink className="w-4 h-4" />
                           <span>الانضمام عبر {activeLive.platform}</span>
@@ -285,7 +285,7 @@ export default function StudentLivePage() {
 
                 <div className="p-4 sm:p-5 rounded-2xl relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 liquid-glass-card liquid-glass-hover student-card-accent">
                   <div className="space-y-0.5 min-w-0">
-                    <div className="flex items-center gap-1.5 text-xs font-black text-emerald-700">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
                       <Video className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                       <span>{activeLive.courseName}</span>
                     </div>
@@ -294,7 +294,7 @@ export default function StudentLivePage() {
                     </h2>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100/90 px-3.5 py-1.5 rounded-xl border border-slate-200/80 shrink-0">
-                    <Radio className="w-3.5 h-3.5 text-[#173A7C]" />
+                    <Radio className="w-3.5 h-3.5 text-[#0B3766]" />
                     <span>{activeLive.platform}</span>
                   </div>
                 </div>
@@ -307,7 +307,7 @@ export default function StudentLivePage() {
               >
                 <div className="pb-3 border-b border-slate-200/60 flex items-center justify-between shrink-0">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-xs">
+                    <div className="p-1.5 rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-xs">
                       <MessageSquare className="w-3.5 h-3.5" />
                     </div>
                     <div>
@@ -329,7 +329,7 @@ export default function StudentLivePage() {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-black text-[#173A7C] text-[11px]">{msg.sender}</span>
+                        <span className="font-bold text-[#0B3766] text-[11px]">{msg.sender}</span>
                         <span className="text-[9px] text-slate-400">{msg.time}</span>
                       </div>
                       <p className="text-slate-700 text-[11px] font-bold">{msg.text}</p>
@@ -344,11 +344,11 @@ export default function StudentLivePage() {
                     onChange={(e) => setNewChatMessage(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="اكتب سؤالك أو مشاركتك..."
-                    className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/70"
+                    className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/70"
                   />
                   <button
                     onClick={handleSendMessage}
-                    className="p-2 rounded-xl bg-[#173A7C] text-white hover:bg-[#1E4D9D] transition-colors cursor-pointer"
+                    className="p-2 rounded-xl bg-[#0B3766] text-white hover:bg-[#168AD3] transition-colors cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
                   </button>
@@ -364,14 +364,14 @@ export default function StudentLivePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {liveSessions.slice(1).map((s) => (
                   <div key={s.id} className="p-4 rounded-2xl liquid-glass-card space-y-2">
-                    <span className="text-[11px] font-black text-emerald-700">{s.courseName}</span>
-                    <h4 className="text-xs font-black text-slate-900">{s.title}</h4>
+                    <span className="text-[11px] font-bold text-emerald-700">{s.courseName}</span>
+                    <h4 className="text-xs font-bold text-slate-900">{s.title}</h4>
                     <p className="text-[11px] text-slate-500 font-bold">{s.date} - {s.time}</p>
                     <a
                       href={s.joinUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-black text-[#173A7C] hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0B3766] hover:underline"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                       <span>رابط الحضور ({s.platform})</span>
@@ -387,11 +387,11 @@ export default function StudentLivePage() {
         <div className="space-y-4">
           {pastRecordings.length === 0 ? (
             <div className="p-10 sm:p-14 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-4">
-              <div className="w-16 h-16 rounded-3xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-3xl bg-[#0B3766]/10 text-[#0B3766] flex items-center justify-center mx-auto">
                 <Video className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-lg font-black text-slate-900">لا توجد تسجيلات مؤرشفة حالياً</h3>
+                <h3 className="text-lg font-bold text-slate-900">لا توجد تسجيلات مؤرشفة حالياً</h3>
                 <p className="text-xs font-bold text-slate-500 max-w-md mx-auto">
                   سيتم أرشفة تسجيلات اللقاءات المباشرة فور انتهاء كل ورشة ليتسنى لك الرجوع إليها في أي وقت.
                 </p>
@@ -401,15 +401,15 @@ export default function StudentLivePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {pastRecordings.map((rec) => (
                 <div key={rec.id} className="p-6 rounded-3xl liquid-glass-card space-y-3">
-                  <span className="text-xs font-black text-emerald-700">{rec.courseName}</span>
-                  <h3 className="text-sm font-black text-slate-900">{rec.title}</h3>
+                  <span className="text-xs font-bold text-emerald-700">{rec.courseName}</span>
+                  <h3 className="text-sm font-bold text-slate-900">{rec.title}</h3>
                   <p className="text-xs text-slate-500 font-bold">{rec.date}</p>
                   {rec.recording_url && (
                     <a
                       href={rec.recording_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0B3766] text-white text-xs font-bold"
                     >
                       <PlayCircle className="w-4 h-4" />
                       <span>مشاهدة التسجيل</span>

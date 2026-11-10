@@ -72,7 +72,7 @@ export default function SingleBlogPostPage({
     return (
       <main className="min-h-screen flex items-center justify-center bg-slate-50" dir="rtl">
         <div className="text-center space-y-3">
-          <div className="w-8 h-8 border-4 border-[#173A7C] border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-8 h-8 border-4 border-[#0B3766] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm font-bold text-slate-600">جاري تحميل المقال...</p>
         </div>
       </main>
@@ -84,7 +84,7 @@ export default function SingleBlogPostPage({
   }
 
   const author = post.author || {
-    name: "فريق النبض المستدام",
+    name: "فريق مَدار للتعلّم",
     role: "هيئة التحرير الأكاديمي",
     bio: "نخبة من الاستشاريين والخبراء المعتمدين في إدارة المشاريع والجودة والحوكمة والاستدامة المؤسسية.",
   };
@@ -120,44 +120,44 @@ export default function SingleBlogPostPage({
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900 selection:bg-[#173A7C] selection:text-white" dir="rtl">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900 selection:bg-[#0B3766] selection:text-white" dir="rtl">
       {/* ═══════════════════════════════════════ TOP BREADCRUMB & HEADER ═══════════════════════════════════════ */}
-      <section className="relative pt-32 pb-14 bg-gradient-to-b from-[#173A7C]/[0.06] via-[#173A7C]/[0.02] to-transparent overflow-hidden">
+      <section className="relative pt-32 pb-14 bg-gradient-to-b from-[#0B3766]/[0.06] via-[#0B3766]/[0.02] to-transparent overflow-hidden">
         {/* Background glow */}
-        <div className="absolute -top-32 right-1/4 w-[600px] h-[600px] bg-[#173A7C]/[0.04] rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-[#5CB07C]/[0.04] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute -top-32 right-1/4 w-[600px] h-[600px] bg-[#0B3766]/[0.04] rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-[#19B6C7]/[0.04] rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-8 font-medium">
-            <Link href="/" className="hover:text-[#173A7C] transition-colors">
+            <Link href="/" className="hover:text-[#0B3766] transition-colors">
               الرئيسية
             </Link>
             <ChevronLeft className="w-3.5 h-3.5 text-slate-400" />
-            <Link href="/blog" className="hover:text-[#173A7C] transition-colors">
+            <Link href="/blog" className="hover:text-[#0B3766] transition-colors">
               المدونة الأكاديمية
             </Link>
             <ChevronLeft className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-[#173A7C] font-semibold truncate max-w-[200px] sm:max-w-xs">
+            <span className="text-[#0B3766] font-semibold truncate max-w-[200px] sm:max-w-xs">
               {post.title}
             </span>
           </nav>
 
           {/* Meta Tags Pill Row */}
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            <span className="bg-[#173A7C] text-white text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm">
+            <span className="bg-[#0B3766] text-white text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm">
               {post.category}
             </span>
             <span className="flex items-center gap-1.5 text-xs text-slate-600 font-medium bg-white/90 px-3 py-1.5 rounded-full border border-slate-200 shadow-2xs">
-              <Calendar className="w-3.5 h-3.5 text-[#5CB07C]" />
+              <Calendar className="w-3.5 h-3.5 text-[#19B6C7]" />
               {post.date}
             </span>
             <span className="flex items-center gap-1.5 text-xs text-slate-600 font-medium bg-white/90 px-3 py-1.5 rounded-full border border-slate-200 shadow-2xs">
-              <Clock className="w-3.5 h-3.5 text-[#5CB07C]" />
+              <Clock className="w-3.5 h-3.5 text-[#19B6C7]" />
               وقت القراءة: {post.readTime}
             </span>
             <span className="flex items-center gap-1.5 text-xs text-slate-600 font-medium bg-white/90 px-3 py-1.5 rounded-full border border-slate-200 shadow-2xs">
-              <Eye className="w-3.5 h-3.5 text-[#173A7C]" />
+              <Eye className="w-3.5 h-3.5 text-[#0B3766]" />
               {post.viewsCount.toLocaleString("ar-SA")} مشاهدة
             </span>
           </div>
@@ -167,7 +167,7 @@ export default function SingleBlogPostPage({
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-black text-slate-900 leading-[1.35] tracking-tight mb-5"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-bold text-slate-900 leading-[1.35] tracking-tight mb-5"
           >
             {post.title}
           </motion.h1>
@@ -186,8 +186,8 @@ export default function SingleBlogPostPage({
           <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-slate-200/80">
             {/* Author */}
             <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#173A7C] to-[#5CB07C] p-0.5 shadow-md flex items-center justify-center shrink-0">
-                <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-black text-[#173A7C] text-lg">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0B3766] to-[#19B6C7] p-0.5 shadow-md flex items-center justify-center shrink-0">
+                <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-bold text-[#0B3766] text-lg">
                   {post.author.name.charAt(post.author.name.indexOf(" ") + 1 || 0)}
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function SingleBlogPostPage({
                   <span className="font-bold text-slate-900 text-sm sm:text-base">
                     {post.author.name}
                   </span>
-                  <CheckCircle2 className="w-4 h-4 text-[#5CB07C]" strokeWidth={2.5} />
+                  <CheckCircle2 className="w-4 h-4 text-[#19B6C7]" strokeWidth={2.5} />
                 </div>
                 <p className="text-xs text-slate-500 font-medium">
                   {post.author.role}
@@ -223,12 +223,12 @@ export default function SingleBlogPostPage({
                 onClick={() => setIsSaved(!isSaved)}
                 className={`p-2.5 rounded-xl border transition-all ${
                   isSaved
-                    ? "bg-emerald-50 text-[#5CB07C] border-[#5CB07C]/30"
+                    ? "bg-emerald-50 text-[#19B6C7] border-[#19B6C7]/30"
                     : "bg-white text-slate-700 hover:bg-slate-50 border-slate-200"
                 }`}
                 title="حفظ المقال"
               >
-                <Bookmark className={`w-4 h-4 ${isSaved ? "fill-[#5CB07C]" : ""}`} />
+                <Bookmark className={`w-4 h-4 ${isSaved ? "fill-[#19B6C7]" : ""}`} />
               </button>
 
               <button
@@ -243,7 +243,7 @@ export default function SingleBlogPostPage({
                   </>
                 ) : (
                   <>
-                    <Share2 className="w-4 h-4 text-[#173A7C]" />
+                    <Share2 className="w-4 h-4 text-[#0B3766]" />
                     <span>مشاركة</span>
                   </>
                 )}
@@ -259,7 +259,7 @@ export default function SingleBlogPostPage({
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
-          className="relative rounded-3xl overflow-hidden border border-slate-200/90 shadow-[0_20px_50px_-15px_rgba(23,58,124,0.15)] bg-slate-900"
+          className="relative rounded-3xl overflow-hidden border border-slate-200/90 shadow-[0_20px_50px_-15px_rgba(11,55,102,0.12)] bg-slate-900"
         >
           <CardImage
             src={post.image}
@@ -269,7 +269,7 @@ export default function SingleBlogPostPage({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
           <div className="absolute bottom-4 right-5 text-white/90 text-xs sm:text-sm font-medium bg-black/40 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
-            {post.title} — دراسة مرجعية معتمدة من النبض المستدام
+            {post.title} — دراسة مرجعية معتمدة من مَدار للتعلّم
           </div>
         </motion.div>
       </section>
@@ -283,19 +283,19 @@ export default function SingleBlogPostPage({
             
             {/* Key Takeaways Box */}
             {keyTakeaways.length > 0 && (
-              <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#173A7C]/[0.05] via-slate-50 to-[#5CB07C]/[0.06] border border-[#173A7C]/15 shadow-sm">
+              <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#0B3766]/[0.05] via-slate-50 to-[#19B6C7]/[0.06] border border-[#0B3766]/15 shadow-sm">
                 <div className="flex items-center gap-2.5 mb-5">
-                  <div className="w-8 h-8 rounded-xl bg-[#173A7C] text-white flex items-center justify-center shadow-xs">
+                  <div className="w-8 h-8 rounded-xl bg-[#0B3766] text-white flex items-center justify-center shadow-xs">
                     <ListChecks aria-hidden="true" className="w-4 h-4 text-emerald-300" />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900">
                     أبرز مخرجات ومحاور المقال الأكاديمي
                   </h3>
                 </div>
                 <ul className="space-y-3">
                   {keyTakeaways.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-3 text-sm sm:text-[15px] text-slate-700 leading-relaxed">
-                      <CheckCircle2 className="w-5 h-5 text-[#5CB07C] shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-5 h-5 text-[#19B6C7] shrink-0 mt-0.5" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -307,10 +307,10 @@ export default function SingleBlogPostPage({
             {sections.map((section, sIdx) => (
               <section key={section.id || sIdx} id={section.id} className="scroll-mt-32 space-y-5">
                 <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-lg bg-[#173A7C]/10 text-[#173A7C] font-black text-sm flex items-center justify-center shrink-0">
+                  <span className="w-7 h-7 rounded-lg bg-[#0B3766]/10 text-[#0B3766] font-bold text-sm flex items-center justify-center shrink-0">
                     {sIdx + 1}
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
                     {section.title}
                   </h2>
                 </div>
@@ -324,12 +324,12 @@ export default function SingleBlogPostPage({
 
                 {/* Highlight Quote if present */}
                 {section.quote && (
-                  <div className="my-6 p-6 sm:p-7 rounded-2xl bg-gradient-to-r from-[#173A7C]/[0.08] to-[#5CB07C]/[0.05] border-r-4 border-[#173A7C] relative overflow-hidden">
-                    <Quote className="w-10 h-10 text-[#173A7C]/15 absolute top-3 left-4" />
+                  <div className="my-6 p-6 sm:p-7 rounded-2xl bg-gradient-to-r from-[#0B3766]/[0.08] to-[#19B6C7]/[0.05] border-r-4 border-[#0B3766] relative overflow-hidden">
+                    <Quote className="w-10 h-10 text-[#0B3766]/15 absolute top-3 left-4" />
                     <p className="text-base sm:text-lg font-bold text-slate-800 italic leading-relaxed mb-3 relative z-10">
                       "{section.quote.text}"
                     </p>
-                    <span className="text-xs sm:text-sm font-semibold text-[#173A7C]">
+                    <span className="text-xs sm:text-sm font-semibold text-[#0B3766]">
                       — {section.quote.author}
                     </span>
                   </div>
@@ -341,7 +341,7 @@ export default function SingleBlogPostPage({
                     <ul className="space-y-2.5">
                       {section.bulletPoints.map((bp: string, bIdx: number) => (
                         <li key={bIdx} className="flex items-start gap-2.5 text-sm sm:text-[15px] text-slate-700 leading-relaxed">
-                          <div className="w-2 h-2 rounded-full bg-[#5CB07C] mt-2 shrink-0" />
+                          <div className="w-2 h-2 rounded-full bg-[#19B6C7] mt-2 shrink-0" />
                           <span>{bp}</span>
                         </li>
                       ))}
@@ -353,7 +353,7 @@ export default function SingleBlogPostPage({
                 {section.table && Array.isArray(section.table.headers) && (
                   <div className="my-6 overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs">
                     <table className="w-full text-right text-sm">
-                      <thead className="bg-[#173A7C] text-white">
+                      <thead className="bg-[#0B3766] text-white">
                         <tr>
                           {section.table.headers.map((h: string, hIdx: number) => (
                             <th key={hIdx} className="p-3.5 sm:p-4 font-bold text-xs sm:text-sm">
@@ -384,9 +384,9 @@ export default function SingleBlogPostPage({
 
                 {/* Highlight Callout Box if present */}
                 {section.highlightBox && (
-                  <div className="my-6 p-6 rounded-2xl bg-white border border-[#5CB07C]/40 shadow-[0_4px_20px_rgba(92,176,124,0.08)] ring-1 ring-[#5CB07C]/20">
+                  <div className="my-6 p-6 rounded-2xl bg-white border border-[#19B6C7]/40 shadow-[0_4px_20px_rgba(11,55,102,0.1)] ring-1 ring-[#19B6C7]/20">
                     <div className="flex items-center gap-2 mb-2">
-                      <Award className="w-5 h-5 text-[#5CB07C]" />
+                      <Award className="w-5 h-5 text-[#19B6C7]" />
                       <h4 className="font-bold text-slate-900 text-sm sm:text-base">
                         {section.highlightBox.title}
                       </h4>
@@ -403,7 +403,7 @@ export default function SingleBlogPostPage({
             {academicReferences.length > 0 && (
               <div className="pt-8 border-t border-slate-200 space-y-4">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-lg">
-                  <BookOpen className="w-5 h-5 text-[#173A7C]" />
+                  <BookOpen className="w-5 h-5 text-[#0B3766]" />
                   <h3>المراجع والمصادر الأكاديمية المعتمدة</h3>
                 </div>
                 <ol className="space-y-2 list-decimal list-inside text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50 p-5 rounded-2xl border border-slate-200/80">
@@ -419,8 +419,8 @@ export default function SingleBlogPostPage({
             {/* FAQ Section Accordion */}
             {faqs.length > 0 && (
               <div className="pt-8 border-t border-slate-200 space-y-5">
-                <div className="flex items-center gap-2 text-slate-900 font-black text-xl">
-                  <HelpCircle className="w-6 h-6 text-[#5CB07C]" />
+                <div className="flex items-center gap-2 text-slate-900 font-bold text-xl">
+                  <HelpCircle className="w-6 h-6 text-[#19B6C7]" />
                   <h3>الأسئلة الشائعة حول {post.category}</h3>
                 </div>
                 
@@ -434,10 +434,10 @@ export default function SingleBlogPostPage({
                       >
                         <button
                           onClick={() => setOpenFaq(isOpen ? null : idx)}
-                          className="w-full p-4 sm:p-5 flex items-center justify-between text-right font-bold text-slate-800 text-sm sm:text-base hover:text-[#173A7C] transition-colors"
+                          className="w-full p-4 sm:p-5 flex items-center justify-between text-right font-bold text-slate-800 text-sm sm:text-base hover:text-[#0B3766] transition-colors"
                         >
                           <span>{faq.question}</span>
-                          <ChevronDown className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180 text-[#173A7C]" : ""}`} />
+                          <ChevronDown className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180 text-[#0B3766]" : ""}`} />
                         </button>
                         {isOpen && (
                           <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
@@ -453,17 +453,17 @@ export default function SingleBlogPostPage({
 
             {/* Author Full Profile Bio Box */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-5">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#5CB07C] p-0.5 shrink-0 flex items-center justify-center text-white font-black text-2xl shadow-md">
-                <div className="w-full h-full bg-white rounded-2xl flex items-center justify-center text-[#173A7C]">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#19B6C7] p-0.5 shrink-0 flex items-center justify-center text-white font-bold text-2xl shadow-md">
+                <div className="w-full h-full bg-white rounded-2xl flex items-center justify-center text-[#0B3766]">
                   {author.name ? author.name.charAt(author.name.indexOf(" ") + 1 || 0) : "م"}
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-black text-slate-900 text-base sm:text-lg">
+                  <h4 className="font-bold text-slate-900 text-base sm:text-lg">
                     {author.name}
                   </h4>
-                  <span className="text-[11px] bg-[#173A7C]/10 text-[#173A7C] font-bold px-2.5 py-0.5 rounded-full">
+                  <span className="text-[11px] bg-[#0B3766]/10 text-[#0B3766] font-bold px-2.5 py-0.5 rounded-full">
                     كاتب ومحاضر معتمد
                   </span>
                 </div>
@@ -473,7 +473,7 @@ export default function SingleBlogPostPage({
                   </p>
                 )}
                 {author.credentials && (
-                  <p className="text-xs font-semibold text-[#5CB07C] flex items-center gap-1.5">
+                  <p className="text-xs font-semibold text-[#19B6C7] flex items-center gap-1.5">
                     <GraduationCap className="w-4 h-4" />
                     {author.credentials}
                   </p>
@@ -504,7 +504,7 @@ export default function SingleBlogPostPage({
             {tableOfContents.length > 0 && (
               <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm space-y-4">
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                  <Layers className="w-5 h-5 text-[#173A7C]" />
+                  <Layers className="w-5 h-5 text-[#0B3766]" />
                   <h3 className="font-bold text-slate-900 text-base">
                     فهرس محتويات المقال
                   </h3>
@@ -514,9 +514,9 @@ export default function SingleBlogPostPage({
                     <a
                       key={item.id || idx}
                       href={`#${item.id}`}
-                      className="flex items-center gap-2 text-xs sm:text-sm text-slate-600 hover:text-[#173A7C] hover:font-bold transition-all p-2 rounded-xl hover:bg-slate-50 group"
+                      className="flex items-center gap-2 text-xs sm:text-sm text-slate-600 hover:text-[#0B3766] hover:font-bold transition-all p-2 rounded-xl hover:bg-slate-50 group"
                     >
-                      <span className="w-5 h-5 rounded-md bg-slate-100 text-slate-500 group-hover:bg-[#173A7C] group-hover:text-white flex items-center justify-center text-[11px] font-bold shrink-0 transition-colors">
+                      <span className="w-5 h-5 rounded-md bg-slate-100 text-slate-500 group-hover:bg-[#0B3766] group-hover:text-white flex items-center justify-center text-[11px] font-bold shrink-0 transition-colors">
                         {idx + 1}
                       </span>
                       <span className="truncate">{item.title}</span>
@@ -528,9 +528,9 @@ export default function SingleBlogPostPage({
 
             {/* Recommended Training Program CTA */}
             {post.relatedCourseTitle && (
-              <div className="p-6 rounded-3xl bg-gradient-to-br from-[#173A7C] to-[#112a59] text-white shadow-xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#5CB07C]/20 rounded-full blur-2xl pointer-events-none" />
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold bg-[#5CB07C] text-white px-3 py-1 rounded-full mb-4 shadow-xs">
+              <div className="p-6 rounded-3xl bg-gradient-to-br from-[#0B3766] to-[#112a59] text-white shadow-xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#19B6C7]/20 rounded-full blur-2xl pointer-events-none" />
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold bg-[#19B6C7] text-white px-3 py-1 rounded-full mb-4 shadow-xs">
                   <Award className="w-3.5 h-3.5" />
                   برنامج تدريبي مرتبط
                 </span>
@@ -538,11 +538,11 @@ export default function SingleBlogPostPage({
                   {post.relatedCourseTitle}
                 </h4>
                 <p className="text-xs text-slate-200 leading-relaxed mb-5">
-                  احصل على تأهيل مهني شامل وشهادة معتمدة تعزز مستقبلك الوظيفي من منصة النبض المستدام.
+                  احصل على تأهيل مهني شامل وشهادة إتمام تعزز مستقبلك الوظيفي من منصة مَدار للتعلّم.
                 </p>
                 <Link
                   href={post.relatedCourseSlug ? `/courses` : "/courses"}
-                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white text-[#173A7C] font-bold text-xs sm:text-sm hover:bg-emerald-50 hover:text-[#5CB07C] transition-all shadow-md"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white text-[#0B3766] font-bold text-xs sm:text-sm hover:bg-emerald-50 hover:text-[#19B6C7] transition-all shadow-md"
                 >
                   <span>استكشف تفاصيل الدورة والتسجيل</span>
                   <ArrowUpRight className="w-4 h-4" />
@@ -553,7 +553,7 @@ export default function SingleBlogPostPage({
             {/* Corporate Training Inquiries Box */}
             <div className="p-6 rounded-3xl bg-slate-50 border border-slate-200/90 space-y-4">
               <div className="flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-[#5CB07C]" />
+                <Building2 className="w-5 h-5 text-[#19B6C7]" />
                 <h4 className="font-bold text-slate-900 text-sm sm:text-base">
                   تدريب مخصص للشركات والهيئات
                 </h4>
@@ -563,7 +563,7 @@ export default function SingleBlogPostPage({
               </p>
               <Link
                 href="/corporate"
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#173A7C] hover:bg-[#122e63] text-white text-xs font-bold transition-all shadow-xs"
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#0B3766] hover:bg-[#122e63] text-white text-xs font-bold transition-all shadow-xs"
               >
                 <span>طلب تدريب شركات مخصص</span>
                 <ChevronLeft className="w-4 h-4" />
@@ -578,16 +578,16 @@ export default function SingleBlogPostPage({
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
             <div>
-              <span className="text-xs font-bold text-[#5CB07C] tracking-wider uppercase">
+              <span className="text-xs font-bold text-[#19B6C7] tracking-wider uppercase">
                 استكشف المزيد
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
                 مقالات ودراسات ذات صلة
               </h3>
             </div>
             <Link
               href="/blog"
-              className="text-xs sm:text-sm font-bold text-[#173A7C] hover:text-[#5CB07C] flex items-center gap-1 transition-colors"
+              className="text-xs sm:text-sm font-bold text-[#0B3766] hover:text-[#19B6C7] flex items-center gap-1 transition-colors"
             >
               <span>جميع المقالات</span>
               <ChevronLeft className="w-4 h-4" />
@@ -599,7 +599,7 @@ export default function SingleBlogPostPage({
               <Link
                 key={relPost.id}
                 href={`/blog/${relPost.slug}`}
-                className="group rounded-2xl overflow-hidden bg-white border border-slate-200 hover:border-[#173A7C]/30 hover:shadow-xl transition-all duration-300 flex flex-col sm:flex-row"
+                className="group rounded-2xl overflow-hidden bg-white border border-slate-200 hover:border-[#0B3766]/30 hover:shadow-xl transition-all duration-300 flex flex-col sm:flex-row"
               >
                 <div className="relative w-full sm:w-44 shrink-0 bg-slate-900">
                   <CardImage
@@ -616,14 +616,14 @@ export default function SingleBlogPostPage({
                     <span className="text-[11px] text-slate-400 font-semibold block mb-1">
                       {relPost.date} • {relPost.readTime}
                     </span>
-                    <h4 className="font-bold text-slate-900 text-sm sm:text-[15px] group-hover:text-[#173A7C] transition-colors line-clamp-2 mb-2 leading-snug">
+                    <h4 className="font-bold text-slate-900 text-sm sm:text-[15px] group-hover:text-[#0B3766] transition-colors line-clamp-2 mb-2 leading-snug">
                       {relPost.title}
                     </h4>
                     <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
                       {relPost.excerpt}
                     </p>
                   </div>
-                  <span className="text-xs font-bold text-[#5CB07C] flex items-center gap-1 mt-4 group-hover:gap-2 transition-all">
+                  <span className="text-xs font-bold text-[#19B6C7] flex items-center gap-1 mt-4 group-hover:gap-2 transition-all">
                     <span>قراءة المقال</span>
                     <ChevronLeft className="w-3.5 h-3.5" />
                   </span>

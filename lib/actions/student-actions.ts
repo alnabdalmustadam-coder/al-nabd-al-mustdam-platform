@@ -6,9 +6,9 @@ export { getCourseAllLessons };
 
 // Persistent Storage Keys for Local/Server Sync
 const STORAGE_KEYS = {
-  COMPLETED_LESSONS: 'sustainsulse_completed_lessons',
-  STUDENT_NOTES: 'sustainsulse_student_notes',
-  QUIZ_SCORES: 'sustainsulse_quiz_scores',
+  COMPLETED_LESSONS: 'madar-learning-demo_completed_lessons',
+  STUDENT_NOTES: 'madar-learning-demo_student_notes',
+  QUIZ_SCORES: 'madar-learning-demo_quiz_scores',
 };
 
 export interface StudentNote {
@@ -34,8 +34,8 @@ export const getCompletedLessons = (courseSlug: string): Set<string> => {
       `${STORAGE_KEYS.COMPLETED_LESSONS}_${courseSlug}`,
       `${STORAGE_KEYS.COMPLETED_LESSONS}_${clean}`,
       `${STORAGE_KEYS.COMPLETED_LESSONS}_course-${clean}`,
-      `nabd_completed_lessons_${courseSlug}`,
-      `nabd_completed_lessons_${clean}`,
+      `madar_demo_completed_lessons_${courseSlug}`,
+      `madar_demo_completed_lessons_${clean}`,
     ];
 
     for (const key of keysToCheck) {
@@ -67,7 +67,7 @@ export const saveCompletedLessons = (courseSlug: string, completedSet: Set<strin
     // Notify other components/tabs
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('storage'));
-      window.dispatchEvent(new CustomEvent('nabd_progress_updated', {
+      window.dispatchEvent(new CustomEvent('madar_demo_progress_updated', {
         detail: { courseSlug, completedCount: completedSet.size }
       }));
     }

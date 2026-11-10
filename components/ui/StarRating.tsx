@@ -23,14 +23,14 @@ export default function StarRating({ rating, size = "md", className = "" }: Star
           <defs>
             <linearGradient id="halfGrad">
               <stop offset="50%" stopColor="#E8A020" />
-              <stop offset="50%" stopColor="rgba(255,255,255,0.2)" />
+              <stop offset="50%" stopColor="#CBD5E1" />
             </linearGradient>
           </defs>
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="url(#halfGrad)" />
         </svg>
       )}
       {Array.from({ length: empty }).map((_, i) => (
-        <svg key={`e-${i}`} width={s} height={s} viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)" stroke="none">
+        <svg key={`e-${i}`} width={s} height={s} viewBox="0 0 24 24" fill="#CBD5E1" stroke="none">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
       ))}

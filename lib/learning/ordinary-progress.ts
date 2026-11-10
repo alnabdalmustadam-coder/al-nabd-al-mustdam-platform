@@ -8,7 +8,7 @@ import { getQuizActivity } from '@/lib/quizzes/activity';
  * comes from saved, current-course lessons and a configured final's real grade. */
 export async function readOrdinaryCourseProgress(admin: SupabaseClient, course: Course, email: string) {
   const lessons = getCourseAllLessons(course);
-  const prefix = `https://nabdtraining.com/courses/${course.slug}/lessons/`;
+  const prefix = `https://learning.madar.example/courses/${course.slug}/lessons/`;
   const idsByIri = new Map(lessons.map((lesson) => [`${prefix}${encodeURIComponent(lesson.id)}`, lesson.id]));
   const { data, error } = await admin.from('xapi_statements').select('object_id')
     .eq('actor_email', email).eq('verb_display', 'completed').ilike('object_id', `${prefix}%`);

@@ -14,7 +14,7 @@ interface CourseCardProps {
   index?: number;
 }
 
-const BADGE_VARIANTS = ["admin", "data", "languages", "tech", "corporate"] as const;
+const BADGE_VARIANTS = ["admin", "management", "data", "languages", "tech", "corporate"] as const;
 
 export default function CourseCard({ course, index = 0 }: CourseCardProps) {
   const imageUrl = typeof course.image === "string" ? course.image : "/logo.webp";
@@ -32,9 +32,9 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="h-full"
     >
-      <div className="relative group h-full flex flex-col bg-white rounded-[2rem] border border-slate-200/80 shadow-[0_10px_40px_-10px_rgba(23,58,124,0.08)] hover:shadow-[0_40px_80px_-20px_rgba(23,58,124,0.18)] hover:border-slate-300 hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+      <div className="relative group h-full flex flex-col bg-white rounded-[2rem] border border-slate-200/80 shadow-[0_10px_40px_-10px_rgba(11,55,102,0.12)] hover:shadow-[0_40px_80px_-20px_rgba(11,55,102,0.18)] hover:border-slate-300 hover:-translate-y-2 transition-all duration-500 overflow-hidden">
         {/* Premium top accent bar */}
-        <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#173A7C] via-[#5CB07C] to-[#173A7C] z-30 opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#0B3766] via-[#19B6C7] to-[#0B3766] z-30 opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
 
         {/* Top Image Section */}
         <div className="relative shrink-0 overflow-hidden bg-gradient-to-br from-slate-50 to-[#f0f4f8]">
@@ -47,10 +47,10 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
           </div>
 
           {/* Hover Play Overlay */}
-          <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#173A7C]/20 backdrop-blur-[4px]">
+          <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#0B3766]/20 backdrop-blur-[4px]">
             <Link
               href={`/courses/${course.slug}`}
-              className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-[0_10px_40px_rgba(23,58,124,0.3)] text-[#5CB07C] group-hover:scale-110 transition-transform duration-500 cursor-pointer"
+              className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-[0_10px_40px_rgba(11,55,102,0.1)] text-[#19B6C7] group-hover:scale-110 transition-transform duration-500 cursor-pointer"
             >
               <Play className="w-6 h-6 ml-1" fill="currentColor" />
             </Link>
@@ -74,7 +74,8 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
                 : "bg-white/90 text-slate-400 hover:text-rose-500 hover:bg-white shadow-slate-900/10"
             }`}
             title={isFavorited ? "إزالة من المفضلة" : "إضافة إلى المفضلة"}
-            aria-label="المفضلة"
+            aria-label={isFavorited ? "إزالة الدورة من المفضلة" : "إضافة الدورة إلى المفضلة"}
+            aria-pressed={isFavorited}
           >
             <Heart
               className={`w-4 h-4 transition-transform duration-300 ${
@@ -87,7 +88,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
         {/* Content Section */}
         <div className="p-5 sm:p-6 flex flex-col flex-1 relative z-20 bg-white">
           <Link href={`/courses/${course.slug}`}>
-            <h3 className="card-title-royal-blue text-lg sm:text-[19px] mb-2.5 line-clamp-2 leading-[1.3] group-hover:text-[#1E4D9D] transition-colors">
+            <h3 className="card-title-royal-blue text-base sm:text-[19px] mb-2.5 line-clamp-2 leading-[1.65] sm:leading-[1.4] group-hover:text-[#168AD3] transition-colors">
               {course.title}
             </h3>
           </Link>
@@ -98,20 +99,20 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
           {/* Meta Info */}
           <div className="flex items-center gap-2 text-xs text-slate-600 mb-5 font-bold">
             <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-              <Users className="w-3.5 h-3.5 text-[#173A7C]" />
+              <Users className="w-3.5 h-3.5 text-[#0B3766]" />
               {(course.enrollees || course.studentsCount || 0) > 0 ? `${course.enrollees || course.studentsCount} متدرب` : 'متاح للتسجيل'}
             </span>
             <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-              <Clock className="w-3.5 h-3.5 text-[#5CB07C]" />
+              <Clock className="w-3.5 h-3.5 text-[#19B6C7]" />
               {course.duration}
             </span>
           </div>
 
           {/* Price Container */}
           <div className="bg-gradient-to-r from-slate-50 to-[#f8fafc] rounded-full px-5 py-3 mb-5 border border-slate-100 flex justify-between items-center group-hover:border-slate-200 transition-colors">
-            <span className="text-xs font-black text-slate-500">إتاحة مؤقتة</span>
-            <span className="text-xl font-black text-[#173A7C]">
-              <span className="text-sm text-[#5CB07C]">مجاناً الآن</span>
+            <span className="text-xs font-semibold text-slate-500">رسوم الدورة</span>
+            <span className="text-sm font-bold text-[#0B3766]">
+              {course.price > 0 ? <>{Number(course.price).toLocaleString("en-US")} {course.currency || "ر.س"}</> : "مجانية"}
             </span>
           </div>
 
@@ -119,14 +120,14 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
           <div className="flex items-center gap-2 mt-auto pt-1">
             <Link
               href={`/checkout?slug=${course.slug}`}
-              className="flex-1 bg-gradient-to-r from-[#5CB07C] to-[#4EA06E] text-white text-xs font-black py-2.5 px-3 rounded-xl hover:from-[#4EA06E] hover:to-[#5CB07C] transition-all shadow-md shadow-[#5CB07C]/20 hover:-translate-y-0.5 flex items-center justify-center gap-1 text-center truncate"
+              className="flex-1 bg-gradient-to-r from-[#0B3766] to-[#0B6589] text-white text-xs font-bold py-2.5 px-3 rounded-xl hover:from-[#0B6589] hover:to-[#0B3766] transition-all shadow-md shadow-[#19B6C7]/20 hover:-translate-y-0.5 flex items-center justify-center gap-1 text-center truncate"
             >
-              سجّل مجاناً
+              {course.price > 0 ? "اشترك الآن" : "سجّل مجاناً"}
             </Link>
 
             <Link
               href={`/courses/${course.slug}`}
-              className="flex-1 bg-slate-100 hover:bg-[#173A7C] text-slate-700 hover:text-white border border-slate-200 hover:border-[#173A7C] text-xs font-black py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1 text-center truncate"
+              className="flex-1 bg-slate-100 hover:bg-[#0B3766] text-slate-700 hover:text-white border border-slate-200 hover:border-[#0B3766] text-xs font-bold py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1 text-center truncate"
             >
               التفاصيل
             </Link>
@@ -135,11 +136,11 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps) {
               onClick={() => addToCart(course)}
               className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0 border cursor-pointer ${
                 inCart
-                  ? "bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-500/20"
-                  : "bg-white hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border-slate-200 hover:border-emerald-300"
+                  ? "bg-cyan-500 text-white border-cyan-500 shadow-md shadow-cyan-500/20"
+                  : "bg-white hover:bg-cyan-50 text-slate-600 hover:text-cyan-700 border-slate-200 hover:border-cyan-300"
               }`}
               title={inCart ? "موجودة في السلة" : "إضافة إلى السلة"}
-              aria-label="إضافة إلى السلة"
+              aria-label={inCart ? "عرض الدورة في السلة" : "إضافة الدورة إلى السلة"}
             >
               {inCart ? <Check className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
             </button>

@@ -124,14 +124,14 @@ export function DeviceLimitModal({
               <ShieldAlert className="w-5 h-5 sm:w-7 sm:h-7 text-amber-600" />
             </div>
             <div className="space-y-0.5 sm:space-y-1 min-w-0">
-              <span className="inline-block px-2 sm:px-3 py-0.5 rounded-full text-[10px] sm:text-[11px] font-black bg-amber-100/80 text-amber-800 border border-amber-200">
+              <span className="inline-block px-2 sm:px-3 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-amber-100/80 text-amber-800 border border-amber-200">
                 حماية الحساب وسياسة الأجهزة
               </span>
-              <h2 className="text-sm sm:text-lg md:text-xl font-black text-slate-900 leading-tight">
+              <h2 className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 leading-tight">
                 تجاوز الحد الأقصى للأجهزة المصرح بها
               </h2>
               <p className="text-[10px] sm:text-xs text-slate-600 font-bold leading-relaxed pt-0.5 sm:pt-1">
-                وفقاً لسياسة منصة النبض المستدام، يُسمح لكل متدرب بالتسجيل من <span className="text-[#173A7C] font-black">جهازين فقط</span> في نفس الوقت لحماية أمان حسابك.
+                وفقاً لسياسة منصة مَدار للتعلّم، يُسمح لكل متدرب بالتسجيل من <span className="text-[#0B3766] font-bold">جهازين فقط</span> في نفس الوقت لحماية أمان حسابك.
               </p>
             </div>
           </div>
@@ -146,7 +146,7 @@ export function DeviceLimitModal({
           {/* Current Device Banner */}
           <div className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-blue-50/70 border border-blue-100 flex items-center justify-between gap-2 text-[10px] sm:text-xs">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-white text-[#173A7C] shadow-xs shrink-0">
+              <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-white text-[#0B3766] shadow-xs shrink-0">
                 {currentDeviceInfo.deviceName.includes('iPhone') || currentDeviceInfo.deviceName.includes('هاتف') ? (
                   <Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 ) : (
@@ -154,20 +154,20 @@ export function DeviceLimitModal({
                 )}
               </div>
               <div className="min-w-0">
-                <span className="block font-black text-[#173A7C] text-[10px] sm:text-xs">جهازك الحالي:</span>
+                <span className="block font-bold text-[#0B3766] text-[10px] sm:text-xs">جهازك الحالي:</span>
                 <span className="text-slate-600 font-bold text-[9px] sm:text-[11px] truncate block">
                   {currentDeviceInfo.deviceName} ({currentDeviceInfo.browser})
                 </span>
               </div>
             </div>
-            <span className="px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-black bg-[#173A7C] text-white whitespace-nowrap shrink-0">
+            <span className="px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-bold bg-[#0B3766] text-white whitespace-nowrap shrink-0">
               جديد
             </span>
           </div>
 
           {/* Registered Devices List */}
           <div className="space-y-2">
-            <h3 className="text-[10px] sm:text-xs font-black text-slate-700">
+            <h3 className="text-[10px] sm:text-xs font-bold text-slate-700">
               اختر جهازاً لإلغاء ربطه واستبداله:
             </h3>
 
@@ -186,7 +186,7 @@ export function DeviceLimitModal({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-black text-slate-900 truncate text-[11px] sm:text-xs">
+                      <h4 className="font-bold text-slate-900 truncate text-[11px] sm:text-xs">
                         {device.device_name || 'جهاز مسجل'}
                       </h4>
                       <p className="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-0.5">
@@ -198,7 +198,7 @@ export function DeviceLimitModal({
                   <button
                     onClick={() => handleRevokeAndActivate(device.device_id)}
                     disabled={revokingId !== null}
-                    className="w-full sm:w-auto px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200/80 hover:border-red-600 text-[10px] sm:text-[11px] font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0 disabled:opacity-50"
+                    className="w-full sm:w-auto px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200/80 hover:border-red-600 text-[10px] sm:text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0 disabled:opacity-50"
                   >
                     {revokingId === device.device_id ? (
                       <>
@@ -221,7 +221,7 @@ export function DeviceLimitModal({
           <div className="pt-2 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-2 sm:gap-3">
             <button
               onClick={handleLogout}
-              className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] sm:text-xs font-black flex items-center justify-center gap-1.5 sm:gap-2 transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-colors cursor-pointer"
             >
               <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               <span>تسجيل الخروج</span>

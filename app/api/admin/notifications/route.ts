@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest,NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/security/auth";
 
@@ -102,30 +102,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (err: any) {
     console.error("Admin notifications error:", err);
-    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
-  }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    const auth = await requireAdmin(req);
-    if (!auth.ok) return auth.response;
-    const supabaseAdmin = getSupabaseAdmin();
-    const body = await req.json();
-
-    if (body.action === "mark_all_read") {
-      await supabaseAdmin.from("notifications").update({ is_read: true }).eq("is_read", false);
-      return NextResponse.json({ success: true, message: "تم تحديث كافة الإشعارات كمقروءة" });
-    }
-
-    if (body.action === "mark_read" && body.id && !body.id.startsWith("user-") && !body.id.startsWith("enroll-")) {
-      await supabaseAdmin.from("notifications").update({ is_read: true }).eq("id", body.id);
-      return NextResponse.json({ success: true, message: "تم تحديث الإشعار كمقروء" });
-    }
-
-    return NextResponse.json({ success: true, message: "تم التحديث بنجاح" });
-  } catch (err: any) {
-    console.error("Error updating notifications:", err);
     return NextResponse.json({ success: false, message: err.message }, { status: 500 });
   }
 }

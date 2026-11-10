@@ -1,0 +1,31 @@
+/* Premium Fluid UI v1.3 — OPTIONAL proportional-art reference pattern.
+ * Use on illustrations/license-plate-like visual artifacts, not ordinary prose.
+ * This is a pattern to adapt; do not paste globally into an existing product.
+ */
+.pf-card-slot {
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.pf-proportional-art {
+  container: pf-art / inline-size;
+  inline-size: 100%;
+  aspect-ratio: 3.18;
+  position: relative;
+  min-inline-size: 0;
+  overflow: visible;
+}
+.pf-proportional-art__digits,
+.pf-proportional-art__letters {
+  position: absolute;
+  top: 20%;
+  inline-size: 33%;
+  font-size: clamp(.5rem, 10cqi, 2.6rem);
+  line-height: 1;
+  white-space: nowrap;
+}
+.pf-proportional-art__digits { inset-inline-start: 6%; }
+.pf-proportional-art__letters { inset-inline-end: 6%; }
+/* The font clamp is an example ONLY. For faithful scale at very small widths,
+ * render the entire artifact as an SVG viewBox or canvas AND offer a zoom/detail
+ * alternative for critical information. Do not inverse-scale browser zoom. */

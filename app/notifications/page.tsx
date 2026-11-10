@@ -13,7 +13,7 @@ const sections = [
     iconColor: "text-blue-600",
     bgColor: "bg-blue-50",
     title: "الهدف من نظام التنبيهات الذكي",
-    content: "يُعد (نظام التنبيهات المركزية) في معهد النبض المستدام أداة إدارية وتنظيمية بالغة الأهمية. يهدف النظام إلى إبقاء المستفيد (المتدرب والمدرب) على اطلاع دائم ومباشر بمساره التدريبي، وتذكيره بالمواعيد النهائية لضمان عدم تفويت أي جلسة افتراضية أو تكليف، مما ينعكس بشكل حاسم وإيجابي على تقدمه العلمي واجتيازه الناجح للدورات والبرامج التأهيلية."
+    content: "يُعد (نظام التنبيهات المركزية) في معهد مَدار للتعلّم أداة إدارية وتنظيمية بالغة الأهمية. يهدف النظام إلى إبقاء المستفيد (المتدرب والمدرب) على اطلاع دائم ومباشر بمساره التدريبي، وتذكيره بالمواعيد النهائية لضمان عدم تفويت أي جلسة افتراضية أو تكليف، مما ينعكس بشكل حاسم وإيجابي على تقدمه العلمي واجتيازه الناجح للدورات والبرامج التأهيلية."
   },
   {
     id: "types",
@@ -72,13 +72,13 @@ export default function NotificationsSystemPage() {
           transition={{ duration: 0.7 }}
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm mb-8 hover:shadow-md transition-shadow">
-            <BellRing className="w-4 h-4 text-[#173A7C]" />
-            <span className="text-xs font-extrabold text-slate-700 tracking-wide uppercase">ابقَ على اطلاع دائماً</span>
+            <BellRing className="w-4 h-4 text-[#0B3766]" />
+            <span className="text-xs font-bold text-slate-700 tracking-wide uppercase">ابقَ على اطلاع دائماً</span>
           </div>
           
-          <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black text-slate-900 mb-6 leading-[1.35] tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold text-slate-900 mb-6 leading-[1.35] tracking-tight">
             سياسة وآليات <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#173A7C] to-[#5CB07C] inline-block mt-3">نظام التنبيهات والإشعارات</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0B3766] to-[#19B6C7] inline-block mt-3">نظام التنبيهات والإشعارات</span>
           </h1>
           
           <p className="text-slate-500 text-base sm:text-lg font-medium leading-[1.8] max-w-3xl mx-auto mb-10">
@@ -86,11 +86,11 @@ export default function NotificationsSystemPage() {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-bold text-slate-400">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> تذكير آلي بالجلسات</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> تذكير آلي بالجلسات</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> رسائل SMS وإيميل</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> رسائل SMS وإيميل</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> تخصيص الخصوصية</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> تخصيص الخصوصية</span>
           </div>
         </motion.div>
       </section>
@@ -106,14 +106,14 @@ export default function NotificationsSystemPage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="w-full lg:w-1/3 lg:sticky lg:top-32 order-2 lg:order-1"
           >
-            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(23,58,124,0.08)]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(11,55,102,0.12)]">
               {/* Logo Area */}
               <div className="flex justify-center mb-8 pb-6 border-b border-slate-100/80">
-                <img src="/logo.svg" alt="Sustain Pulse Logo" className="h-[4.5rem] w-auto object-contain hover:scale-105 transition-transform duration-300" />
+                <img src="/logo.svg" alt="Madar Learning Logo" className="h-[4.5rem] w-auto object-contain hover:scale-105 transition-transform duration-300" />
               </div>
 
-              <h3 className="font-extrabold text-lg text-slate-800 mb-6 flex items-center gap-3">
-                <ShieldHalf className="w-5 h-5 text-[#173A7C]" />
+              <h3 className="font-bold text-lg text-slate-800 mb-6 flex items-center gap-3">
+                <ShieldHalf className="w-5 h-5 text-[#0B3766]" />
                 أقسام التنظيمات
               </h3>
               <div className="space-y-2">
@@ -126,16 +126,16 @@ export default function NotificationsSystemPage() {
                     }}
                     className={`w-full text-right px-4 lg:px-5 py-3.5 lg:py-4 rounded-2xl transition-all duration-300 font-bold text-sm flex items-center justify-between group ${
                       activeSection === p.id 
-                        ? "bg-slate-50 text-[#173A7C] border border-slate-200 shadow-sm" 
+                        ? "bg-slate-50 text-[#0B3766] border border-slate-200 shadow-sm"
                         : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-transparent"
                     }`}
                   >
                     <span className="flex items-center gap-3">
-                      <p.icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${activeSection === p.id ? "text-[#173A7C]" : "text-slate-400 group-hover:text-slate-600"}`} />
+                      <p.icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${activeSection === p.id ? "text-[#0B3766]" : "text-slate-400 group-hover:text-slate-600"}`} />
                       {p.title.split(' ').slice(0, 3).join(' ') + (p.title.split(' ').length > 3 ? "..." : "")}
                     </span>
                     {activeSection === p.id && (
-                      <motion.div layoutId="activeIndicator" className="w-1.5 h-1.5 rounded-full bg-[#173A7C]" />
+                      <motion.div layoutId="activeIndicator" className="w-1.5 h-1.5 rounded-full bg-[#0B3766]" />
                     )}
                   </button>
                 ))}
@@ -143,15 +143,15 @@ export default function NotificationsSystemPage() {
             </div>
             
             {/* Call to action decorative widget */}
-            <div className="mt-6 bg-gradient-to-br from-[#173A7C] to-[#2F66D6] rounded-3xl p-8 text-white text-center shadow-lg shadow-[#173A7C]/20">
+            <div className="mt-6 bg-gradient-to-br from-[#0B3766] to-[#168AD3] rounded-3xl p-8 text-white text-center shadow-lg shadow-[#0B3766]/20">
               <Mail className="w-12 h-12 text-white/80 mx-auto mb-4" />
-              <h4 className="font-black text-lg mb-2">تأكد من بياناتك</h4>
+              <h4 className="font-bold text-lg mb-2">تأكد من بياناتك</h4>
               <p className="text-sm text-blue-100 font-medium opacity-90 leading-relaxed mb-6">
                 احرص دائماً على تحديث رقم الجوال المربوط بالمنصة والبريد الإلكتروني كي لا يفوتك أي اختبار أو إعلان مركزي يخص مسارك التدريبي.
               </p>
               <Link 
                 href="/about"
-                className="inline-block px-6 py-3 bg-white text-[#173A7C] font-bold text-sm rounded-xl hover:bg-slate-50 hover:-translate-y-1 transition-all shadow-sm"
+                className="inline-block px-6 py-3 bg-white text-[#0B3766] font-bold text-sm rounded-xl hover:bg-slate-50 hover:-translate-y-1 transition-all shadow-sm"
               >
                 تحديث معلوماتك
               </Link>
@@ -172,7 +172,7 @@ export default function NotificationsSystemPage() {
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                   onViewportEnter={() => setActiveSection(sec.id)}
                   className={`relative bg-white rounded-[2.5rem] p-8 sm:p-12 border transition-all duration-500 overflow-hidden group ${
-                    activeSection === sec.id ? "border-[#173A7C]/20 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.12)] ring-1 ring-[#173A7C]/5" : "border-slate-100 shadow-sm hover:shadow-md"
+                    activeSection === sec.id ? "border-[#0B3766]/20 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] ring-1 ring-[#0B3766]/5" : "border-slate-100 shadow-sm hover:shadow-md"
                   }`}
                 >
                   <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${sec.color} opacity-[0.03] rounded-bl-full pointer-events-none transition-transform duration-700 group-hover:scale-150`} />
@@ -182,7 +182,7 @@ export default function NotificationsSystemPage() {
                       <Icon className={`w-7 h-7 ${sec.iconColor}`} />
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-4">{sec.title}</h2>
+                      <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-4">{sec.title}</h2>
                       <p className="text-slate-500 text-[15.5px] leading-[2] font-medium mb-4">
                         {sec.content}
                       </p>

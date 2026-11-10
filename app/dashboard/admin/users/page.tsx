@@ -25,7 +25,6 @@ import {
   Calendar,
   Activity,
   GraduationCap,
-  Sparkles,
   ChevronLeft,
   Lock,
   Copy,
@@ -259,7 +258,7 @@ function AdminUsersPageContent() {
       createdCredentials.courses && createdCredentials.courses.length > 0
         ? `\nالدورات المعتمدة: ${createdCredentials.courses.join('، ')}`
         : '';
-    const text = `بيانات الدخول لمنصة النبض المستدام:\nالاسم: ${createdCredentials.name}\nنوع الصلاحية: ${createdCredentials.role || 'متدرب'}\nالبريد: ${createdCredentials.email}\nكلمة المرور: ${createdCredentials.password}${coursesText}\nرابط الدخول: ${window.location.origin}/auth/login`;
+    const text = `بيانات الدخول لمنصة مَدار للتعلّم:\nالاسم: ${createdCredentials.name}\nنوع الصلاحية: ${createdCredentials.role || 'متدرب'}\nالبريد: ${createdCredentials.email}\nكلمة المرور: ${createdCredentials.password}${coursesText}\nرابط الدخول: ${window.location.origin}/auth/login`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -280,8 +279,8 @@ function AdminUsersPageContent() {
     <div className="space-y-6" dir="rtl">
       {/* Background Ambient Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-20 right-10 w-96 h-96 bg-[#173A7C]/8 rounded-full blur-[140px]" />
-        <div className="absolute bottom-20 left-10 w-[30rem] h-[30rem] bg-[#5CB07C]/8 rounded-full blur-[160px]" />
+        <div className="absolute top-20 right-10 w-96 h-96 bg-[#0B3766]/8 rounded-full blur-[140px]" />
+        <div className="absolute bottom-20 left-10 w-[30rem] h-[30rem] bg-[#19B6C7]/8 rounded-full blur-[160px]" />
       </div>
 
       {/* Header Banner - Liquid Glass Hero */}
@@ -295,11 +294,11 @@ function AdminUsersPageContent() {
         <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6`}>
           <div className={`${heroStyles.intro} space-y-3 sm:space-y-3.5`}>
             <div className="flex flex-col items-start">
-              <div className={`${heroStyles.badge} admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15`}>
-                <Users className="w-4 h-4 text-[#173A7C] shrink-0" />
+              <div className={`${heroStyles.badge} admin-hero-tag bg-[#0B3766]/10 text-[#0B3766] border border-[#0B3766]/15`}>
+                <Users className="w-4 h-4 text-[#0B3766] shrink-0" />
                 <span>إدارة المتدربين وسجلات الحضور</span>
               </div>
-              <h1 className="text-sm sm:text-2xl lg:text-3xl font-black student-heading-h1 student-name-gradient leading-snug">
+              <h1 className="text-sm sm:text-2xl lg:text-3xl font-bold student-heading-h1 student-name-gradient leading-snug">
                 <span className="sm:hidden">إدارة الطلاب والمتدربين</span>
                 <span className="hidden sm:inline">سجل الطلاب والمتدربين <span className="inline-block whitespace-nowrap">والأنشطة 👥</span></span>
               </h1>
@@ -328,7 +327,7 @@ function AdminUsersPageContent() {
               }}
               className="flex-1 sm:flex-none px-3.5 sm:px-4.5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 shadow-2xs cursor-pointer transition-all shrink-0 whitespace-nowrap"
             >
-              <Download className="w-4 h-4 text-[#173A7C] shrink-0" />
+              <Download className="w-4 h-4 text-[#0B3766] shrink-0" />
               <span className="sm:hidden">تصدير البيانات</span>
               <span className="hidden sm:inline">تصدير البيانات 📊</span>
             </motion.button>
@@ -336,7 +335,7 @@ function AdminUsersPageContent() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setIsAddUserModalOpen(true)}
-              className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#173A7C] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-[#173A7C]/20 cursor-pointer border border-white/25 transition-all shrink-0 whitespace-nowrap"
+              className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#0B3766] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-[#0B3766]/20 cursor-pointer border border-white/25 transition-all shrink-0 whitespace-nowrap"
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span className="sm:hidden">متدرب جديد</span>
@@ -346,22 +345,22 @@ function AdminUsersPageContent() {
         </div>
 
         {/* Quick KPI stats strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-[#173A7C]/10">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-[#0B3766]/10">
           <div className="liquid-glass-inset p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border border-white/70">
             <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold">إجمالي المستخدمين</p>
-            <p className="text-base sm:text-lg font-black text-[#173A7C]">{users.length} مسجل</p>
+            <p className="text-base sm:text-lg font-bold text-[#0B3766]">{users.length} مسجل</p>
           </div>
           <div className="liquid-glass-inset p-3.5 rounded-xl border border-white/70">
             <p className="text-[11px] text-slate-500 font-bold">الطلاب والمتدربين</p>
-            <p className="text-base sm:text-lg font-black text-emerald-700">{studentCount} طالب</p>
+            <p className="text-base sm:text-lg font-bold text-emerald-700">{studentCount} طالب</p>
           </div>
           <div className="liquid-glass-inset p-3.5 rounded-xl border border-white/70">
             <p className="text-[11px] text-slate-500 font-bold">المحاضرين والخبراء</p>
-            <p className="text-base sm:text-lg font-black text-[#173A7C]">{trainerCount} مدرب معتمد</p>
+            <p className="text-base sm:text-lg font-bold text-[#0B3766]">{trainerCount} مدرب معتمد</p>
           </div>
           <div className="liquid-glass-inset p-3.5 rounded-xl border border-white/70">
             <p className="text-[11px] text-slate-500 font-bold">الحسابات النشطة</p>
-            <p className="text-base sm:text-lg font-black text-emerald-700">{activeCount}</p>
+            <p className="text-base sm:text-lg font-bold text-emerald-700">{activeCount}</p>
           </div>
         </div>
       </motion.div>
@@ -382,8 +381,8 @@ function AdminUsersPageContent() {
                 aria-pressed={isActive}
                 onClick={() => setRoleFilter(tab.id as any)}
                 className={`premium-tab min-w-0 flex-1 md:flex-none px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${isActive
-                    ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-[#173A7C]'
-                    : 'bg-white/80 text-slate-700 hover:bg-white hover:text-[#173A7C] border border-slate-200/80'
+                    ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20 border border-[#0B3766]'
+                    : 'bg-white/80 text-slate-700 hover:bg-white hover:text-[#0B3766] border border-slate-200/80'
                   }`}
               >
                 <span className="premium-tab-label"><span className="md:hidden">{tab.mobileLabel}</span><span className="hidden md:inline">{tab.label}</span></span>
@@ -399,7 +398,7 @@ function AdminUsersPageContent() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="البحث باسم المتدرب، البريد، أو الجوال..."
-            className="w-full py-2.5 pr-10 pl-4 text-xs font-bold text-slate-800 bg-white/90 rounded-xl border border-slate-200/80 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all shadow-sm"
+            className="w-full py-2.5 pr-10 pl-4 text-xs font-bold text-slate-800 bg-white/90 rounded-xl border border-slate-200/80 focus:outline-none focus:border-[#0B3766] focus:ring-2 focus:ring-[#0B3766]/15 transition-all shadow-sm"
           />
         </div>
       </div>
@@ -410,7 +409,7 @@ function AdminUsersPageContent() {
         {/* Desktop Table - hidden on mobile */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-right text-xs">
-            <thead className="bg-[#173A7C]/5 text-[#173A7C] font-black border-b border-[#173A7C]/10">
+            <thead className="bg-[#0B3766]/5 text-[#0B3766] font-bold border-b border-[#0B3766]/10">
               <tr>
                 <th className="p-4">المتدرب</th>
                 <th className="p-4">التصنيف</th>
@@ -421,7 +420,7 @@ function AdminUsersPageContent() {
                 <th className="p-4 text-center">الإجراءات</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#173A7C]/8 font-bold text-slate-800">
+            <tbody className="divide-y divide-[#0B3766]/8 font-bold text-slate-800">
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-white/60 transition-colors">
                   <td className="p-4">
@@ -433,18 +432,18 @@ function AdminUsersPageContent() {
                           className="w-10 h-10 rounded-xl object-cover shadow-md border border-white/60 shrink-0 bg-slate-100"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white font-black flex items-center justify-center shrink-0 text-sm shadow-md shadow-[#173A7C]/20 border border-white/20">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white font-bold flex items-center justify-center shrink-0 text-sm shadow-md shadow-[#0B3766]/20 border border-white/20">
                           {user.name.charAt(0)}
                         </div>
                       )}
-                      <div className="font-extrabold text-[#152C5B] text-sm student-heading-h3 [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+                      <div className="font-bold text-[#152C5B] text-sm student-heading-h3 [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
                         {user.name}
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black border ${
-                      user.role === 'طالب' ? 'bg-[#173A7C]/10 text-[#173A7C] border-[#173A7C]/20' :
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
+                      user.role === 'طالب' ? 'bg-[#0B3766]/10 text-[#0B3766] border-[#0B3766]/20' :
                       user.role === 'مدرب' ? 'bg-amber-500/10 text-amber-800 border-amber-500/20' :
                       'bg-rose-500/10 text-rose-800 border-rose-500/20'
                     }`}>
@@ -453,7 +452,7 @@ function AdminUsersPageContent() {
                   </td>
                   <td className="p-4 space-y-1">
                     <div className="flex items-center gap-1.5 text-slate-600">
-                      <Mail className="w-3.5 h-3.5 text-[#173A7C]" />
+                      <Mail className="w-3.5 h-3.5 text-[#0B3766]" />
                       <span className="font-mono text-[11px]">{user.email}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-slate-500 text-[11px]">
@@ -461,13 +460,13 @@ function AdminUsersPageContent() {
                       <span className="font-mono" dir="ltr">{user.phone}</span>
                     </div>
                   </td>
-                  <td className="p-4 font-black">
-                    <span className="text-[#173A7C] bg-[#173A7C]/10 px-2.5 py-1 rounded-lg border border-[#173A7C]/15">
+                  <td className="p-4 font-bold">
+                    <span className="text-[#0B3766] bg-[#0B3766]/10 px-2.5 py-1 rounded-lg border border-[#0B3766]/15">
                       {user.enrolledCourses} مساقات
                     </span>
                   </td>
                   <td className="p-4">
-                    <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-800 font-mono font-black border border-emerald-500/20">
+                    <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-800 font-mono font-bold border border-emerald-500/20">
                       {user.attendanceRate}
                     </span>
                   </td>
@@ -481,14 +480,14 @@ function AdminUsersPageContent() {
                           setUserToEditName(user);
                           setEditStudentFullName(user.name);
                         }}
-                        className="p-1.5 rounded-xl bg-blue-50 hover:bg-[#173A7C] text-[#173A7C] hover:text-white transition-all cursor-pointer border border-blue-200 shadow-xs"
+                        className="p-1.5 rounded-xl bg-blue-50 hover:bg-[#0B3766] text-[#0B3766] hover:text-white transition-all cursor-pointer border border-blue-200 shadow-xs"
                         title="تعديل وتصحيح اسم المتدرب للشهادات"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setSelectedUserForLogs(user)}
-                        className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#173A7C] hover:text-white text-[#173A7C] font-bold text-[11px] transition-all cursor-pointer border border-[#173A7C]/20 shadow-xs whitespace-nowrap"
+                        className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#0B3766] hover:text-white text-[#0B3766] font-bold text-[11px] transition-all cursor-pointer border border-[#0B3766]/20 shadow-xs whitespace-nowrap"
                         title="سجل الأنشطة"
                       >
                         سجل الأنشطة 📋
@@ -509,7 +508,7 @@ function AdminUsersPageContent() {
         </div>
 
         {/* Mobile Cards - visible only on mobile */}
-        <div className="md:hidden divide-y-2 divide-[#173A7C]/20">
+        <div className="md:hidden divide-y-2 divide-[#0B3766]/20">
           {filteredUsers.map((user) => (
             <article key={user.id} aria-label={'حساب ' + user.name} className="space-y-3 p-4">
               <header className="flex min-w-0 items-start justify-between gap-3">
@@ -521,7 +520,7 @@ function AdminUsersPageContent() {
                       className="h-10 w-10 shrink-0 rounded-xl border border-white/60 bg-slate-100 object-cover shadow-md"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-sm font-black text-white shadow-md shadow-[#173A7C]/20">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-sm font-bold text-white shadow-md shadow-[#0B3766]/20">
                       {user.name.charAt(0)}
                     </div>
                   )}
@@ -530,7 +529,7 @@ function AdminUsersPageContent() {
                   </div>
                 </div>
                 <span className={'inline-flex min-h-6 shrink-0 items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ' + (
-                  user.role === 'طالب' ? 'border-[#173A7C]/20 bg-[#173A7C]/10 text-[#173A7C]' :
+                  user.role === 'طالب' ? 'border-[#0B3766]/20 bg-[#0B3766]/10 text-[#0B3766]' :
                   user.role === 'مدرب' ? 'border-amber-500/20 bg-amber-500/10 text-amber-800' :
                   'border-rose-500/20 bg-rose-500/10 text-rose-800'
                 )}>
@@ -540,7 +539,7 @@ function AdminUsersPageContent() {
 
               <div className="space-y-2 rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2.5 text-[11px]">
                 <div className="flex min-w-0 items-start gap-2 text-slate-600">
-                  <Mail aria-hidden="true" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#173A7C]" />
+                  <Mail aria-hidden="true" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#0B3766]" />
                   <span className="min-w-0 break-all font-mono leading-5" dir="ltr">{user.email}</span>
                 </div>
                 <div className="flex min-w-0 items-center gap-2 text-slate-500">
@@ -552,7 +551,7 @@ function AdminUsersPageContent() {
               <div className="grid grid-cols-2 gap-2">
                 <div className="liquid-glass-inset rounded-lg border border-white/60 p-2 text-center">
                   <p className="text-[10px] font-medium text-slate-500">المساقات</p>
-                  <p className="text-sm font-bold tabular-nums text-[#173A7C]">{user.enrolledCourses}</p>
+                  <p className="text-sm font-bold tabular-nums text-[#0B3766]">{user.enrolledCourses}</p>
                 </div>
                 <div className="liquid-glass-inset rounded-lg border border-white/60 p-2 text-center">
                   <p className="text-[10px] font-medium text-slate-500">الحضور</p>
@@ -560,7 +559,7 @@ function AdminUsersPageContent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] gap-2 border-t border-[#173A7C]/10 pt-3">
+              <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] gap-2 border-t border-[#0B3766]/10 pt-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -568,7 +567,7 @@ function AdminUsersPageContent() {
                     setEditStudentFullName(user.name);
                   }}
                   aria-label={'تعديل اسم ' + user.name}
-                  className="flex min-h-11 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-[#173A7C] shadow-xs transition-colors hover:bg-[#173A7C] hover:text-white"
+                  className="flex min-h-11 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-[#0B3766] shadow-xs transition-colors hover:bg-[#0B3766] hover:text-white"
                   title="تعديل وتصحيح اسم المتدرب"
                 >
                   <Pencil aria-hidden="true" className="h-4 w-4" />
@@ -576,7 +575,7 @@ function AdminUsersPageContent() {
                 <button
                   type="button"
                   onClick={() => setSelectedUserForLogs(user)}
-                  className="flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-xl border border-[#173A7C]/20 bg-white px-2 text-xs font-semibold text-[#173A7C] shadow-xs transition-colors hover:bg-[#173A7C] hover:text-white"
+                  className="flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-xl border border-[#0B3766]/20 bg-white px-2 text-xs font-semibold text-[#0B3766] shadow-xs transition-colors hover:bg-[#0B3766] hover:text-white"
                 >
                   <Activity aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
                   <span>سجل الأنشطة</span>
@@ -614,11 +613,11 @@ function AdminUsersPageContent() {
               {/* Modal Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-200/70 shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20">
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20">
                     <Plus className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg sm:text-xl text-[#152C5B] student-heading-h3">تسجيل مستخدم جديد في النظام</h3>
+                    <h3 className="font-bold text-lg sm:text-xl text-[#152C5B] student-heading-h3">تسجيل مستخدم جديد في النظام</h3>
                     <p className="text-xs text-slate-500 font-bold">إنشاء حساب وتعيين الصلاحيات والدورات التدريبية فورياً</p>
                   </div>
                 </div>
@@ -644,9 +643,9 @@ function AdminUsersPageContent() {
                         <button
                           type="button"
                           onClick={() => setNewRole('STUDENT')}
-                          className={`py-2.5 px-2 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                          className={`py-2.5 px-2 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                             newRole === 'STUDENT'
-                              ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white border-[#173A7C] shadow-sm'
+                              ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white border-[#0B3766] shadow-sm'
                               : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
                           }`}
                         >
@@ -656,7 +655,7 @@ function AdminUsersPageContent() {
                         <button
                           type="button"
                           onClick={() => setNewRole('INSTRUCTOR')}
-                          className={`py-2.5 px-2 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                          className={`py-2.5 px-2 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                             newRole === 'INSTRUCTOR'
                               ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-sm'
                               : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
@@ -668,7 +667,7 @@ function AdminUsersPageContent() {
                         <button
                           type="button"
                           onClick={() => setNewRole('ADMIN')}
-                          className={`py-2.5 px-2 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                          className={`py-2.5 px-2 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                             newRole === 'ADMIN'
                               ? 'bg-gradient-to-r from-purple-700 to-indigo-800 text-white border-purple-700 shadow-sm'
                               : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-white'
@@ -689,7 +688,7 @@ function AdminUsersPageContent() {
                         placeholder="مثال: أحمد عبدالأمير العلي"
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
-                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
+                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#0B3766] focus:bg-white focus:ring-2 focus:ring-[#0B3766]/15 transition-all text-xs"
                       />
                     </div>
 
@@ -702,7 +701,7 @@ function AdminUsersPageContent() {
                         placeholder="name@example.com"
                         value={newEmail}
                         onChange={(e) => setNewEmail(e.target.value)}
-                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
+                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#0B3766] focus:bg-white focus:ring-2 focus:ring-[#0B3766]/15 transition-all text-xs"
                       />
                     </div>
 
@@ -717,13 +716,13 @@ function AdminUsersPageContent() {
                             placeholder="12345678"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className="w-full p-3 pl-9 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 font-mono focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
+                            className="w-full p-3 pl-9 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 font-mono focus:outline-none focus:border-[#0B3766] focus:bg-white focus:ring-2 focus:ring-[#0B3766]/15 transition-all text-xs"
                           />
                           <button
                             type="button"
                             onClick={() => setNewPassword(generatePassword())}
                             title="توليد كلمة مرور عشوائية قوية"
-                            className="absolute left-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#173A7C] transition-colors cursor-pointer"
+                            className="absolute left-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#0B3766] transition-colors cursor-pointer"
                           >
                             <RefreshCw className="w-3.5 h-3.5" />
                           </button>
@@ -737,7 +736,7 @@ function AdminUsersPageContent() {
                           placeholder="+966 50 000 0000"
                           value={newPhone}
                           onChange={(e) => setNewPhone(e.target.value)}
-                          className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
+                          className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#0B3766] focus:bg-white focus:ring-2 focus:ring-[#0B3766]/15 transition-all text-xs"
                         />
                       </div>
                     </div>
@@ -750,7 +749,7 @@ function AdminUsersPageContent() {
                         placeholder="10 أرقام (اختياري)"
                         value={newNationalId}
                         onChange={(e) => setNewNationalId(e.target.value)}
-                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#173A7C] focus:bg-white focus:ring-2 focus:ring-[#173A7C]/15 transition-all text-xs"
+                        className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-900 focus:outline-none focus:border-[#0B3766] focus:bg-white focus:ring-2 focus:ring-[#0B3766]/15 transition-all text-xs"
                       />
                     </div>
                   </div>
@@ -761,8 +760,8 @@ function AdminUsersPageContent() {
                       <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/90 space-y-3 flex-1 flex flex-col">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-slate-800">
-                            <BookOpen className="w-4 h-4 text-[#173A7C]" />
-                            <span className="font-black text-xs">
+                            <BookOpen className="w-4 h-4 text-[#0B3766]" />
+                            <span className="font-bold text-xs">
                               {newRole === 'STUDENT'
                                 ? 'صلاحيات الاشتراك في الدورات (اختياري)'
                                 : 'تكليف المدرب بالدورات التدريبية (اختياري)'}
@@ -788,7 +787,7 @@ function AdminUsersPageContent() {
                               placeholder="ابحث عن دورة لتحديدها..."
                               value={courseSearchTerm}
                               onChange={(e) => setCourseSearchTerm(e.target.value)}
-                              className="w-full pr-8 pl-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#5CB07C]"
+                              className="w-full pr-8 pl-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#19B6C7]"
                             />
                           </div>
                         )}
@@ -808,7 +807,7 @@ function AdminUsersPageContent() {
                                   key={course.slug || course.id}
                                   className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
                                     isSelected
-                                      ? 'bg-emerald-50/90 border-[#5CB07C] text-emerald-950 shadow-xs'
+                                      ? 'bg-emerald-50/90 border-[#19B6C7] text-emerald-950 shadow-xs'
                                       : 'bg-white border-slate-200/80 text-slate-700 hover:border-slate-300'
                                   }`}
                                 >
@@ -822,7 +821,7 @@ function AdminUsersPageContent() {
                                         setSelectedCourseSlugs((prev) => [...prev, course.slug]);
                                       }
                                     }}
-                                    className="w-4 h-4 text-[#5CB07C] focus:ring-[#5CB07C] border-slate-300 rounded cursor-pointer shrink-0"
+                                    className="w-4 h-4 text-[#19B6C7] focus:ring-[#19B6C7] border-slate-300 rounded cursor-pointer shrink-0"
                                   />
                                   <span className="flex-1 truncate">{course.title}</span>
                                   {isSelected && (
@@ -859,7 +858,7 @@ function AdminUsersPageContent() {
                           <button
                             type="button"
                             onClick={() => setIsCustomCourseActive(!isCustomCourseActive)}
-                            className="flex items-center gap-1.5 text-xs text-[#173A7C] hover:text-[#1E4D9D] font-bold cursor-pointer transition-colors"
+                            className="flex items-center gap-1.5 text-xs text-[#0B3766] hover:text-[#168AD3] font-bold cursor-pointer transition-colors"
                           >
                             <Plus
                               className={`w-3.5 h-3.5 transition-transform ${
@@ -885,7 +884,7 @@ function AdminUsersPageContent() {
                                 placeholder="اكتب اسم الدورة التدريبية الجديدة هنا..."
                                 value={customCourseTitle}
                                 onChange={(e) => setCustomCourseTitle(e.target.value)}
-                                className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15"
+                                className="w-full p-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-[#0B3766] focus:ring-2 focus:ring-[#0B3766]/15"
                               />
                               <p className="text-[10px] text-slate-400 font-normal">
                                 سيتم ربط المستخدم بهذه الدورة فور إنشائها واعتماده فيها.
@@ -900,7 +899,7 @@ function AdminUsersPageContent() {
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 text-white flex items-center justify-center shadow-lg shadow-purple-600/20">
                           <ShieldCheck className="w-7 h-7" />
                         </div>
-                        <h4 className="font-black text-sm sm:text-base text-slate-800">صلاحيات الإدارة والتحكم الكاملة</h4>
+                        <h4 className="font-bold text-sm sm:text-base text-slate-800">صلاحيات الإدارة والتحكم الكاملة</h4>
                         <p className="text-xs text-slate-500 leading-relaxed max-w-xs">
                           حساب الأدمن (مدير النظام) يمتلك صلاحية الوصول الشاملة لكافة لوحات التحكم، إعدادات المنصة، السجلات، وإدارة الأعضاء.
                         </p>
@@ -925,7 +924,7 @@ function AdminUsersPageContent() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all border border-white/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs shadow-lg shadow-[#0B3766]/25 cursor-pointer transition-all border border-white/20 flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {saving ? (
                       <>
@@ -963,7 +962,7 @@ function AdminUsersPageContent() {
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg text-slate-900">تم إنشاء الحساب بنجاح!</h3>
+                  <h3 className="font-bold text-lg text-slate-900">تم إنشاء الحساب بنجاح!</h3>
                   <p className="text-xs text-slate-500 font-bold">يمكن للمستخدم تسجيل الدخول فوراً عبر البيانات التالية</p>
                 </div>
               </div>
@@ -971,19 +970,19 @@ function AdminUsersPageContent() {
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs font-bold text-slate-700">
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500">الاسم:</span>
-                  <span className="text-slate-900 font-black">{createdCredentials.name}</span>
+                  <span className="text-slate-900 font-bold">{createdCredentials.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500">نوع الصلاحية:</span>
-                  <span className="text-emerald-700 font-black">{createdCredentials.role || 'متدرب'}</span>
+                  <span className="text-emerald-700 font-bold">{createdCredentials.role || 'متدرب'}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500">البريد الإلكتروني:</span>
-                  <span className="text-[#173A7C] font-mono">{createdCredentials.email}</span>
+                  <span className="text-[#0B3766] font-mono">{createdCredentials.email}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500">كلمة المرور:</span>
-                  <span className="text-emerald-700 font-mono font-black">{createdCredentials.password}</span>
+                  <span className="text-emerald-700 font-mono font-bold">{createdCredentials.password}</span>
                 </div>
                 {createdCredentials.courses && createdCredentials.courses.length > 0 && (
                   <div className="pt-2 border-t border-slate-200/60 space-y-1.5">
@@ -1014,7 +1013,7 @@ function AdminUsersPageContent() {
               <div className="pt-2 flex gap-2">
                 <button
                   onClick={handleCopyCredentials}
-                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 hover:opacity-95 transition-all cursor-pointer"
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 hover:opacity-95 transition-all cursor-pointer"
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   <span>{copied ? 'تم النسخ بنجاح!' : 'نسخ بيانات الدخول'}</span>
@@ -1051,7 +1050,7 @@ function AdminUsersPageContent() {
                   <AlertTriangle className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-black text-lg text-slate-900">تأكيد حذف الحساب نهائياً</h3>
+                  <h3 className="font-bold text-lg text-slate-900">تأكيد حذف الحساب نهائياً</h3>
                   <p className="text-xs text-rose-600 font-bold">هذا الإجراء لا يمكن التراجع عنه</p>
                 </div>
               </div>
@@ -1064,7 +1063,7 @@ function AdminUsersPageContent() {
                 <button
                   onClick={handleDeleteUser}
                   disabled={isDeleting}
-                  className="flex-1 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-600/25 transition-all cursor-pointer disabled:opacity-50"
+                  className="flex-1 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-600/25 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isDeleting ? (
                     <>
@@ -1106,15 +1105,15 @@ function AdminUsersPageContent() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="w-full max-w-lg bg-white/95 backdrop-blur-xl text-slate-900 rounded-xl sm:rounded-2xl border border-white/80 p-6 sm:p-8 space-y-5 shadow-2xl overflow-hidden relative my-8"
             >
-              <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#5CB07C] via-[#173A7C] to-emerald-400" />
+              <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#19B6C7] via-[#0B3766] to-emerald-400" />
 
               <div className="flex items-center justify-between pb-3 border-b border-slate-200/70">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-[#173A7C]/10 text-[#173A7C]">
+                  <div className="p-3 rounded-xl bg-[#0B3766]/10 text-[#0B3766]">
                     <Activity className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg text-[#152C5B] student-heading-h3">
+                    <h3 className="font-bold text-lg text-[#152C5B] student-heading-h3">
                       سجل أنشطة وحضور: {selectedUserForLogs.name}
                     </h3>
                     <p className="text-xs text-slate-500 font-bold">تتبع دقيق لمحاضرات ومشاركات الطالب</p>
@@ -1129,20 +1128,20 @@ function AdminUsersPageContent() {
               </div>
 
               <div className="space-y-3 text-xs">
-                <div className="p-3.5 rounded-xl bg-[#173A7C]/5 border border-[#173A7C]/15 flex justify-between font-bold text-[#173A7C]">
+                <div className="p-3.5 rounded-xl bg-[#0B3766]/5 border border-[#0B3766]/15 flex justify-between font-bold text-[#0B3766]">
                   <span>نسبة الحضور والتفاعل الإجمالية:</span>
-                  <span className="font-black font-mono text-emerald-700 text-sm">{selectedUserForLogs.attendanceRate}</span>
+                  <span className="font-bold font-mono text-emerald-700 text-sm">{selectedUserForLogs.attendanceRate}</span>
                 </div>
 
                 <div className="space-y-2 pt-2">
-                  <h4 className="font-black text-slate-700">آخر الجلسات والدروس المسجلة:</h4>
+                  <h4 className="font-bold text-slate-700">آخر الجلسات والدروس المسجلة:</h4>
                   {[
                     { date: 'اليوم، 10:15 ص', action: 'حضور المحاضرة المباشرة: تطبيقات الحوار الإيجابي' },
                     { date: 'أمس، 04:30 م', action: 'إكمال الدرس الأول: مدخل إلى قيم التسامح' },
                     { date: '28 يوليو 2026', action: 'تسليم واجب الوحدة الثانية بنجاح (98/100)' },
                   ].map((item, idx) => (
                     <div key={idx} className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start gap-2.5 shadow-sm">
-                      <Clock className="w-4 h-4 text-[#173A7C] shrink-0 mt-0.5" />
+                      <Clock className="w-4 h-4 text-[#0B3766] shrink-0 mt-0.5" />
                       <div>
                         <div className="font-bold text-slate-800">{item.action}</div>
                         <div className="text-[10px] text-slate-400 font-medium mt-0.5">{item.date}</div>
@@ -1181,11 +1180,11 @@ function AdminUsersPageContent() {
             >
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2.5 rounded-xl bg-[#173A7C]/10 text-[#173A7C]">
+                  <div className="p-2.5 rounded-xl bg-[#0B3766]/10 text-[#0B3766]">
                     <Pencil className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-black text-base text-slate-900">تعديل وتصحيح اسم المتدرب</h3>
+                    <h3 className="font-bold text-base text-slate-900">تعديل وتصحيح اسم المتدرب</h3>
                     <p className="text-[11px] text-slate-500 font-medium">الاسم الرسمي المعتمد لإصدار الشهادات والتقارير</p>
                   </div>
                 </div>
@@ -1199,14 +1198,14 @@ function AdminUsersPageContent() {
 
               <form onSubmit={handleSaveStudentName} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-slate-700">الاسم الكامل (المعتمد على الشهادة)</label>
+                  <label className="text-xs font-bold text-slate-700">الاسم الكامل (المعتمد على الشهادة)</label>
                   <input
                     type="text"
                     required
                     value={editStudentFullName}
                     onChange={(e) => setEditStudentFullName(e.target.value)}
                     placeholder="مثال: عبد العزيز بن فهد المنصور"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                   <p className="text-[10.5px] text-emerald-700 font-bold mt-1">
                     ✓ سيتم اعتماد هذا الاسم فوراً في حسابه وفي أي شهادة جديدة تصدر له.
@@ -1222,14 +1221,14 @@ function AdminUsersPageContent() {
                   <button
                     type="button"
                     onClick={() => setUserToEditName(null)}
-                    className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black cursor-pointer transition-colors"
+                    className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer transition-colors"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
                     disabled={isSavingStudentName}
-                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-[#173A7C]/20 transition-all cursor-pointer disabled:opacity-60"
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-[#0B3766]/20 transition-all cursor-pointer disabled:opacity-60"
                   >
                     {isSavingStudentName ? (
                       <>
@@ -1255,7 +1254,7 @@ function AdminUsersPageContent() {
 
 export default function AdminUsersPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-4 border-slate-200 border-t-[#173A7C] rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-4 border-slate-200 border-t-[#0B3766] rounded-full animate-spin" /></div>}>
       <AdminUsersPageContent />
     </Suspense>
   );

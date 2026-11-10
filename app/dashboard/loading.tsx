@@ -4,7 +4,7 @@ export default function DashboardLoading() {
   return (
     <BrandLoadingScreen
       message="جاري تجهيز لوحة التحكم..."
-      subMessage="منصة النبض المستدام للتعليم والتدريب الصحي"
+      subMessage="منصة مَدار للتعلّم للتعليم والتدريب الصحي"
     />
   );
 }

@@ -1,99 +1,95 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Target, Eye, Heart, Award, Users, BookOpen, Globe, PhoneCall, ShieldCheck, FileCheck, QrCode, BadgePercent, Building } from "lucide-react";
+import { Target, Eye, Heart, Award, Users, BookOpen, Globe, PhoneCall } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 const values = [
-  { icon: Award, title: "الجودة", desc: "نلتزم بأعلى معايير الجودة في المحتوى والتقديم وفقاً للمعايير العالمية" },
-  { icon: Heart, title: "الشغف", desc: "نؤمن بأن التعليم رسالة قبل أن يكون مهنة فهدفنا إيصال المعرفة بشغف" },
-  { icon: Users, title: "التمكين", desc: "نسعى لتمكين كل متدرب من تحقيق أهدافه المهنية والذاتية" },
-  { icon: Globe, title: "الانفتاح", desc: "نواكب أحدث المنهجيات والتقنيات لتوفير تجربة تعليمية معاصرة" },
+  { icon: Award, title: "الجودة", desc: "نلتزم بأعلى معايير الجودة في المحتوى والتقديم وفقاً للمعايير والاعتمادات العالمية." },
+  { icon: Heart, title: "الشغف", desc: "نؤمن بأن التعليم رسالة سامية وهدفنا إيصال المعرفة بتفانٍ وشغف معرفي حقيقي." },
+  { icon: Users, title: "التمكين", desc: "نسعى لتمكين كل متدرب وكادر مؤسسي من تحقيق أهدافه المهنية والارتقاء بأدائه." },
+  { icon: Globe, title: "الابتكار", desc: "نواكب أحدث المنهجيات الرقمية لتوفير تجربة تعليمية معاصرة ومواكبة للمستقبل." },
 ];
 
 const achievements = [
-  { value: "15+", label: "سنوات خبرة" },
-  { value: "5000+", label: "متدرب فخور" },
-  { value: "50+", label: "دورة احترافية" },
-  { value: "100+", label: "شريك نجاح" },
+  { value: "+15", label: "سنوات خبرة مؤسسية" },
+  { value: "+5K", label: "متدرب وكادر مؤهل" },
+  { value: "+85", label: "دورة وبرنامج معتمد" },
+  { value: "+120", label: "شريك نجاح ومؤسسة" },
 ];
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] via-[#EEF4F9]/60 to-[#FFFFFF] pb-24 overflow-x-clip">
       
       {/* ═══════════════════════════════════════ HERO SECTION ═══════════════════════════════════════ */}
-      <section className="relative pt-20 md:pt-[calc(10vh+5rem)] pb-16 md:pb-32 overflow-hidden bg-white">
-        {/* Background Image & Texture */}
+      <section className="relative pt-24 sm:pt-32 pb-20 sm:pb-28 overflow-hidden">
+        {/* Background Texture */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none overflow-hidden z-0">
-          <img src="/bg.webp" alt="Background Texture" className="w-full h-full object-contain" />
+          <img src="/bg.webp" alt="" className="w-full h-full object-cover" />
         </div>
         
-        {/* Particle Grid */}
-        <div className="particles-grid opacity-50 absolute inset-0 z-0 pointer-events-none" />
-        
-        {/* Ambient Glow */}
-        <div className="absolute top-0 right-10 w-96 h-96 bg-[#173A7C]/[0.05] rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-10 left-10 w-80 h-80 bg-[#5CB07C]/[0.06] rounded-full blur-[100px] pointer-events-none" />
+        {/* Ambient Luxury Glows (Home Identity) */}
+        <div className="absolute -top-24 -right-20 w-[550px] h-[550px] bg-[#0B3766]/[0.08] rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-0 -left-20 w-[500px] h-[500px] bg-[#19B6C7]/[0.07] rounded-full blur-[140px] pointer-events-none" />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            <span className="section-badge-glass mb-8">
+            <span className="section-badge-glass mb-4 sm:mb-6">
               من نحن
             </span>
             
-            <h1 className="section-main-title-premium mb-6">
-              تعرّف على <span className="gradient-text">النبض المستدام</span>
+            <h1 className="hero-main-title-premium mb-4 sm:mb-6">
+              تعرّف على <span className="gradient-text">مَدار للتعلّم</span>
             </h1>
             
-            <div className="w-24 h-[3px] mx-auto bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full mb-8 opacity-80" />
-            
-            <p className="section-desc-premium max-w-3xl mx-auto text-lg sm:text-2xl">
-              منصة تعليمية رائدة نشأت من رحم خبرة تزيد عن 15 عاماً في التدريب المهني والتقني. 
-              نؤمن بأن كل فرد يستحق فرصة حقيقية لتطوير مهاراته والوصول إلى التميز في مسيرته.
+            <p className="section-desc-premium max-w-3xl mx-auto text-base sm:text-lg lg:text-xl leading-relaxed">
+              منصة تعليمية رائدة نشأت من رحم خبرة تزيد عن 15 عاماً في التدريب والتطوير المهني. 
+              نؤمن بأن كل متدرب يستحق تجربة تعليمية رائدة تمكّنه من صنع فارق ملموس في مسيرته وسوق العمل.
             </p>
           </motion.div>
         </div>
 
-        {/* Bottom Divider */}
-        <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-none">
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[90%] md:w-[95%] h-[2px] bg-gradient-to-r from-transparent via-[#5CB07C]/50 to-transparent"></div>
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[75%] md:w-[80%] h-[3px] bg-gradient-to-r from-transparent via-[#173A7C]/60 to-transparent blur-[1px]"></div>
-          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-slate-200/50"></div>
+        {/* Section Bottom Hairline */}
+        <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-none flex flex-col items-center justify-end h-12">
+          <div className="w-[85%] md:w-[92%] h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════ OUR STORY (Floating Card) ═══════════════════════════════════════ */}
-      <section className="relative z-30 -mt-16 px-4 sm:px-6 max-w-5xl mx-auto">
+      {/* ═══════════════════════════════════════ OUR STORY (Liquid Glass Card) ═══════════════════════════════════════ */}
+      <section className="relative z-30 -mt-10 sm:-mt-14 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         <motion.div 
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="bg-white/80 backdrop-blur-2xl border border-white ring-1 ring-inset ring-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.15)] rounded-[2.5rem] p-10 sm:p-14 lg:p-16 relative overflow-hidden"
+          className="liquid-glass-card rounded-[2rem] sm:rounded-[2.5rem] p-7 sm:p-12 lg:p-14 relative overflow-hidden border border-white/90 shadow-[0_20px_50px_-15px_rgba(11,55,102,0.12)]"
         >
-          {/* Subtle decoration inside card */}
-          <div className="absolute -top-32 -right-32 w-64 h-64 bg-[#5CB07C]/5 rounded-full blur-[50px] pointer-events-none" />
+          {/* Curved Specular Sheen */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/80 via-white/20 to-transparent z-0" />
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] opacity-80" />
           
-          <div className="relative z-10 flex flex-col md:flex-row gap-12 items-start">
-            <div className="md:w-1/3 shrink-0">
-              <h2 className="card-title-royal-blue text-3xl lg:text-4xl mb-4">قصتنا</h2>
-              <p className="card-desc-premium text-sm">كيف بدأت رحلة الإلهام والتدريب</p>
+          <div className="relative z-10 flex flex-col md:flex-row gap-8 lg:gap-12 items-start">
+            <div className="md:w-1/3 shrink-0 text-right">
+              <h2 className="card-title-royal-blue text-2xl sm:text-3xl lg:text-4xl mb-2 text-[#0B3766]">
+                قصتنا
+              </h2>
+              <p className="card-desc-premium text-xs sm:text-sm text-slate-500 font-bold">
+                رحلة انطلقت من شغف التطوير والتمكين
+              </p>
             </div>
             
-            <div className="md:w-2/3 space-y-6 text-[#465A78] leading-relaxed text-lg sm:text-[19px] font-medium border-r-2 border-[#173A7C]/10 pr-6 sm:pr-10">
+            <div className="md:w-2/3 space-y-4 text-slate-700 leading-relaxed text-sm sm:text-base font-medium border-r-2 border-[#0B3766]/15 pr-5 sm:pr-8 text-right">
               <p>
-                بدأت رحلتنا من إيمان عميق بأن التعليم هو المحرك الأساسي للتنمية المستدامة.
-                أسسنا <span className="font-bold text-[#173A7C]">النبض المستدام</span> ليكون جسراً يربط بين الطموح والفرصة، بين المعرفة والتطبيق الفعلي في سوق العمل.
+                بدأت رحلتنا من إيمان عميق بأن التعلّم المستمر هو الركيزة الأساسية للنمو الوظيفي والريادة المؤسسية.
+                أسسنا <span className="font-bold text-[#0B3766]">مَدار للتعلّم</span> ليكون المحرك الموثوق الذي يربط بين شغف المتدرب واحتياجات سوق العمل الحقيقية.
               </p>
               <p>
-                على مدار السنين، قمنا بتدريب آلاف المتدربين في مختلف القطاعات من خلال أحدث المنهجيات التعليمية، محققين نسب رضا استثنائية. 
-                واليوم، نفخر بأننا الخيار المفضل للمؤسسات والأفراد الباحثين عن التفوق.
+                على مدار السنين، دربنا آلاف الكوادر والمهنيين في مختلف القطاعات الحيوية، معتمدين على برامج تفاعلية ومناهج واقعية تحاكي متطلبات العمل الفعلية.
               </p>
             </div>
           </div>
@@ -101,214 +97,54 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════════════════════════ MISSION & VISION ═══════════════════════════════════════ */}
-      <section className="py-24 max-w-6xl mx-auto px-4 sm:px-6 relative">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <section className="py-20 sm:py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           
           {/* Mission Card */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -25 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="group relative bg-white border border-slate-100 shadow-sm hover:shadow-[0_30px_60px_-15px_rgba(23,58,124,0.1)] rounded-[2.5rem] p-10 sm:p-12 transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+            transition={{ duration: 0.6 }}
+            className="group relative liquid-glass-card rounded-[2rem] p-7 sm:p-10 border border-white/80 shadow-[0_12px_36px_-10px_rgba(11,55,102,0.12)] hover:shadow-[0_24px_50px_-12px_rgba(11,55,102,0.18)] transition-all duration-400 hover:-translate-y-1.5 overflow-hidden text-right flex flex-col justify-between"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#173A7C]/5 rounded-bl-[100px] -z-0 transition-transform duration-500 group-hover:scale-110" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/70 via-white/10 to-transparent z-0" />
+            <div className="absolute top-0 right-0 w-28 h-28 bg-[#0B3766]/[0.05] rounded-bl-full pointer-events-none" />
             
             <div className="relative z-10">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#173A7C] to-[#2F66D6] flex items-center justify-center mb-8 shadow-lg shadow-[#173A7C]/20 text-white transform group-hover:rotate-12 transition-transform duration-500">
-                <Target className="w-10 h-10" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] flex items-center justify-center mb-6 shadow-md shadow-[#0B3766]/20 text-white group-hover:scale-105 transition-transform duration-400">
+                <Target className="w-7 h-7 sm:w-8 sm:h-8" strokeWidth={2} />
               </div>
-              <h3 className="card-title-royal-blue text-3xl mb-6">رسالتنا</h3>
-              <p className="card-desc-premium leading-relaxed text-lg">
-                تقديم تجربة تعليمية متميزة تمكّن الأفراد والمؤسسات من اكتساب المهارات
-                اللازمة للنجاح في سوق العمل المعاصر، استناداً إلى الجودة والابتكار 
-                والتدريب الممنهج الفعّال.
+              <h3 className="card-title-royal-blue text-xl sm:text-2xl font-bold mb-3 text-[#0B3766]">
+                رسالتنا
+              </h3>
+              <p className="text-slate-600 leading-relaxed text-sm sm:text-base font-medium">
+                تقديم تجربة تعليمية متميزة تمكّن الأفراد والمنظمات من اكتساب مهارات عملية معتمدة تصنع فارقاً تشغيلياً حقيقياً، استناداً إلى معايير الجودة والابتكار المستمر.
               </p>
             </div>
           </motion.div>
 
-          {/* Vision Card (MANDATORY TEXT) */}
+          {/* Vision Card */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 25 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="group relative bg-white border border-slate-100 shadow-sm hover:shadow-[0_30px_60px_-15px_rgba(92,176,124,0.15)] rounded-[2.5rem] p-10 sm:p-12 transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+            transition={{ duration: 0.6 }}
+            className="group relative liquid-glass-card rounded-[2rem] p-7 sm:p-10 border border-white/80 shadow-[0_12px_36px_-10px_rgba(11,55,102,0.12)] hover:shadow-[0_24px_50px_-12px_rgba(11,55,102,0.18)] transition-all duration-400 hover:-translate-y-1.5 overflow-hidden text-right flex flex-col justify-between"
           >
-            <div className="absolute top-0 left-0 w-32 h-32 bg-[#5CB07C]/5 rounded-br-[100px] -z-0 transition-transform duration-500 group-hover:scale-110" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/70 via-white/10 to-transparent z-0" />
+            <div className="absolute top-0 left-0 w-28 h-28 bg-[#19B6C7]/[0.05] rounded-br-full pointer-events-none" />
             
             <div className="relative z-10">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#5CB07C] to-[#4EA06E] flex items-center justify-center mb-8 shadow-lg shadow-[#5CB07C]/20 text-white transform group-hover:-rotate-12 transition-transform duration-500">
-                <Eye className="w-10 h-10" />
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#168AD3] to-[#19B6C7] flex items-center justify-center mb-6 shadow-md shadow-[#19B6C7]/20 text-white group-hover:scale-105 transition-transform duration-400">
+                <Eye className="w-7 h-7 sm:w-8 sm:h-8" strokeWidth={2} />
               </div>
-              <h3 className="card-title-royal-blue text-3xl mb-6">رؤيتنا</h3>
-              <p className="card-desc-premium leading-relaxed text-lg">
-                أن نصبح احد افضل شركات التدريب بالمملكة بجودة ومصداقية حتى نصل إلى أعلى مستويات التدريب وفقاً لرؤية 2030 .
+              <h3 className="card-title-royal-blue text-xl sm:text-2xl font-bold mb-3 text-[#0B3766]">
+                رؤيتنا
+              </h3>
+              <p className="text-slate-600 leading-relaxed text-sm sm:text-base font-medium">
+                أن نصبح الشريك الرائد في التدريب المهني بالمملكة بجودة ومصداقية ومخرجات تنافسية تسهم في بناء الكوادر الوطنية وفق مستهدفات رؤية المملكة 2030.
               </p>
-            </div>
-          </motion.div>
-
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════ COMMERCIAL REGISTRATION ═══════════════════════════════════════ */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#5CB07C]/10 to-[#173A7C]/10 text-[#5CB07C] mb-6 shadow-inner">
-            <ShieldCheck className="w-8 h-8" strokeWidth={2.5} />
-          </div>
-          <h2 className="section-main-title-premium mb-6">الاعتماد <span className="gradient-text">والموثوقية</span></h2>
-          <p className="section-desc-premium max-w-2xl mx-auto">
-            نعمل وفق الإجراءات والتنظيمات الرسمية في المملكة العربية السعودية، وحاصلين على الرخص المعتمدة من الجهات المعنية لنقدم لكم خدمات تدريبية موثوقة وآمنة تتوافق مع أعلى المعايير.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-          
-          {/* Commercial Registration */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="group relative bg-white rounded-[2.5rem] p-8 sm:p-10 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] hover:shadow-[0_30px_80px_-20px_rgba(23,58,124,0.15)] overflow-hidden transition-all duration-500 hover:-translate-y-1"
-          >
-            <div className="absolute top-0 left-0 w-48 h-48 bg-gradient-to-br from-[#173A7C]/[0.05] to-transparent rounded-br-full pointer-events-none transition-transform duration-500 group-hover:scale-110" />
-            
-            <div className="flex items-center gap-6 mb-8 relative z-10">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#2F66D6] text-white flex items-center justify-center shadow-lg shadow-[#173A7C]/20 shrink-0 transform group-hover:rotate-6 transition-transform duration-500">
-                <FileCheck className="w-10 h-10" />
-              </div>
-              <div>
-                <h3 className="card-title-royal-blue text-2xl sm:text-3xl mb-2">السجل التجاري</h3>
-                <p className="card-desc-premium text-sm sm:text-base">وزارة التجارة</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-50/80 rounded-[1.5rem] p-6 sm:p-8 border border-white shadow-inner space-y-5 relative z-10">
-              <div className="flex justify-between items-center border-b border-slate-200/60 pb-5">
-                <span className="text-sm font-bold text-slate-400">اسم الكيان</span>
-                <span className="text-base sm:text-lg font-black text-[#173A7C] text-left">معهد النبض المستدام للتدريب</span>
-              </div>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200/60 pb-5 gap-2 sm:gap-0">
-                <span className="text-sm font-bold text-slate-400">الرقم الوطني الموحد</span>
-                <span className="text-lg sm:text-xl font-black text-[#173A7C] tracking-widest">7051493539</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-slate-400">حالة السجل</span>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#5CB07C]/10 text-[#5CB07C] border border-[#5CB07C]/20">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5CB07C] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#5CB07C]"></span>
-                  </span>
-                  <span className="text-sm font-black">نشط</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Value Added Tax (VAT) */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="group relative bg-white rounded-[2.5rem] p-8 sm:p-10 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] hover:shadow-[0_30px_80px_-20px_rgba(23,58,124,0.15)] overflow-hidden transition-all duration-500 hover:-translate-y-1"
-          >
-            <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-[#0C8983]/[0.04] to-transparent rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110" />
-            
-            <div className="flex items-center gap-6 mb-8 relative z-10">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0C8983] to-[#12A8A0] text-white flex items-center justify-center shadow-lg shadow-[#0C8983]/20 shrink-0 transform group-hover:-rotate-6 transition-transform duration-500">
-                <BadgePercent className="w-10 h-10" />
-              </div>
-              <div>
-                <h3 className="card-title-royal-blue text-2xl sm:text-3xl mb-2">القيمة المضافة</h3>
-                <p className="card-desc-premium text-sm sm:text-base">هيئة الزكاة والضريبة والجمارك</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-50/80 rounded-[1.5rem] p-6 sm:p-8 border border-white shadow-inner space-y-5 relative z-10">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200/60 pb-5 gap-2 sm:gap-0">
-                <span className="text-sm font-bold text-slate-400">رقم التسجيل الضريبي</span>
-                <span className="text-lg sm:text-xl font-black text-[#0C8983] tracking-widest">314195012200003</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-slate-200/60 pb-5">
-                <span className="text-sm font-bold text-slate-400">تاريخ النفاذ</span>
-                <span className="text-base sm:text-lg font-black text-[#173A7C]">2026/03/01</span>
-              </div>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
-                <span className="text-sm font-bold text-slate-400">الرقم الموحد المميز</span>
-                <span className="text-base sm:text-lg font-black text-slate-600 tracking-wider">7051493539</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Balady License */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="group relative bg-white rounded-[2.5rem] p-8 sm:p-10 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] hover:shadow-[0_30px_80px_-20px_rgba(23,58,124,0.15)] overflow-hidden transition-all duration-500 hover:-translate-y-1"
-          >
-            <div className="absolute top-0 rtl:left-0 ltr:right-0 w-48 h-48 bg-gradient-to-br from-[#76B82A]/[0.05] to-transparent rtl:rounded-br-full ltr:rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110" />
-            
-            <div className="flex items-center gap-6 mb-8 relative z-10">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#76B82A] to-[#88D331] text-white flex items-center justify-center shadow-lg shadow-[#76B82A]/20 shrink-0 transform group-hover:rotate-6 transition-transform duration-500">
-                <Building className="w-10 h-10" />
-              </div>
-              <div>
-                <h3 className="card-title-royal-blue text-2xl sm:text-3xl mb-2">رخصة بلدي</h3>
-                <p className="card-desc-premium text-sm sm:text-base">وزارة الشؤون البلدية والقروية</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-50/80 rounded-[1.5rem] p-6 sm:p-8 border border-white shadow-inner space-y-5 relative z-10">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200/60 pb-5 gap-2 sm:gap-0">
-                <span className="text-sm font-bold text-slate-400">رقم الرخصة الموحد</span>
-                <span className="text-lg sm:text-xl font-black text-[#76B82A] tracking-widest">470822783752</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-slate-200/60 pb-5">
-                <span className="text-sm font-bold text-slate-400">النشاط التفصيلي</span>
-                <span className="text-base sm:text-lg font-black text-[#173A7C]">معهد التدريب</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-slate-400">تاريخ الإنتهاء</span>
-                <span className="text-base sm:text-lg font-black text-slate-600">1451/09/23 هـ</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Civil Defense License */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="group relative bg-white rounded-[2.5rem] p-8 sm:p-10 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] hover:shadow-[0_30px_80px_-20px_rgba(23,58,124,0.15)] overflow-hidden transition-all duration-500 hover:-translate-y-1"
-          >
-            <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-[#E3A832]/[0.05] to-transparent rounded-bl-full pointer-events-none transition-transform duration-500 group-hover:scale-110" />
-            
-            <div className="flex items-center gap-6 mb-8 relative z-10">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#E3A832] to-[#F5B83B] text-white flex items-center justify-center shadow-lg shadow-[#E3A832]/20 shrink-0 transform group-hover:-rotate-6 transition-transform duration-500">
-                <ShieldCheck className="w-10 h-10" />
-              </div>
-              <div>
-                <h3 className="card-title-royal-blue text-2xl sm:text-3xl mb-2">ترخيص سلامة</h3>
-                <p className="card-desc-premium text-sm sm:text-base">المديرية العامة للدفاع المدني</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-50/80 rounded-[1.5rem] p-6 sm:p-8 border border-white shadow-inner space-y-5 relative z-10">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200/60 pb-5 gap-2 sm:gap-0">
-                <span className="text-sm font-bold text-slate-400">رقم الترخيص</span>
-                <span className="text-lg sm:text-xl font-black text-[#E3A832] tracking-widest">47-06312100-1</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-slate-200/60 pb-5">
-                <span className="text-sm font-bold text-slate-400">تاريخ الإصدار</span>
-                <span className="text-base sm:text-lg font-black text-[#173A7C]">1447/09/23 هـ</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-slate-400">تاريخ الإنتهاء</span>
-                <span className="text-base sm:text-lg font-black text-slate-600">1451/09/23 هـ</span>
-              </div>
             </div>
           </motion.div>
 
@@ -316,35 +152,41 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════════════════════════ CORE VALUES ═══════════════════════════════════════ */}
-      <section className="py-24 bg-white border-y border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-20">
-            <h2 className="section-main-title-premium mb-6">مبادئنا <span className="gradient-text">الأساسية</span></h2>
-            <p className="section-desc-premium max-w-2xl mx-auto">
+      <section className="py-20 sm:py-24 bg-white/70 border-y border-slate-200/60 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14 sm:mb-18">
+            <h2 className="section-main-title-premium mb-3 sm:mb-4">
+              مبادئنا <span className="gradient-text">الأساسية</span>
+            </h2>
+            <p className="section-desc-premium max-w-2xl mx-auto text-sm sm:text-base">
               الأسس والقيم التي نبني عليها كل برامجنا وتوجهاتنا، لضمان أعلى درجات الثقة والمصداقية لعملائنا.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-7">
             {values.map((v, i) => {
               const Icon = v.icon;
               return (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="group relative bg-[#f8fafc] border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] rounded-[2rem] p-8 sm:p-10 text-center hover:bg-white hover:shadow-[0_30px_60px_-15px_rgba(23,58,124,0.12)] hover:-translate-y-3 transition-all duration-500 overflow-hidden"
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08, duration: 0.5 }}
+                  className="group relative liquid-glass-card rounded-[1.75rem] p-6 sm:p-8 text-center border border-white/85 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between pf-card-equal"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-[#173A7C]/0 via-transparent to-[#173A7C]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/75 via-white/10 to-transparent z-0" />
                   
-                  <div className="relative z-10">
-                    <div className="w-20 h-20 mx-auto mb-6 bg-white shadow-md shadow-slate-200/50 border border-slate-100 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <Icon className="w-9 h-9 text-[#173A7C] group-hover:text-[#5CB07C] transition-colors duration-500" />
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="w-14 h-14 mb-5 rounded-2xl bg-gradient-to-br from-[#0B3766]/[0.08] to-[#19B6C7]/[0.10] border border-[#0B3766]/12 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 shadow-xs">
+                      <Icon className="w-6 h-6 text-[#0B3766] group-hover:text-[#168AD3] transition-colors" strokeWidth={2} />
                     </div>
-                    <h3 className="card-title-royal-blue text-xl mb-4 group-hover:text-[#1E4D9D] transition-colors">{v.title}</h3>
-                    <p className="card-desc-premium">{v.desc}</p>
+                    <h3 className="card-title-royal-blue text-lg sm:text-xl font-bold mb-2 text-[#0B3766]">
+                      {v.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                      {v.desc}
+                    </p>
                   </div>
                 </motion.div>
               );
@@ -353,62 +195,63 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════ ACHIEVEMENTS BANNER ═══════════════════════════════════════ */}
+      <section className="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="liquid-glass-card rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-10 lg:p-14 border border-white/90 shadow-[0_20px_50px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden"
+        >
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/80 via-white/15 to-transparent z-0" />
+          
+          <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 text-center">
+            {achievements.map((a, i) => (
+              <div key={i} className="bg-white/85 rounded-2xl p-5 sm:p-6 border border-slate-200/70 shadow-xs hover:shadow-md transition-all">
+                <div className="hero-stat-number mb-1 text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0B3766] pf-tabular-nums">
+                  {a.value}
+                </div>
+                <div className="text-xs sm:text-sm font-bold text-slate-600">
+                  {a.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
       {/* ═══════════════════════════════════════ CALL TO ACTION ═══════════════════════════════════════ */}
-      <section className="pt-24 pb-8">
+      <section className="pb-16 pt-4">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="section-main-title-premium mb-6">هل أنت مستعد <span className="gradient-text">لتطوير قدراتك</span>؟</h2>
-            <p className="section-desc-premium max-w-2xl mx-auto mb-12">
-              انضم إلينا اليوم واكتشف باقة متميزة من البرامج التدريبية التي صُممت لمواكبة تطلعاتك.
+            <h2 className="section-main-title-premium mb-4">
+              هل أنت مستعد <span className="gradient-text">لتطوير قدراتك</span>؟
+            </h2>
+            <p className="section-desc-premium max-w-2xl mx-auto mb-8 text-sm sm:text-base">
+              انضم إلينا اليوم واكتشف باقة متميزة من البرامج التدريبية المعتمدة المصممة لتلبي تطلعاتك وتطلعات مؤسستك.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 max-w-md mx-auto">
               <Link 
                 href="/courses" 
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-[#173A7C] to-[#2F66D6] text-white text-[15px] font-black hover:opacity-90 shadow-lg shadow-[#173A7C]/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-sm font-bold shadow-md shadow-[#0B3766]/20 hover:shadow-lg transition-all hover:scale-[1.02]"
               >
-                تصفح دوراتنا
-                <BookOpen className="w-5 h-5 rtl:mr-2" />
+                <BookOpen className="w-4 h-4" />
+                <span>تصفح الدورات</span>
               </Link>
               
               <Link 
                 href="/contact" 
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white border-2 border-slate-200 text-slate-700 text-[15px] font-black hover:border-[#173A7C] hover:text-[#173A7C] hover:bg-slate-50 hover:-translate-y-1 transition-all duration-300"
+                className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-white border-2 border-[#0B3766]/30 text-[#0B3766] hover:bg-[#0B3766] hover:text-white text-sm font-bold shadow-xs hover:shadow-sm transition-all hover:scale-[1.02]"
               >
-                تواصل معنا
-                <PhoneCall className="w-5 h-5 rtl:mr-2" />
+                <PhoneCall className="w-4 h-4" />
+                <span>تواصل معنا</span>
               </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════ ACHIEVEMENTS BANNER ═══════════════════════════════════════ */}
-      <section className="py-8 pb-32">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="bg-white border border-slate-100 rounded-[3rem] p-12 sm:p-20 shadow-[0_30px_60px_-15px_rgba(23,58,124,0.06)] relative overflow-hidden"
-          >
-            {/* Elegant Background pattern */}
-            <div className="absolute inset-0 bg-[url('/bg.webp')] opacity-[0.02] object-cover mix-blend-multiply" />
-            <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#173A7C]/[0.04] rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#5CB07C]/[0.06] rounded-full blur-[100px] pointer-events-none" />
-            
-            <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 text-center">
-              {achievements.map((a, i) => (
-                <div key={i} className="bg-[#f8fafc]/80 backdrop-blur-md rounded-[2rem] p-8 border border-slate-100/60 shadow-sm hover:shadow-md hover:bg-white hover:-translate-y-2 transition-all duration-500">
-                  <div className="hero-stat-number mb-2">{a.value}</div>
-                  <div className="text-sm sm:text-base font-bold text-slate-500">{a.label}</div>
-                </div>
-              ))}
             </div>
           </motion.div>
         </div>

@@ -67,7 +67,7 @@ async function prepareCoverImage(
           );
           ctx.restore();
 
-          ctx.fillStyle = 'rgba(12, 35, 72, 0.12)';
+          ctx.fillStyle = 'rgba(11, 55, 102, 0.05)';
           ctx.fillRect(0, 0, targetWidth, targetHeight);
         }
 
@@ -216,8 +216,8 @@ export function DeviceImageUploader({
   return (
     <div className={`space-y-1.5 text-right ${className}`}>
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-        <label className="text-slate-800 text-xs font-black flex items-center gap-1.5 leading-snug">
-          <ImageIcon className="w-3.5 h-3.5 text-[#173A7C]" />
+        <label className="text-slate-800 text-xs font-bold flex items-center gap-1.5 leading-snug">
+          <ImageIcon className="w-3.5 h-3.5 text-[#0B3766]" />
           <span>{label}</span>
         </label>
         {recommendedSize && (
@@ -247,8 +247,8 @@ export function DeviceImageUploader({
         onDrop={onDrop}
         className={`relative w-full overflow-hidden rounded-[1.25rem] border-2 transition-all duration-300 sm:rounded-2xl ${
           isDragging
-            ? 'border-[#173A7C] bg-blue-50/50 scale-[1.01]'
-            : 'border-dashed border-slate-300 hover:border-[#173A7C]/60 bg-slate-50/70 hover:bg-white'
+            ? 'border-[#0B3766] bg-blue-50/50 scale-[1.01]'
+            : 'border-dashed border-slate-300 hover:border-[#0B3766]/60 bg-slate-50/70 hover:bg-white'
         } ${aspectClasses}`}
       >
         {/* Preview of Current Image */}
@@ -271,7 +271,7 @@ export function DeviceImageUploader({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex min-h-10 cursor-pointer items-center gap-1 rounded-lg bg-white px-2.5 py-1 text-[11px] font-black text-[#173A7C] shadow-xs transition-all hover:bg-blue-50 sm:min-h-0"
+                  className="flex min-h-10 cursor-pointer items-center gap-1 rounded-lg bg-white px-2.5 py-1 text-[11px] font-bold text-[#0B3766] shadow-xs transition-all hover:bg-blue-50 sm:min-h-0"
                 >
                   <RefreshCw className="w-3 h-3" />
                   <span>تغيير</span>
@@ -299,24 +299,24 @@ export function DeviceImageUploader({
             type="button"
             disabled={isUploading}
             onClick={() => !isUploading && fileInputRef.current?.click()}
-            className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#173A7C] ${
+            className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#0B3766] ${
               isUploading ? 'cursor-wait' : ''
             }`}
           >
             {isUploading ? (
               <div className="w-full max-w-xs space-y-2.5 px-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-100 text-[#173A7C] flex items-center justify-center mx-auto shadow-xs">
-                  <Loader2 className="w-4 h-4 animate-spin text-[#173A7C]" />
+                <div className="w-9 h-9 rounded-xl bg-blue-100 text-[#0B3766] flex items-center justify-center mx-auto shadow-xs">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#0B3766]" />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between text-[11px] font-black text-slate-700 mb-1">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1">
                     <span>{statusText}</span>
-                    <span className="font-mono text-[#173A7C]">{progress}%</span>
+                    <span className="font-mono text-[#0B3766]">{progress}%</span>
                   </div>
                   {/* Progress Bar */}
                   <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden shadow-inner">
                     <div
-                      className="h-full bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] transition-all duration-300 rounded-full"
+                      className="h-full bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] transition-all duration-300 rounded-full"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -327,11 +327,11 @@ export function DeviceImageUploader({
               </div>
             ) : (
               <div className="group space-y-2 sm:space-y-1.5">
-                <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl border border-blue-100 bg-white text-[#173A7C] shadow-sm transition-all group-hover:scale-105 group-hover:border-[#173A7C]/40 sm:h-10 sm:w-10 sm:rounded-xl sm:border-slate-200 sm:shadow-xs">
-                  <UploadCloud className="w-5 h-5 text-[#173A7C]" />
+                <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl border border-blue-100 bg-white text-[#0B3766] shadow-sm transition-all group-hover:scale-105 group-hover:border-[#0B3766]/40 sm:h-10 sm:w-10 sm:rounded-xl sm:border-slate-200 sm:shadow-xs">
+                  <UploadCloud className="w-5 h-5 text-[#0B3766]" />
                 </div>
                 <div>
-                  <p className="text-xs font-black text-slate-800">
+                  <p className="text-xs font-bold text-slate-800">
                     اضغط لاختيار صورة من جهازك
                   </p>
                   <p className="mt-1 text-[10px] font-medium text-slate-400">

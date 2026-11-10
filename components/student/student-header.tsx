@@ -181,11 +181,11 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
       <div
         className="w-full rounded-none px-3.5 sm:px-6 py-[calc(0.75rem+1vh)] min-h-[calc(3.75rem+2vh)] flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 relative z-30"
         style={{
-          background: 'rgba(255, 255, 255, 0.88)',
+          background: 'rgba(255, 255, 255, 0.94)',
           backdropFilter: 'blur(28px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.60)',
+          boxShadow: '0 4px 20px rgba(11, 55, 102, 0.06)',
+          borderBottom: '1px solid rgba(11, 55, 102, 0.08)',
         }}
       >
         {/* RIGHT SIDE (RTL): Mobile Sidebar Toggle & Platform Logo */}
@@ -194,7 +194,7 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="lg:hidden w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
+              className="lg:hidden w-9 h-9 rounded-xl text-slate-700 hover:text-[#0B3766] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
               title="القائمة الجانبية"
             >
               <Menu className="w-5 h-5" />
@@ -206,7 +206,7 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
             <button
               onClick={onToggleSidebar}
               title={isSidebarCollapsed ? 'توسيع القائمة الجانبية' : 'طي القائمة الجانبية'}
-              className="hidden lg:flex w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer items-center justify-center"
+              className="hidden lg:flex w-9 h-9 rounded-xl text-slate-700 hover:text-[#0B3766] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer items-center justify-center"
             >
               {isSidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
             </button>
@@ -216,15 +216,15 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
           <Link
             href="/dashboard/student"
             className="flex items-center gap-2 shrink-0 transition-transform hover:scale-105"
-            title="منصة النبض المستدام"
+            title="منصة مَدار للتعلّم"
           >
-            <img src="/logo.svg" alt="شعار منصة النبض المستدام" className="h-8 sm:h-9 w-auto object-contain" />
+            <img src="/madar-learning-logo-compact.svg" alt="شعار منصة مَدار للتعلّم" className="h-8 sm:h-9 w-auto object-contain" />
           </Link>
         </div>
 
         {/* CENTER: Real-Time Interactive Search Bar */}
         <div ref={searchContainerRef} className="hidden md:flex flex-1 min-w-0 max-w-lg mx-4 relative">
-          <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center px-3.5 rounded-2xl border border-slate-200/90 transition-all focus-within:border-[#173A7C] focus-within:bg-white bg-slate-50/90 shadow-2xs">
+          <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center px-3.5 rounded-2xl border border-slate-200/90 transition-all focus-within:border-[#0B3766] focus-within:bg-white bg-slate-50/90 shadow-2xs">
             <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
             <input
               type="text"
@@ -248,9 +248,9 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
           {/* Search Dropdown Quick Categories */}
           {isSearchFocused && (
             <div className="absolute top-full right-0 left-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 z-50 space-y-1 text-right animate-in fade-in zoom-in-95 duration-150 font-[family-name:var(--font-cairo)]">
-              <div className="px-3 py-1.5 text-[11px] font-black text-slate-500 flex items-center justify-between border-b border-slate-100 mb-1">
+              <div className="px-3 py-1.5 text-[11px] font-bold text-slate-500 flex items-center justify-between border-b border-slate-100 mb-1">
                 <span>{searchQuery ? `نتائج البحث عن: "${searchQuery}" (اضغط Enter)` : 'البحث السريع في أقسام المنصة'}</span>
-                <Search className="w-3.5 h-3.5 text-[#173A7C]" />
+                <Search className="w-3.5 h-3.5 text-[#0B3766]" />
               </div>
 
               {studentSearchCategories.map((item, idx) => {
@@ -266,12 +266,12 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
                       <div className={`p-2 rounded-xl ${item.color}`}>
                         <Icon className="w-4 h-4" />
                       </div>
-                      <span className="text-xs font-bold text-slate-700 group-hover:text-[#173A7C]">
+                      <span className="text-xs font-bold text-slate-700 group-hover:text-[#0B3766]">
                         {item.title}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600">
                         {item.badge}
                       </span>
                       <ArrowLeft className="w-3 h-3 text-slate-400 group-hover:-translate-x-1 transition-transform" />
@@ -288,7 +288,7 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
           {/* Mobile Search Button Toggle */}
           <button
             onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-            className="md:hidden w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
+            className="md:hidden w-9 h-9 rounded-xl text-slate-700 hover:text-[#0B3766] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
             title="البحث بالمنصة"
           >
             {isMobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
@@ -297,10 +297,10 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
           {/* Go to Home Link (Uniform 9x9 size matching mobile icons) */}
           <Link
             href="/"
-            className="w-9 h-9 sm:w-auto sm:px-3 sm:py-1.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-[#173A7C] hover:text-[#1E4D9D] transition-all cursor-pointer border border-slate-200/60 flex items-center justify-center gap-1.5 shrink-0 text-xs font-black"
+            className="w-9 h-9 sm:w-auto sm:px-3 sm:py-1.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-[#0B3766] hover:text-[#168AD3] transition-all cursor-pointer border border-slate-200/60 flex items-center justify-center gap-1.5 shrink-0 text-xs font-bold"
             title="الذهاب للرئيسية"
           >
-            <Home className="w-4 h-4 text-[#173A7C] shrink-0" />
+            <Home className="w-4 h-4 text-[#0B3766] shrink-0" />
             <span className="hidden sm:inline">الرئيسية</span>
           </Link>
 
@@ -311,7 +311,7 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="w-9 h-9 rounded-full text-slate-700 hover:text-[#173A7C] transition-all cursor-pointer flex items-center justify-center border border-slate-200/60 p-0.5 overflow-hidden"
+              className="w-9 h-9 rounded-full text-slate-700 hover:text-[#0B3766] transition-all cursor-pointer flex items-center justify-center border border-slate-200/60 p-0.5 overflow-hidden"
               title="الملف الشخصي والحساب"
             >
               <DefaultAvatar
@@ -330,7 +330,7 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
                   href="/dashboard/student/profile"
                   className="flex items-center gap-2.5 p-2.5 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
                 >
-                  <User className="w-4 h-4 text-[#5CB07C]" />
+                  <User className="w-4 h-4 text-[#19B6C7]" />
                   <span>الملف الشخصي</span>
                 </Link>
                 <div className="pt-1 border-t border-slate-200">
@@ -359,7 +359,7 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
       {isMobileSearchOpen && (
         <div className="md:hidden w-full px-4 py-3 bg-white/95 border-b border-slate-200/80 backdrop-blur-md shadow-md animate-fade-in-down">
           <form onSubmit={handleSearchSubmit} className="relative flex items-center px-3.5 rounded-xl border border-slate-200/80 overflow-hidden bg-slate-50 shadow-xs">
-            <Search className="w-4 h-4 text-[#173A7C] shrink-0 ml-2" />
+            <Search className="w-4 h-4 text-[#0B3766] shrink-0 ml-2" />
             <input
               type="text"
               autoFocus

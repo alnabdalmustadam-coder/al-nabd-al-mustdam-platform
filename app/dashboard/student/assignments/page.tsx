@@ -264,12 +264,12 @@ export default function StudentAssignmentsPage() {
         custom={0}
         className="relative z-20 liquid-glass-hero p-6 sm:p-8 md:p-9 space-y-4 liquid-glass-hover overflow-hidden student-card-accent rounded-2xl sm:rounded-3xl"
       >
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#173A7C]/8 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#0B3766]/8 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2.5 sm:space-y-3 pr-2">
-            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50/90 text-[#173A7C] border border-blue-200/80 shadow-xs">
-              <FileText className="w-3 h-3 text-[#173A7C]" />
+            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50/90 text-[#0B3766] border border-blue-200/80 shadow-xs">
+              <FileText className="w-3 h-3 text-[#0B3766]" />
               <span>المهام والتسليمات الأكاديمية</span>
             </motion.div>
 
@@ -285,15 +285,15 @@ export default function StudentAssignmentsPage() {
           {/* Quick Counter Stats */}
           <motion.div variants={textItemVariants} className="flex items-center justify-around gap-2 sm:gap-4 liquid-glass-inner p-3.5 sm:p-4 rounded-2xl shadow-xs">
             <div className="text-center px-2 sm:px-3 border-l border-slate-200/60">
-              <span className="block text-base sm:text-lg font-black text-amber-600">{pendingCount}</span>
+              <span className="block text-base sm:text-lg font-bold text-amber-600">{pendingCount}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">واجب مطلوب</span>
             </div>
             <div className="text-center px-2 sm:px-3 border-l border-slate-200/60">
-              <span className="block text-base sm:text-lg font-black text-[#173A7C]">{submittedCount}</span>
+              <span className="block text-base sm:text-lg font-bold text-[#0B3766]">{submittedCount}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">قيد التصحيح</span>
             </div>
             <div className="text-center px-2 sm:px-3">
-              <span className="block text-base sm:text-lg font-black text-[#0D5C3A]">{gradedCount}</span>
+              <span className="block text-base sm:text-lg font-bold text-[#0D5C3A]">{gradedCount}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">تم تقييمها</span>
             </div>
           </motion.div>
@@ -314,8 +314,8 @@ export default function StudentAssignmentsPage() {
               onClick={() => setFilter(tab.key as any)}
               className={`premium-tab px-3 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-200 text-center cursor-pointer flex-1 sm:flex-none ${
                 filter === tab.key
-                  ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                  : 'text-slate-600 hover:text-[#173A7C] hover:bg-white/60 bg-slate-50/60 sm:bg-transparent'
+                  ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                  : 'text-slate-600 hover:text-[#0B3766] hover:bg-white/60 bg-slate-50/60 sm:bg-transparent'
               }`}
             >
               <span className="premium-tab-label">{tab.label}</span>
@@ -323,7 +323,7 @@ export default function StudentAssignmentsPage() {
           ))}
         </div>
 
-        <div className="text-[10px] sm:text-xs text-slate-700 font-extrabold flex items-center gap-1.5 drop-shadow-xs">
+        <div className="text-[10px] sm:text-xs text-slate-700 font-bold flex items-center gap-1.5 drop-shadow-xs">
           <FileCheck className="w-3.5 h-3.5 text-[#0D5C3A] shrink-0" />
           <span>الملفات المقبولة: PDF, DOCX, ZIP (بحد أقصى 25 ميجابايت)</span>
         </div>
@@ -332,16 +332,16 @@ export default function StudentAssignmentsPage() {
       {/* Assignments List */}
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل الواجبات والتكليفات...</p>
         </div>
       ) : filteredAssignments.length === 0 ? (
         <div className="p-10 sm:p-14 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-4">
-          <div className="w-16 h-16 rounded-3xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-3xl bg-[#0B3766]/10 text-[#0B3766] flex items-center justify-center mx-auto">
             <FileText className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-black text-slate-900">لا توجد واجبات {filter !== 'all' ? 'في هذا القسم' : 'مطلوبة حالياً'}</h3>
+            <h3 className="text-lg font-bold text-slate-900">لا توجد واجبات {filter !== 'all' ? 'في هذا القسم' : 'مطلوبة حالياً'}</h3>
             <p className="text-xs font-bold text-slate-500 max-w-md mx-auto">
               ستظهر هنا جميع التكليفات والأنشطة المكلف بها في مقرراتك الدراسية.
             </p>
@@ -359,7 +359,7 @@ export default function StudentAssignmentsPage() {
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 border-b border-slate-200/60 pb-4">
                 <div className="space-y-1.5 min-w-0">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-black text-[#0D5C3A]">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D5C3A]">
                     <BookOpen className="w-3.5 h-3.5 text-[#0D5C3A] shrink-0" />
                     <span>{assignment.courseTitle}</span>
                   </span>
@@ -367,21 +367,21 @@ export default function StudentAssignmentsPage() {
                 </div>
 
                 {assignment.status === 'pending' && (
-                  <span className="px-4 py-1.5 rounded-full text-xs font-black bg-amber-500 text-white border border-amber-400 shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                  <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-white border border-amber-400 shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap">
                     <Clock className="w-4 h-4 text-white" />
                     <span>آخر موعد: {assignment.dueDate}</span>
                   </span>
                 )}
 
                 {assignment.status === 'submitted' && (
-                  <span className="px-4 py-1.5 rounded-full text-xs font-black bg-[#173A7C] text-white border border-blue-400 shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                  <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-[#0B3766] text-white border border-blue-400 shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap">
                     <FileCheck className="w-4 h-4 text-white" />
                     <span>تم التسليم - قيد المراجعة</span>
                   </span>
                 )}
 
                 {assignment.status === 'graded' && (
-                  <span className="px-4 py-1.5 rounded-full text-xs font-black bg-emerald-500 text-white border border-emerald-400 shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                  <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-500 text-white border border-emerald-400 shadow-xs flex items-center gap-1.5 shrink-0 whitespace-nowrap">
                     <CheckCircle2 className="w-4 h-4 text-white" />
                     <span>تم التقييم: {assignment.grade}</span>
                   </span>
@@ -393,15 +393,15 @@ export default function StudentAssignmentsPage() {
               {assignment.submittedFile && (
                 <div className="p-3.5 rounded-2xl flex flex-wrap xs:flex-nowrap items-center justify-between gap-2.5 text-xs font-bold border border-slate-200/90 bg-slate-100/90 shadow-inner min-w-0 overflow-hidden">
                   <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-                    <Paperclip className="w-4 h-4 text-[#173A7C] shrink-0" />
+                    <Paperclip className="w-4 h-4 text-[#0B3766] shrink-0" />
                     <span className="text-slate-800 truncate min-w-0">
-                      ملف التسليم: <strong className="text-[#173A7C]">{assignment.submittedFile.startsWith('storage://') ? 'مرفق محفوظ بأمان' : assignment.submittedFile}</strong>
+                      ملف التسليم: <strong className="text-[#0B3766]">{assignment.submittedFile.startsWith('storage://') ? 'مرفق محفوظ بأمان' : assignment.submittedFile}</strong>
                     </span>
                   </div>
                   {assignment.submittedFile.startsWith('storage://') && (
                     <a
                       href={`/api/student/submissions/file?ref=${encodeURIComponent(assignment.submittedFile)}`}
-                      className="p-2 rounded-lg bg-white border border-slate-200 text-[#173A7C]"
+                      className="p-2 rounded-lg bg-white border border-slate-200 text-[#0B3766]"
                       title="تنزيل ملف التسليم"
                     >
                       <Download className="w-4 h-4" />
@@ -412,8 +412,8 @@ export default function StudentAssignmentsPage() {
 
               {assignment.instructorFeedback && (
                 <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/90 shadow-inner space-y-1.5">
-                  <div className="flex items-center gap-2 text-emerald-800 font-black text-xs">
-                    <MessageSquare className="w-4 h-4 text-[#5CB07C]" />
+                  <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs">
+                    <MessageSquare className="w-4 h-4 text-[#19B6C7]" />
                     <span>ملاحظات الأستاذ المحاضر:</span>
                   </div>
                   <p className="text-xs text-emerald-900 font-bold mr-6 leading-relaxed">{assignment.instructorFeedback}</p>
@@ -421,12 +421,12 @@ export default function StudentAssignmentsPage() {
               )}
 
               <div className="flex items-center justify-between pt-2">
-                <span className="text-xs text-slate-500 font-extrabold">الدرجة الكلية: {assignment.maxGrade}</span>
+                <span className="text-xs text-slate-500 font-bold">الدرجة الكلية: {assignment.maxGrade}</span>
 
                 {assignment.status === 'pending' && (
                   <button
                     onClick={() => setActiveUploadModal(assignment)}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all hover:-translate-y-0.5 cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all hover:-translate-y-0.5 cursor-pointer"
                   >
                     <Upload className="w-4 h-4" />
                     <span>تسليم الواجب الآن</span>
@@ -468,10 +468,10 @@ export default function StudentAssignmentsPage() {
 
               {/* File upload or note */}
               <div className="space-y-3">
-                <label className="text-xs font-black text-slate-700">مرفق الواجب (ملف / رابط)</label>
-                <div className="p-6 rounded-2xl border-2 border-dashed border-[#173A7C]/40 bg-slate-50/80 flex flex-col items-center justify-center text-center space-y-2 relative">
-                  <Upload className="w-8 h-8 text-[#173A7C]" />
-                  <p className="text-xs font-black text-slate-800">اختر ملفاً من جهازك أو اكتب اسمه/رابطه بالأسفل</p>
+                <label className="text-xs font-bold text-slate-700">مرفق الواجب (ملف / رابط)</label>
+                <div className="p-6 rounded-2xl border-2 border-dashed border-[#0B3766]/40 bg-slate-50/80 flex flex-col items-center justify-center text-center space-y-2 relative">
+                  <Upload className="w-8 h-8 text-[#0B3766]" />
+                  <p className="text-xs font-bold text-slate-800">اختر ملفاً من جهازك أو اكتب اسمه/رابطه بالأسفل</p>
                   <input
                     type="file"
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
@@ -484,20 +484,20 @@ export default function StudentAssignmentsPage() {
                   />
                 </div>
                 {uploadedFileName && (
-                  <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-between text-xs font-black text-emerald-800">
+                  <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-between text-xs font-bold text-emerald-800">
                     <span className="truncate">{uploadedFileName}</span>
                     <span className="text-[10px] bg-emerald-200/60 px-2 py-0.5 rounded font-bold">جاهز</span>
                   </div>
                 )}
 
                 <div className="space-y-1 pt-2">
-                  <label className="text-xs font-black text-slate-700">ملاحظات إضافية أو رابط الحل</label>
+                  <label className="text-xs font-bold text-slate-700">ملاحظات إضافية أو رابط الحل</label>
                   <textarea
                     rows={3}
                     value={submissionNotes}
                     onChange={(e) => setSubmissionNotes(e.target.value)}
                     placeholder="يمكنك كتابة ملاحظاتك للمدرب أو رابط Google Drive / GitHub..."
-                    className="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C] bg-white/70"
+                    className="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#0B3766] bg-white/70"
                   />
                 </div>
               </div>
@@ -511,14 +511,14 @@ export default function StudentAssignmentsPage() {
                     setUploadedFile(null);
                     setSubmissionNotes('');
                   }}
-                  className="px-5 py-2.5 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                  className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                 >
                   إلغاء
                 </button>
                 <button
                   disabled={submitting}
                   onClick={handleFileSubmit}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer disabled:opacity-60"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all cursor-pointer disabled:opacity-60"
                 >
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   <span>{submitting ? 'جاري الإرسال...' : 'تأكيد التسليم'}</span>

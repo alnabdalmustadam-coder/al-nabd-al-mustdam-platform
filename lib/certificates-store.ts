@@ -85,7 +85,7 @@ function formatArabicDate(date: Date): string {
 }
 
 function deterministicLegacyUuid(scope: string, value: string): string {
-  const hex = createHash('sha256').update(`sustainable-pulse:${scope}:${value}`).digest('hex').slice(0, 32);
+  const hex = createHash('sha256').update(`madar-learning:${scope}:${value}`).digest('hex').slice(0, 32);
   const variant = ((Number.parseInt(hex[16], 16) & 0x3) | 0x8).toString(16);
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-${variant}${hex.slice(17, 20)}-${hex.slice(20)}`;
 }
@@ -131,15 +131,15 @@ function toTemplate(row: CertificateTemplateRow): CertificateTemplate {
       ? bgPreset as CertificateTemplate['bgPreset']
       : 'royal-gold',
     imageUrl: row.image_url || stringValue(payload.imageUrl, '/1.png'),
-    headerTitle: stringValue(payload.headerTitle, 'شهادة إتمام وتفوق معتمدة'),
+    headerTitle: stringValue(payload.headerTitle, 'شهادة إتمام'),
     subtitle: stringValue(payload.subtitle, 'CERTIFICATE OF ACHIEVEMENT'),
-    statement: stringValue(payload.statement, 'يشهد معهد النبض المستدام العالي للتدريب بأن المتدرب/ـة:'),
+    statement: stringValue(payload.statement, 'يشهد أكاديمية مَدار للتعلّم بأن المتدرب/ـة:'),
     bodyText: stringValue(payload.bodyText, 'قد اجتاز/ت بنجاح متطلبات الدورة التدريبية واكتملت كافة ساعاتها المعتمدة بنجاح.'),
-    issuerName: stringValue(payload.issuerName, 'معهد النبض المستدام العالي للتدريب'),
+    issuerName: stringValue(payload.issuerName, 'أكاديمية مَدار للتعلّم'),
     signatory1Title: stringValue(payload.signatory1Title, 'المشرف الأكاديمي والتدريب'),
-    signatory1Name: stringValue(payload.signatory1Name, 'د. عبدالرحمن الغامدي'),
+    signatory1Name: stringValue(payload.signatory1Name, 'فريق التدريب'),
     signatory2Title: stringValue(payload.signatory2Title, 'المدير التنفيذي للمعهد'),
-    signatory2Name: stringValue(payload.signatory2Name, 'أ. نورة الشمري'),
+    signatory2Name: stringValue(payload.signatory2Name, 'إدارة البرامج'),
     showQrCode: booleanValue(payload.showQrCode, true),
     showNationalSeal: booleanValue(payload.showNationalSeal, true),
     showInstituteSeal: booleanValue(payload.showInstituteSeal, true),
@@ -296,15 +296,15 @@ export async function saveTemplate(
     bgType: templateData.bgType || existing?.bgType || 'image',
     bgPreset: templateData.bgPreset || existing?.bgPreset || 'royal-gold',
     imageUrl: templateData.imageUrl || existing?.imageUrl || '/1.png',
-    headerTitle: templateData.headerTitle || existing?.headerTitle || 'شهادة إتمام وتفوق معتمدة',
+    headerTitle: templateData.headerTitle || existing?.headerTitle || 'شهادة إتمام',
     subtitle: templateData.subtitle || existing?.subtitle || 'CERTIFICATE OF ACHIEVEMENT',
-    statement: templateData.statement || existing?.statement || 'يشهد معهد النبض المستدام العالي للتدريب بأن المتدرب/ـة:',
+    statement: templateData.statement || existing?.statement || 'يشهد أكاديمية مَدار للتعلّم بأن المتدرب/ـة:',
     bodyText: templateData.bodyText || existing?.bodyText || 'قد اجتاز/ت بنجاح متطلبات الدورة التدريبية واكتملت كافة ساعاتها المعتمدة بنجاح.',
-    issuerName: templateData.issuerName || existing?.issuerName || 'معهد النبض المستدام العالي للتدريب',
+    issuerName: templateData.issuerName || existing?.issuerName || 'أكاديمية مَدار للتعلّم',
     signatory1Title: templateData.signatory1Title || existing?.signatory1Title || 'المشرف الأكاديمي والتدريب',
-    signatory1Name: templateData.signatory1Name || existing?.signatory1Name || 'د. عبدالرحمن الغامدي',
+    signatory1Name: templateData.signatory1Name || existing?.signatory1Name || 'فريق التدريب',
     signatory2Title: templateData.signatory2Title || existing?.signatory2Title || 'المدير التنفيذي للمعهد',
-    signatory2Name: templateData.signatory2Name || existing?.signatory2Name || 'أ. نورة الشمري',
+    signatory2Name: templateData.signatory2Name || existing?.signatory2Name || 'إدارة البرامج',
     showQrCode: templateData.showQrCode ?? existing?.showQrCode ?? true,
     showNationalSeal: templateData.showNationalSeal ?? existing?.showNationalSeal ?? true,
     showInstituteSeal: templateData.showInstituteSeal ?? existing?.showInstituteSeal ?? true,

@@ -1,3 +1,4 @@
+import { createDraftId } from '@/lib/client-draft-id';
 import type { QuizData } from '@/types';
 
 export function createCourseQuizDraft(): QuizData {
@@ -5,7 +6,7 @@ export function createCourseQuizDraft(): QuizData {
     title: '',
     passingScore: 70,
     questions: [{
-      id: `q-${crypto.randomUUID()}`,
+      id: `q-${createDraftId()}`,
       question: '',
       options: ['', '', '', ''],
       correctIndex: 0,

@@ -31,7 +31,7 @@
 .heroRefresh {
   border-color: #dce5ef;
   background: rgb(255 255 255 / 85%);
-  color: #173a7c;
+  color: #0B3766;
 }
 
 .heroRefresh:hover {
@@ -62,7 +62,7 @@
   position: relative;
   flex-shrink: 0;
   isolation: isolate;
-  background: #173a7c;
+  background: #0B3766;
 }
 
 .cover::after {

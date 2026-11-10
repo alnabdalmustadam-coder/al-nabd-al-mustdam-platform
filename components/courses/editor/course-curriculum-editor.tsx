@@ -1,4 +1,5 @@
 'use client';
+import { createDraftId } from '@/lib/client-draft-id';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { BookOpen, ChevronDown, ChevronUp, Clock3, FileText, HelpCircle, Layers, Loader2, Plus, Trash2, UploadCloud, Video } from 'lucide-react';
 import type { EditorLesson, EditorSection } from '@/lib/courses/editor-model';
@@ -25,12 +26,12 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
     : lessonId ? { ...section, subItems: section.subItems.map((lesson) => lesson.id === lessonId ? { ...lesson, attachments: update(lesson.attachments || []) } : lesson) }
       : { ...section, attachments: update(section.attachments || []) }));
   const addLesson = (id: string, type: EditorLesson['type']) => onChange((current) => current.map((section) => section.id === id ? { ...section,
-    subItems: [...section.subItems, { id: `lesson-${crypto.randomUUID()}`, title: '', duration: '', videoUrl: '', type, isLocked: false,
+    subItems: [...section.subItems, { id: `lesson-${createDraftId()}`, title: '', duration: '', videoUrl: '', type, isLocked: false,
       attachments: [], ...(type === 'article' ? { contentBlocks: [] } : {}), ...(type === 'quiz' ? { quizData: createCourseQuizDraft() } : {}) }] } : section));
   const addSection = () => {
     setCollapsed(new Set(value.map((section) => section.id)));
-    onChange((current) => [...current, { id: `section-${crypto.randomUUID()}`, title: '', duration: '', videoUrl: '', type: 'video', isLocked: false, attachments: [],
-      subItems: [{ id: `lesson-${crypto.randomUUID()}`, title: '', duration: '', videoUrl: '', type: 'video', isLocked: false, attachments: [] }] }]);
+    onChange((current) => [...current, { id: `section-${createDraftId()}`, title: '', duration: '', videoUrl: '', type: 'video', isLocked: false, attachments: [],
+      subItems: [{ id: `lesson-${createDraftId()}`, title: '', duration: '', videoUrl: '', type: 'video', isLocked: false, attachments: [] }] }]);
   };
   const busy = disabled || Boolean(videoUpload);
   return <div className="space-y-5 sm:space-y-7">
@@ -42,7 +43,7 @@ export function CourseCurriculumEditor({ value, onChange, onUploadVideo, videoUp
       const open = !collapsed.has(section.id);
       return <section key={section.id} data-editor-panel className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <header className={`flex items-center gap-3 bg-linear-to-l from-blue-50/70 via-white to-white px-4 py-3 sm:px-6 sm:py-5 ${open ? 'border-b border-slate-100' : ''}`}>
-          <span className={`flex h-10 w-10 shrink-0 flex-col sm:h-12 sm:w-12 items-center justify-center gap-1 rounded-2xl border text-sm font-semibold ${open ? 'border-blue-800 bg-linear-to-br from-blue-600 to-blue-950 text-white shadow-[0_4px_10px_rgba(23,58,124,0.15)]' : 'border-blue-100 bg-blue-50 text-blue-700'}`}><Layers aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={1.6} /><span className="text-[10px] leading-none">{String(sectionIndex + 1).padStart(2, '0')}</span></span>
+          <span className={`flex h-10 w-10 shrink-0 flex-col sm:h-12 sm:w-12 items-center justify-center gap-1 rounded-2xl border text-sm font-semibold ${open ? 'border-blue-800 bg-linear-to-br from-blue-600 to-blue-950 text-white shadow-[0_4px_10px_rgba(11,55,102,0.1)]' : 'border-blue-100 bg-blue-50 text-blue-700'}`}><Layers aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={1.6} /><span className="text-[10px] leading-none">{String(sectionIndex + 1).padStart(2, '0')}</span></span>
           <button type="button" disabled={busy} aria-expanded={open} aria-controls={`unit-${section.id}`} className="flex min-h-11 min-w-0 flex-1 items-center justify-between gap-3 text-right" onClick={() => setCollapsed((current) => { const next = new Set(current); if (next.has(section.id)) next.delete(section.id); else next.add(section.id); return next; })}>
             <span className="min-w-0"><span className="block truncate text-sm font-semibold text-slate-900 sm:text-base">{section.title || `الوحدة ${sectionIndex + 1}`}</span><span className="mt-1 block text-xs font-normal text-slate-400">{section.subItems.length} دروس · {section.attachments?.length || 0} ملفات للوحدة</span></span>
             {open ? <ChevronUp className="h-4 w-4 shrink-0 text-slate-400" /> : <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />}

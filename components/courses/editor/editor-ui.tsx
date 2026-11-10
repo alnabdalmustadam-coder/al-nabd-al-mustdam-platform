@@ -3,13 +3,13 @@ import { useId, type ReactNode } from 'react';
 import { BookOpen, Check, ClipboardCheck, FolderOpen, Layers, Settings2, type LucideIcon } from 'lucide-react';
 import { EditorIllustration, type EditorIllustrationKind } from './editor-illustration';
 
-export const editorInput = 'w-full min-w-0 min-h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-base sm:min-h-12 sm:px-4 sm:py-3 font-normal leading-6 text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.025)] outline-none transition-colors placeholder:text-slate-400 hover:border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:text-slate-500 sm:text-sm';
-export const editorButton = 'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[13px] sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm font-semibold text-slate-700 shadow-[0_2px_3px_rgba(15,23,42,0.025)] transition-colors hover:border-blue-200 hover:bg-blue-50/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50';
-export const editorPrimary = `${editorButton} !border-blue-800 !bg-blue-900 bg-linear-to-br from-blue-700 to-blue-950 !text-white !shadow-[0_5px_14px_rgba(23,58,124,0.18)] hover:!bg-blue-800`;
+export const editorInput = 'w-full min-w-0 min-h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-base sm:min-h-12 sm:px-4 sm:py-3 font-normal leading-6 text-slate-900 shadow-[0_1px_2px_rgba(11,55,102,0.1)] outline-none transition-colors placeholder:text-slate-400 hover:border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:text-slate-500 sm:text-sm';
+export const editorButton = 'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[13px] sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm font-semibold text-slate-700 shadow-[0_2px_3px_rgba(11,55,102,0.1)] transition-colors hover:border-blue-200 hover:bg-blue-50/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50';
+export const editorPrimary = `${editorButton} !border-blue-800 !bg-blue-900 bg-linear-to-br from-blue-700 to-blue-950 !text-white !shadow-[0_5px_14px_rgba(11,55,102,0.1)] hover:!bg-blue-800`;
 const sectionIcons = { course: BookOpen, curriculum: Layers, files: FolderOpen, exam: ClipboardCheck };
 export function EditorSectionHeading({ eyebrow, title, description, action, kind = 'course' }: { eyebrow?: string; title: string; description: string; action?: ReactNode; kind?: EditorIllustrationKind }) {
   const Icon = sectionIcons[kind];
-  return <div className="relative isolate overflow-hidden rounded-2xl border border-blue-100/90 bg-linear-to-bl from-white via-[#f3f7ff] to-[#edf8f5] p-4 shadow-[0_5px_20px_-12px_rgba(23,58,124,0.18)] sm:p-6">
+  return <div className="relative isolate overflow-hidden rounded-2xl border border-blue-100/90 bg-linear-to-bl from-white via-[#f3f7ff] to-[#edf8f5] p-4 shadow-[0_5px_20px_-12px_rgba(11,55,102,0.12)] sm:p-6">
     <div aria-hidden="true" className="pointer-events-none absolute -left-10 -top-20 h-56 w-56 rounded-full border border-blue-200/35" />
     <div className="relative flex items-center justify-between gap-4 sm:gap-7">
       <div className="min-w-0 flex-1">
@@ -28,7 +28,7 @@ export function EditorField({ label, hint, children, icon: Icon }: { label: stri
 }
 export function EditorCardHeading({ title, description, icon: Icon, meta }: { title: string; description?: string; icon: LucideIcon; meta?: string }) {
   return <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-3">
-    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-linear-to-br from-blue-50 to-white text-blue-800 shadow-[0_2px_5px_rgba(23,58,124,0.04)] sm:h-11 sm:w-11"><Icon aria-hidden="true" className="h-[22px] w-[22px]" strokeWidth={1.7} /></span>
+    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-linear-to-br from-blue-50 to-white text-blue-800 shadow-[0_2px_5px_rgba(11,55,102,0.1)] sm:h-11 sm:w-11"><Icon aria-hidden="true" className="h-[22px] w-[22px]" strokeWidth={1.7} /></span>
     <div className="min-w-0"><h3 className="text-sm font-semibold text-slate-900 sm:text-base">{title}</h3>{description && <p className="mt-1 text-xs text-slate-500">{description}</p>}</div>
   </div>{meta && <span className="rounded-lg border border-blue-100 bg-blue-50/60 px-2.5 py-1.5 text-[11px] font-medium text-blue-800">{meta}</span>}</div>;
 }

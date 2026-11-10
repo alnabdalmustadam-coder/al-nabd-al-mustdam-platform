@@ -33,13 +33,3 @@ export function isLessonUnlocked(ids: string[], completed: Set<string>, lessonId
   const index = ids.indexOf(lessonId);
   return index >= 0 && ids.slice(0, index).every((id) => completed.has(id));
 }
-
-export function extractBunnyVideoId(value: string): string | null {
-  const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
-  if (new RegExp(`^${uuid}$`, 'i').test(value.trim())) return value.trim().toLowerCase();
-  try {
-    const url = new URL(value);
-    if (!['iframe.mediadelivery.net', 'player.mediadelivery.net'].includes(url.hostname) || url.protocol !== 'https:') return null;
-    return url.pathname.match(new RegExp(`/(?:embed|play)/\\d+/(${uuid})(?:/|$)`, 'i'))?.[1].toLowerCase() || null;
-  } catch { return null; }
-}

@@ -44,16 +44,16 @@ export default function ServiceVisualMockup({
   // 1. DESIGN & BRANDING MOCKUP
   if (categorySlug === 'design') {
     return (
-      <div className={`w-full h-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-[#173A7C] to-[#0A1A3A] p-4 ${isLarge ? 'p-6' : 'p-4'} flex flex-col justify-between text-white font-[family-name:var(--font-cairo)]`}>
+      <div className={`w-full h-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-[#0B3766] to-[#0A1A3A] p-4 ${isLarge ? 'p-6' : 'p-4'} flex flex-col justify-between text-white font-[family-name:var(--font-cairo)]`}>
         {/* Background Grid Pattern */}
         <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#ffffff15_1px,transparent_1px),linear-gradient(to_bottom,#ffffff15_1px,transparent_1px)] bg-[size:16px_16px]" />
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#5CB07C]/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#19B6C7]/20 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
 
         {/* Top Bar */}
         <div className="relative z-10 flex items-center justify-between">
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-bold text-emerald-300">
-            <Palette className="w-3.5 h-3.5 text-[#5CB07C]" />
+            <Palette className="w-3.5 h-3.5 text-[#19B6C7]" />
             <span>Brand Identity Guide</span>
           </div>
           <span className="text-[10px] font-mono text-slate-300 bg-white/5 px-2 py-0.5 rounded border border-white/10">Vector AI • SVG • PDF</span>
@@ -64,7 +64,7 @@ export default function ServiceVisualMockup({
           {/* Logo Monogram Box */}
           <div className="relative">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-white/15 to-white/5 border border-white/20 backdrop-blur-lg flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500">
-              <span className="text-2xl sm:text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-white to-sky-200">
+              <span className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-white to-sky-200">
                 {title.charAt(0) || 'ن'}
               </span>
               <PenTool aria-hidden="true" className="w-4 h-4 text-amber-300 absolute -top-1 -right-1 animate-pulse" />
@@ -73,8 +73,8 @@ export default function ServiceVisualMockup({
 
           {/* Color Palette Swatches */}
           <div className="flex items-center gap-1.5 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-            <div className="w-4 h-4 rounded-full bg-[#173A7C] border border-white/40 shadow-xs" title="#173A7C" />
-            <div className="w-4 h-4 rounded-full bg-[#5CB07C] border border-white/40 shadow-xs" title="#5CB07C" />
+            <div className="w-4 h-4 rounded-full bg-[#0B3766] border border-white/40 shadow-xs" title="#0B3766" />
+            <div className="w-4 h-4 rounded-full bg-[#19B6C7] border border-white/40 shadow-xs" title="#19B6C7" />
             <div className="w-4 h-4 rounded-full bg-[#D4AF37] border border-white/40 shadow-xs" title="#D4AF37" />
             <div className="w-4 h-4 rounded-full bg-slate-900 border border-white/40 shadow-xs" title="#0F172A" />
             <span className="text-[9px] text-slate-300 font-mono mr-1">Saudi Palette</span>
@@ -163,7 +163,7 @@ export default function ServiceVisualMockup({
         <div className="relative z-10 my-auto py-2">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 space-y-1.5 shadow-lg">
             <div className="flex items-center justify-between text-[11px]">
-              <span className="font-black text-amber-200">تحسين محركات البحث SEO</span>
+              <span className="font-bold text-amber-200">تحسين محركات البحث SEO</span>
               <span className="px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-mono text-[9px]">Score 98%</span>
             </div>
             <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
@@ -204,11 +204,11 @@ export default function ServiceVisualMockup({
         <div className="relative z-10 my-auto py-2 grid grid-cols-2 gap-2">
           <div className="bg-black/25 backdrop-blur-md p-2 rounded-xl border border-white/15 text-center">
             <span className="text-[10px] text-orange-200 block">العائد على الإعلان ROI</span>
-            <span className="text-lg font-black text-emerald-300 font-mono">+380%</span>
+            <span className="text-lg font-bold text-emerald-300 font-mono">+380%</span>
           </div>
           <div className="bg-black/25 backdrop-blur-md p-2 rounded-xl border border-white/15 text-center">
             <span className="text-[10px] text-orange-200 block">معدل التحويل CR</span>
-            <span className="text-lg font-black text-amber-300 font-mono">4.8%</span>
+            <span className="text-lg font-bold text-amber-300 font-mono">4.8%</span>
           </div>
         </div>
 
@@ -242,7 +242,7 @@ export default function ServiceVisualMockup({
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 space-y-2 shadow-lg">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
-              <span className="text-xs font-black text-white">خارطة طريق لاعتماد المنشآت</span>
+              <span className="text-xs font-bold text-white">خارطة طريق لاعتماد المنشآت</span>
             </div>
             <div className="flex items-center gap-1 text-[10px] text-indigo-200">
               <span className="px-1.5 py-0.5 rounded bg-indigo-500/30 border border-indigo-400/30">1. التقييم</span>
@@ -267,7 +267,7 @@ export default function ServiceVisualMockup({
 
   // 6. DEFAULT / OTHER CATEGORIES (DATA, MEDIA, BUSINESS)
   return (
-    <div className={`w-full h-full relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#173A7C] p-4 ${isLarge ? 'p-6' : 'p-4'} flex flex-col justify-between text-white font-[family-name:var(--font-cairo)]`}>
+    <div className={`w-full h-full relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0B3766] p-4 ${isLarge ? 'p-6' : 'p-4'} flex flex-col justify-between text-white font-[family-name:var(--font-cairo)]`}>
       <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#ffffff15_1px,transparent_1px),linear-gradient(to_bottom,#ffffff15_1px,transparent_1px)] bg-[size:16px_16px]" />
       
       <div className="relative z-10 flex items-center justify-between">

@@ -108,7 +108,7 @@ export default function InstructorLivePage() {
         title,
         course_id: courseId,
         instructor_id: user?.id || null,
-        meeting_url: meetingUrl || 'https://zoom.us',
+        meeting_url: meetingUrl || '/demo',
         platform,
         scheduled_at: scheduledDateTime,
         duration_minutes: parseInt(duration) || 60,
@@ -146,12 +146,12 @@ export default function InstructorLivePage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         {/* Top Badges Row */}
         <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-700 text-xs font-black border border-red-200/90 shadow-xs">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-700 text-xs font-bold border border-red-200/90 shadow-xs">
             <Radio className="w-4 h-4 text-red-600 animate-pulse" />
             <span>القاعات الافتراضية واللقاءات الحية</span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-300 shadow-xs">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>{sessions.length} ورش مجدولة</span>
           </span>
@@ -164,7 +164,7 @@ export default function InstructorLivePage() {
                 <Radio className="w-6 h-6 sm:w-7 sm:h-7 text-white animate-pulse" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(11,55,102,0.1)] student-heading-h1">
                   جلساتي وورشي <span className="student-name-gradient">المباشرة</span>
                 </h1>
               </div>
@@ -176,7 +176,7 @@ export default function InstructorLivePage() {
 
           <button
             onClick={() => setShowModal(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-red-600/20 hover:opacity-95 transition-all cursor-pointer whitespace-nowrap border border-white/20"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-red-600/20 hover:opacity-95 transition-all cursor-pointer whitespace-nowrap border border-white/20"
           >
             <Plus className="w-4 h-4" />
             <span>جدولة ورشة جديدة</span>
@@ -187,13 +187,13 @@ export default function InstructorLivePage() {
       {/* Sessions list */}
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل الجلسات...</p>
         </div>
       ) : sessions.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
-          <Radio className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
-          <h3 className="text-base font-black text-slate-900">لا توجد جلسات مجدولة حالياً</h3>
+          <Radio className="w-12 h-12 text-[#0B3766]/30 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">لا توجد جلسات مجدولة حالياً</h3>
         </div>
       ) : (
         <div className="space-y-4">
@@ -217,15 +217,15 @@ export default function InstructorLivePage() {
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200/60 pb-3">
                   <div>
-                    <span className="text-xs font-black text-emerald-700">{s.course_id}</span>
+                    <span className="text-xs font-bold text-emerald-700">{s.course_id}</span>
                     <h3 className="student-heading-h3 pt-1">{s.title}</h3>
                   </div>
 
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-black border ${
+                    className={`px-3 py-1 rounded-full text-xs font-bold border ${
                       s.status === 'live'
                         ? 'bg-red-50 text-red-700 border-red-300 animate-pulse'
-                        : 'bg-blue-50 text-[#173A7C] border-blue-300'
+                        : 'bg-blue-50 text-[#0B3766] border-blue-300'
                     }`}
                   >
                     {s.status === 'live' ? 'مباشر الآن 🔴' : 'مجدول 📅'}
@@ -235,11 +235,11 @@ export default function InstructorLivePage() {
                 <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-bold text-slate-600">
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4 text-[#173A7C]" />
+                      <Calendar className="w-4 h-4 text-[#0B3766]" />
                       <span>{dateStr}</span>
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-[#173A7C]" />
+                      <Clock className="w-4 h-4 text-[#0B3766]" />
                       <span>{timeStr} ({s.duration_minutes} دقيقة)</span>
                     </span>
                   </div>
@@ -248,7 +248,7 @@ export default function InstructorLivePage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleCopyLink(s.id, s.meeting_url)}
-                        className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-black flex items-center gap-1.5 cursor-pointer"
+                        className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                       >
                         {copiedId === s.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                         <span>نسخ الرابط</span>
@@ -257,7 +257,7 @@ export default function InstructorLivePage() {
                         href={s.meeting_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-1.5 rounded-xl bg-[#173A7C] text-white text-xs font-black flex items-center gap-1.5 hover:bg-[#1E4D9D]"
+                        className="px-4 py-1.5 rounded-xl bg-[#0B3766] text-white text-xs font-bold flex items-center gap-1.5 hover:bg-[#168AD3]"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>فتح القاعة ({s.platform || 'Zoom'})</span>
@@ -305,68 +305,68 @@ export default function InstructorLivePage() {
 
               <form onSubmit={handleCreateSession} className="space-y-3.5">
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">عنوان الورشة التدريبية</label>
+                  <label className="text-xs font-bold text-slate-700">عنوان الورشة التدريبية</label>
                   <input
                     type="text"
                     required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="مثال: تطبيقات الحوار المؤسسي"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">المقرر / الدورة</label>
+                  <label className="text-xs font-bold text-slate-700">المقرر / الدورة</label>
                   <input
                     type="text"
                     required
                     value={courseId}
                     onChange={(e) => setCourseId(e.target.value)}
                     placeholder="diploma-tolerance-citizenship"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">تاريخ الورشة</label>
+                    <label className="text-xs font-bold text-slate-700">تاريخ الورشة</label>
                     <input
                       type="date"
                       required
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">وقت البدء</label>
+                    <label className="text-xs font-bold text-slate-700">وقت البدء</label>
                     <input
                       type="time"
                       value={time}
                       onChange={(e) => setTime(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">المدة (بالدقائق)</label>
+                    <label className="text-xs font-bold text-slate-700">المدة (بالدقائق)</label>
                     <input
                       type="number"
                       min="15"
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">المنصة</label>
+                    <label className="text-xs font-bold text-slate-700">المنصة</label>
                     <select
                       value={platform}
                       onChange={(e) => setPlatform(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     >
                       <option value="Zoom">Zoom</option>
                       <option value="Microsoft Teams">Microsoft Teams</option>
@@ -376,13 +376,13 @@ export default function InstructorLivePage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">رابط القاعة (URL)</label>
+                  <label className="text-xs font-bold text-slate-700">رابط القاعة (URL)</label>
                   <input
                     type="url"
                     value={meetingUrl}
                     onChange={(e) => setMeetingUrl(e.target.value)}
-                    placeholder="https://zoom.us/j/..."
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    placeholder="/demo"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
@@ -390,14 +390,14 @@ export default function InstructorLivePage() {
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="px-4 py-2 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                    className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 text-white text-xs font-black flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-60"
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-60"
                   >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     <span>{saving ? 'جاري الحفظ...' : 'نشر وجدولة الجلسة'}</span>

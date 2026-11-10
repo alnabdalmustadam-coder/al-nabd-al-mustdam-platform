@@ -89,7 +89,7 @@ export default function TechnicalSpecificationsPage() {
         >
           <div className="mb-8">
             <span className="section-badge-glass">
-              <Server className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              <Server className="w-4 h-4 text-[#0B3766] ml-1 inline" />
               البنية التحتية والبيانات
             </span>
           </div>
@@ -100,15 +100,15 @@ export default function TechnicalSpecificationsPage() {
           </h1>
           
           <p className="section-desc-premium text-base sm:text-lg max-w-3xl mx-auto mb-10">
-            يمتلك <span className="font-bold text-slate-700">معهد النبض المستدام للتدريب</span> البنية التقنية القوية والمتطورة اللازمة لدعم وسلاسة عملية التدريب الإلكتروني، ولديها القدرة الفائقة على تحمل مختلف أعداد المستفيدين داخل الجهة دون التأثير على جودة الاتصال أو الخدمة.
+            يمتلك <span className="font-bold text-slate-700">أكاديمية مَدار للتعلّم</span> البنية التقنية القوية والمتطورة اللازمة لدعم وسلاسة عملية التدريب الإلكتروني، ولديها القدرة الفائقة على تحمل مختلف أعداد المستفيدين داخل الجهة دون التأثير على جودة الاتصال أو الخدمة.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-bold text-slate-400">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> خوادم عالية الأداء</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> خوادم عالية الأداء</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> استقرار المنصة 99.9%</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> استقرار المنصة 99.9%</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> أمان بيانات موثوق</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> أمان بيانات موثوق</span>
           </div>
         </motion.div>
       </section>
@@ -125,7 +125,7 @@ export default function TechnicalSpecificationsPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              className={`bg-white rounded-[2rem] p-8 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(23,58,124,0.08)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group ${spec.colSpan}`}
+              className={`bg-white rounded-[2rem] p-8 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(11,55,102,0.12)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group ${spec.colSpan}`}
             >
               <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl ${spec.color} opacity-[0.03] rounded-bl-full pointer-events-none transition-transform duration-700 group-hover:scale-150`} />
               <div className={`w-14 h-14 rounded-2xl ${spec.bgColor} flex items-center justify-center mb-6 border border-white shadow-inner`}>
@@ -152,9 +152,9 @@ export default function TechnicalSpecificationsPage() {
                  <Users className="w-9 h-9 text-cyan-400" />
               </div>
               <div>
-                <h3 className="text-2xl font-black text-white mb-4">{specifications[3].title}</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">{specifications[3].title}</h3>
                 <p className="text-cyan-50 font-medium text-[16px] leading-[2.2] opacity-90">
-                  يصل عدد المستخدمين في المنصة إلى <strong className="text-white px-1 font-black" dir="ltr">( 35 )</strong> متدرب حسب نظام التدريب الإلكتروني، و يُسمح بزيادة عدد المتعلمين بمقدار <strong className="text-white px-1 font-black" dir="ltr">25%</strong> على العدد المذكور أعلاه في الفصل الافتراضي المتزامن. ويمكن عمل وإتاحة الفصول الافتراضية بشكل لانهائي كلما اقتضت الحاجة لذلك لضمان استقرار الخوادم.
+                  يصل عدد المستخدمين في المنصة إلى <strong className="text-white px-1 font-bold" dir="ltr">( 35 )</strong> متدرب حسب نظام التدريب الإلكتروني، و يُسمح بزيادة عدد المتعلمين بمقدار <strong className="text-white px-1 font-bold" dir="ltr">25%</strong> على العدد المذكور أعلاه في الفصل الافتراضي المتزامن. ويمكن عمل وإتاحة الفصول الافتراضية بشكل لانهائي كلما اقتضت الحاجة لذلك لضمان استقرار الخوادم.
                 </p>
               </div>
             </div>
@@ -169,7 +169,7 @@ export default function TechnicalSpecificationsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.4 + (index * 0.1), duration: 0.5 }}
-                  className={`bg-white rounded-[2rem] p-8 sm:p-10 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(23,58,124,0.08)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group`}
+                  className={`bg-white rounded-[2rem] p-8 sm:p-10 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(11,55,102,0.12)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group`}
                 >
                   <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${spec.color} opacity-[0.03] rounded-bl-full pointer-events-none transition-transform duration-700 group-hover:scale-150`} />
                   
@@ -197,15 +197,15 @@ export default function TechnicalSpecificationsPage() {
 
       {/* CTA Box */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 mt-16">
-        <div className="bg-gradient-to-br from-[#173A7C] to-[#2F66D6] rounded-[2rem] p-8 sm:p-10 text-center shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-[#0B3766] to-[#168AD3] rounded-[2rem] p-8 sm:p-10 text-center shadow-2xl relative overflow-hidden">
              <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none" />
-             <h3 className="text-xl sm:text-2xl font-black text-white mb-4 relative z-10">جاهزية تقنية للمستقبل</h3>
+             <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 relative z-10">جاهزية تقنية للمستقبل</h3>
              <p className="text-blue-100 font-medium text-[15px] leading-relaxed max-w-2xl mx-auto mb-8 relative z-10">
-               نسعى دوماً في معهد النبض المستدام لتحديث البنية التقنية وتأمين الخوادم لتواكب أحدث المعايير الرقمية لتقديم تجربة تدريب غير مسبوقة.
+               نسعى دوماً في معهد مَدار للتعلّم لتحديث البنية التقنية وتأمين الخوادم لتواكب أحدث المعايير الرقمية لتقديم تجربة تدريب غير مسبوقة.
              </p>
              <Link 
                href="/contact"
-               className="relative z-10 inline-flex items-center gap-2 px-8 py-3.5 bg-white text-[#173A7C] font-bold text-sm rounded-xl hover:bg-slate-50 hover:-translate-y-1 transition-all shadow-lg"
+               className="relative z-10 inline-flex items-center gap-2 px-8 py-3.5 bg-white text-[#0B3766] font-bold text-sm rounded-xl hover:bg-slate-50 hover:-translate-y-1 transition-all shadow-lg"
              >
                فريق الدعم المباشر
              </Link>

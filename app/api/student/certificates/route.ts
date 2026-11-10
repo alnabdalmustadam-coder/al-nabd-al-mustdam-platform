@@ -1,14 +1,14 @@
 import { readCompletedJourneyScore } from '@/lib/learning/journey-completion';
 import { isLearningJourney } from '@/lib/learning/journey';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest,NextResponse } from 'next/server';
 import {
-  CertificatePersistenceError,
-  getAllIssuedCertificates,
-  getAllTemplates,
-  issueCertificate,
-  formatCertificateGrade,
-  formatCertificateHours,
+CertificatePersistenceError,
+getAllIssuedCertificates,
+getAllTemplates,
+issueCertificate,
+formatCertificateGrade,
+formatCertificateHours,
 } from '@/lib/certificates-store';
 import { getAllCoursesAsync } from '@/lib/courses-store';
 import { findCourseByIdentifier } from '@/lib/public-courses';

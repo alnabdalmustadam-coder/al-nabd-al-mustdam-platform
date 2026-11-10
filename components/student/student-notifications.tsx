@@ -26,7 +26,7 @@ export const StudentNotifications: React.FC = () => {
     },
     {
       id: '2',
-      title: 'إصدار شهادة معتمدة 📜',
+      title: 'إصدار شهادة إتمام 📜',
       message: 'تهانينا! تم إصدار شهادة "دورة استخدام الحاسب الالي في الاعمال المكتبية" بنجاح.',
       time: 'منذ ساعتين',
       type: 'certificate',
@@ -74,9 +74,9 @@ export const StudentNotifications: React.FC = () => {
   const getTypeIcon = (type: NotificationItem['type']) => {
     switch (type) {
       case 'certificate':
-        return <Award className="w-4 h-4 text-[#5CB07C]" />;
+        return <Award className="w-4 h-4 text-[#19B6C7]" />;
       case 'academic':
-        return <BookOpen className="w-4 h-4 text-[#173A7C]" />;
+        return <BookOpen className="w-4 h-4 text-[#0B3766]" />;
       case 'billing':
         return <ShieldCheck className="w-4 h-4 text-amber-500" />;
       default:
@@ -87,19 +87,19 @@ export const StudentNotifications: React.FC = () => {
   const renderContent = (isMobile: boolean = false) => (
     <div className="flex flex-col h-full w-full font-[family-name:var(--font-cairo)] text-right relative overflow-hidden" dir="rtl">
       {/* Top Emerald Accent Ribbon */}
-      <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#5CB07C] via-[#173A7C] to-emerald-400 rounded-t-[28px] z-20" />
+      <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#19B6C7] via-[#0B3766] to-emerald-400 rounded-t-[28px] z-20" />
 
       {/* Header Bar */}
       <div className="p-4 pt-4 pb-3 border-b border-slate-200/60 flex items-center justify-between relative z-10 shrink-0 bg-slate-50/60 backdrop-blur-md">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 shrink-0">
+          <div className="p-2 rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20 shrink-0">
             <Bell className="w-4 h-4" />
           </div>
           <div className="min-w-0">
-            <h3 className="font-black text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+            <h3 className="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
               <span>إشعارات الطالب والتنبيهات</span>
             </h3>
-            <p className="text-[10px] text-slate-500 font-extrabold truncate">
+            <p className="text-[10px] text-slate-500 font-bold truncate">
               {unreadCount > 0 ? `لديك ${unreadCount} إشعار جديد` : 'جميع الإشعارات مقروءة'}
             </p>
           </div>
@@ -109,7 +109,7 @@ export const StudentNotifications: React.FC = () => {
           {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
-              className="p-1.5 px-2.5 text-[10px] font-black text-[#5CB07C] hover:bg-emerald-50 rounded-xl transition-all border border-emerald-200/60 flex items-center gap-1 cursor-pointer"
+              className="p-1.5 px-2.5 text-[10px] font-bold text-[#19B6C7] hover:bg-emerald-50 rounded-xl transition-all border border-emerald-200/60 flex items-center gap-1 cursor-pointer"
               title="تحديد الكل كمقروء"
             >
               <CheckCheck className="w-3.5 h-3.5" />
@@ -131,20 +131,20 @@ export const StudentNotifications: React.FC = () => {
         <div className="premium-tabs flex items-center gap-2">
           <button
             onClick={() => setActiveTab('all')}
-            className={`premium-tab px-3 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer ${
+            className={`premium-tab px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
               activeTab === 'all'
-                ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                : 'text-slate-600 hover:text-[#173A7C] hover:bg-white/60'
+                ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                : 'text-slate-600 hover:text-[#0B3766] hover:bg-white/60'
             }`}
           >
             <span className="premium-tab-label">الكل ({notifications.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('unread')}
-            className={`premium-tab px-3 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer ${
+            className={`premium-tab px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
               activeTab === 'unread'
-                ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                : 'text-slate-600 hover:text-[#173A7C] hover:bg-white/60'
+                ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                : 'text-slate-600 hover:text-[#0B3766] hover:bg-white/60'
             }`}
           >
             <span className="premium-tab-label">غير مقروء ({unreadCount})</span>
@@ -152,7 +152,7 @@ export const StudentNotifications: React.FC = () => {
         </div>
 
         {unreadCount > 0 && (
-          <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-200/60">
+          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-200/60">
             {unreadCount} جديد
           </span>
         )}
@@ -165,7 +165,7 @@ export const StudentNotifications: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
               <Bell className="w-6 h-6 stroke-1" />
             </div>
-            <p className="text-xs font-black text-slate-600">لا توجد إشعارات لعرضها حالياً</p>
+            <p className="text-xs font-bold text-slate-600">لا توجد إشعارات لعرضها حالياً</p>
           </div>
         ) : (
           filteredNotifications.map((notif) => (
@@ -184,10 +184,10 @@ export const StudentNotifications: React.FC = () => {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-1 mb-1">
-                  <h4 className="font-black text-slate-800 text-xs truncate">
+                  <h4 className="font-bold text-slate-800 text-xs truncate">
                     {notif.title}
                   </h4>
-                  <span className="text-[9px] text-slate-400 font-extrabold whitespace-nowrap shrink-0">
+                  <span className="text-[9px] text-slate-400 font-bold whitespace-nowrap shrink-0">
                     {notif.time}
                   </span>
                 </div>
@@ -213,7 +213,7 @@ export const StudentNotifications: React.FC = () => {
 
       {/* Footer */}
       <div className="p-3 bg-slate-50/80 border-t border-slate-200/50 text-center shrink-0 mt-auto relative z-10">
-        <span className="text-[10px] font-black text-[#5CB07C]">
+        <span className="text-[10px] font-bold text-[#19B6C7]">
           النظام الذكي للتنبيهات الأكاديمية والمالية الموحد ✓
         </span>
       </div>
@@ -225,7 +225,7 @@ export const StudentNotifications: React.FC = () => {
       {/* Topbar Notification Trigger Button (NO WHITE HALO GLOW) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-9 h-9 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center relative"
+        className="w-9 h-9 rounded-xl text-slate-700 hover:text-[#0B3766] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center relative"
         title="التنبيهات والإشعارات"
       >
         <Bell className="w-4 h-4 text-slate-700" />
@@ -250,9 +250,9 @@ export const StudentNotifications: React.FC = () => {
           <div
             className="fixed top-[96px] right-3 left-3 z-[1220] max-h-[calc(100vh-112px)] h-[80vh] rounded-[30px] border border-slate-300/90 flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-top-3 duration-300"
             style={{
-              background: 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(241,245,249,0.95) 100%)',
+              background: 'linear-gradient(145deg, rgba(11,55,102,0.08) 0%, rgba(11,55,102,0.08) 100%)',
               backdropFilter: 'blur(28px) saturate(1.9)',
-              boxShadow: '0 25px 60px rgba(15, 23, 42, 0.25)',
+              boxShadow: '0 25px 60px rgba(11,55,102,0.08)',
             }}
           >
             {renderContent(true)}
@@ -271,9 +271,9 @@ export const StudentNotifications: React.FC = () => {
           <div
             className="relative z-[1200] w-96 max-h-[540px] h-[520px] rounded-[28px] border border-slate-300/85 flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200"
             style={{
-              background: 'linear-gradient(145deg, rgba(255,255,255,0.96) 0%, rgba(241,245,249,0.92) 100%)',
+              background: 'linear-gradient(145deg, rgba(11,55,102,0.08) 0%, rgba(11,55,102,0.08) 100%)',
               backdropFilter: 'blur(28px) saturate(1.9)',
-              boxShadow: '0 20px 50px rgba(15, 23, 42, 0.2)',
+              boxShadow: '0 20px 50px rgba(11, 55, 102, 0.12)',
             }}
           >
             {renderContent(false)}

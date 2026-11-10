@@ -54,22 +54,22 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
         transition={{ duration: 0.2, ease: 'easeOut' }}
         className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4.5 sm:p-6 min-h-[92px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3.5 sm:gap-4 group cursor-default"
       >
-        <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#5CB07C] to-emerald-400" />
-        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#5CB07C] to-emerald-600 text-white shadow-md shadow-emerald-500/20 border border-white/30">
+        <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7]" />
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20 border border-white/30">
           <TrendingUp className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
         </div>
 
         <div className="space-y-1 sm:space-y-1 relative z-10 min-w-0 flex-1">
           <div className="flex items-baseline gap-1.5 sm:gap-2">
-            <span className="text-xl sm:text-3xl font-black text-[#173A7C] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+            <span className="text-xl sm:text-3xl font-bold text-[#0B3766] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
               %{overallProgressPercent}
             </span>
-            <span className="text-xs sm:text-sm font-black text-[#173A7C] truncate [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+            <span className="text-xs sm:text-sm font-bold text-[#0B3766] truncate [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
               تقدم التعلم العام
             </span>
           </div>
-          <div className="flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-bold text-emerald-800">
-            <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+          <div className="flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-bold text-[#168AD3]">
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-[#19B6C7]" />
             <span className="truncate">أداء ممتاز ومستمر</span>
           </div>
         </div>
@@ -82,21 +82,21 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
         transition={{ duration: 0.2, ease: 'easeOut' }}
         className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4.5 sm:p-6 min-h-[92px] sm:min-h-[120px] liquid-glass-card liquid-glass-hover flex items-center gap-3.5 sm:gap-4 group cursor-default"
       >
-        <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#173A7C] to-[#1E4D9D]" />
-        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-white/30">
+        <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#0B3766] to-[#168AD3]" />
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20 border border-white/30">
           <BookOpen className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
         </div>
 
         <div className="space-y-1 sm:space-y-1 relative z-10 min-w-0 flex-1">
           <div className="flex items-baseline gap-1.5 sm:gap-2">
-            <span className="text-xl sm:text-3xl font-black text-[#173A7C] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+            <span className="text-xl sm:text-3xl font-bold text-[#0B3766] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
               {enrolledCoursesCount}
             </span>
-            <span className="text-xs sm:text-sm font-black text-[#173A7C] truncate [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+            <span className="text-xs sm:text-sm font-bold text-[#0B3766] truncate [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
               دورات مسجلة
             </span>
           </div>
-          <p className="text-[10.5px] sm:text-[11px] text-[#173A7C] font-bold truncate">
+          <p className="text-[10.5px] sm:text-[11px] text-[#0B3766] font-bold truncate">
             في خطتك الأكاديمية
           </p>
         </div>
@@ -116,10 +116,10 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
 
         <div className="space-y-1 sm:space-y-1 relative z-10 min-w-0 flex-1">
           <div className="flex items-baseline gap-1.5 sm:gap-2">
-            <span className="text-xl sm:text-3xl font-black text-[#173A7C] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+            <span className="text-xl sm:text-3xl font-bold text-[#0B3766] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
               {completedCoursesCount}
             </span>
-            <span className="text-xs sm:text-sm font-black text-[#173A7C] truncate [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+            <span className="text-xs sm:text-sm font-bold text-[#0B3766] truncate [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
               دورات مكتملة
             </span>
           </div>
@@ -143,10 +143,10 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
 
         <div className="space-y-1 sm:space-y-1 relative z-10 min-w-0 flex-1">
           <div className="flex items-baseline gap-1.5 sm:gap-2">
-            <span className="text-xl sm:text-3xl font-black text-[#173A7C] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+            <span className="text-xl sm:text-3xl font-bold text-[#0B3766] tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
               {certificatesCount}
             </span>
-            <span className="text-xs sm:text-sm font-black text-[#173A7C] truncate [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+            <span className="text-xs sm:text-sm font-bold text-[#0B3766] truncate [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
               شهادات مكتسبة
             </span>
           </div>

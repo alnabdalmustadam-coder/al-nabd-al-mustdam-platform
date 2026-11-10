@@ -1,17 +1,6 @@
 @import "tailwindcss";
 
-/* ============================================
-   خط ثمانية الأصلي المحلي (Thmanyah Font Family)
-   ============================================ */
-@font-face {
-  font-family: 'Thmanyah';
-  src: url('/fonts/thmanyah/thmanyahsans-Light.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Alexandria variable — locally hosted for body copy and dense UI content. */
+/* Alexandria variable is served locally for Arabic and Latin text. */
 @font-face {
   font-family: 'Alexandria Local';
   src: url('/fonts/alexandria/alexandria-arabic-variable.woff2') format('woff2');
@@ -30,69 +19,21 @@
   unicode-range: U+??, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-@font-face {
-  font-family: 'Thmanyah';
-  src: url('/fonts/thmanyah/thmanyahsans-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Thmanyah';
-  src: url('/fonts/thmanyah/thmanyahsans-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Thmanyah';
-  src: url('/fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Thmanyah';
-  src: url('/fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Thmanyah';
-  src: url('/fonts/thmanyah/thmanyahsans-Black.woff2') format('woff2');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Thmanyah';
-  src: url('/fonts/thmanyah/thmanyahsans-Black.woff2') format('woff2');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* ============================================
-   النبض المستدام — Design Tokens (Tailwind v4 - Light Premium Theme)
+   مَدار للتعلّم — Design Tokens (Tailwind v4 - Light Premium Theme)
    ============================================ */
 
 @theme inline {
   /* ---- Colors ---- */
-  --color-primary: #173A7C;
-  /* Navy Blue from TTi Logo */
-  --color-primary-light: #1E4D9D;
+  --color-primary: #0B3766;
+  /* Madar brand navy */
+  --color-primary-light: #168AD3;
   --color-secondary: #0F172A;
   /* Deep Slate/Navy */
   --color-secondary-light: #334155;
-  --color-accent: #5CB07C;
-  /* Green from Logo */
-  --color-accent-light: #7DD09D;
+  --color-accent: #19B6C7;
+  /* Madar brand cyan accent */
+  --color-accent-light: #BCECF2;
 
   --color-surface: #FFFFFF;
   --color-surface-hover: #F8FAFC;
@@ -103,7 +44,7 @@
   --font-cairo: var(--font-body);
   --font-sora: var(--font-body);
   --font-alexandria: var(--font-body);
-  --font-display: var(--font-thmanyah), "Thmanyah", Arial, sans-serif;
+  --font-display: var(--font-body);
 
   /* ---- Spacing / Radius ---- */
   --radius-card: 20px;
@@ -117,10 +58,10 @@
    ============================================ */
 
 :root {
-  --hero-gradient: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
-  --card-shadow: 0 10px 32px rgba(15, 23, 42, 0.09);
-  --card-shadow-hover: 0 18px 48px rgba(15, 23, 42, 0.15);
-  --font-display: var(--font-thmanyah), "Thmanyah", Arial, sans-serif;
+  --hero-gradient: linear-gradient(135deg, #F7FBFF 0%, #EAF7FD 100%);
+  --card-shadow: 0 10px 32px rgba(11, 55, 102, 0.08);
+  --card-shadow-hover: 0 18px 48px rgba(11, 55, 102, 0.15);
+  --font-display: var(--font-body);
   --font-body: "Alexandria Local", Arial, sans-serif;
   --font-app: var(--font-body);
   --font-cairo: var(--font-body);
@@ -139,23 +80,25 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
-  max-width: 100vw;
-  width: 100%;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  scrollbar-gutter: stable;
 }
 
 body {
   font-family: var(--font-app) !important;
   font-size: 0.9375rem;
-  background: #F8FAFC;
-  /* Light slate-50 background */
+  background: #F7FBFF;
+  /* Madar cool-white brand surface */
   color: #152C5B;
   /* Premium Deep Royal Navy Text (No harsh black) */
   overflow-x: clip;
-  max-width: 100vw;
-  width: 100%;
+  inline-size: 100%;
+  max-inline-size: 100%;
   position: relative;
   font-synthesis: none !important;
   -webkit-font-synthesis: none !important;
+  font-synthesis-weight: none !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.012em;
@@ -166,18 +109,114 @@ body {
    Typography Defaults & Unified Student Design Architecture
    ============================================ */
 
-/* Display typography: Thmanyah gives the product its distinctive Arabic voice. */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   line-height: 1.28;
   letter-spacing: -0.014em;
   text-wrap: balance;
-  text-shadow: 0 1px 1px rgba(15, 23, 42, 0.07);
+  text-shadow: 0 1px 1px rgba(11, 55, 102, 0.08);
 }
 
-h1 { font-weight: 900; }
-h2, h3 { font-weight: 700; }
-h4, h5, h6 { font-weight: 700; }
+h1 { font-weight: 700; }
+h2, h3 { font-weight: 600; }
+h4, h5, h6 { font-weight: 600; }
+
+/* Arabic Balanced Weight Ramp (Prevents ink-trap blotching in Alexandria / Cairo) */
+.font-bold {
+  font-weight: 700 !important;
+}
+.font-bold {
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   Premium Fluid UI (v1.5.0) — Two-Tier Scaling & Anti-Distortion Guards
+   ========================================================================== */
+
+/* 1. TIER 1: Proportional 2D Desktop Scaling for Smaller PC Screens (1024x600 .. 1600x900) */
+@media (min-width: 64rem) {
+  html {
+    font-size: clamp(
+      60%,
+      min(calc(0.1rem + 0.9vw), calc(0.1rem + 1.5dvh)),
+      100%
+    );
+  }
+}
+
+/* 2. Low-Res Readability Floor on 1024x600 / 1366x768 (1dpr displays) */
+@media (min-width: 64rem) and (max-width: 86rem) {
+  .pf-type-body, p {
+    font-size: max(var(--pf-type-body, 0.9375rem), 12px);
+  }
+  .pf-type-caption, .pf-type-micro, small {
+    font-size: max(var(--pf-type-caption, 0.8125rem), 11px);
+  }
+}
+
+/* 3. Font-Weight & Small-Screen Halation Guard */
+@media (max-width: 39.99rem), (min-width: 64rem) and (max-width: 86rem), (max-resolution: 1.25dppx) {
+  h1, h2, h3, .font-bold, .font-bold {
+    font-weight: 600 !important;
+  }
+  small, .text-xs, .pf-type-caption, .pf-type-micro {
+    font-weight: 500;
+  }
+}
+
+/* 4. Tabular Numbers & Equal Card Heights */
+.pf-tabular-nums,
+[data-pf-price],
+[data-pf-timer] {
+  font-variant-numeric: tabular-nums;
+}
+
+.pf-card-equal {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.pf-card-equal__footer,
+.pf-card-equal__cta {
+  margin-block-start: auto;
+}
+
+/* 5. TIER 2: Structural Reflow below 1024px */
+@media (max-width: 63.99rem) {
+  html {
+    font-size: 100%;
+  }
+  .pf-desktop-only-actions {
+    display: none !important;
+  }
+  .pf-desktop-floating-card {
+    position: static !important;
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+    inset: auto !important;
+    transform: none !important;
+    margin-block-start: 1rem;
+  }
+}
+
+/* Mobile Portrait (< 640px) Reflow */
+@media (max-width: 39.99rem) {
+  .pf-responsive-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .pf-responsive-stepper {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+}
+
+/* Floating Action Button (FAB) clearance in footer for WhatsApp & Marketplace badges */
+.pf-footer-fab-clearance {
+  padding-block-end: clamp(5rem, 12dvh, 7rem) !important;
+}
 
 button,
 [role="tab"],
@@ -210,37 +249,35 @@ p, .subtext, .desc {
   backdrop-filter: blur(24px) saturate(1.55);
   -webkit-backdrop-filter: blur(24px) saturate(1.55);
   transition-property: padding, background-color, border-color, box-shadow;
+  overflow: visible !important;
 }
 
 .premium-navbar-light {
-  background: transparent;
-  border-bottom-color: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-bottom: 1px solid rgba(11, 55, 102, 0.08) !important;
+  box-shadow: 0 4px 20px -2px rgba(11, 55, 102, 0.06) !important;
+  backdrop-filter: blur(24px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.8) !important;
 }
 
 .premium-navbar-light[data-scrolled="true"] {
   padding-block: 0.52rem;
-  background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.97), rgba(246, 249, 255, 0.94) 52%, rgba(242, 250, 246, 0.95));
-  border-bottom-color: rgba(23, 58, 124, 0.14);
-  backdrop-filter: blur(24px) saturate(1.55);
-  -webkit-backdrop-filter: blur(24px) saturate(1.55);
-  box-shadow:
-    0 18px 44px -24px rgba(23, 58, 124, 0.34),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-bottom: 1px solid rgba(11, 55, 102, 0.12) !important;
+  backdrop-filter: blur(28px) saturate(2) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(2) !important;
+  box-shadow: 0 10px 30px -10px rgba(11, 55, 102, 0.14), 0 4px 12px rgba(11, 55, 102, 0.05) !important;
 }
 
 .premium-navbar-dark {
-  background: linear-gradient(115deg, rgba(7, 18, 42, 0.94), rgba(10, 31, 67, 0.91));
-  border-bottom-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 18px 44px -24px rgba(0, 0, 0, 0.72);
+  background: linear-gradient(115deg, rgba(11, 55, 102, 0.08), rgba(11, 55, 102, 0.08));
+  border-bottom-color: rgba(11, 55, 102, 0.08);
+  box-shadow: 0 18px 44px -24px rgba(11, 55, 102, 0.08);
 }
 
 .premium-navbar-dark[data-scrolled="true"] {
   padding-block: 0.52rem;
-  background: linear-gradient(115deg, rgba(7, 18, 42, 0.98), rgba(10, 31, 67, 0.97));
+  background: linear-gradient(115deg, rgba(11, 55, 102, 0.08), rgba(11, 55, 102, 0.08));
 }
 
 .premium-navbar::after {
@@ -252,7 +289,7 @@ p, .subtext, .desc {
   height: 1px;
   pointer-events: none;
   opacity: 1;
-  background: linear-gradient(90deg, transparent, rgba(23, 58, 124, 0.28), rgba(92, 176, 124, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(11, 55, 102, 0.08), rgba(11, 55, 102, 0.08), transparent);
   transition: opacity 300ms ease;
 }
 
@@ -263,6 +300,7 @@ p, .subtext, .desc {
 .premium-navbar-inner {
   position: relative;
   z-index: 1;
+  overflow: visible !important;
 }
 
 .premium-nav-link {
@@ -272,24 +310,24 @@ p, .subtext, .desc {
   line-height: 1.35;
   letter-spacing: -0.008em;
   text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.92),
-    0 -1px 0 rgba(23, 58, 124, 0.13),
-    0 3px 9px rgba(23, 58, 124, 0.08);
+    0 1px 0 rgba(11, 55, 102, 0.08),
+    0 -1px 0 rgba(11, 55, 102, 0.08),
+    0 3px 9px rgba(11, 55, 102, 0.08);
 }
 
 .premium-navbar-light .premium-nav-link {
-  color: #173A7C !important;
+  color: #0B3766 !important;
 }
 
 .premium-navbar-dark .premium-nav-link {
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.32);
+  text-shadow: 0 1px 8px rgba(11, 55, 102, 0.08);
 }
 
 .engraved-nav-text {
   text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.92),
-    0 -1px 0 rgba(23, 58, 124, 0.13),
-    0 3px 9px rgba(23, 58, 124, 0.08);
+    0 1px 0 rgba(11, 55, 102, 0.08),
+    0 -1px 0 rgba(11, 55, 102, 0.08),
+    0 3px 9px rgba(11, 55, 102, 0.08);
 }
 
 /* Hero heading scale: consistent at every breakpoint and subtly engraved. */
@@ -298,13 +336,13 @@ p, .subtext, .desc {
 .hero-typewriter-premium,
 .hero-stat-number {
   font-family: var(--font-display);
-  color: #173A7C;
+  color: #0B3766;
   font-weight: 900;
   letter-spacing: -0.018em;
   text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.96),
-    0 -1px 0 rgba(12, 41, 94, 0.22),
-    0 3px 8px rgba(23, 58, 124, 0.12);
+    0 1px 0 rgba(11, 55, 102, 0.08),
+    0 -1px 0 rgba(11, 55, 102, 0.08),
+    0 3px 8px rgba(11, 55, 102, 0.08);
 }
 
 .hero-course-title-premium {
@@ -355,7 +393,7 @@ p, .subtext, .desc {
 
 .hero-main-title-premium .gradient-text {
   text-shadow: none;
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9)) drop-shadow(0 3px 5px rgba(23, 58, 124, 0.12));
+  filter: drop-shadow(0 1px 0 rgba(11, 55, 102, 0.08)) drop-shadow(0 3px 5px rgba(11, 55, 102, 0.08));
 }
 
 .hero-typewriter-premium {
@@ -374,20 +412,20 @@ p, .subtext, .desc {
    ============================================ */
 .section-main-title-premium {
   font-family: var(--font-display);
-  color: #173A7C;
+  color: #0B3766;
   font-weight: 900;
   letter-spacing: -0.018em;
   font-size: clamp(2rem, 1.45rem + 1.6vw, 3.4rem);
   line-height: 1.22;
   text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.96),
-    0 -1px 0 rgba(12, 41, 94, 0.22),
-    0 3px 8px rgba(23, 58, 124, 0.12);
+    0 1px 0 rgba(11, 55, 102, 0.08),
+    0 -1px 0 rgba(11, 55, 102, 0.08),
+    0 3px 8px rgba(11, 55, 102, 0.08);
 }
 
 .section-main-title-premium .gradient-text {
   text-shadow: none;
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9)) drop-shadow(0 3px 5px rgba(23, 58, 124, 0.12));
+  filter: drop-shadow(0 1px 0 rgba(11, 55, 102, 0.08)) drop-shadow(0 3px 5px rgba(11, 55, 102, 0.08));
 }
 
 .section-desc-premium {
@@ -400,13 +438,13 @@ p, .subtext, .desc {
 
 .card-title-royal-blue {
   font-family: var(--font-display);
-  color: #173A7C;
+  color: #0B3766;
   font-weight: 900;
   letter-spacing: -0.015em;
   text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9),
-    0 -1px 0 rgba(12, 41, 94, 0.12),
-    0 2px 6px rgba(23, 58, 124, 0.08);
+    0 1px 0 rgba(11, 55, 102, 0.08),
+    0 -1px 0 rgba(11, 55, 102, 0.08),
+    0 2px 6px rgba(11, 55, 102, 0.08);
 }
 
 .card-desc-premium {
@@ -418,8 +456,9 @@ p, .subtext, .desc {
 }
 
 .course-card-description {
-  font-size: 0.75rem;
-  line-height: 1.75;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.9;
 }
 
 .course-detail-summary {
@@ -433,7 +472,10 @@ p, .subtext, .desc {
 }
 
 @media (min-width: 640px) {
-  .course-card-description,
+  .course-card-description {
+    font-size: 0.875rem;
+  }
+
   .course-detail-summary {
     font-size: 0.8125rem;
   }
@@ -487,12 +529,12 @@ p, .subtext, .desc {
   font-size: clamp(0.78rem, 0.74rem + 0.16vw, 0.9rem);
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #173A7C;
-  background: rgba(255, 255, 255, 0.88);
+  color: #0B3766;
+  background: rgba(11, 55, 102, 0.08);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(23, 58, 124, 0.1);
-  box-shadow: 0 2px 8px rgba(23, 58, 124, 0.05);
+  border: 1px solid rgba(11, 55, 102, 0.08);
+  box-shadow: 0 2px 8px rgba(11, 55, 102, 0.08);
   border-radius: 9999px;
   padding: 0.45rem 1.25rem;
 }
@@ -512,19 +554,19 @@ p, .subtext, .desc {
   font-family: var(--font-display);
   font-size: clamp(1.3rem, 1.12rem + 0.85vw, 2rem);
   font-weight: 900;
-  color: #173A7C !important;
+  color: #0B3766 !important;
   letter-spacing: -0.018em;
   line-height: 1.22;
-  text-shadow: 0 1px 1px rgba(23, 58, 124, 0.08);
+  text-shadow: 0 1px 1px rgba(11, 55, 102, 0.08);
 }
 
 .student-name-gradient {
-  background: linear-gradient(135deg, #173A7C 0%, #1E4D9D 45%, #059669 100%) !important;
+  background: linear-gradient(135deg, #0B3766 0%, #168AD3 45%, #0D8495 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
   text-shadow: none !important;
-  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.5)) !important;
+  filter: drop-shadow(0 1px 1px rgba(11, 55, 102, 0.08)) !important;
   font-weight: 900 !important;
   display: inline-block;
 }
@@ -533,34 +575,34 @@ p, .subtext, .desc {
   font-family: var(--font-display);
   font-size: clamp(1.08rem, 1rem + 0.42vw, 1.45rem);
   font-weight: 700 !important;
-  color: #173A7C !important;
+  color: #0B3766 !important;
   letter-spacing: -0.012em;
   line-height: 1.3;
-  text-shadow: 0 1px 1px rgba(23, 58, 124, 0.07) !important;
+  text-shadow: 0 1px 1px rgba(11, 55, 102, 0.08) !important;
 }
 
 .student-heading-h3 {
   font-family: var(--font-display);
   font-size: clamp(0.98rem, 0.94rem + 0.25vw, 1.18rem);
   font-weight: 700 !important;
-  color: #173A7C !important;
+  color: #0B3766 !important;
   letter-spacing: -0.008em;
   line-height: 1.35;
-  text-shadow: 0 1px 1px rgba(23, 58, 124, 0.06) !important;
+  text-shadow: 0 1px 1px rgba(11, 55, 102, 0.08) !important;
 }
 
 .engraved-text-light {
-  color: #173A7C !important;
+  color: #0B3766 !important;
   text-shadow: 
-    0 1px 0 rgba(255, 255, 255, 0.35),
-    0 -1px 1px rgba(23, 58, 124, 0.15) !important;
+    0 1px 0 rgba(11, 55, 102, 0.08),
+    0 -1px 1px rgba(11, 55, 102, 0.08) !important;
 }
 
 .engraved-text-dark {
   text-shadow: 
-    0 1px 0 rgba(255, 255, 255, 0.35),
-    0 -1px 2px rgba(0, 0, 0, 0.9),
-    0 2px 4px rgba(0, 0, 0, 0.6) !important;
+    0 1px 0 rgba(11, 55, 102, 0.08),
+    0 -1px 2px rgba(11, 55, 102, 0.08),
+    0 2px 4px rgba(11, 55, 102, 0.08) !important;
 }
 
 .student-text-body {
@@ -592,7 +634,7 @@ p, .subtext, .desc {
   margin-bottom: 0.75rem !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 1px 3px 0 rgba(11, 55, 102, 0.08) !important;
 }
 @media (min-width: 640px) {
   .admin-hero-tag,
@@ -618,7 +660,7 @@ p, .subtext, .desc {
   margin-bottom: 0.85rem;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 2px 0 rgba(11, 55, 102, 0.08);
 }
 @media (min-width: 640px) {
   .student-tag-badge {
@@ -644,11 +686,11 @@ p, .subtext, .desc {
   text-wrap: balance;
 }
 
-/* Engraved Thmanyah labels: isolated from the tab surface so active backgrounds stay intact. */
+/* Keep engraved labels separate from the active tab background. */
 .premium-tab-label {
   font-family: var(--font-display);
   font-weight: 800;
-  background-image: linear-gradient(to left, #173A7C 0%, #2D67B8 38%, #0A9465 72%, #5CB07C 100%);
+  background-image: linear-gradient(to left, #0B3766 0%, #2D67B8 38%, #159CB8 72%, #19B6C7 100%);
   background-size: 100% 100%;
   background-position: center;
   -webkit-background-clip: text;
@@ -656,75 +698,75 @@ p, .subtext, .desc {
   color: transparent;
   -webkit-text-fill-color: transparent;
   filter:
-    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.96))
-    drop-shadow(0 -1px 0 rgba(12, 41, 94, 0.2))
-    drop-shadow(0 2px 3px rgba(23, 58, 124, 0.1));
+    drop-shadow(0 1px 0 rgba(11, 55, 102, 0.08))
+    drop-shadow(0 -1px 0 rgba(11, 55, 102, 0.08))
+    drop-shadow(0 2px 3px rgba(11, 55, 102, 0.08));
   transition: filter 240ms ease;
 }
 
 .premium-tab:hover .premium-tab-label {
   filter:
-    drop-shadow(0 1px 0 rgba(255, 255, 255, 1))
-    drop-shadow(0 -1px 0 rgba(12, 41, 94, 0.22))
-    drop-shadow(0 3px 5px rgba(23, 58, 124, 0.14));
+    drop-shadow(0 1px 0 rgba(11, 55, 102, 0.08))
+    drop-shadow(0 -1px 0 rgba(11, 55, 102, 0.08))
+    drop-shadow(0 3px 5px rgba(11, 55, 102, 0.08));
 }
 
-/* Light engraving for selected tabs on navy/green surfaces. */
+/* Light engraving for selected tabs on navy/blue surfaces. */
 .premium-tab.text-white .premium-tab-label {
-  background-image: linear-gradient(to left, #FFFFFF 0%, #EAF5FF 50%, #BDEBCB 100%);
+  background-image: linear-gradient(to left, #FFFFFF 0%, #EAF5FF 50%, #D1F3F7 100%);
   filter:
-    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.25))
-    drop-shadow(0 -1px 0 rgba(5, 22, 52, 0.42))
-    drop-shadow(0 2px 3px rgba(5, 22, 52, 0.24));
+    drop-shadow(0 1px 0 rgba(11, 55, 102, 0.08))
+    drop-shadow(0 -1px 0 rgba(11, 55, 102, 0.08))
+    drop-shadow(0 2px 3px rgba(11, 55, 102, 0.08));
 }
 
-/* Dashboard navigation uses crisp white surface matching the filter tab aesthetics */
+/* Dashboard navigation uses compact, refined, calm palette */
 .dashboard-nav-tab {
   font-family: var(--font-display) !important;
-  font-size: clamp(0.85rem, 0.81rem + 0.15vw, 0.96rem) !important;
-  letter-spacing: -0.008em;
-  line-height: 1.35;
-  border-radius: 0.875rem !important;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  font-size: 0.72rem !important;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  padding: 0.38rem 0.65rem !important;
+  min-height: 2.15rem !important;
+  border-radius: 0.65rem !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .dashboard-nav-tab:not(.text-white) {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid rgba(23, 58, 124, 0.10) !important;
-  box-shadow: 0 2px 8px -3px rgba(23, 58, 124, 0.08), 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+  background: #FFFFFF !important;
+  border: 1px solid rgba(11, 55, 102, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(11, 55, 102, 0.03) !important;
 }
 
 .dashboard-nav-tab:not(.text-white):hover {
-  background: #FFFFFF !important;
-  border-color: rgba(23, 58, 124, 0.25) !important;
-  box-shadow: 0 6px 18px -4px rgba(23, 58, 124, 0.14), 0 2px 4px rgba(15, 23, 42, 0.04) !important;
+  background: #F4F9FD !important;
+  border-color: rgba(22, 138, 211, 0.35) !important;
+  box-shadow: 0 4px 12px -2px rgba(11, 55, 102, 0.08) !important;
   transform: translateX(-2px);
 }
 
 .dashboard-nav-tab-label {
   font-family: var(--font-display) !important;
-  font-weight: 800 !important;
-  background-image: linear-gradient(to left, #173A7C 0%, #1E4D9D 40%, #078A5E 75%, #5CB07C 100%);
-  background-size: 100% 100%;
-  background-position: center;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent !important;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.95));
-  transition: filter 220ms ease;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  color: #0B3766 !important;
+  -webkit-text-fill-color: #0B3766 !important;
+  background: none !important;
+  filter: none !important;
+  transition: color 180ms ease;
 }
 
 .dashboard-nav-tab:not(.text-white):hover .dashboard-nav-tab-label {
-  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 1)) drop-shadow(0 2px 4px rgba(23, 58, 124, 0.15));
+  color: #168AD3 !important;
+  -webkit-text-fill-color: #168AD3 !important;
+  filter: none !important;
 }
 
 .dashboard-nav-tab.text-white .dashboard-nav-tab-label {
-  background-image: linear-gradient(to left, #FFFFFF 0%, #EAF5FF 50%, #BDEBCB 100%);
-  filter:
-    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.24))
-    drop-shadow(0 -1px 0 rgba(5, 22, 52, 0.44))
-    drop-shadow(0 2px 3px rgba(5, 22, 52, 0.24));
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  background: none !important;
+  filter: none !important;
 }
 
 /* Courses catalogue filter: stronger surface and reliable viewport sticking. */
@@ -741,13 +783,13 @@ p, .subtext, .desc {
   isolation: isolate;
   overflow: hidden;
   background:
-    radial-gradient(circle at 88% 8%, rgba(92, 176, 124, 0.14), transparent 34%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(244, 248, 255, 0.97) 56%, rgba(245, 252, 248, 0.98));
-  border: 1px solid rgba(23, 58, 124, 0.13);
+    radial-gradient(circle at 88% 8%, rgba(11, 55, 102, 0.08), transparent 34%),
+    linear-gradient(145deg, rgba(11, 55, 102, 0.08), rgba(11, 55, 102, 0.08) 56%, rgba(11, 55, 102, 0.08));
+  border: 1px solid rgba(11, 55, 102, 0.08);
   box-shadow:
-    0 26px 58px -28px rgba(23, 58, 124, 0.42),
-    0 10px 24px -18px rgba(15, 23, 42, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+    0 26px 58px -28px rgba(11, 55, 102, 0.08),
+    0 10px 24px -18px rgba(11, 55, 102, 0.08),
+    inset 0 1px 0 rgba(11, 55, 102, 0.08);
 }
 
 .courses-filter-panel::before {
@@ -758,41 +800,41 @@ p, .subtext, .desc {
   left: 1.5rem;
   height: 4px;
   border-radius: 0 0 9999px 9999px;
-  background: linear-gradient(90deg, #173A7C, #2D67B8 52%, #5CB07C);
-  box-shadow: 0 3px 12px rgba(23, 58, 124, 0.2);
+  background: linear-gradient(90deg, #0B3766, #2D67B8 52%, #19B6C7);
+  box-shadow: 0 3px 12px rgba(11, 55, 102, 0.08);
   z-index: 2;
 }
 
 .course-filter-tab {
   min-height: 2.55rem;
   padding: 0.56rem 0.9rem !important;
-  border: 1px solid rgba(23, 58, 124, 0.08);
-  box-shadow: 0 4px 12px -8px rgba(23, 58, 124, 0.2);
+  border: 1px solid rgba(11, 55, 102, 0.08);
+  box-shadow: 0 4px 12px -8px rgba(11, 55, 102, 0.08);
 }
 
 .course-filter-tab .premium-tab-label {
   display: inline-block;
-  background-image: linear-gradient(to left, #173A7C 0%, #2F6CBF 36%, #079468 70%, #5CB07C 100%);
+  background-image: linear-gradient(to left, #0B3766 0%, #2F6CBF 36%, #13A5BB 70%, #19B6C7 100%);
 }
 
 .course-filter-tab.text-white .premium-tab-label {
-  background-image: linear-gradient(to left, #FFFFFF 0%, #EAF5FF 48%, #B6EFC8 100%);
+  background-image: linear-gradient(to left, #FFFFFF 0%, #EAF5FF 48%, #D1F3F7 100%);
 }
 
 .course-filter-tab:not(.text-white) {
-  background: rgba(255, 255, 255, 0.66);
+  background: rgba(11, 55, 102, 0.08);
 }
 
 .course-filter-tab:not(.text-white):hover {
-  background: rgba(255, 255, 255, 0.96);
-  border-color: rgba(23, 58, 124, 0.17);
-  box-shadow: 0 10px 22px -14px rgba(23, 58, 124, 0.34);
+  background: rgba(11, 55, 102, 0.08);
+  border-color: rgba(11, 55, 102, 0.08);
+  box-shadow: 0 10px 22px -14px rgba(11, 55, 102, 0.08);
   transform: translateY(-1px);
 }
 
 @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
   .premium-tab-label {
-    color: #173A7C;
+    color: #0B3766;
     -webkit-text-fill-color: currentColor;
     background-image: none;
   }
@@ -802,8 +844,8 @@ p, .subtext, .desc {
   }
 
   .dashboard-nav-tab-label {
-    color: #173A7C !important;
-    -webkit-text-fill-color: currentColor;
+    color: #0B3766 !important;
+    -webkit-text-fill-color: #0B3766 !important;
     background-image: none;
   }
 
@@ -820,52 +862,39 @@ p, .subtext, .desc {
 }
 
 /* ============================================
-   LIQUID GLASS ULTRA PREMIUM DESIGN SYSTEM
+   LIQUID GLASS ULTRA PREMIUM DESIGN SYSTEM (Luminous Pearl & Sky Edition)
    ============================================ */
 
 .liquid-glass-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86) 0%, rgba(241, 245, 249, 0.62) 50%, rgba(255, 255, 255, 0.82) 100%) !important;
-  backdrop-filter: blur(28px) saturate(2.1) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(2.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 251, 254, 0.95) 100%) !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+  border: 1px solid rgba(11, 55, 102, 0.08) !important;
   box-shadow: 
-    0 16px 40px -8px rgba(15, 23, 42, 0.07),
-    0 4px 12px -2px rgba(23, 58, 124, 0.04),
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1.5px 1px 0 rgba(203, 213, 225, 0.3) !important;
-  border-radius: 10px;
-}
-
-@media (min-width: 640px) {
-  .liquid-glass-card {
-    border-radius: 20px;
-  }
+    0 10px 28px -8px rgba(11, 55, 102, 0.06),
+    0 2px 8px -2px rgba(11, 55, 102, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  position: relative;
 }
 
 .liquid-glass-hero {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(238, 244, 255, 0.7) 50%, rgba(245, 250, 247, 0.85) 100%) !important;
-  backdrop-filter: blur(32px) saturate(2.2) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(2.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 250, 254, 0.94) 60%, rgba(238, 247, 253, 0.92) 100%) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(11, 55, 102, 0.1) !important;
   box-shadow: 
-    0 20px 48px -10px rgba(23, 58, 124, 0.12),
-    0 6px 16px -4px rgba(15, 23, 42, 0.05),
-    inset 0 2px 2px 0 rgba(255, 255, 255, 1) !important;
-  border-radius: 12px;
-}
-
-@media (min-width: 640px) {
-  .liquid-glass-hero {
-    border-radius: 24px;
-  }
+    0 16px 40px -12px rgba(11, 55, 102, 0.07),
+    0 4px 12px -2px rgba(11, 55, 102, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  position: relative;
 }
 
 .liquid-glass-inner {
-  background: linear-gradient(135deg, rgba(248, 250, 252, 0.75) 0%, rgba(241, 245, 249, 0.5) 100%) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(226, 232, 240, 0.85) !important;
-  box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.03), inset 0 -1px 2px rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(11, 55, 102, 0.07) !important;
+  box-shadow: inset 0 1px 2px rgba(11, 55, 102, 0.03) !important;
   border-radius: 8px;
 }
 
@@ -876,24 +905,23 @@ p, .subtext, .desc {
 }
 
 .liquid-glass-hover {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .liquid-dashboard-backdrop {
   background: 
-    radial-gradient(at 95% 5%, rgba(23, 58, 124, 0.09) 0px, transparent 50%),
-    radial-gradient(at 5% 95%, rgba(92, 176, 124, 0.08) 0px, transparent 50%),
-    radial-gradient(at 50% 30%, rgba(30, 77, 157, 0.06) 0px, transparent 55%),
-    radial-gradient(at 80% 80%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
-    linear-gradient(145deg, #E2E8F0 0%, #D8E2EE 40%, #DCE7E1 100%) !important;
+    radial-gradient(at 95% 5%, rgba(22, 138, 211, 0.05) 0px, transparent 45%),
+    radial-gradient(at 5% 95%, rgba(25, 182, 199, 0.05) 0px, transparent 45%),
+    radial-gradient(at 50% 30%, rgba(11, 55, 102, 0.03) 0px, transparent 50%),
+    linear-gradient(180deg, #F2F8FE 0%, #FFFFFF 45%, #EAF7FD 100%) !important;
 }
 .liquid-glass-hover:hover {
-  transform: translateY(-4px) scale(1.003) !important;
+  transform: translateY(-3px) scale(1.002) !important;
   box-shadow: 
-    0 24px 52px -12px rgba(23, 58, 124, 0.15),
-    0 8px 24px -4px rgba(15, 23, 42, 0.08),
-    inset 0 2px 2px 0 rgba(255, 255, 255, 1) !important;
-  border-color: rgba(255, 255, 255, 0.98) !important;
+    0 24px 52px -12px rgba(11, 55, 102, 0.1),
+    0 8px 24px -4px rgba(11, 55, 102, 0.06),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(22, 138, 211, 0.3) !important;
 }
 
 /* Student Card Accent — thick right gradient strip for RTL cards */
@@ -912,7 +940,7 @@ p, .subtext, .desc {
   bottom: 20px !important;
   right: 0 !important;
   width: 5px !important;
-  background: linear-gradient(to bottom, #173A7C 0%, #5CB07C 100%) !important;
+  background: linear-gradient(to bottom, #0B3766 0%, #19B6C7 100%) !important;
   border-radius: 9999px 0 0 9999px !important;
   z-index: 20 !important;
   pointer-events: none;
@@ -934,7 +962,7 @@ p, .subtext, .desc {
   right: 24px !important;
   left: 24px !important;
   height: 5px !important;
-  background: linear-gradient(to left, #173A7C 0%, #1E4D9D 50%, #5CB07C 100%) !important;
+  background: linear-gradient(to left, #0B3766 0%, #168AD3 50%, #19B6C7 100%) !important;
   border-radius: 9999px 9999px 0 0 !important;
   z-index: 20 !important;
   pointer-events: none;
@@ -955,18 +983,18 @@ p, .subtext, .desc {
 .glass {
   backdrop-filter: blur(20px) saturate(1.8);
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(11, 55, 102, 0.08);
   border: none;
-  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.09), 0 2px 6px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 12px 36px rgba(11, 55, 102, 0.08), 0 2px 6px rgba(11, 55, 102, 0.08);
   border-radius: var(--radius-card);
 }
 
 .glass-saudi {
   backdrop-filter: blur(24px) saturate(2);
   -webkit-backdrop-filter: blur(24px) saturate(2);
-  background: linear-gradient(135deg, rgba(15, 45, 30, 0.85) 0%, rgba(10, 25, 40, 0.9) 100%);
-  border: 1px solid rgba(212, 175, 55, 0.25);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(11, 55, 102, 0.08) 0%, rgba(11, 55, 102, 0.08) 100%);
+  border: 1px solid rgba(11, 55, 102, 0.08);
+  box-shadow: 0 20px 50px rgba(11, 55, 102, 0.08), inset 0 1px 0 rgba(11, 55, 102, 0.08);
   border-radius: var(--radius-card);
   color: #FFFFFF;
 }
@@ -974,32 +1002,32 @@ p, .subtext, .desc {
 .glass-panel {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(11, 55, 102, 0.08);
   border: none;
-  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.09);
+  box-shadow: 0 14px 40px rgba(11, 55, 102, 0.08);
   border-radius: var(--radius-card);
 }
 
 .dark .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  background: rgba(11, 55, 102, 0.08);
+  border: 1px solid rgba(11, 55, 102, 0.08);
+  box-shadow: 0 10px 30px rgba(11, 55, 102, 0.08);
   color: #F8FAFC;
 }
 
 .glass-badge {
   backdrop-filter: blur(10px);
-  background: rgba(23, 58, 124, 0.08);
-  border: 1px solid rgba(23, 58, 124, 0.15);
+  background: rgba(11, 55, 102, 0.08);
+  border: 1px solid rgba(11, 55, 102, 0.08);
   border-radius: var(--radius-pill);
 }
 
 .glow-emerald {
-  box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 30px rgba(11, 55, 102, 0.08);
 }
 
 .glow-gold {
-  box-shadow: 0 0 30px rgba(234, 179, 8, 0.25);
+  box-shadow: 0 0 30px rgba(11, 55, 102, 0.08);
 }
 
 .glass-card {
@@ -1029,7 +1057,7 @@ p, .subtext, .desc {
 .particles-grid {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(15, 23, 42, 0.06) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(11, 55, 102, 0.08) 1px, transparent 1px);
   background-size: 40px 40px;
   animation: particlesFloat 30s linear infinite;
 }
@@ -1073,7 +1101,7 @@ p, .subtext, .desc {
 
 .ultra-card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 14px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(23, 58, 124, 0.08) !important;
+  box-shadow: 0 14px 32px -4px rgba(11, 55, 102, 0.08), 0 4px 12px -2px rgba(11, 55, 102, 0.08) !important;
 }
 
 /* ============================================
@@ -1113,7 +1141,7 @@ p, .subtext, .desc {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 10%, transparent 70%);
+  background: radial-gradient(circle, rgba(11, 55, 102, 0.08) 10%, transparent 70%);
   transform: scale(0);
   opacity: 0;
   transition: transform 0.5s, opacity 0.3s;
@@ -1248,7 +1276,7 @@ p, .subtext, .desc {
    ============================================ */
 
 .gradient-text {
-  background: linear-gradient(135deg, #173A7C, #5CB07C);
+  background: linear-gradient(135deg, #0B3766, #0D8495);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1267,7 +1295,7 @@ p, .subtext, .desc {
 
 .section-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.06), transparent);
+  background: linear-gradient(90deg, transparent, rgba(11, 55, 102, 0.08), transparent);
 }
 
 /* ============================================
@@ -1296,7 +1324,7 @@ p, .subtext, .desc {
    ============================================ */
 
 :focus-visible {
-  outline: 2px solid #173A7C;
+  outline: 2px solid #0B3766;
   outline-offset: 2px;
 }
 
@@ -1305,8 +1333,8 @@ p, .subtext, .desc {
    ============================================ */
 
 ::selection {
-  background: rgba(23, 58, 124, 0.15);
-  color: #173A7C;
+  background: rgba(11, 55, 102, 0.08);
+  color: #0B3766;
 }
 
 /* ============================================
@@ -1316,10 +1344,10 @@ p, .subtext, .desc {
 .bg-mesh-ultra {
   background-color: #F8FAFC;
   background-image:
-    radial-gradient(at 90% 0%, rgba(23, 58, 124, 0.07) 0px, transparent 50%),
-    radial-gradient(at 10% 25%, rgba(92, 176, 124, 0.08) 0px, transparent 50%),
-    radial-gradient(at 85% 75%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
-    radial-gradient(at 15% 90%, rgba(30, 77, 157, 0.06) 0px, transparent 50%);
+    radial-gradient(at 90% 0%, rgba(11, 55, 102, 0.08) 0px, transparent 50%),
+    radial-gradient(at 10% 25%, rgba(11, 55, 102, 0.08) 0px, transparent 50%),
+    radial-gradient(at 85% 75%, rgba(11, 55, 102, 0.08) 0px, transparent 50%),
+    radial-gradient(at 15% 90%, rgba(11, 55, 102, 0.08) 0px, transparent 50%);
 }
 
 /* ============================================
@@ -1364,11 +1392,11 @@ p, .subtext, .desc {
   transform: translateX(100%);
   background-image: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0) 0,
-    rgba(255, 255, 255, 0.45) 35%,
-    rgba(255, 255, 255, 0.85) 50%,
-    rgba(255, 255, 255, 0.45) 65%,
-    rgba(255, 255, 255, 0) 100%
+    rgba(11, 55, 102, 0.08) 0,
+    rgba(11, 55, 102, 0.08) 35%,
+    rgba(11, 55, 102, 0.08) 50%,
+    rgba(11, 55, 102, 0.08) 65%,
+    rgba(11, 55, 102, 0.08) 100%
   );
   animation: skeleton-shimmer 1.5s infinite ease-in-out;
   pointer-events: none;
@@ -1399,4 +1427,151 @@ p, .subtext, .desc {
 }
 .animate-brand-shimmer {
   animation: brand-shimmer 1.8s ease-in-out infinite alternate;
+}
+
+
+/* Home page typography: lighter hierarchy without changing the site's theme. */
+.home-page .hero-main-title-premium {
+  font-size: clamp(1.8rem, 1.44rem + 1.28vw, 2.92rem);
+  font-weight: 790;
+  line-height: 1.26;
+}
+.home-page .hero-course-title-premium {
+  font-size: clamp(1.2rem, 1.05rem + 0.68vw, 1.92rem);
+  font-weight: 740;
+  line-height: 1.42;
+}
+.home-page .section-main-title-premium {
+  font-size: clamp(1.6rem, 1.28rem + 1.05vw, 2.65rem);
+  font-weight: 750;
+  line-height: 1.34;
+}
+.home-page .section-desc-premium {
+  font-size: clamp(0.9rem, 0.84rem + 0.2vw, 1.06rem);
+  font-weight: 430;
+  line-height: 1.85;
+}
+.home-page .hero-typewriter-premium {
+  font-size: clamp(1rem, 0.88rem + 0.35vw, 1.42rem);
+  font-weight: 650;
+}
+.home-page .hero-course-description-premium {
+  font-size: clamp(0.87rem, 0.82rem + 0.17vw, 1.03rem);
+  font-weight: 450;
+}
+.home-page .card-title-royal-blue {
+  font-weight: 730;
+}
+@media (max-width: 359px) {
+  .home-page .hero-main-title-premium { font-size: 1.65rem; }
+}
+
+
+/* Al Madar logo palette preview: homepage typography only.
+   Deep navy anchors titles; the orbital blue/cyan/violet appears on accents.
+   Leave buttons, glass cards, backgrounds and internal pages unchanged. */
+.home-page .hero-main-title-premium,
+.home-page .hero-course-title-premium,
+.home-page .section-main-title-premium,
+.home-page .card-title-royal-blue {
+  color: #142544;
+}
+.home-page .gradient-text {
+  background: linear-gradient(115deg, #0B3766 0%, #147EBA 48%, #0D8495 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.home-page .hero-typewriter-premium {
+  color: #1A3769;
+}
+.home-page .hero-typewriter-premium .font-bold {
+  color: #2453BA;
+}
+.home-page .hero-stat-number {
+  color: #1B3972;
+}
+.home-page .hero-main-title-premium .gradient-text,
+.home-page .section-main-title-premium .gradient-text {
+  filter: drop-shadow(0 2px 3px rgba(11, 55, 102, 0.08));
+}
+
+
+/* Madar mobile typography — balanced Arabic titles and generous line spacing. */
+@media (max-width: 639px) {
+  .home-page .hero-main-title-premium {
+    font-size: clamp(1.48rem, 1.36rem + 0.42vw, 1.62rem);
+    font-weight: 760;
+    line-height: 1.54;
+    letter-spacing: -0.008em;
+  }
+
+  .home-page .hero-course-title-premium {
+    font-size: 1.16rem;
+    font-weight: 730;
+    line-height: 1.62;
+  }
+
+  .home-page .section-main-title-premium {
+    font-size: clamp(1.37rem, 1.25rem + 0.5vw, 1.53rem);
+    font-weight: 750;
+    line-height: 1.64;
+    letter-spacing: -0.008em;
+  }
+
+  .home-page .section-main-title-premium.whitespace-nowrap {
+    white-space: normal;
+  }
+
+  .home-page .section-desc-premium {
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.97;
+    letter-spacing: 0;
+  }
+
+  .home-page .hero-course-description-premium {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.95;
+    max-height: 5.85em;
+  }
+
+  .home-page .hero-typewriter-premium {
+    font-size: 0.94rem;
+    line-height: 1.6;
+  }
+
+  .home-page .card-title-royal-blue {
+    font-size: 1rem;
+    line-height: 1.68;
+  }
+
+  .home-page .card-desc-premium {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.92;
+  }
+}
+
+/* Responsive hero actions: two equal tap targets with compact Arabic labels. */
+@media (max-width: 639px) {
+  .home-page .hero-main-cta {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    min-height: 44px;
+    padding-inline: 0.35rem !important;
+    font-size: clamp(0.75rem, 0.69rem + 0.22vw, 0.8125rem) !important;
+    font-weight: 700;
+    line-height: 1.35;
+    column-gap: 0.35rem;
+    white-space: nowrap;
+  }
+
+  .home-page .hero-main-cta svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
 }

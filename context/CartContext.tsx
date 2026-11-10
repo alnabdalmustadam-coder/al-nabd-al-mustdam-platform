@@ -30,7 +30,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'sustainsulse_user_cart';
+const LOCAL_STORAGE_KEY = 'madar-learning-demo_user_cart';
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);

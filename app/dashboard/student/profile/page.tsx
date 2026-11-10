@@ -352,7 +352,6 @@ export default function StudentProfilePage() {
           console.warn('Direct profile update note:', dbError);
         }
 
-        // Call update-profile API to sync with GHL and auth user metadata
         try {
           await fetch('/api/auth/update-profile', {
             method: 'POST',
@@ -503,15 +502,15 @@ export default function StudentProfilePage() {
   };
 
   const glassCard = {
-    background: 'linear-gradient(145deg, rgba(255,255,255,0.72) 0%, rgba(248,250,252,0.55) 100%)',
+    background: 'linear-gradient(145deg, rgba(11,55,102,0.08) 0%, rgba(11,55,102,0.08) 100%)',
     backdropFilter: 'blur(24px) saturate(1.8)',
     WebkitBackdropFilter: 'blur(24px) saturate(1.8)',
-    boxShadow: '0 8px 32px rgba(23, 58, 124, 0.06), 0 1px 0 rgba(255,255,255,0.8) inset',
+    boxShadow: '0 8px 32px rgba(11,55,102,0.08), 0 1px 0 rgba(11,55,102,0.08) inset',
   };
 
   const glassInput = {
     background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
-    boxShadow: 'inset 0 2.5px 6px rgba(15, 23, 42, 0.08), 0 1px 0 rgba(255, 255, 255, 0.9)',
+    boxShadow: 'inset 0 2.5px 6px rgba(11,55,102,0.08), 0 1px 0 rgba(11,55,102,0.08)',
   };
 
   return (
@@ -528,7 +527,7 @@ export default function StudentProfilePage() {
               <Shield className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <h4 className="text-sm font-black text-amber-950">
+              <h4 className="text-sm font-bold text-amber-950">
                 مطلوب استكمال بياناتك الأساسية (رقم الجوال ورقم الهوية الوطنية / الإقامة)
               </h4>
               <p className="text-xs text-amber-800 leading-relaxed font-bold">
@@ -542,7 +541,7 @@ export default function StudentProfilePage() {
               const el = document.getElementById('student-phone-input');
               el?.focus();
             }}
-            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-black shrink-0 transition-colors cursor-pointer shadow-xs"
+            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shrink-0 transition-colors cursor-pointer shadow-xs"
           >
             إكمال البيانات الآن
           </button>
@@ -557,14 +556,14 @@ export default function StudentProfilePage() {
         custom={0}
         className="relative z-20 rounded-3xl p-5 sm:p-6 border space-y-3.5 ultra-card-hover overflow-hidden student-card-accent"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(241,245,249,0.85) 100%)',
+          background: 'linear-gradient(135deg, rgba(11,55,102,0.08) 0%, rgba(11,55,102,0.08) 100%)',
           backdropFilter: 'blur(20px) saturate(1.5)',
           WebkitBackdropFilter: 'blur(20px) saturate(1.5)',
-          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08), 0 10px 28px rgba(15, 23, 42, 0.08)',
-          border: '1px solid rgba(226, 232, 240, 0.6)',
+          boxShadow: '0 2px 6px rgba(11,55,102,0.08), 0 10px 28px rgba(11,55,102,0.08)',
+          border: '1px solid rgba(11,55,102,0.08)',
         }}
       >
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#173A7C]/8 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#0B3766]/8 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
           <div className="flex items-center gap-5 sm:gap-6">
@@ -579,7 +578,7 @@ export default function StudentProfilePage() {
 
             {/* Large Interactive Avatar Container Matching Card Height */}
             <div className="relative shrink-0 group">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-3xl overflow-hidden shadow-xl ring-4 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] flex items-center justify-center relative transition-transform duration-300 group-hover:scale-[1.02]">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-3xl overflow-hidden shadow-xl ring-4 ring-[#0B3766]/20 border-2 border-white bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#2563EB] flex items-center justify-center relative transition-transform duration-300 group-hover:scale-[1.02]">
                 {student.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -591,7 +590,7 @@ export default function StudentProfilePage() {
                     onError={() => setStudent((prev) => ({ ...prev, avatarUrl: null }))}
                   />
                 ) : (
-                  <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white">
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
                     {student.fullName ? student.fullName.charAt(0) : 'م'}
                   </span>
                 )}
@@ -600,7 +599,7 @@ export default function StudentProfilePage() {
                 {isUploadingAvatar && (
                   <div className="absolute inset-0 bg-slate-900/75 backdrop-blur-xs flex flex-col items-center justify-center text-white z-20">
                     <Loader2 className="w-7 h-7 animate-spin text-emerald-400" />
-                    <span className="text-[10px] font-black mt-1">جاري الحفظ...</span>
+                    <span className="text-[10px] font-bold mt-1">جاري الحفظ...</span>
                   </div>
                 )}
 
@@ -613,7 +612,7 @@ export default function StudentProfilePage() {
                   title="انقر لتغيير الصورة الشخصية"
                 >
                   <Camera className="w-6 h-6 text-white drop-shadow-md" />
-                  <span className="text-[11px] font-black mt-1">تغيير الصورة</span>
+                  <span className="text-[11px] font-bold mt-1">تغيير الصورة</span>
                 </button>
               </div>
 
@@ -626,11 +625,11 @@ export default function StudentProfilePage() {
                 <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{student.role}</span>
               </motion.div>
-              <motion.h1 variants={textItemVariants} className="student-heading-h1 text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+              <motion.h1 variants={textItemVariants} className="student-heading-h1 text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
                 {student.fullName || (isLoading ? 'جاري التحميل...' : 'المتدرب')}
               </motion.h1>
               <motion.p variants={textItemVariants} className="text-xs sm:text-sm text-slate-500 font-bold">
-                عضو معتمد في معهد النبض المستدام العالي منذ {student.joinedDate}
+                عضو معتمد في معهد مَدار للتعلّم العالي منذ {student.joinedDate}
               </motion.p>
             </div>
           </div>
@@ -639,12 +638,12 @@ export default function StudentProfilePage() {
             type="button"
             disabled={isUploadingAvatar}
             onClick={() => fileInputRef.current?.click()}
-            className="px-5 py-3 rounded-2xl bg-white hover:bg-slate-50 text-[#173A7C] font-black text-xs flex items-center gap-2 border border-slate-200 shadow-sm hover:shadow-md cursor-pointer transition-all shrink-0 self-start md:self-center"
+            className="px-5 py-3 rounded-2xl bg-white hover:bg-slate-50 text-[#0B3766] font-bold text-xs flex items-center gap-2 border border-slate-200 shadow-sm hover:shadow-md cursor-pointer transition-all shrink-0 self-start md:self-center"
           >
             {isUploadingAvatar ? (
-              <Loader2 className="w-4 h-4 animate-spin text-[#173A7C]" />
+              <Loader2 className="w-4 h-4 animate-spin text-[#0B3766]" />
             ) : (
-              <Camera className="w-4 h-4 text-[#173A7C]" />
+              <Camera className="w-4 h-4 text-[#0B3766]" />
             )}
             <span>{isUploadingAvatar ? 'جاري التحويل والرفع...' : 'تغيير الصورة الشخصية'}</span>
           </button>
@@ -662,11 +661,11 @@ export default function StudentProfilePage() {
       >
         <div className="flex items-center justify-between border-b border-slate-200/30 pb-4">
           <h3 className="student-heading-h3 flex items-center gap-2">
-            <User className="w-4 h-4 text-[#173A7C]" />
+            <User className="w-4 h-4 text-[#0B3766]" />
             <span>البيانات الشخصية والأكاديمية</span>
           </h3>
           {savedSuccess && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200/60 animate-fade-in">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 animate-fade-in">
               <CheckCircle2 className="w-3.5 h-3.5" />
               تم حفظ التغييرات بنجاح
             </span>
@@ -683,8 +682,8 @@ export default function StudentProfilePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
             <div className="space-y-2.5">
-              <label className="text-slate-700 font-extrabold flex items-center gap-2 mb-1">
-                <User className="w-3.5 h-3.5 text-[#173A7C]" />
+              <label className="text-slate-700 font-bold flex items-center gap-2 mb-1">
+                <User className="w-3.5 h-3.5 text-[#0B3766]" />
                 <span>الاسم الكامل باللغة العربية *</span>
               </label>
               <input
@@ -693,14 +692,14 @@ export default function StudentProfilePage() {
                 value={student.fullName}
                 onChange={(e) => setStudent({ ...student, fullName: e.target.value })}
                 placeholder="الاسم الثلاثي أو الرباعي..."
-                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all"
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] focus:ring-4 focus:ring-[#0B3766]/15 transition-all"
                 style={glassInput}
               />
             </div>
 
             <div className="space-y-2.5">
-              <label className="text-slate-700 font-extrabold flex items-center gap-2 mb-1">
-                <Mail className="w-3.5 h-3.5 text-[#173A7C]" />
+              <label className="text-slate-700 font-bold flex items-center gap-2 mb-1">
+                <Mail className="w-3.5 h-3.5 text-[#0B3766]" />
                 <span>البريد الإلكتروني المعتمد</span>
               </label>
               <input
@@ -714,8 +713,8 @@ export default function StudentProfilePage() {
 
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <label className="text-slate-700 font-extrabold flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5 text-[#173A7C]" />
+                <label className="text-slate-700 font-bold flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-[#0B3766]" />
                   <span>رقم الجوال (المملكة العربية السعودية) *</span>
                 </label>
                 <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
@@ -729,7 +728,7 @@ export default function StudentProfilePage() {
                 value={student.phone}
                 onChange={(e) => setStudent({ ...student, phone: e.target.value })}
                 placeholder="05XXXXXXXX"
-                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all text-right"
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] focus:ring-4 focus:ring-[#0B3766]/15 transition-all text-right"
                 dir="rtl"
                 style={glassInput}
               />
@@ -737,8 +736,8 @@ export default function StudentProfilePage() {
 
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <label className="text-slate-700 font-extrabold flex items-center gap-2">
-                  <Shield className="w-3.5 h-3.5 text-[#173A7C]" />
+                <label className="text-slate-700 font-bold flex items-center gap-2">
+                  <Shield className="w-3.5 h-3.5 text-[#0B3766]" />
                   <span>رقم الهوية الوطنية / الإقامة *</span>
                 </label>
                 <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
@@ -751,7 +750,7 @@ export default function StudentProfilePage() {
                 value={student.nationalId}
                 onChange={(e) => setStudent({ ...student, nationalId: e.target.value })}
                 placeholder="أدخل رقم الهوية أو الإقامة (10 أرقام تبدأ بـ 1 أو 2)..."
-                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all text-right"
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] focus:ring-4 focus:ring-[#0B3766]/15 transition-all text-right"
                 dir="rtl"
                 style={glassInput}
               />
@@ -762,7 +761,7 @@ export default function StudentProfilePage() {
             <button
               type="submit"
               disabled={isSavingProfile}
-              className="px-7 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 transition-all duration-300 shadow-lg shadow-[#173A7C]/20 hover:-translate-y-0.5 cursor-pointer disabled:opacity-60"
+              className="px-7 py-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center gap-2 transition-all duration-300 shadow-lg shadow-[#0B3766]/20 hover:-translate-y-0.5 cursor-pointer disabled:opacity-60"
             >
               {isSavingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               <span>{isSavingProfile ? 'جاري الحفظ...' : 'حفظ البيانات'}</span>
@@ -782,11 +781,11 @@ export default function StudentProfilePage() {
       >
         <div className="flex items-center justify-between border-b border-slate-200/30 pb-4">
           <h3 className="student-heading-h3 flex items-center gap-2">
-            <Key className="w-4 h-4 text-[#173A7C]" />
+            <Key className="w-4 h-4 text-[#0B3766]" />
             <span>{isGoogleUser ? 'تعيين كلمة المرور والأمان' : 'تغيير كلمة المرور والأمان'}</span>
           </h3>
           {passSuccess && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-200/60 animate-fade-in">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 animate-fade-in">
               <CheckCircle2 className="w-3.5 h-3.5" />
               {isGoogleUser ? 'تم تعيين كلمة المرور بنجاح لحسابك' : 'تم تحديث كلمة المرور بنجاح'}
             </span>
@@ -795,12 +794,12 @@ export default function StudentProfilePage() {
 
         <form onSubmit={handleSavePassword} className={`grid grid-cols-1 ${isGoogleUser ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-4 text-xs`}>
           {isGoogleUser && (
-            <div className="sm:col-span-2 p-3.5 rounded-2xl bg-blue-50/90 border border-blue-200 text-[#173A7C] text-xs font-bold flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-white border border-blue-200 flex items-center justify-center font-black text-[#173A7C] shadow-xs shrink-0">
+            <div className="sm:col-span-2 p-3.5 rounded-2xl bg-blue-50/90 border border-blue-200 text-[#0B3766] text-xs font-bold flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-white border border-blue-200 flex items-center justify-center font-bold text-[#0B3766] shadow-xs shrink-0">
                 G
               </div>
               <div>
-                <h4 className="font-black text-slate-900">حسابك مسجل عبر Google</h4>
+                <h4 className="font-bold text-slate-900">حسابك مسجل عبر Google</h4>
                 <p className="text-[11px] text-slate-600 font-medium mt-0.5">
                   لا تحتاج إلى إدخال كلمة مرور حالية. يمكنك إنشاء وتعيين كلمة مرور جديدة لحسابك مباشرة لتسجيل الدخول مستقبلاً بكلمة المرور أو عبر Google.
                 </p>
@@ -825,7 +824,7 @@ export default function StudentProfilePage() {
                 required
                 value={passwords.current}
                 onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
-                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400 text-right"
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] focus:ring-4 focus:ring-[#0B3766]/15 transition-all placeholder:text-slate-400 text-right"
                 dir="rtl"
                 style={glassInput}
               />
@@ -842,7 +841,7 @@ export default function StudentProfilePage() {
               required
               value={passwords.newPass}
               onChange={(e) => setPasswords({ ...passwords, newPass: e.target.value })}
-              className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400 text-right"
+              className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] focus:ring-4 focus:ring-[#0B3766]/15 transition-all placeholder:text-slate-400 text-right"
               dir="rtl"
               style={glassInput}
             />
@@ -858,7 +857,7 @@ export default function StudentProfilePage() {
               required
               value={passwords.confirmPass}
               onChange={(e) => setPasswords({ ...passwords, confirmPass: e.target.value })}
-              className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all placeholder:text-slate-400 text-right"
+              className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] focus:ring-4 focus:ring-[#0B3766]/15 transition-all placeholder:text-slate-400 text-right"
               dir="rtl"
               style={glassInput}
             />
@@ -868,7 +867,7 @@ export default function StudentProfilePage() {
             <button
               type="submit"
               disabled={isSavingPassword}
-              className="px-6 py-2.5 rounded-xl bg-[#173A7C] text-white font-black text-xs hover:bg-[#1E4D9D] transition-colors disabled:cursor-wait disabled:opacity-70 inline-flex items-center gap-2 cursor-pointer shadow-md"
+              className="px-6 py-2.5 rounded-xl bg-[#0B3766] text-white font-bold text-xs hover:bg-[#168AD3] transition-colors disabled:cursor-wait disabled:opacity-70 inline-flex items-center gap-2 cursor-pointer shadow-md"
             >
               {isSavingPassword && <Loader2 className="h-4 w-4 animate-spin" />}
               <span>{isSavingPassword ? 'جاري الحفظ...' : isGoogleUser ? 'تعيين كلمة المرور لحسابك' : 'تحديث كلمة المرور'}</span>
@@ -888,16 +887,16 @@ export default function StudentProfilePage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/30 pb-3">
           <h3 className="student-heading-h3 flex items-center gap-2">
-            <Laptop className="w-4 h-4 text-[#173A7C]" />
+            <Laptop className="w-4 h-4 text-[#0B3766]" />
             <span>الأجهزة النشطة والمسجلة</span>
           </h3>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-50 text-[#173A7C] border border-blue-200/70">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#0B3766] border border-blue-200/70">
               الأجهزة المسجلة: {devices.length} من 2 (الحد الأقصى)
             </span>
             <button
               onClick={() => loadDevices()}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-[#173A7C] hover:bg-slate-100 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-[#0B3766] hover:bg-slate-100 transition-colors"
               title="تحديث قائمة الأجهزة"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loadingDevices ? 'animate-spin' : ''}`} />
@@ -908,7 +907,7 @@ export default function StudentProfilePage() {
         <div className="space-y-3">
           {loadingDevices && devices.length === 0 ? (
             <div className="p-8 text-center text-xs font-bold text-slate-500 flex items-center justify-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-[#173A7C]" />
+              <Loader2 className="w-4 h-4 animate-spin text-[#0B3766]" />
               <span>جاري مزامنة بيانات الأجهزة المسجلة...</span>
             </div>
           ) : devices.length === 0 ? (
@@ -928,16 +927,16 @@ export default function StudentProfilePage() {
                     style={glassInput}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={`p-2.5 rounded-xl ${isCurrent ? 'bg-[#173A7C] text-white shadow-xs' : 'bg-slate-200/70 text-slate-700'}`}>
+                      <div className={`p-2.5 rounded-xl ${isCurrent ? 'bg-[#0B3766] text-white shadow-xs' : 'bg-slate-200/70 text-slate-700'}`}>
                         {isMobile ? <Smartphone className="w-4 h-4" /> : <Laptop className="w-4 h-4" />}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-black text-slate-800 truncate">
+                          <h4 className="font-bold text-slate-800 truncate">
                             {device.device_name || 'كمبيوتر شخصي (PC)'}
                           </h4>
                           {isCurrent ? (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                               (الجهاز الحالي) نشط الآن
                             </span>
                           ) : (
@@ -973,7 +972,7 @@ export default function StudentProfilePage() {
               {devices.length === 1 && (
                 <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/60 text-xs font-bold text-blue-900 flex items-center justify-between gap-2">
                   <span>💡 لديك مقعد متبقي: يمكنك تسجيل الدخول من جهاز آخر إضافي (مثال: هاتفك الجوال).</span>
-                  <span className="text-[11px] font-black px-2 py-0.5 bg-blue-100 rounded-md">متاح 1 من 2</span>
+                  <span className="text-[11px] font-bold px-2 py-0.5 bg-blue-100 rounded-md">متاح 1 من 2</span>
                 </div>
               )}
             </>

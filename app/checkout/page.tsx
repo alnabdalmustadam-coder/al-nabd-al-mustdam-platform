@@ -190,8 +190,8 @@ function CheckoutContent() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 font-[family-name:var(--font-cairo)]" dir="rtl">
         <div className="relative flex items-center justify-center">
-          <div className="w-20 h-20 border-4 border-[#5CB07C]/20 border-t-[#5CB07C] rounded-full animate-spin" />
-          <Shield className="absolute w-8 h-8 text-[#5CB07C] animate-pulse" />
+          <div className="w-20 h-20 border-4 border-[#19B6C7]/20 border-t-[#19B6C7] rounded-full animate-spin" />
+          <Shield className="absolute w-8 h-8 text-[#19B6C7] animate-pulse" />
         </div>
         <p className="mt-6 text-slate-500 font-bold text-lg animate-pulse">جاري تحميل بيانات التسجيل والدورة...</p>
       </div>
@@ -205,18 +205,18 @@ function CheckoutContent() {
           <AlertCircle className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-black text-slate-900">{courseError ? 'تعذر تحميل الدورة' : 'الدورة المطلوبة غير متوفرة'}</h2>
+          <h2 className="text-xl font-bold text-slate-900">{courseError ? 'تعذر تحميل الدورة' : 'الدورة المطلوبة غير متوفرة'}</h2>
           <p className="text-xs text-slate-500 font-bold leading-relaxed">
             {courseError || 'لم نتمكن من العثور على الدورة التدريبية المحددة للتسجيل. قد يكون تم تحديث الرابط أو تعديل حالة نشر الدورة.'}
           </p>
         </div>
         <Link
           href="/courses"
-          className="px-6 py-3 rounded-xl bg-[#173A7C] text-white text-xs font-black hover:bg-[#122e62] transition-colors shadow-md cursor-pointer"
+          className="px-6 py-3 rounded-xl bg-[#0B3766] text-white text-xs font-bold hover:bg-[#122e62] transition-colors shadow-md cursor-pointer"
         >
           استعراض دليل الدورات المتاحة
         </Link>
-        {courseError && <button type="button" onClick={reload} className="font-bold text-[#173A7C] underline">إعادة المحاولة</button>}
+        {courseError && <button type="button" onClick={reload} className="font-bold text-[#0B3766] underline">إعادة المحاولة</button>}
       </div>
     );
   }
@@ -224,18 +224,18 @@ function CheckoutContent() {
   if (isCartCheckout && cart.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto space-y-5 font-[family-name:var(--font-cairo)]" dir="rtl">
-        <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#173A7C] shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0B3766] shadow-sm">
           <ShoppingBag className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-black text-slate-900">سلة التسجيل فارغة</h2>
+          <h2 className="text-xl font-bold text-slate-900">سلة التسجيل فارغة</h2>
           <p className="text-xs text-slate-500 font-bold leading-relaxed">
             لا توجد دورات تدريبية حالياً في سلة التسجيل الخاصة بك.
           </p>
         </div>
         <Link
           href="/courses"
-          className="px-6 py-3 rounded-xl bg-[#173A7C] text-white text-xs font-black hover:bg-[#122e62] transition-colors shadow-md cursor-pointer"
+          className="px-6 py-3 rounded-xl bg-[#0B3766] text-white text-xs font-bold hover:bg-[#122e62] transition-colors shadow-md cursor-pointer"
         >
           تصفح دليل الدورات التدريبية
         </Link>
@@ -246,7 +246,7 @@ function CheckoutContent() {
   return (
     <div className="min-h-screen pt-20 md:pt-28 pb-20 bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-100/50 relative overflow-hidden text-slate-800 font-[family-name:var(--font-cairo)]" dir="rtl">
       {/* Decorative Glow Elements */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#5CB07C]/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#19B6C7]/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -255,7 +255,7 @@ function CheckoutContent() {
           <div className="text-right">
             <div className="mb-3">
               <span className="section-badge-glass">
-                <UserPlus aria-hidden="true" className="w-3.5 h-3.5 text-[#173A7C] ml-1 inline" />
+                <UserPlus aria-hidden="true" className="w-3.5 h-3.5 text-[#0B3766] ml-1 inline" />
                 التسجيل المفتوح مؤقتاً
               </span>
             </div>
@@ -286,11 +286,11 @@ function CheckoutContent() {
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xl shadow-slate-900/5 space-y-6">
               <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="w-10 h-10 rounded-2xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-[#0B3766]/10 text-[#0B3766] flex items-center justify-center">
                   <ShoppingBag className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-black text-slate-900">ملخص الطلب</h2>
+                  <h2 className="text-base font-bold text-slate-900">ملخص الطلب</h2>
                   <p className="text-xs text-slate-500 font-bold">{checkoutItems.length} دورات محددة</p>
                 </div>
               </div>
@@ -300,10 +300,10 @@ function CheckoutContent() {
                 {checkoutItems.map((item) => (
                   <div key={item.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <h4 className="text-xs font-black text-slate-900 truncate">{item.title}</h4>
+                      <h4 className="text-xs font-bold text-slate-900 truncate">{item.title}</h4>
                       <span className="text-[10px] text-slate-500 font-bold">{item.duration || 'دورة تدريبية معتمدة'}</span>
                     </div>
-                    <span className="text-xs font-black text-[#173A7C] shrink-0">
+                    <span className="text-xs font-bold text-[#0B3766] shrink-0">
                       <span className="text-emerald-700">متاحة مجاناً مؤقتاً</span>
                     </span>
                   </div>
@@ -316,7 +316,7 @@ function CheckoutContent() {
                   <span>القيمة الأصلية:</span>
                   <span className="line-through text-slate-400">{originalSubtotal} ر.س</span>
                 </div>
-                <div className="flex justify-between items-center text-base font-black text-slate-900 pt-2 border-t border-slate-100">
+                <div className="flex justify-between items-center text-base font-bold text-slate-900 pt-2 border-t border-slate-100">
                   <span>المطلوب دفعه الآن:</span>
                   <span className="text-xl text-emerald-700">0 ر.س</span>
                 </div>
@@ -327,7 +327,7 @@ function CheckoutContent() {
             <div className="rounded-2xl p-5 bg-emerald-50/80 border border-emerald-200/80 flex items-start gap-3.5">
               <Shield className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <h4 className="text-xs font-black text-emerald-950">ضمان الاعتماد والجودة الرسمية</h4>
+                <h4 className="text-xs font-bold text-emerald-950">ضمان الاعتماد والجودة الرسمية</h4>
                 <p className="text-[11px] text-emerald-800 leading-relaxed font-bold">
                   التسجيل متاح مجاناً بصورة مؤقتة لحين تفعيل وسائل الدفع، مع بقاء متطلبات إتمام الدورة والشهادة كما هي.
                 </p>
@@ -339,20 +339,20 @@ function CheckoutContent() {
           <div className="lg:col-span-7">
             <form onSubmit={handleCheckout} className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xl shadow-slate-900/5 space-y-6">
               <div className="border-b border-slate-100 pb-4">
-                <h2 className="text-lg font-black text-slate-900">بيانات المتدرب والتسجيل</h2>
+                <h2 className="text-lg font-bold text-slate-900">بيانات المتدرب والتسجيل</h2>
                 <p className="text-xs text-slate-500 font-bold mt-0.5">تأكد من صحة الاسم ورقم الجوال ورقم الهوية لطباعة واعتماد الشهادة</p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-black text-slate-700 mb-1.5">الاسم الكامل (كما سيظهر بالشهادة) *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">الاسم الكامل (كما سيظهر بالشهادة) *</label>
                   <div className="relative">
                     <input
                       type="text"
                       required
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#0B3766] focus:bg-white transition-all"
                       placeholder="الاسم الثلاثي أو الرباعي"
                     />
                     <User className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
@@ -360,7 +360,7 @@ function CheckoutContent() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black text-slate-700 mb-1.5">البريد الإلكتروني المسجل</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">البريد الإلكتروني المسجل</label>
                   <input
                     type="email"
                     disabled
@@ -372,7 +372,7 @@ function CheckoutContent() {
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-black text-slate-700">
+                    <label className="block text-xs font-bold text-slate-700">
                       رقم الجوال للتواصل وتوثيق الحساب *
                     </label>
                     {phone && (
@@ -387,7 +387,7 @@ function CheckoutContent() {
                       required
                       value={phoneInput}
                       onChange={(e) => setPhoneInput(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all text-right"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#0B3766] focus:bg-white transition-all text-right"
                       placeholder="05XXXXXXXX"
                       dir="rtl"
                     />
@@ -397,7 +397,7 @@ function CheckoutContent() {
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-black text-slate-700">
+                    <label className="block text-xs font-bold text-slate-700">
                       رقم الهوية الوطنية / الإقامة (لإصدار الشهادة الرسمية) *
                     </label>
                     {nationalId && (
@@ -412,7 +412,7 @@ function CheckoutContent() {
                       required
                       value={nationalIdInput}
                       onChange={(e) => setNationalIdInput(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all text-right"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-bold focus:outline-none focus:border-[#0B3766] focus:bg-white transition-all text-right"
                       placeholder="10XXXXXXXX"
                       dir="rtl"
                     />
@@ -432,7 +432,7 @@ function CheckoutContent() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#0D5C3A] via-[#127A4D] to-[#0D5C3A] hover:from-[#127A4D] hover:to-[#0D5C3A] text-white font-black text-sm flex items-center justify-center gap-2.5 shadow-lg shadow-[#0D5C3A]/25 hover:shadow-xl transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#0B3766] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-sm flex items-center justify-center gap-2.5 shadow-lg shadow-[#0B3766]/25 hover:shadow-xl transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -458,7 +458,7 @@ export default function CheckoutPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="w-10 h-10 text-[#173A7C] animate-spin" />
+        <Loader2 className="w-10 h-10 text-[#0B3766] animate-spin" />
       </div>
     }>
       <CheckoutContent />

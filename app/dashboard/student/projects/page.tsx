@@ -201,8 +201,8 @@ export default function StudentProjectsPage() {
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2.5 sm:space-y-3 pr-2">
-            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50 text-[#173A7C] border border-blue-200/80 shadow-xs">
-              <FolderGit2 className="w-3.5 h-3.5 text-[#173A7C]" />
+            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50 text-[#0B3766] border border-blue-200/80 shadow-xs">
+              <FolderGit2 className="w-3.5 h-3.5 text-[#0B3766]" />
               <span>المشاريع العملية ومشاريع التخرج المعتمدة</span>
             </motion.div>
 
@@ -218,7 +218,7 @@ export default function StudentProjectsPage() {
           <motion.div variants={textItemVariants} className="flex items-center gap-3">
             <button
               onClick={() => setShowNewProjectModal(true)}
-              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer"
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>تسليم مشروع جديد</span>
@@ -230,23 +230,23 @@ export default function StudentProjectsPage() {
       {/* Projects list */}
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل المشاريع...</p>
         </div>
       ) : projects.length === 0 ? (
         <div className="p-10 sm:p-14 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-4">
-          <div className="w-16 h-16 rounded-3xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-3xl bg-[#0B3766]/10 text-[#0B3766] flex items-center justify-center mx-auto">
             <FolderGit2 className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-black text-slate-900">لا توجد مشاريع مسجلة حالياً</h3>
+            <h3 className="text-lg font-bold text-slate-900">لا توجد مشاريع مسجلة حالياً</h3>
             <p className="text-xs font-bold text-slate-500 max-w-md mx-auto">
               يمكنك رفع مشروع التخرج الخاص بك أو التطبيقات العملية لتقييمها واعتمادها من قِبل اللجنة الأكاديمية.
             </p>
           </div>
           <button
             onClick={() => setShowNewProjectModal(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white font-black text-xs shadow-md hover:shadow-lg transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white font-bold text-xs shadow-md hover:shadow-lg transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>رفع وتسليم مشروعك الآن</span>
@@ -264,7 +264,7 @@ export default function StudentProjectsPage() {
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200/60 pb-4">
                 <div className="space-y-1">
-                  <span className="text-xs font-black text-emerald-700 flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>{project.courseTitle}</span>
                   </span>
@@ -272,14 +272,14 @@ export default function StudentProjectsPage() {
                 </div>
 
                 {project.status === 'approved' && (
-                  <span className="px-4 py-1.5 rounded-full text-xs font-black bg-emerald-500 text-white border border-emerald-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
+                  <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-500 text-white border border-emerald-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
                     <CheckCircle2 className="w-4 h-4 text-white" />
                     <span>معتمد: {project.grade || 'ناجح'}</span>
                   </span>
                 )}
 
                 {project.status === 'submitted' && (
-                  <span className="px-4 py-1.5 rounded-full text-xs font-black bg-[#173A7C] text-white border border-blue-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
+                  <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-[#0B3766] text-white border border-blue-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
                     <FileCheck className="w-4 h-4 text-white" />
                     <span>قيد المراجعة الأكاديمية</span>
                   </span>
@@ -291,13 +291,13 @@ export default function StudentProjectsPage() {
               {project.submittedFile && (
                 <div className="p-3.5 rounded-2xl flex items-center justify-between gap-2.5 text-xs font-bold border border-slate-200 bg-slate-50">
                   <div className="flex items-center gap-2 truncate">
-                    <Paperclip className="w-4 h-4 text-[#173A7C]" />
+                    <Paperclip className="w-4 h-4 text-[#0B3766]" />
                     <span className="truncate">ملف المشروع: <strong>{project.submittedFile.startsWith('storage://') ? 'مرفق محفوظ بأمان' : project.submittedFile}</strong></span>
                   </div>
                   {project.submittedFile.startsWith('storage://') && (
                     <a
                       href={`/api/student/submissions/file?ref=${encodeURIComponent(project.submittedFile)}`}
-                      className="p-2 rounded-lg bg-white border border-slate-200 text-[#173A7C]"
+                      className="p-2 rounded-lg bg-white border border-slate-200 text-[#0B3766]"
                       title="تنزيل ملف المشروع"
                     >
                       <Download className="w-4 h-4" />
@@ -308,7 +308,7 @@ export default function StudentProjectsPage() {
 
               {project.feedback && (
                 <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-900 space-y-1">
-                  <span className="font-black text-emerald-800 block">تقييم المشرف الأكاديمي:</span>
+                  <span className="font-bold text-emerald-800 block">تقييم المشرف الأكاديمي:</span>
                   <p>{project.feedback}</p>
                 </div>
               )}
@@ -344,59 +344,59 @@ export default function StudentProjectsPage() {
 
               <form onSubmit={handleCreateProject} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">عنوان المشروع</label>
+                  <label className="text-xs font-bold text-slate-700">عنوان المشروع</label>
                   <input
                     type="text"
                     required
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     placeholder="مثال: الخطة التنفيذية لتعزيز الحوار المؤسسي"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">رمز الدورة / البرنامج التدريبي</label>
+                  <label className="text-xs font-bold text-slate-700">رمز الدورة / البرنامج التدريبي</label>
                   <input
                     type="text"
                     required
                     value={newCourseId}
                     onChange={(e) => setNewCourseId(e.target.value)}
                     placeholder="مثال: diploma-tolerance-citizenship"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">وصف وملخص المشروع</label>
+                  <label className="text-xs font-bold text-slate-700">وصف وملخص المشروع</label>
                   <textarea
                     rows={3}
                     required
                     value={newDesc}
                     onChange={(e) => setNewDesc(e.target.value)}
                     placeholder="اكتب نبذة عن أهداف ومنهجية المشروع والنتائج المتوقعة..."
-                    className="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">ملف المشروع</label>
+                    <label className="text-xs font-bold text-slate-700">ملف المشروع</label>
                     <input
                       type="file"
                       accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.7z"
                       onChange={(e) => setNewFile(e.target.files?.[0] || null)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">رابط الكود/المستودع (اختياري)</label>
+                    <label className="text-xs font-bold text-slate-700">رابط الكود/المستودع (اختياري)</label>
                     <input
                       type="url"
                       value={newRepoUrl}
                       onChange={(e) => setNewRepoUrl(e.target.value)}
                       placeholder="GitHub / GitLab URL"
-                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                 </div>
@@ -405,14 +405,14 @@ export default function StudentProjectsPage() {
                   <button
                     type="button"
                     onClick={() => setShowNewProjectModal(false)}
-                    className="px-5 py-2.5 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                    className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer disabled:opacity-60"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all cursor-pointer disabled:opacity-60"
                   >
                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     <span>{submitting ? 'جاري الحفظ...' : 'تسليم المشروع'}</span>

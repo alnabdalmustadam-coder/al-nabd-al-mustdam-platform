@@ -13,7 +13,6 @@ import {
   AlertCircle,
   User,
   Send,
-  Sparkles,
   Paperclip,
   ChevronLeft,
   X,
@@ -167,12 +166,12 @@ export default function AdminSupportPage() {
       <div className={`${heroStyles.hero} relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent`}>
         <div className={`${heroStyles.layout} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
           <div className={`${heroStyles.intro} space-y-2`}>
-            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#0B3766] border border-blue-200`}>
               <Headphones className="w-4 h-4 text-blue-600 shrink-0" />
               <span className="sm:hidden">الدعم الأكاديمي والتقني</span>
               <span className="hidden sm:inline">خدمة العملاء والدعم الأكاديمي والتقني</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
+            <h1 className="text-xl sm:text-2xl font-bold student-heading-h1">
               <span className="sm:hidden">الدعم والاستفسارات</span>
               <span className="hidden sm:inline">إدارة <span className="student-name-gradient">تذاكر واستفسارات المتدربين</span> 🎧</span>
             </h1>
@@ -182,7 +181,7 @@ export default function AdminSupportPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="px-4 py-2 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-300 font-black text-xs">
+            <span className="px-4 py-2 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold text-xs">
               {tickets.filter((t) => t.status === 'OPEN').length} تذكرة مفتوحة
             </span>
           </div>
@@ -198,7 +197,7 @@ export default function AdminSupportPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="بحث برقم التذكرة، الاسم، أو الموضوع..."
-            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
           />
         </div>
 
@@ -215,7 +214,7 @@ export default function AdminSupportPage() {
               onClick={() => setFilter(st.key as any)}
               className={`premium-tab px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 filter === st.key
-                  ? 'bg-[#173A7C] text-white'
+                  ? 'bg-[#0B3766] text-white'
                   : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -231,7 +230,7 @@ export default function AdminSupportPage() {
         <div className="lg:col-span-1 space-y-3">
           {loading ? (
             <div className="p-8 rounded-2xl bg-white border border-slate-200 text-center">
-              <Loader2 className="w-6 h-6 animate-spin text-[#173A7C] mx-auto" />
+              <Loader2 className="w-6 h-6 animate-spin text-[#0B3766] mx-auto" />
             </div>
           ) : filteredTickets.length === 0 ? (
             <div className="p-8 rounded-2xl bg-white border border-slate-200 text-center text-xs font-bold text-slate-500">
@@ -244,16 +243,16 @@ export default function AdminSupportPage() {
                 onClick={() => setSelectedTicket(t)}
                 className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-2 ${
                   selectedTicket?.id === t.id
-                    ? 'bg-blue-50/80 border-[#173A7C] shadow-sm'
+                    ? 'bg-blue-50/80 border-[#0B3766] shadow-sm'
                     : 'bg-white/80 border-slate-200/80 hover:bg-slate-50'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[11px] font-black text-[#173A7C] bg-white px-2 py-0.5 rounded-lg border border-blue-200">
+                  <span className="font-mono text-[11px] font-bold text-[#0B3766] bg-white px-2 py-0.5 rounded-lg border border-blue-200">
                     {t.ticket_number}
                   </span>
                   <span
-                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
                       t.status === 'OPEN'
                         ? 'bg-amber-50 text-amber-800 border-amber-300'
                         : t.status === 'ANSWERED'
@@ -264,7 +263,7 @@ export default function AdminSupportPage() {
                     {t.status === 'OPEN' ? 'جديدة' : t.status === 'ANSWERED' ? 'تم الرد' : t.status}
                   </span>
                 </div>
-                <h4 className="text-xs font-black text-slate-900 line-clamp-1">{t.subject}</h4>
+                <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{t.subject}</h4>
                 <p className="text-[11px] text-slate-500 font-bold line-clamp-2">{t.message}</p>
                 <span className="text-[10px] text-slate-400 font-bold block">{t.studentName}</span>
               </div>
@@ -279,10 +278,10 @@ export default function AdminSupportPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/60 pb-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-black text-[#173A7C] bg-blue-50 px-2.5 py-1 rounded-xl border border-blue-200">
+                    <span className="font-mono text-xs font-bold text-[#0B3766] bg-blue-50 px-2.5 py-1 rounded-xl border border-blue-200">
                       {selectedTicket.ticket_number}
                     </span>
-                    <span className="text-xs font-black text-slate-600">{selectedTicket.studentName} ({selectedTicket.email})</span>
+                    <span className="text-xs font-bold text-slate-600">{selectedTicket.studentName} ({selectedTicket.email})</span>
                   </div>
                   <h3 className="student-heading-h3 pt-1">{selectedTicket.subject}</h3>
                 </div>
@@ -303,24 +302,24 @@ export default function AdminSupportPage() {
 
               {/* Original Message */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 space-y-1">
-                <span className="font-black text-[#173A7C] block">رسالة المتدرب:</span>
+                <span className="font-bold text-[#0B3766] block">رسالة المتدرب:</span>
                 <p className="leading-relaxed">{selectedTicket.message}</p>
               </div>
 
               {/* Replies History */}
               {selectedTicket.replies && selectedTicket.replies.length > 0 && (
                 <div className="space-y-3">
-                  <h4 className="text-xs font-black text-slate-800">سجل الردود:</h4>
+                  <h4 className="text-xs font-bold text-slate-800">سجل الردود:</h4>
                   {selectedTicket.replies.map((r) => (
                     <div
                       key={r.id}
                       className={`p-4 rounded-2xl text-xs font-bold leading-relaxed space-y-1 ${
                         r.is_admin_reply
                           ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
-                          : 'bg-blue-50 border border-blue-200 text-[#173A7C]'
+                          : 'bg-blue-50 border border-blue-200 text-[#0B3766]'
                       }`}
                     >
-                      <span className="font-black block">
+                      <span className="font-bold block">
                         {r.is_admin_reply ? 'رد فريق الإدارة / الدعم:' : 'رد المتدرب:'}
                       </span>
                       <p>{r.message}</p>
@@ -331,20 +330,20 @@ export default function AdminSupportPage() {
 
               {/* Reply Box */}
               <div className="space-y-2 pt-2 border-t border-slate-200/60">
-                <label className="text-xs font-black text-slate-700">إرسال رد رسمي للمتدرب:</label>
+                <label className="text-xs font-bold text-slate-700">إرسال رد رسمي للمتدرب:</label>
                 <textarea
                   rows={4}
                   value={replyMessage}
                   onChange={(e) => setReplyMessage(e.target.value)}
                   placeholder="اكتب ردك الواضح والشافي للمتدرب..."
-                  className="w-full p-4 rounded-2xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/90 leading-relaxed"
+                  className="w-full p-4 rounded-2xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/90 leading-relaxed"
                 />
 
                 <div className="flex justify-end">
                   <button
                     disabled={sendingReply || !replyMessage.trim()}
                     onClick={handleSendReply}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 shadow-md cursor-pointer disabled:opacity-60"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center gap-2 shadow-md cursor-pointer disabled:opacity-60"
                   >
                     {sendingReply ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     <span>{sendingReply ? 'جاري الإرسال...' : 'إرسال الرد وتحديث الحالة'}</span>
@@ -354,8 +353,8 @@ export default function AdminSupportPage() {
             </div>
           ) : (
             <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 text-center space-y-3">
-              <Inbox className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
-              <h3 className="text-sm font-black text-slate-700">اختر تذكرة من القائمة للرد عليها ومتابعتها</h3>
+              <Inbox className="w-12 h-12 text-[#0B3766]/30 mx-auto" />
+              <h3 className="text-sm font-bold text-slate-700">اختر تذكرة من القائمة للرد عليها ومتابعتها</h3>
             </div>
           )}
         </div>

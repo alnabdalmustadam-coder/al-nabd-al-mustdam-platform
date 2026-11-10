@@ -13,7 +13,7 @@ const terms = [
     iconColor: "text-blue-600",
     bgColor: "bg-blue-50",
     title: "الشروط العامة",
-    content: "مرحباً بك في منصة معهد النبض المستدام للتدريب. باستخدامك لهذه المنصة، فإنك توافق على الالتزام بجميع الشروط والأحكام الموضحة هنا. يُعد استخدامك المستمر للمنصة بعد إجراء أي تغييرات على الشروط موافقة ضمنية عليها. نرجو منك مراجعة هذه الشروط بانتظام للتأكد من موافقتك عليها."
+    content: "مرحباً بك في منصة أكاديمية مَدار للتعلّم. باستخدامك لهذه المنصة، فإنك توافق على الالتزام بجميع الشروط والأحكام الموضحة هنا. يُعد استخدامك المستمر للمنصة بعد إجراء أي تغييرات على الشروط موافقة ضمنية عليها. نرجو منك مراجعة هذه الشروط بانتظام للتأكد من موافقتك عليها."
   },
   {
     id: "user-obligations",
@@ -31,7 +31,7 @@ const terms = [
     iconColor: "text-purple-600",
     bgColor: "bg-purple-50",
     title: "حقوق الملكية الفكرية",
-    content: "جميع المحتويات المتوفرة على المنصة، بما في ذلك الدورات التدريبية، المقالات، الفيديوهات، التصاميم، والشعارات هي ملكية حصرية لمعهد النبض المستدام للتدريب. يُمنع تماماً نسخ، تعديل، توزيع، أو إعادة استخدام أي جزء من هذا المحتوى لأغراض تجارية أو غير تجارية دون إذن كتابي مسبق من الإدارة."
+    content: "جميع المحتويات المتوفرة على المنصة، بما في ذلك الدورات التدريبية، المقالات، الفيديوهات، التصاميم، والشعارات هي ملكية حصرية لأكاديمية مَدار للتعلّم. يُمنع تماماً نسخ، تعديل، توزيع، أو إعادة استخدام أي جزء من هذا المحتوى لأغراض تجارية أو غير تجارية دون إذن كتابي مسبق من الإدارة."
   },
   {
     id: "cancellation",
@@ -68,7 +68,7 @@ export default function TermsPage() {
         >
           <div className="mb-8">
             <span className="section-badge-glass">
-              <Scale className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              <Scale className="w-4 h-4 text-[#0B3766] ml-1 inline" />
               وثيقة الشروط والأحكام
             </span>
           </div>
@@ -79,15 +79,15 @@ export default function TermsPage() {
           </h1>
           
           <p className="section-desc-premium text-base sm:text-lg max-w-3xl mx-auto mb-10">
-            تهدف هذه الوثيقة إلى تنظيم العلاقة بين معهد النبض المستدام والمستخدمين، وتوضيح الحقوق والواجبات المتبادلة لضمان تقديم تجربة تعليمية متميزة تسودها الشفافية والموثوقية.
+            تهدف هذه الوثيقة إلى تنظيم العلاقة بين معهد مَدار للتعلّم والمستخدمين، وتوضيح الحقوق والواجبات المتبادلة لضمان تقديم تجربة تعليمية متميزة تسودها الشفافية والموثوقية.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-bold text-slate-400">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> شفافية</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> شفافية</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> حقوق محفوظة</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> حقوق محفوظة</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> التزام متبادل</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> التزام متبادل</span>
           </div>
         </motion.div>
       </section>
@@ -103,14 +103,14 @@ export default function TermsPage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="w-full lg:w-1/3 lg:sticky lg:top-32 order-2 lg:order-1"
           >
-            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(23,58,124,0.08)]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-[0_15px_40px_-15px_rgba(11,55,102,0.12)]">
               {/* Logo Area */}
               <div className="flex justify-center mb-8 pb-6 border-b border-slate-100/80">
-                <img src="/logo.svg" alt="Sustain Pulse Logo" className="h-20 w-auto object-contain hover:scale-105 transition-transform duration-300" />
+                <img src="/logo.svg" alt="Madar Learning Logo" className="h-20 w-auto object-contain hover:scale-105 transition-transform duration-300" />
               </div>
 
               <h3 className="card-title-royal-blue text-lg mb-6 flex items-center gap-3">
-                <FileText className="w-5 h-5 text-[#173A7C]" />
+                <FileText className="w-5 h-5 text-[#0B3766]" />
                 محتويات الوثيقة
               </h3>
               <div className="space-y-2">
@@ -123,31 +123,31 @@ export default function TermsPage() {
                     }}
                     className={`w-full text-right px-4 lg:px-5 py-3.5 lg:py-4 rounded-2xl transition-all duration-300 font-bold text-sm flex items-center justify-between group ${
                       activeSection === p.id 
-                        ? "bg-slate-50 text-[#173A7C] border border-slate-200 shadow-sm" 
+                        ? "bg-slate-50 text-[#0B3766] border border-slate-200 shadow-sm"
                         : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-transparent"
                     }`}
                   >
                     <span className="flex items-center gap-3">
-                      <p.icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${activeSection === p.id ? "text-[#173A7C]" : "text-slate-400 group-hover:text-slate-600"}`} />
+                      <p.icon className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${activeSection === p.id ? "text-[#0B3766]" : "text-slate-400 group-hover:text-slate-600"}`} />
                       {p.title}
                     </span>
                     {activeSection === p.id && (
-                      <motion.div layoutId="activeTermsInd" className="w-1.5 h-1.5 rounded-full bg-[#173A7C]" />
+                      <motion.div layoutId="activeTermsInd" className="w-1.5 h-1.5 rounded-full bg-[#0B3766]" />
                     )}
                   </button>
                 ))}
               </div>
             </div>
             
-            <div className="mt-6 bg-gradient-to-br from-[#173A7C] to-[#2F66D6] rounded-3xl p-8 text-white text-center shadow-lg shadow-[#173A7C]/20">
+            <div className="mt-6 bg-gradient-to-br from-[#0B3766] to-[#168AD3] rounded-3xl p-8 text-white text-center shadow-lg shadow-[#0B3766]/20">
               <ShieldCheck className="w-12 h-12 text-white/80 mx-auto mb-4" />
-              <h4 className="font-black text-lg mb-2">حقوقك محفوظة</h4>
+              <h4 className="font-bold text-lg mb-2">حقوقك محفوظة</h4>
               <p className="text-sm text-blue-100 font-medium opacity-90 leading-relaxed mb-6">
                 نحن نحرص على تقديم أفضل الحلول التي تضمن سلاسة التعامل بين المعهد وكافة المتدربين بشفافية عالية.
               </p>
               <Link 
                 href="/contact"
-                className="inline-block px-6 py-3 bg-white text-[#173A7C] font-bold text-sm rounded-xl hover:bg-slate-50 hover:-translate-y-1 transition-all shadow-sm"
+                className="inline-block px-6 py-3 bg-white text-[#0B3766] font-bold text-sm rounded-xl hover:bg-slate-50 hover:-translate-y-1 transition-all shadow-sm"
               >
                 تواصل مع الدعم
               </Link>
@@ -168,7 +168,7 @@ export default function TermsPage() {
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                   onViewportEnter={() => setActiveSection(policy.id)}
                   className={`relative bg-white rounded-[2.5rem] p-8 sm:p-12 border transition-all duration-500 overflow-hidden group ${
-                    activeSection === policy.id ? "border-[#173A7C]/20 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.12)] ring-1 ring-[#173A7C]/5" : "border-slate-100 shadow-sm hover:shadow-md"
+                    activeSection === policy.id ? "border-[#0B3766]/20 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] ring-1 ring-[#0B3766]/5" : "border-slate-100 shadow-sm hover:shadow-md"
                   }`}
                 >
                   <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${policy.color} opacity-[0.03] rounded-bl-full pointer-events-none transition-transform duration-700 group-hover:scale-150`} />

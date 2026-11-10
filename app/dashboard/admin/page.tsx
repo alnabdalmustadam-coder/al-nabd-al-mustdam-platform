@@ -201,8 +201,8 @@ export default function AdminDashboardPage() {
       value: '1,482,900 ر.س',
       growth: '+18.4% نمو شهري',
       icon: DollarSign,
-      topBar: 'from-[#5CB07C] to-emerald-400',
-      iconGradient: 'from-[#5CB07C] to-emerald-600',
+      topBar: 'from-[#19B6C7] to-emerald-400',
+      iconGradient: 'from-[#19B6C7] to-emerald-600',
       badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-300',
     },
     {
@@ -210,9 +210,9 @@ export default function AdminDashboardPage() {
       value: '14,250 طالب',
       growth: '+1,840 تسجيل جديد',
       icon: Users,
-      topBar: 'from-[#173A7C] to-[#1E4D9D]',
-      iconGradient: 'from-[#173A7C] to-[#1E4D9D]',
-      badgeBg: 'bg-blue-50 text-[#173A7C] border-blue-300',
+      topBar: 'from-[#0B3766] to-[#168AD3]',
+      iconGradient: 'from-[#0B3766] to-[#168AD3]',
+      badgeBg: 'bg-blue-50 text-[#0B3766] border-blue-300',
     },
     {
       title: 'الشهادات الصادرة المعتمدة',
@@ -235,10 +235,10 @@ export default function AdminDashboardPage() {
   ];
 
   const funnelSteps = [
-    { label: 'التسجيل والزيارات الأولى للمنصة', count: '18,400 زائر', percent: 100, color: 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D]' },
-    { label: 'بدء أول درس في المساق المعتمد', count: '16,920 متدرب', percent: 92, color: 'bg-gradient-to-r from-[#1E4D9D] to-blue-500' },
-    { label: 'إكمال نصف محتوى البرنامج (%50)', count: '15,200 متدرب', percent: 82.6, color: 'bg-gradient-to-r from-blue-500 to-[#5CB07C]' },
-    { label: 'اجتياز الاختبارات التقييمية بنجاح', count: '14,350 متدرب', percent: 78, color: 'bg-gradient-to-r from-[#5CB07C] to-emerald-400' },
+    { label: 'التسجيل والزيارات الأولى للمنصة', count: '18,400 زائر', percent: 100, color: 'bg-gradient-to-r from-[#0B3766] to-[#168AD3]' },
+    { label: 'بدء أول درس في المساق المعتمد', count: '16,920 متدرب', percent: 92, color: 'bg-gradient-to-r from-[#168AD3] to-blue-500' },
+    { label: 'إكمال نصف محتوى البرنامج (%50)', count: '15,200 متدرب', percent: 82.6, color: 'bg-gradient-to-r from-blue-500 to-[#19B6C7]' },
+    { label: 'اجتياز الاختبارات التقييمية بنجاح', count: '14,350 متدرب', percent: 78, color: 'bg-gradient-to-r from-[#19B6C7] to-emerald-400' },
     { label: 'إصدار الشهادة وتوثيق الاعتماد الأكاديمي', count: '13,950 شهادة', percent: 75.8, color: 'bg-gradient-to-r from-amber-400 to-amber-500' },
   ];
 
@@ -282,7 +282,7 @@ export default function AdminDashboardPage() {
   const recentActivities = [
     {
       id: '1',
-      title: 'إصدار شهادة معتمدة بنجاح ⚡',
+      title: 'إصدار شهادة إتمام بنجاح ⚡',
       desc: 'تم إصدار شهادة (استخدام الحاسب الآلي) للمتدرب عبدالله الشمري بنسبة %98',
       time: 'منذ 4 دقائق',
       icon: Award,
@@ -305,7 +305,7 @@ export default function AdminDashboardPage() {
       time: 'منذ 35 دقيقة',
       icon: Users,
       badge: 'الطلاب',
-      badgeColor: 'text-[#173A7C] bg-blue-100/90 border-blue-300',
+      badgeColor: 'text-[#0B3766] bg-blue-100/90 border-blue-300',
     },
     {
       id: '4',
@@ -333,19 +333,19 @@ export default function AdminDashboardPage() {
         <div className="specular-card-reflection" />
 
         {/* Ambient Liquid Glowing Orbs */}
-        <div className="absolute -top-16 -right-16 w-56 h-56 bg-gradient-to-br from-[#173A7C]/20 to-[#1E4D9D]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-gradient-to-br from-[#5CB07C]/20 to-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-16 -right-16 w-56 h-56 bg-gradient-to-br from-[#0B3766]/20 to-[#168AD3]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-gradient-to-br from-[#19B6C7]/20 to-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className={`${heroStyles.layout} relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-6`}>
           <div className={`${heroStyles.intro} space-y-1.5 sm:space-y-2.5 pr-0.5 sm:pr-2`}>
             <motion.div variants={textItemVariants} className="flex flex-col items-start">
-              <div className={`${heroStyles.badge} admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15`}>
+              <div className={`${heroStyles.badge} admin-hero-tag bg-[#0B3766]/10 text-[#0B3766] border border-[#0B3766]/15`}>
                 <Crown className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>مركز التحليلات الذكية والأداء المؤسسي</span>
               </div>
-              <h1 className="text-sm sm:text-xl lg:text-2xl font-black student-heading-h1 leading-snug">
+              <h1 className="text-sm sm:text-xl lg:text-2xl font-bold student-heading-h1 leading-snug">
                 <span className="sm:hidden">مركز التحليلات والأداء</span>
-                <span className="hidden sm:inline">مركز التحليلات وإدارة الأداء المالي والأكاديمي Sustain Pulse</span>
+                <span className="hidden sm:inline">مركز التحليلات وإدارة الأداء المالي والأكاديمي Madar Learning</span>
               </h1>
             </motion.div>
 
@@ -367,8 +367,8 @@ export default function AdminDashboardPage() {
                 onClick={() => setTimeRange(t.key as any)}
                 className={`premium-tab py-1.5 px-1 sm:px-3 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold text-center transition-all cursor-pointer truncate ${
                   timeRange === t.key
-                    ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-sm shadow-[#173A7C]/25 border border-white/20'
-                    : 'text-[#173A7C] hover:text-[#173A7C] hover:bg-slate-100/80'
+                    ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-sm shadow-[#0B3766]/25 border border-white/20'
+                    : 'text-[#0B3766] hover:text-[#0B3766] hover:bg-slate-100/80'
                 }`}
               >
                 <span className="premium-tab-label sm:hidden">{t.label}</span>
@@ -408,15 +408,15 @@ export default function AdminDashboardPage() {
                 <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br ${kpi.iconGradient} text-white flex items-center justify-center shadow-md shadow-slate-900/10 border border-white/30 shrink-0`}>
                   <Icon className="w-4 h-4" />
                 </div>
-                <span className={`px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[10.5px] font-black border flex items-center gap-1 shadow-2xs ${kpi.badgeBg} shrink-0 whitespace-nowrap`}>
+                <span className={`px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[10.5px] font-bold border flex items-center gap-1 shadow-2xs ${kpi.badgeBg} shrink-0 whitespace-nowrap`}>
                   <ArrowUpRight className="w-3 h-3 shrink-0" />
                   <span>{kpi.growth}</span>
                 </span>
               </div>
 
               <div className="space-y-0.5 pt-2">
-                <span className="text-[#173A7C]/80 font-bold text-[11px] block">{kpi.title}</span>
-                <h3 className="text-lg sm:text-xl font-black text-[#173A7C] font-mono tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.35)]">
+                <span className="text-[#0B3766]/80 font-bold text-[11px] block">{kpi.title}</span>
+                <h3 className="text-lg sm:text-xl font-bold text-[#0B3766] font-mono tracking-tight leading-none [text-shadow:_0_1px_0_rgba(255,255,255,0.8)]">
                   {kpi.value}
                 </h3>
               </div>
@@ -440,10 +440,10 @@ export default function AdminDashboardPage() {
           {/* Chart Header Bar */}
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 pb-3 border-b border-slate-200/60">
             <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-blue-50 text-[#173A7C] border border-blue-200/80 flex items-center justify-center shadow-xs shrink-0">
-                <BarChart3 aria-hidden="true" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#173A7C]" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-blue-50 text-[#0B3766] border border-blue-200/80 flex items-center justify-center shadow-xs shrink-0">
+                <BarChart3 aria-hidden="true" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0B3766]" />
               </div>
-              <h3 className="min-w-0 whitespace-nowrap text-xs sm:text-sm font-semibold leading-5 text-[#173A7C]">نمو الإيرادات</h3>
+              <h3 className="min-w-0 whitespace-nowrap text-xs sm:text-sm font-semibold leading-5 text-[#0B3766]">نمو الإيرادات</h3>
             </div>
 
             <div aria-label="نمو الإيرادات بنسبة 24.8%" className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] sm:text-[11px] font-semibold text-emerald-800 whitespace-nowrap">
@@ -467,14 +467,14 @@ export default function AdminDashboardPage() {
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="grid grid-cols-2 items-center gap-x-3 gap-y-2.5 p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-[#173A7C]/5 via-[#1E4D9D]/5 to-[#5CB07C]/10 border border-[#173A7C]/15 shadow-2xs"
+            className="grid grid-cols-2 items-center gap-x-3 gap-y-2.5 p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-[#0B3766]/5 via-[#168AD3]/5 to-[#19B6C7]/10 border border-[#0B3766]/15 shadow-2xs"
           >
             <div className="col-span-2 flex min-w-0 items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-2">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0 font-mono">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0 font-mono">
                   {selectedPoint.id}
                 </div>
-                <h4 className="min-w-0 text-xs sm:text-sm font-semibold leading-5 text-[#173A7C]">
+                <h4 className="min-w-0 text-xs sm:text-sm font-semibold leading-5 text-[#0B3766]">
                   إحصاءات {selectedPoint.name}
                 </h4>
               </div>
@@ -539,12 +539,12 @@ export default function AdminDashboardPage() {
                       }`}
                     >
                       <span
-                        className={`text-[7px] sm:text-[10px] font-mono font-black px-0.5 sm:px-1.5 py-0.5 rounded sm:rounded-md border shadow-2xs block truncate max-w-[28px] sm:max-w-none ${
+                        className={`text-[7px] sm:text-[10px] font-mono font-bold px-0.5 sm:px-1.5 py-0.5 rounded sm:rounded-md border shadow-2xs block truncate max-w-[28px] sm:max-w-none ${
                           isSelected
-                            ? 'bg-[#173A7C] text-white border-[#173A7C]'
+                            ? 'bg-[#0B3766] text-white border-[#0B3766]'
                             : m.status === 'current'
                             ? 'bg-emerald-600 text-white border-emerald-700'
-                            : 'bg-white/95 text-slate-700 border-slate-200/90 group-hover:border-[#173A7C]/40 group-hover:text-[#173A7C]'
+                            : 'bg-white/95 text-slate-700 border-slate-200/90 group-hover:border-[#0B3766]/40 group-hover:text-[#0B3766]'
                         }`}
                       >
                         {m.revText}
@@ -559,12 +559,12 @@ export default function AdminDashboardPage() {
                         transition={{ duration: 0.6, delay: idx * 0.04, ease: [0.22, 1, 0.36, 1] }}
                         className={`w-full rounded-t-md sm:rounded-t-xl transition-all relative overflow-hidden flex flex-col justify-between ${
                           isSelected
-                            ? 'bg-gradient-to-t from-[#173A7C] via-[#1E4D9D] to-emerald-400 shadow-lg shadow-[#173A7C]/30 ring-2 ring-emerald-400'
+                            ? 'bg-gradient-to-t from-[#0B3766] via-[#168AD3] to-emerald-400 shadow-lg shadow-[#0B3766]/30 ring-2 ring-emerald-400'
                             : m.status === 'current'
-                            ? 'bg-gradient-to-t from-[#173A7C] via-[#5CB07C] to-emerald-400 shadow-md shadow-emerald-500/25 ring-2 ring-emerald-500/60'
+                            ? 'bg-gradient-to-t from-[#0B3766] via-[#19B6C7] to-emerald-400 shadow-md shadow-emerald-500/25 ring-2 ring-emerald-500/60'
                             : m.status === 'completed'
-                            ? 'bg-gradient-to-t from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] group-hover:to-emerald-400 group-hover:shadow-md'
-                            : 'bg-gradient-to-t from-[#173A7C]/35 via-[#1E4D9D]/30 to-[#5CB07C]/35 border-t-2 border-dashed border-emerald-400/80'
+                            ? 'bg-gradient-to-t from-[#0B3766] via-[#168AD3] to-[#19B6C7] group-hover:to-emerald-400 group-hover:shadow-md'
+                            : 'bg-gradient-to-t from-[#0B3766]/35 via-[#168AD3]/30 to-[#19B6C7]/35 border-t-2 border-dashed border-emerald-400/80'
                         }`}
                       >
                         {/* Specular Inner Sheen */}
@@ -581,15 +581,15 @@ export default function AdminDashboardPage() {
                       <span
                         className={`text-[9px] sm:text-[11px] block transition-colors ${
                           isSelected
-                            ? 'text-[#173A7C] font-black scale-105'
+                            ? 'text-[#0B3766] font-bold scale-105'
                             : m.status === 'current'
-                            ? 'text-emerald-800 font-extrabold'
-                            : 'text-slate-600 font-bold group-hover:text-[#173A7C]'
+                            ? 'text-emerald-800 font-bold'
+                            : 'text-slate-600 font-bold group-hover:text-[#0B3766]'
                         }`}
                       >
                         {timeRange === 'year' ? (
                           <>
-                            <span className="sm:hidden font-mono font-black">{m.id}</span>
+                            <span className="sm:hidden font-mono font-bold">{m.id}</span>
                             <span className="hidden sm:inline truncate">{m.name}</span>
                           </>
                         ) : (
@@ -599,7 +599,7 @@ export default function AdminDashboardPage() {
                       <span
                         className={`hidden sm:block text-[8px] sm:text-[9px] font-mono font-bold truncate ${
                           isSelected
-                            ? 'text-emerald-700 font-black'
+                            ? 'text-emerald-700 font-bold'
                             : m.status === 'current'
                             ? 'text-emerald-600 font-bold'
                             : 'text-slate-400'
@@ -616,14 +616,14 @@ export default function AdminDashboardPage() {
 
           {/* Payment Gateways Distribution */}
           <div className="pt-3 border-t border-slate-200/60 space-y-2.5">
-            <h4 className="flex items-center gap-2 whitespace-nowrap text-xs sm:text-sm font-medium leading-5 text-[#173A7C]">
+            <h4 className="flex items-center gap-2 whitespace-nowrap text-xs sm:text-sm font-medium leading-5 text-[#0B3766]">
               <PieChart aria-hidden="true" className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
               <span>توزيع وسائل الدفع</span>
             </h4>
 
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-2.5">
               {[
-                { name: 'بطاقات مدى', amount: '188,055', share: 45, badge: 'bg-[#173A7C]/10 text-[#173A7C]' },
+                { name: 'بطاقات مدى', amount: '188,055', share: 45, badge: 'bg-[#0B3766]/10 text-[#0B3766]' },
                 { name: 'أقساط تمارا', amount: '125,370', share: 30, badge: 'bg-emerald-500/10 text-emerald-800' },
                 { name: 'أقساط تابي', amount: '62,685', share: 15, badge: 'bg-indigo-500/10 text-indigo-700' },
                 { name: 'Visa / Master', amount: '41,790', share: 10, badge: 'bg-amber-500/10 text-amber-800' },
@@ -633,7 +633,7 @@ export default function AdminDashboardPage() {
                   <span dir="ltr" className={`row-span-2 shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums ${method.badge}`}>
                     {method.share}%
                   </span>
-                  <p className="flex items-baseline gap-1 whitespace-nowrap leading-4 text-[#173A7C]">
+                  <p className="flex items-baseline gap-1 whitespace-nowrap leading-4 text-[#0B3766]">
                     <bdi className="font-mono text-[11px] sm:text-xs font-semibold tabular-nums">{method.amount}</bdi>
                     <span className="text-[9px] font-medium text-slate-500">ر.س</span>
                   </p>
@@ -653,9 +653,9 @@ export default function AdminDashboardPage() {
                 <div className="w-7 h-7 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shadow-xs shrink-0">
                   <Target className="w-3.5 h-3.5 text-emerald-600" />
                 </div>
-                <h3 className="student-heading-h3 text-xs sm:text-sm font-black truncate">قمع التحويل الأكاديمي</h3>
+                <h3 className="student-heading-h3 text-xs sm:text-sm font-bold truncate">قمع التحويل الأكاديمي</h3>
               </div>
-              <span className="text-[10px] sm:text-xs font-black text-[#173A7C] bg-blue-50 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-blue-200 shrink-0 whitespace-nowrap">
+              <span className="text-[10px] sm:text-xs font-bold text-[#0B3766] bg-blue-50 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-blue-200 shrink-0 whitespace-nowrap">
                 نسبة الإكمال
               </span>
             </div>
@@ -666,7 +666,7 @@ export default function AdminDashboardPage() {
                 <div key={idx} className="space-y-0.5">
                   <div className="flex items-center justify-between text-[11px] font-bold">
                     <span className="text-slate-700">{step.label}</span>
-                    <span className="text-[#173A7C] font-black font-mono">{step.percent}%</span>
+                    <span className="text-[#0B3766] font-bold font-mono">{step.percent}%</span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-slate-200/60 overflow-hidden">
                     <div
@@ -683,15 +683,15 @@ export default function AdminDashboardPage() {
           {/* Student Satisfaction NPS Meter */}
           <div className="p-3 rounded-lg sm:rounded-xl bg-emerald-50/90 border border-emerald-200/80 flex items-center justify-between shadow-2xs">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#5CB07C] to-emerald-600 text-white shadow-xs shrink-0">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#19B6C7] to-emerald-600 text-white shadow-xs shrink-0">
                 <Smile className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <h4 className="font-black text-xs text-[#173A7C] truncate">صافي رضا المستفيدين (NPS)</h4>
+                <h4 className="font-bold text-xs text-[#0B3766] truncate">صافي رضا المستفيدين (NPS)</h4>
                 <span className="text-[10px] font-bold text-emerald-800 truncate block">تقييم الطلاب 4.95 / 5.0</span>
               </div>
             </div>
-            <span className="font-black text-base text-emerald-700 font-mono shrink-0">94.8%</span>
+            <span className="font-bold text-base text-emerald-700 font-mono shrink-0">94.8%</span>
           </div>
         </div>
       </motion.div>
@@ -713,9 +713,9 @@ export default function AdminDashboardPage() {
               <div className="w-7 h-7 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shadow-xs shrink-0">
                 <MapPin className="w-3.5 h-3.5 text-emerald-600" />
               </div>
-              <h3 className="student-heading-h3 text-xs sm:text-sm font-black truncate">التوزيع الجغرافي للمتدربين</h3>
+              <h3 className="student-heading-h3 text-xs sm:text-sm font-bold truncate">التوزيع الجغرافي للمتدربين</h3>
             </div>
-            <span className="text-[10px] sm:text-xs font-black text-[#173A7C] bg-blue-50 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-blue-200 shrink-0 whitespace-nowrap">
+            <span className="text-[10px] sm:text-xs font-bold text-[#0B3766] bg-blue-50 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-blue-200 shrink-0 whitespace-nowrap">
               المملكة
             </span>
           </div>
@@ -725,11 +725,11 @@ export default function AdminDashboardPage() {
               <div key={idx} className="space-y-1">
                 <div className="flex items-center justify-between text-[11px] font-bold">
                   <span className="text-slate-700">{reg.region}</span>
-                  <span className="text-[#173A7C] font-black font-mono">{reg.percentage}% ({reg.count})</span>
+                  <span className="text-[#0B3766] font-bold font-mono">{reg.percentage}% ({reg.count})</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-200/60 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C]"
+                    className="h-full rounded-full bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7]"
                     style={{ width: `${reg.percentage}%` }}
                   />
                 </div>
@@ -747,45 +747,45 @@ export default function AdminDashboardPage() {
               <div className="w-7 h-7 rounded-lg sm:rounded-xl bg-amber-50 text-amber-500 border border-amber-200 flex items-center justify-center shadow-xs shrink-0">
                 <Flame className="w-3.5 h-3.5 text-amber-500" />
               </div>
-              <h3 className="student-heading-h3 text-xs sm:text-sm font-black truncate">ساعات الذروة والتفاعل الأكاديمي</h3>
+              <h3 className="student-heading-h3 text-xs sm:text-sm font-bold truncate">ساعات الذروة والتفاعل الأكاديمي</h3>
             </div>
-            <span className="text-[10px] sm:text-xs font-black text-amber-800 bg-amber-100/90 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-amber-300 shadow-2xs shrink-0 whitespace-nowrap">
+            <span className="text-[10px] sm:text-xs font-bold text-amber-800 bg-amber-100/90 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-amber-300 shadow-2xs shrink-0 whitespace-nowrap">
               ذروة المساء 🔥
             </span>
           </div>
 
           <div className="space-y-3">
             <p className="text-[11px] sm:text-xs text-slate-600 font-medium leading-relaxed">
-              تظهر تحليلات المنصة أن الذروة الكبرى لتصفح الدروس وحضور اللقاءات تتركز بين <span className="text-[#173A7C] font-extrabold">8:00م - 11:30م</span> بنسبة 68% من إجمالي التفاعل.
+              تظهر تحليلات المنصة أن الذروة الكبرى لتصفح الدروس وحضور اللقاءات تتركز بين <span className="text-[#0B3766] font-bold">8:00م - 11:30م</span> بنسبة 68% من إجمالي التفاعل.
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
               <div className="p-2.5 rounded-lg sm:rounded-xl space-y-0.5 bg-white/70 border border-slate-200/70 shadow-2xs">
                 <span className="text-slate-500 font-bold text-[9.5px] block">صباحاً (8 - 12)</span>
-                <span className="text-[#173A7C] text-sm block font-mono font-black">12%</span>
+                <span className="text-[#0B3766] text-sm block font-mono font-bold">12%</span>
                 <span className="text-[9px] text-slate-400 font-bold block">هادئ</span>
               </div>
               <div className="p-2.5 rounded-lg sm:rounded-xl space-y-0.5 bg-white/70 border border-slate-200/70 shadow-2xs">
                 <span className="text-slate-500 font-bold text-[9.5px] block">ظهراً (12 - 4)</span>
-                <span className="text-[#173A7C] text-sm block font-mono font-black">15%</span>
+                <span className="text-[#0B3766] text-sm block font-mono font-bold">15%</span>
                 <span className="text-[9px] text-slate-400 font-bold block">متوسط</span>
               </div>
               <div className="p-2.5 rounded-lg sm:rounded-xl space-y-0.5 bg-white/70 border border-slate-200/70 shadow-2xs">
                 <span className="text-slate-500 font-bold text-[9.5px] block">عصراً (4 - 8)</span>
-                <span className="text-[#1E4D9D] text-sm block font-mono font-black">28%</span>
+                <span className="text-[#168AD3] text-sm block font-mono font-bold">28%</span>
                 <span className="text-[9px] text-blue-600 font-bold block">نشط</span>
               </div>
               <div className="p-2.5 rounded-lg sm:rounded-xl space-y-0.5 bg-amber-50/90 border border-amber-200/90 shadow-2xs">
                 <span className="text-amber-900 font-bold text-[9.5px] block">مساءً (8 - 12)</span>
-                <span className="text-amber-700 text-sm block font-mono font-black">68%</span>
-                <span className="text-[9px] text-amber-800 font-extrabold block">أعلى ذروة 🔥</span>
+                <span className="text-amber-700 text-sm block font-mono font-bold">68%</span>
+                <span className="text-[9px] text-amber-800 font-bold block">أعلى ذروة 🔥</span>
               </div>
             </div>
           </div>
 
           <div className="pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-slate-500 gap-2">
             <span className="truncate">تحديث البيانات: تلقائي كل 60 ثانية</span>
-            <span className="text-emerald-700 font-black flex items-center gap-1 shrink-0 whitespace-nowrap">
+            <span className="text-emerald-700 font-bold flex items-center gap-1 shrink-0 whitespace-nowrap">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>الخوادم تعمل 100%</span>
             </span>
@@ -805,21 +805,21 @@ export default function AdminDashboardPage() {
 
         <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-200/60">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="p-1.5 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-xs shrink-0">
+            <div className="p-1.5 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-xs shrink-0">
               <Star className="w-3.5 h-3.5 text-amber-300" />
             </div>
             <div className="min-w-0">
-              <h3 className="student-heading-h3 text-xs sm:text-sm font-black truncate">المساقات الأكثر إقبالاً وإيراداً</h3>
+              <h3 className="student-heading-h3 text-xs sm:text-sm font-bold truncate">المساقات الأكثر إقبالاً وإيراداً</h3>
               <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold truncate">ترتيب البرامج حسب إجمالي المتدربين</p>
             </div>
           </div>
 
           <Link
             href="/dashboard/admin/courses"
-            className="text-[10px] sm:text-xs font-bold text-[#173A7C] hover:bg-blue-50 px-2 sm:px-2.5 py-1 rounded-lg border border-blue-200/60 flex items-center gap-1 shrink-0 whitespace-nowrap transition-colors"
+            className="text-[10px] sm:text-xs font-bold text-[#0B3766] hover:bg-blue-50 px-2 sm:px-2.5 py-1 rounded-lg border border-blue-200/60 flex items-center gap-1 shrink-0 whitespace-nowrap transition-colors"
           >
             <span>جميع المساقات ({topCourses.length})</span>
-            <ChevronLeft className="w-3 h-3 text-[#173A7C] shrink-0" />
+            <ChevronLeft className="w-3 h-3 text-[#0B3766] shrink-0" />
           </Link>
         </div>
 
@@ -827,20 +827,20 @@ export default function AdminDashboardPage() {
           {topCourses.map((crs, idx) => (
             <div
               key={idx}
-              className="p-3.5 sm:p-4 rounded-lg sm:rounded-xl space-y-3 bg-white/70 hover:bg-white/90 border border-slate-200/70 hover:border-[#173A7C]/30 transition-all duration-200 shadow-2xs hover:shadow-sm group"
+              className="p-3.5 sm:p-4 rounded-lg sm:rounded-xl space-y-3 bg-white/70 hover:bg-white/90 border border-slate-200/70 hover:border-[#0B3766]/30 transition-all duration-200 shadow-2xs hover:shadow-sm group"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[9.5px] sm:text-[10px] font-black bg-blue-50 text-[#173A7C] border border-blue-200/80 shrink-0 whitespace-nowrap">
+                  <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[9.5px] sm:text-[10px] font-bold bg-blue-50 text-[#0B3766] border border-blue-200/80 shrink-0 whitespace-nowrap">
                     {crs.category}
                   </span>
                   <span className="text-[10px] sm:text-xs font-bold text-amber-600 flex items-center gap-0.5 shrink-0 whitespace-nowrap">
                     ★ {crs.rating}
                   </span>
                 </div>
-                <h4 className="font-black text-xs sm:text-sm text-[#173A7C] leading-snug group-hover:text-[#1E4D9D] transition-colors">{crs.title}</h4>
+                <h4 className="font-bold text-xs sm:text-sm text-[#0B3766] leading-snug group-hover:text-[#168AD3] transition-colors">{crs.title}</h4>
                 <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold flex items-center gap-1">
-                  <GraduationCap className="w-3.5 h-3.5 text-[#5CB07C] shrink-0" />
+                  <GraduationCap className="w-3.5 h-3.5 text-[#19B6C7] shrink-0" />
                   <span className="truncate">{crs.instructor}</span>
                 </p>
               </div>
@@ -848,22 +848,22 @@ export default function AdminDashboardPage() {
               <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-200/60">
                 <div>
                   <span className="text-slate-500 text-[9.5px] block font-bold">إجمالي المتدربين</span>
-                  <span className="font-extrabold text-[#173A7C] block text-xs">{crs.students.toLocaleString('en-US')} طالب</span>
+                  <span className="font-bold text-[#0B3766] block text-xs">{crs.students.toLocaleString('en-US')} طالب</span>
                 </div>
                 <div>
                   <span className="text-slate-500 text-[9.5px] block font-bold">إجمالي الإيراد</span>
-                  <span className="font-extrabold text-emerald-700 block text-xs font-mono">{crs.revenue}</span>
+                  <span className="font-bold text-emerald-700 block text-xs font-mono">{crs.revenue}</span>
                 </div>
               </div>
 
               <div className="space-y-1 pt-2 border-t border-slate-200/60">
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span className="text-slate-600 text-[10px]">معدل إكمال البرنامج:</span>
-                  <span className="text-[#5CB07C] font-black text-xs">{crs.completion}%</span>
+                  <span className="text-[#19B6C7] font-bold text-xs">{crs.completion}%</span>
                 </div>
                 <div className="w-full h-1.5 rounded-full overflow-hidden bg-slate-200/60">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] transition-all duration-700"
+                    className="h-full rounded-full bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] transition-all duration-700"
                     style={{ width: `${crs.completion}%` }}
                   />
                 </div>
@@ -885,16 +885,16 @@ export default function AdminDashboardPage() {
 
         <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-200/60">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="p-1.5 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-xs shrink-0">
+            <div className="p-1.5 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-xs shrink-0">
               <Zap className="w-3.5 h-3.5 text-amber-300" />
             </div>
             <div className="min-w-0">
-              <h3 className="student-heading-h3 text-xs sm:text-sm font-black truncate">سجل العمليات والأنشطة اللحظية</h3>
+              <h3 className="student-heading-h3 text-xs sm:text-sm font-bold truncate">سجل العمليات والأنشطة اللحظية</h3>
               <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold truncate">بث مباشر 24/7 لكافة تفاعلات المنصة</p>
             </div>
           </div>
 
-          <span className="text-[10px] sm:text-xs font-black text-emerald-800 bg-emerald-50 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-emerald-200 flex items-center gap-1.5 whitespace-nowrap shrink-0 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-emerald-200 flex items-center gap-1.5 whitespace-nowrap shrink-0 shadow-2xs">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
             <span>تحديث مباشر</span>
           </span>
@@ -906,16 +906,16 @@ export default function AdminDashboardPage() {
             return (
               <div
                 key={act.id}
-                className="p-3 sm:p-3.5 rounded-lg sm:rounded-xl space-y-1.5 bg-white/70 hover:bg-white/90 border border-slate-200/70 hover:border-[#173A7C]/30 transition-all duration-200 shadow-2xs"
+                className="p-3 sm:p-3.5 rounded-lg sm:rounded-xl space-y-1.5 bg-white/70 hover:bg-white/90 border border-slate-200/70 hover:border-[#0B3766]/30 transition-all duration-200 shadow-2xs"
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#173A7C]/10 to-[#1E4D9D]/10 text-[#173A7C] shadow-xs shrink-0 border border-blue-200/60">
+                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#0B3766]/10 to-[#168AD3]/10 text-[#0B3766] shadow-xs shrink-0 border border-blue-200/60">
                       <Icon className="w-3.5 h-3.5" />
                     </div>
-                    <h4 className="font-black text-xs text-[#173A7C] truncate">{act.title}</h4>
+                    <h4 className="font-bold text-xs text-[#0B3766] truncate">{act.title}</h4>
                   </div>
-                  <span className={`text-[9.5px] sm:text-[10px] font-black px-2 sm:px-2.5 py-0.5 rounded-full border shrink-0 whitespace-nowrap ${act.badgeColor}`}>
+                  <span className={`text-[9.5px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-0.5 rounded-full border shrink-0 whitespace-nowrap ${act.badgeColor}`}>
                     {act.badge}
                   </span>
                 </div>

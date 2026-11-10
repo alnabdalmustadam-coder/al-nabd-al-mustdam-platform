@@ -27,7 +27,6 @@ import {
   X,
   Check,
   Loader2,
-  Sparkles,
   PlayCircle,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
@@ -300,8 +299,8 @@ export default function InstructorDashboardPage() {
       title: 'البرامج والدورات التدريبية',
       value: `${courses.length || stats.coursesCount} برامج`,
       icon: BookOpen,
-      color: 'from-[#173A7C] to-[#1E4D9D]',
-      bgBadge: 'bg-blue-50 text-[#173A7C] border-blue-200',
+      color: 'from-[#0B3766] to-[#168AD3]',
+      bgBadge: 'bg-blue-50 text-[#0B3766] border-blue-200',
       change: 'محدثة ونشطة',
     },
     {
@@ -342,12 +341,12 @@ export default function InstructorDashboardPage() {
       >
         {/* Top Badges Row */}
         <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200/90 shadow-xs">
-            <GraduationCap className="w-4 h-4 text-[#173A7C]" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#0B3766] text-xs font-bold border border-blue-200/90 shadow-xs">
+            <GraduationCap className="w-4 h-4 text-[#0B3766]" />
             <span>لوحة التحكم الأكاديمية للمدرب والمحاضر المعتمد</span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-300 shadow-xs">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>محاضر معتمد</span>
           </span>
@@ -356,11 +355,11 @@ export default function InstructorDashboardPage() {
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="flex items-center gap-3.5 sm:gap-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#173A7C]/25 border border-white/40 shrink-0">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#0B3766]/25 border border-white/40 shrink-0">
                 <GraduationCap className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(11,55,102,0.1)] student-heading-h1">
                   مرحباً بك أيها المحاضر القدير، <span className="student-name-gradient">{instructorName}</span>
                 </h1>
               </div>
@@ -374,7 +373,7 @@ export default function InstructorDashboardPage() {
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             <Link
               href="/dashboard/instructor/courses"
-              className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer border border-white/20"
+              className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-[#0B3766] hover:bg-[#168AD3] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all cursor-pointer border border-white/20"
             >
               <Plus className="w-4 h-4" />
               <span>إضافة دورة جديدة</span>
@@ -382,7 +381,7 @@ export default function InstructorDashboardPage() {
 
             <Link
               href="/dashboard/instructor/live"
-              className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-red-600/20 transition-all cursor-pointer border border-white/20"
+              className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-red-600/20 transition-all cursor-pointer border border-white/20"
             >
               <Radio className="w-4 h-4 animate-pulse" />
               <span>بدء جلسة مباشرة</span>
@@ -390,7 +389,7 @@ export default function InstructorDashboardPage() {
 
             <Link
               href="/dashboard/instructor/assignments"
-              className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-white hover:bg-slate-100 text-[#173A7C] font-black text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200/90 shadow-xs transition-all cursor-pointer"
+              className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-white hover:bg-slate-100 text-[#0B3766] font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200/90 shadow-xs transition-all cursor-pointer"
             >
               <ClipboardList className="w-4 h-4" />
               <span>تصحيح المهام</span>
@@ -416,14 +415,14 @@ export default function InstructorDashboardPage() {
                 <div className={`p-3 rounded-xl bg-gradient-to-br ${kpi.color} text-white shadow-md`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className={`px-3.5 py-1.5 rounded-xl text-xs font-black border ${kpi.bgBadge}`}>
+                <span className={`px-3.5 py-1.5 rounded-xl text-xs font-bold border ${kpi.bgBadge}`}>
                   {kpi.change}
                 </span>
               </div>
 
               <div className="space-y-1">
-                <span className="text-xs text-slate-500 font-extrabold block">{kpi.title}</span>
-                <h3 className="text-2xl sm:text-3xl font-black text-[#173A7C] tracking-tight">{kpi.value}</h3>
+                <span className="text-xs text-slate-500 font-bold block">{kpi.title}</span>
+                <h3 className="text-2xl sm:text-3xl font-bold text-[#0B3766] tracking-tight">{kpi.value}</h3>
               </div>
             </motion.div>
           );
@@ -434,12 +433,12 @@ export default function InstructorDashboardPage() {
       <div className="p-6 sm:p-8 rounded-3xl liquid-glass-card space-y-5 student-card-accent">
         <div className="flex items-center justify-between border-b border-slate-200/60 pb-4">
           <div className="flex items-center gap-2.5">
-            <BookOpen className="w-5 h-5 text-[#173A7C]" />
+            <BookOpen className="w-5 h-5 text-[#0B3766]" />
             <h3 className="student-heading-h3 !text-base sm:!text-lg">مقرراتي وبرامجي التدريبية</h3>
           </div>
           <Link
             href="/dashboard/instructor/courses"
-            className="text-xs font-black text-[#173A7C] hover:underline flex items-center gap-1"
+            className="text-xs font-bold text-[#0B3766] hover:underline flex items-center gap-1"
           >
             <span>إدارة كافة المقررات ({courses.length})</span>
             <ChevronLeft className="w-4 h-4" />
@@ -448,7 +447,7 @@ export default function InstructorDashboardPage() {
 
         {loadingCourses ? (
           <div className="p-8 text-center text-slate-400 space-y-2">
-            <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#173A7C]" />
+            <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#0B3766]" />
             <p className="text-xs font-bold">جاري تحميل المقررات...</p>
           </div>
         ) : courses.length === 0 ? (
@@ -457,7 +456,7 @@ export default function InstructorDashboardPage() {
             <p className="text-xs font-bold">لا توجد مقررات تدريبية مضافة بعد</p>
             <Link
               href="/dashboard/instructor/courses"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0B3766] text-white text-xs font-bold"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>إنشاء أول دورة الآن</span>
@@ -468,23 +467,23 @@ export default function InstructorDashboardPage() {
             {courses.slice(0, 3).map((c) => (
               <div
                 key={c.id || c.slug}
-                className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#173A7C]/40 transition-all space-y-3 shadow-xs group flex flex-col justify-between"
+                className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#0B3766]/40 transition-all space-y-3 shadow-xs group flex flex-col justify-between"
               >
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-black px-3 py-1 rounded-xl bg-blue-50 text-[#173A7C] border border-blue-200">
+                    <span className="text-[11px] font-bold px-3 py-1 rounded-xl bg-blue-50 text-[#0B3766] border border-blue-200">
                       {c.category === 'tech'
                         ? 'تقنية وبرمجة'
                         : c.category === 'management'
                         ? 'تطوير إداري'
                         : 'دبلوم مهني'}
                     </span>
-                    <span className="font-black text-xs text-[#173A7C] bg-slate-100 px-2.5 py-1 rounded-xl">
+                    <span className="font-bold text-xs text-[#0B3766] bg-slate-100 px-2.5 py-1 rounded-xl">
                       {c.price ? `${c.price} ر.س` : 'مجاني'}
                     </span>
                   </div>
 
-                  <h4 className="font-black text-sm sm:text-base text-slate-900 line-clamp-2 leading-snug min-h-[40px]">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 line-clamp-2 leading-snug min-h-[40px]">
                     {c.title}
                   </h4>
 
@@ -500,7 +499,7 @@ export default function InstructorDashboardPage() {
                 <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs">
                   <Link
                     href="/dashboard/instructor/courses"
-                    className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-[#173A7C] hover:text-white text-slate-700 text-xs font-black transition-colors flex items-center gap-1.5"
+                    className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-[#0B3766] hover:text-white text-slate-700 text-xs font-bold transition-colors flex items-center gap-1.5"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                     <span>تعديل ومحتوى</span>
@@ -509,7 +508,7 @@ export default function InstructorDashboardPage() {
                   <Link
                     href={`/courses/${c.slug}`}
                     target="_blank"
-                    className="p-2 rounded-xl text-slate-400 hover:text-[#173A7C] hover:bg-slate-100 transition-colors"
+                    className="p-2 rounded-xl text-slate-400 hover:text-[#0B3766] hover:bg-slate-100 transition-colors"
                     title="معاينة الدورة"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -533,7 +532,7 @@ export default function InstructorDashboardPage() {
               </h3>
               <Link
                 href="/dashboard/instructor/live"
-                className="text-xs font-black text-[#173A7C] hover:underline"
+                className="text-xs font-bold text-[#0B3766] hover:underline"
               >
                 جدولة ورشة
               </Link>
@@ -541,13 +540,13 @@ export default function InstructorDashboardPage() {
 
             <div className="p-5 rounded-2xl bg-gradient-to-br from-red-500/10 via-rose-500/5 to-transparent border border-red-200/90 space-y-3.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black px-3 py-1 rounded-xl bg-red-100 text-red-800 border border-red-200">
+                <span className="text-xs font-bold px-3 py-1 rounded-xl bg-red-100 text-red-800 border border-red-200">
                   بث مباشر تفاعلي
                 </span>
-                <span className="text-xs font-black text-red-700">اليوم 8:00 مساءً</span>
+                <span className="text-xs font-bold text-red-700">اليوم 8:00 مساءً</span>
               </div>
 
-              <h4 className="font-black text-sm sm:text-base text-slate-900 leading-snug">
+              <h4 className="font-bold text-sm sm:text-base text-slate-900 leading-snug">
                 تطبيقات الحوار والتعايش الإيجابي في المنشآت
               </h4>
 
@@ -561,7 +560,7 @@ export default function InstructorDashboardPage() {
             <span className="text-xs text-slate-500 font-bold">عبر منصة Zoom / الغرفة التفاعلية</span>
             <Link
               href="/dashboard/instructor/live"
-              className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs flex items-center gap-1.5 shadow-md shadow-red-600/20"
+              className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-red-600/20"
             >
               <Radio className="w-3.5 h-3.5" />
               <span>دخول القاعة</span>
@@ -579,7 +578,7 @@ export default function InstructorDashboardPage() {
               </h3>
               <Link
                 href="/dashboard/instructor/assignments"
-                className="text-xs font-black text-[#173A7C] hover:underline"
+                className="text-xs font-bold text-[#0B3766] hover:underline"
               >
                 عرض الكل
               </Link>
@@ -589,7 +588,7 @@ export default function InstructorDashboardPage() {
               {submissions.length === 0 ? (
                 <div className="p-6 text-center rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
                   <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-                  <p className="text-xs font-black text-slate-700">لا توجد واجبات بانتظار التقييم حالياً</p>
+                  <p className="text-xs font-bold text-slate-700">لا توجد واجبات بانتظار التقييم حالياً</p>
                   <p className="text-[11px] text-slate-500 font-bold">تم تقييم كافة التكليفات المسلمة بنجاح.</p>
                 </div>
               ) : (
@@ -604,19 +603,19 @@ export default function InstructorDashboardPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h5 className="font-black text-xs sm:text-sm text-slate-900">{sub.studentName}</h5>
+                        <h5 className="font-bold text-xs sm:text-sm text-slate-900">{sub.studentName}</h5>
                         <p className="text-xs text-slate-500 truncate max-w-[220px]">{sub.assignmentTitle}</p>
                       </div>
 
                       {sub.status === 'graded' ? (
-                        <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-black">
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-bold">
                           تم التقييم ({sub.grade}/100)
                         </span>
                       ) : (
                         <button
                           type="button"
                           onClick={() => setSelectedSubForGrading(sub)}
-                          className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-xs cursor-pointer transition-colors flex items-center gap-1"
+                          className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-xs cursor-pointer transition-colors flex items-center gap-1"
                         >
                           <FileCheck className="w-3.5 h-3.5" />
                           <span>تقييم الآن</span>
@@ -637,7 +636,7 @@ export default function InstructorDashboardPage() {
           <div className="pt-2 text-right">
             <Link
               href="/dashboard/instructor/assignments"
-              className="text-xs font-black text-[#173A7C] hover:underline"
+              className="text-xs font-bold text-[#0B3766] hover:underline"
             >
               الانتقال لمركز التقييم والتصحيح الشامل ←
             </Link>
@@ -654,7 +653,7 @@ export default function InstructorDashboardPage() {
           </div>
           <Link
             href="/dashboard/instructor/students"
-            className="text-xs font-black text-[#173A7C] hover:underline flex items-center gap-1"
+            className="text-xs font-bold text-[#0B3766] hover:underline flex items-center gap-1"
           >
             <span>عرض قائمة المتدربين بالكامل</span>
             <ChevronLeft className="w-4 h-4" />
@@ -664,7 +663,7 @@ export default function InstructorDashboardPage() {
         {recentStudents.length === 0 ? (
           <div className="p-8 text-center rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
             <Users className="w-8 h-8 text-slate-400 mx-auto" />
-            <p className="text-xs font-black text-slate-700">لا يوجد متدربون مسجلون حديثاً</p>
+            <p className="text-xs font-bold text-slate-700">لا يوجد متدربون مسجلون حديثاً</p>
             <p className="text-[11px] text-slate-500 font-bold">سيظهر المتدربون الجدد فور تسجيلهم في برامجك التدريبية.</p>
           </div>
         ) : (
@@ -672,12 +671,12 @@ export default function InstructorDashboardPage() {
             {recentStudents.map((st, idx) => (
               <div key={idx} className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 space-y-3 shadow-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-black text-xs sm:text-sm text-slate-900">{st.name}</span>
+                  <span className="font-bold text-xs sm:text-sm text-slate-900">{st.name}</span>
                   <span
-                    className={`px-3 py-1 rounded-xl text-xs font-black ${
+                    className={`px-3 py-1 rounded-xl text-xs font-bold ${
                       st.status === 'مكتمل'
                         ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-blue-50 text-[#173A7C]'
+                        : 'bg-blue-50 text-[#0B3766]'
                     }`}
                   >
                     {st.status}
@@ -686,13 +685,13 @@ export default function InstructorDashboardPage() {
                 <p className="text-xs text-slate-500 truncate">{st.course}</p>
 
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-black text-slate-600">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-600">
                     <span>نسبة الإنجاز</span>
-                    <span className="text-[#173A7C]">{st.progress}%</span>
+                    <span className="text-[#0B3766]">{st.progress}%</span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/60">
                     <div
-                      className="h-full bg-gradient-to-r from-[#173A7C] to-emerald-500 rounded-full"
+                      className="h-full bg-gradient-to-r from-[#0B3766] to-emerald-500 rounded-full"
                       style={{ width: `${st.progress}%` }}
                     />
                   </div>
@@ -720,11 +719,11 @@ export default function InstructorDashboardPage() {
             >
               <form onSubmit={handleSaveGrade} className="space-y-4">
                 {/* Header */}
-                <div className="p-5 bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-between">
+                <div className="p-5 bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <FileCheck className="w-5 h-5 text-amber-300" />
                     <div>
-                      <h3 className="font-black text-sm sm:text-base">تقييم وتصحيح التكليف الدراسي</h3>
+                      <h3 className="font-bold text-sm sm:text-base">تقييم وتصحيح التكليف الدراسي</h3>
                       <p className="text-xs text-blue-100 font-bold">{selectedSubForGrading.studentName}</p>
                     </div>
                   </div>
@@ -741,7 +740,7 @@ export default function InstructorDashboardPage() {
                 <div className="p-5 space-y-4 text-xs font-bold">
                   <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
                     <span className="text-[10px] text-slate-400 block">عنوان الواجب / التكليف:</span>
-                    <h4 className="font-black text-slate-900 text-xs">{selectedSubForGrading.assignmentTitle}</h4>
+                    <h4 className="font-bold text-slate-900 text-xs">{selectedSubForGrading.assignmentTitle}</h4>
                     {selectedSubForGrading.notes && (
                       <p className="text-[11px] text-slate-600 pt-1 border-t border-slate-200/60 font-medium">
                         ملاحظات الطالب: "{selectedSubForGrading.notes}"
@@ -758,7 +757,7 @@ export default function InstructorDashboardPage() {
                       max="100"
                       value={gradeInput}
                       onChange={(e) => setGradeInput(e.target.value)}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none font-mono text-sm font-black text-[#173A7C]"
+                      className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#0B3766] outline-none font-mono text-sm font-bold text-[#0B3766]"
                     />
                   </div>
 
@@ -768,7 +767,7 @@ export default function InstructorDashboardPage() {
                       rows={3}
                       value={feedbackInput}
                       onChange={(e) => setFeedbackInput(e.target.value)}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none resize-none font-medium text-xs"
+                      className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#0B3766] outline-none resize-none font-medium text-xs"
                       placeholder="اكتب توجيهاتك أو ملاحظاتك التشجيعية للطالب..."
                     />
                   </div>
@@ -787,7 +786,7 @@ export default function InstructorDashboardPage() {
                   <button
                     type="submit"
                     disabled={isGrading}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-[#173A7C] text-white font-black text-xs shadow-md hover:opacity-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-[#0B3766] text-white font-bold text-xs shadow-md hover:opacity-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                   >
                     {isGrading ? (
                       <>

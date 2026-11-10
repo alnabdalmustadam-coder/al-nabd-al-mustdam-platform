@@ -1,0 +1,27 @@
+# Optional project-level choices. Do NOT copy values blindly across unrelated brands.
+project:
+  name: ""
+  profile: marketplace # or education, dashboard, marketing
+  direction: rtl # or ltr
+  existing_design_tokens: true
+user_controls:
+  colors_and_branding: true
+  editorial_look_and_feel: true
+skill_controls:
+  fluid_layout: true
+  responsive_spacing: true
+  typography_sizing: true
+  browser_auditing: true
+acceptance:
+  no_unintended_page_horizontal_overflow: true
+  maintain_functionality: true
+  preserve_user_text_resizing: true
+  manually_verify_browser_zoom: true
+
+typography:
+  default_preset: personal-luxury # portable profile; applies to visual design tasks
+  tokens_file: assets/luxury-fluid-typography.css
+  adoption_mode: map-existing-tokens # don't override existing CSS wholesale
+  preserve_approved_existing_for_repair_only: true
+  allow_accessibility_exceptions: true
+  arabic_body_review_required: true

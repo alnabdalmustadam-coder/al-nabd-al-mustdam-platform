@@ -16,7 +16,6 @@ import {
   ExternalLink,
   Users,
   ShieldCheck,
-  Sparkles,
   X,
   Check,
   Loader2,
@@ -253,12 +252,12 @@ export default function InstructorServicesPage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         {/* Top Badges Row */}
         <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200/90 shadow-xs">
-            <Briefcase className="w-4 h-4 text-[#173A7C]" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#0B3766] text-xs font-bold border border-blue-200/90 shadow-xs">
+            <Briefcase className="w-4 h-4 text-[#0B3766]" />
             <span>متجر الخدمات والاستشارات الأكاديمية</span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-300 shadow-xs">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>{services.filter((s) => s.isActive).length} خدمات مفعلة</span>
           </span>
@@ -267,11 +266,11 @@ export default function InstructorServicesPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="flex items-center gap-3.5 sm:gap-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#173A7C]/25 border border-white/40 shrink-0">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#0B3766]/25 border border-white/40 shrink-0">
                 <Briefcase className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(11,55,102,0.1)] student-heading-h1">
                   إدارة <span className="student-name-gradient">خدماتي واستشاراتي التدريبية</span>
                 </h1>
               </div>
@@ -284,7 +283,7 @@ export default function InstructorServicesPage() {
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-[#173A7C]/20 hover:opacity-95 transition-all cursor-pointer border border-white/20"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-[#0B3766]/20 hover:opacity-95 transition-all cursor-pointer border border-white/20"
           >
             <Plus className="w-4 h-4" />
             <span>إضافة خدمة جديدة</span>
@@ -296,16 +295,16 @@ export default function InstructorServicesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
           <div className="flex items-center justify-between">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md">
               <Briefcase className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-blue-50 text-[#173A7C] border-blue-200">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-blue-50 text-[#0B3766] border-blue-200">
               خدماتي
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي الخدمات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#173A7C] tracking-tight">{services.length} خدمة</h3>
+            <span className="text-xs text-slate-500 font-bold block">إجمالي الخدمات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-[#0B3766] tracking-tight">{services.length} خدمة</h3>
           </div>
         </div>
 
@@ -314,13 +313,13 @@ export default function InstructorServicesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-emerald-50 text-emerald-800 border-emerald-300">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-emerald-50 text-emerald-800 border-emerald-300">
               متاحة للطلب
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">الخدمات المفعلة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">الخدمات المفعلة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-emerald-700 tracking-tight">
               {services.filter((s) => s.isActive).length} مفعلة
             </h3>
           </div>
@@ -331,13 +330,13 @@ export default function InstructorServicesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-md">
               <Users className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-blue-50 text-blue-800 border-blue-200">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-blue-50 text-blue-800 border-blue-200">
               إقبال المتدربين
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">الطلبات المنجزة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-blue-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">الطلبات المنجزة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-blue-700 tracking-tight">
               {services.reduce((acc, s) => acc + s.ordersCount, 0)} طلب
             </h3>
           </div>
@@ -348,13 +347,13 @@ export default function InstructorServicesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md">
               <DollarSign className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-amber-50 text-amber-900 border-amber-300">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-amber-50 text-amber-900 border-amber-300">
               الأرباح التقديرية
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي العوائد</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-amber-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">إجمالي العوائد</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-amber-700 tracking-tight">
               {services.reduce((acc, s) => acc + s.price * s.ordersCount, 0).toLocaleString()} ر.س
             </h3>
           </div>
@@ -370,7 +369,7 @@ export default function InstructorServicesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="بحث في الخدمات والاستشارات..."
-            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-slate-50/80"
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-slate-50/80"
           />
         </div>
 
@@ -380,7 +379,7 @@ export default function InstructorServicesPage() {
             onClick={() => setSelectedCategory('all')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               selectedCategory === 'all'
-                ? 'bg-[#173A7C] text-white shadow-sm font-black'
+                ? 'bg-[#0B3766] text-white shadow-sm font-bold'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -393,7 +392,7 @@ export default function InstructorServicesPage() {
               onClick={() => setSelectedCategory(cat)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 selectedCategory === cat
-                  ? 'bg-[#173A7C] text-white shadow-sm font-black'
+                  ? 'bg-[#0B3766] text-white shadow-sm font-bold'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -406,12 +405,12 @@ export default function InstructorServicesPage() {
       {/* ── 4. SERVICES GRID ── */}
       {filteredServices.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
-          <Store className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
-          <h3 className="text-base font-black text-slate-900">لا توجد خدمات مطابقة</h3>
+          <Store className="w-12 h-12 text-[#0B3766]/30 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">لا توجد خدمات مطابقة</h3>
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-4 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black"
+            className="px-4 py-2 rounded-xl bg-[#0B3766] text-white text-xs font-bold"
           >
             + إضافة خدمة الآن
           </button>
@@ -436,18 +435,18 @@ export default function InstructorServicesPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
 
                 <div className="absolute top-3 right-3 left-3 flex items-center justify-between gap-2">
-                  <span className="px-3 py-1 rounded-xl text-[11px] font-black bg-white/95 text-[#173A7C] shadow-md backdrop-blur-md truncate max-w-[160px]">
+                  <span className="px-3 py-1 rounded-xl text-[11px] font-bold bg-white/95 text-[#0B3766] shadow-md backdrop-blur-md truncate max-w-[160px]">
                     {srv.category}
                   </span>
 
                   <div className="flex items-center gap-1.5">
-                    <span className="font-black text-xs text-white bg-[#173A7C]/95 px-2.5 py-1 rounded-xl shadow-md border border-white/20 backdrop-blur-md">
+                    <span className="font-bold text-xs text-white bg-[#0B3766]/95 px-2.5 py-1 rounded-xl shadow-md border border-white/20 backdrop-blur-md">
                       {srv.price} ر.س
                     </span>
                     <button
                       type="button"
                       onClick={() => handleToggleActive(srv.id)}
-                      className={`p-1.5 rounded-xl text-xs font-black transition-all cursor-pointer shadow-md ${
+                      className={`p-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-md ${
                         srv.isActive
                           ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                           : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
@@ -459,7 +458,7 @@ export default function InstructorServicesPage() {
                   </div>
                 </div>
 
-                <div className="absolute bottom-2.5 right-3 left-3 flex items-center justify-between text-white text-[11px] font-black drop-shadow-md">
+                <div className="absolute bottom-2.5 right-3 left-3 flex items-center justify-between text-white text-[11px] font-bold drop-shadow-md">
                   <span className="flex items-center gap-1 bg-black/40 px-2 py-0.5 rounded-lg backdrop-blur-sm">
                     <Clock className="w-3.5 h-3.5 text-emerald-400" />
                     <span>{srv.duration}</span>
@@ -482,7 +481,7 @@ export default function InstructorServicesPage() {
 
                 {/* Deliverables Checklist */}
                 <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                  <span className="text-[11px] text-slate-400 font-extrabold block">مخرجات الخدمة:</span>
+                  <span className="text-[11px] text-slate-400 font-bold block">مخرجات الخدمة:</span>
                   {srv.deliverables.slice(0, 2).map((del, idx) => (
                     <div key={idx} className="flex items-center gap-1.5 text-xs text-slate-700 font-bold">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -498,7 +497,7 @@ export default function InstructorServicesPage() {
                   <button
                     type="button"
                     onClick={() => handleOpenEditModal(srv)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-[#173A7C] hover:text-white text-slate-700 text-xs font-black transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-[#0B3766] hover:text-white text-slate-700 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                     <span>تعديل الخدمة</span>
@@ -507,7 +506,7 @@ export default function InstructorServicesPage() {
                   <button
                     type="button"
                     onClick={() => handleDeleteService(srv.id)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-600 hover:text-white text-red-700 text-xs font-black transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-red-200"
+                    className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-600 hover:text-white text-red-700 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-red-200"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>حذف</span>
@@ -518,14 +517,14 @@ export default function InstructorServicesPage() {
                   <Link
                     href={`/marketplace`}
                     target="_blank"
-                    className="text-[#173A7C] hover:underline font-black flex items-center gap-1"
+                    className="text-[#0B3766] hover:underline font-bold flex items-center gap-1"
                   >
                     <span>معاينة في المتجر</span>
                     <ExternalLink className="w-3 h-3" />
                   </Link>
 
                   <span
-                    className={`text-[11px] font-black px-2.5 py-0.5 rounded-lg border ${
+                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg border ${
                       srv.isActive
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                         : 'bg-slate-100 text-slate-500 border-slate-200'
@@ -557,13 +556,13 @@ export default function InstructorServicesPage() {
             >
               <form onSubmit={handleSaveService} className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] px-4 py-3 text-white sm:px-6 sm:py-4">
+                <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#0B3766] to-[#168AD3] px-4 py-3 text-white sm:px-6 sm:py-4">
                   <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
                     <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs text-amber-300">
                       <Briefcase className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="truncate text-sm font-black leading-tight sm:text-base">
+                      <h3 className="truncate text-sm font-bold leading-tight sm:text-base">
                         {editingService.id ? 'تعديل الخدمة الأكاديمية' : 'إضافة خدمة واستشارة جديدة'}
                       </h3>
                       <p className="mt-0.5 hidden text-[11px] text-blue-100/90 sm:block">عرض وتخصيص تفاصيل الخدمة في متجر خدمات المنصة</p>
@@ -588,25 +587,25 @@ export default function InstructorServicesPage() {
                     {/* ── RIGHT COLUMN (7 COLS): Info, Pricing & Deliverables ── */}
                     <div className="lg:col-span-7 space-y-4 text-xs font-bold">
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">عنوان الخدمة أو الاستشارة *</label>
+                        <label className="text-slate-700 text-xs font-bold block">عنوان الخدمة أو الاستشارة *</label>
                         <input
                           type="text"
                           required
                           value={editingService.title || ''}
                           onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
                           placeholder="مثال: جلسة استشارية فردية في التخطيط الأكاديمي..."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-bold text-slate-900"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none text-xs font-bold text-slate-900"
                         />
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">
-                            <label className="text-slate-700 text-xs font-black block">التصنيف *</label>
+                            <label className="text-slate-700 text-xs font-bold block">التصنيف *</label>
                             <button
                               type="button"
                               onClick={() => setIsAddingNewCat(!isAddingNewCat)}
-                              className="text-[#173A7C] text-[10px] hover:underline font-black cursor-pointer"
+                              className="text-[#0B3766] text-[10px] hover:underline font-bold cursor-pointer"
                             >
                               {isAddingNewCat ? 'إلغاء' : '+ جديد'}
                             </button>
@@ -624,7 +623,7 @@ export default function InstructorServicesPage() {
                               <button
                                 type="button"
                                 onClick={handleAddNewCategory}
-                                className="px-3 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black cursor-pointer"
+                                className="px-3 py-2 rounded-xl bg-[#0B3766] text-white text-xs font-bold cursor-pointer"
                               >
                                 +
                               </button>
@@ -633,7 +632,7 @@ export default function InstructorServicesPage() {
                             <select
                               value={editingService.category || categoriesList[0]}
                               onChange={(e) => setEditingService({ ...editingService, category: e.target.value })}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none bg-white text-xs font-bold text-slate-800"
+                              className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none bg-white text-xs font-bold text-slate-800"
                             >
                               {categoriesList.map((cat) => (
                                 <option key={cat} value={cat}>
@@ -645,44 +644,44 @@ export default function InstructorServicesPage() {
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-slate-700 text-xs font-black block">السعر (ر.س) *</label>
+                          <label className="text-slate-700 text-xs font-bold block">السعر (ر.س) *</label>
                           <input
                             type="number"
                             required
                             min="0"
                             value={editingService.price || 150}
                             onChange={(e) => setEditingService({ ...editingService, price: Number(e.target.value) })}
-                            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-black text-[#173A7C]"
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none text-xs font-bold text-[#0B3766]"
                           />
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-slate-700 text-xs font-black block">مدة التنفيذ *</label>
+                          <label className="text-slate-700 text-xs font-bold block">مدة التنفيذ *</label>
                           <input
                             type="text"
                             required
                             value={editingService.duration || 'جلسة 60 دقيقة'}
                             onChange={(e) => setEditingService({ ...editingService, duration: e.target.value })}
-                            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-bold text-slate-800"
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none text-xs font-bold text-slate-800"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">وصف الخدمة وتفاصيلها *</label>
+                        <label className="text-slate-700 text-xs font-bold block">وصف الخدمة وتفاصيلها *</label>
                         <textarea
                           rows={3}
                           required
                           value={editingService.description || ''}
                           onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
                           placeholder="اشرح القيمة المضافة وما سيحصل عليه العميل من هذه الخدمة..."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none resize-none text-xs font-medium text-slate-800 leading-relaxed"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none resize-none text-xs font-medium text-slate-800 leading-relaxed"
                         />
                       </div>
 
                       {/* Deliverables Checklist Manager */}
                       <div className="space-y-2">
-                        <label className="text-slate-700 text-xs font-black block">مخرجات وبنود الخدمة</label>
+                        <label className="text-slate-700 text-xs font-bold block">مخرجات وبنود الخدمة</label>
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
@@ -695,12 +694,12 @@ export default function InstructorServicesPage() {
                               }
                             }}
                             placeholder="أدخل مخرجاً للخدمة ثم اضغط إضافة..."
-                            className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs"
+                            className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none text-xs"
                           />
                           <button
                             type="button"
                             onClick={handleAddDeliverable}
-                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black cursor-pointer transition-colors"
+                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer transition-colors"
                           >
                             + إضافة
                           </button>
@@ -744,7 +743,7 @@ export default function InstructorServicesPage() {
 
                       {/* Live Store Card Preview */}
                       <div className="p-3.5 rounded-2xl bg-gradient-to-br from-blue-50/50 to-slate-50 border border-blue-100 space-y-2">
-                        <div className="flex items-center justify-between text-[11px] font-black text-[#173A7C]">
+                        <div className="flex items-center justify-between text-[11px] font-bold text-[#0B3766]">
                           <span>معاينة فورية لكارت الخدمة:</span>
                           <span className="text-[10px] font-mono text-slate-400">Live Preview</span>
                         </div>
@@ -758,12 +757,12 @@ export default function InstructorServicesPage() {
                             />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className="text-xs font-black text-slate-800 truncate">
+                            <h4 className="text-xs font-bold text-slate-800 truncate">
                               {editingService.title || 'عنوان الخدمة'}
                             </h4>
                             <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold mt-1">
                               <span>{editingService.duration || 'المدة'}</span>
-                              <span className="text-[#173A7C] font-black">{editingService.price ? `${editingService.price} ر.س` : 'مجاناً'}</span>
+                              <span className="text-[#0B3766] font-bold">{editingService.price ? `${editingService.price} ر.س` : 'مجاناً'}</span>
                             </div>
                           </div>
                         </div>
@@ -789,7 +788,7 @@ export default function InstructorServicesPage() {
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#173A7C] to-emerald-600 px-6 py-2.5 text-xs font-black text-white shadow-md transition-all hover:opacity-95 disabled:opacity-50 sm:flex-none"
+                    className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0B3766] to-emerald-600 px-6 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:opacity-95 disabled:opacity-50 sm:flex-none"
                   >
                     {isSaving ? (
                       <>

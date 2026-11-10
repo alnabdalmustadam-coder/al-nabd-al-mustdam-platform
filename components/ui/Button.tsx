@@ -31,11 +31,11 @@ export default function Button({
 
   const variantClasses = {
     primary:
-      "bg-[#5CB07C] text-white font-bold hover:bg-[#4EA06E] shadow-lg shadow-[#5CB07C]/20 hover:shadow-[#5CB07C]/40",
+      "bg-gradient-to-r from-[#0B3766] to-[#0B6589] text-white font-bold hover:from-[#0B6589] hover:to-[#0B3766] shadow-lg shadow-[#0B3766]/20 hover:shadow-[#168AD3]/30",
     secondary:
       "bg-white border text-center border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm",
     outline:
-      "border-2 border-[#173A7C] text-[#173A7C] hover:bg-[#173A7C] hover:text-white",
+      "border-2 border-[#0B3766] text-[#0B3766] hover:bg-[#0B3766] hover:text-white",
   };
 
   const baseClasses = `

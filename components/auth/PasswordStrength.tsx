@@ -50,7 +50,7 @@ export default function PasswordStrength({ password, showAlways = false }: Passw
       {/* Progress Bars Header */}
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold text-slate-600">مستوى الأمان:</span>
-        <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full border ${status.color}`}>
+        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${status.color}`}>
           {status.text}
         </span>
       </div>

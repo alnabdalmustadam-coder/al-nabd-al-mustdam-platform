@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest,NextResponse } from "next/server";
 import { supabase as supabaseAdmin } from "@/lib/supabase";
-import { requireUser, getDashboardUrlForRole, getRoleDisplayName, isAdminRole, isInstructorRole } from "@/lib/security/auth";
+import { requireUser,getDashboardUrlForRole,getRoleDisplayName,isAdminRole,isInstructorRole } from "@/lib/security/auth";
 
 export async function GET(req: NextRequest) {
   try {

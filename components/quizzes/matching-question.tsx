@@ -177,11 +177,11 @@ export function MatchingQuestion({ question, answer, onChange }: {
         {drag && startPoint && <path d={connectionPath(startPoint, drag.point)} fill="none" stroke="#1d4ed8" strokeWidth={3} strokeDasharray="6 5" strokeLinecap="round" />}
       </svg>}
       <div className="relative z-10 min-w-0 space-y-3" role="group" aria-label="الإجابات">
-        <p className="pb-1 text-center text-xs font-black text-slate-600" dir="rtl">الإجابات</p>
+        <p className="pb-1 text-center text-xs font-bold text-slate-600" dir="rtl">الإجابات</p>
         {question.options.map((text, index) => card(text, { side: 'option', index }))}
       </div>
       <div className="relative z-10 min-w-0 space-y-3" role="group" aria-label="الأسئلة">
-        <p className="pb-1 text-center text-xs font-black text-slate-600" dir="rtl">الأسئلة</p>
+        <p className="pb-1 text-center text-xs font-bold text-slate-600" dir="rtl">الأسئلة</p>
         {prompts.map((text, index) => card(text, { side: 'prompt', index }))}
       </div>
     </div>

@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   Lock,
   Database,
-  Sparkles,
   Award,
   Key,
   Video,
@@ -29,11 +28,11 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
 
   const [platformSettings, setPlatformSettings] = useState({
-    siteName: 'النبض المستدام - منصة الدبلومات والتدريب',
-    contactEmail: 'info@sustainpulse.org',
+    siteName: 'مَدار للتعلّم - منصة الدبلومات والتدريب',
+    contactEmail: 'info@madar-learning.org',
     supportPhone: '+966 11 234 5678',
     nelcLicense: 'NELC-2026-SA-9823',
-    xapiEndpoint: 'https://xapi.sustainpulse.org/v1/statements',
+    xapiEndpoint: 'https://learning.madar.example/v1/statements',
     autoCertificates: true,
     watermarkEnabled: true,
     platformLogo: '/logo.webp',
@@ -118,12 +117,12 @@ export default function AdminSettingsPage() {
       >
         <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6`}>
           <div className={`${heroStyles.intro} space-y-2`}>
-            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#0B3766] border border-blue-200`}>
               <Settings className="w-4 h-4 text-blue-600 shrink-0" />
               <span className="sm:hidden">إعدادات وتكاملات المنصة</span>
-              <span className="hidden sm:inline">إعدادات وتكاملات منصة النبض المستدام</span>
+              <span className="hidden sm:inline">إعدادات وتكاملات منصة مَدار للتعلّم</span>
             </div>
-            <h1 className={`${heroStyles.title} text-xl sm:text-2xl font-black student-heading-h1`}>
+            <h1 className={`${heroStyles.title} text-xl sm:text-2xl font-bold student-heading-h1`}>
               <Settings aria-hidden="true" className="sm:hidden" />
               <span className="sm:hidden">النظام والهوية والتراخيص</span>
               <span className="hidden sm:inline">إعدادات النظام <span className="student-name-gradient">والهوية والتراخيص ⚙️</span></span>
@@ -136,7 +135,7 @@ export default function AdminSettingsPage() {
           <button
             disabled={saving}
             onClick={handleSave}
-            className={`${heroStyles.soloAction} px-6 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 cursor-pointer transition-all shrink-0 whitespace-nowrap disabled:opacity-60`}
+            className={`${heroStyles.soloAction} px-6 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 cursor-pointer transition-all shrink-0 whitespace-nowrap disabled:opacity-60`}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             <span>{saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}</span>
@@ -151,7 +150,7 @@ export default function AdminSettingsPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-black text-xs flex items-center gap-2"
+            className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs flex items-center gap-2"
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>تم حفظ وتحديث إعدادات المنصة في قاعدة البيانات بنجاح!</span>
@@ -163,7 +162,7 @@ export default function AdminSettingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* General settings */}
         <div className="p-6 rounded-3xl liquid-glass-card space-y-4 student-card-accent">
-          <div className="flex items-center gap-2 text-sm font-black text-[#173A7C] border-b border-slate-200/60 pb-3">
+          <div className="flex items-center gap-2 text-sm font-bold text-[#0B3766] border-b border-slate-200/60 pb-3">
             <Globe className="w-4 h-4" />
             <span>معلومات وهوية المنصة</span>
           </div>
@@ -180,32 +179,32 @@ export default function AdminSettingsPage() {
             />
 
             <div className="space-y-1">
-              <label className="text-xs font-black text-slate-700">اسم المنصة الرسمي</label>
+              <label className="text-xs font-bold text-slate-700">اسم المنصة الرسمي</label>
               <input
                 type="text"
                 value={platformSettings.siteName}
                 onChange={(e) => setPlatformSettings({ ...platformSettings, siteName: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-black text-slate-700">البريد الإلكتروني الرسمي للدعم</label>
+              <label className="text-xs font-bold text-slate-700">البريد الإلكتروني الرسمي للدعم</label>
               <input
                 type="email"
                 value={platformSettings.contactEmail}
                 onChange={(e) => setPlatformSettings({ ...platformSettings, contactEmail: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-black text-slate-700">رقم الهاتف وخدمة العملاء</label>
+              <label className="text-xs font-bold text-slate-700">رقم الهاتف وخدمة العملاء</label>
               <input
                 type="text"
                 value={platformSettings.supportPhone}
                 onChange={(e) => setPlatformSettings({ ...platformSettings, supportPhone: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
               />
             </div>
           </div>
@@ -213,29 +212,29 @@ export default function AdminSettingsPage() {
 
         {/* Accreditation and Security */}
         <div className="p-6 rounded-3xl liquid-glass-card space-y-4 student-card-accent">
-          <div className="flex items-center gap-2 text-sm font-black text-[#173A7C] border-b border-slate-200/60 pb-3">
+          <div className="flex items-center gap-2 text-sm font-bold text-[#0B3766] border-b border-slate-200/60 pb-3">
             <ShieldCheck className="w-4 h-4" />
             <span>التراخيص والأمان والشهادات</span>
           </div>
 
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-xs font-black text-slate-700">رقم ترخيص المركز الوطني (NELC)</label>
+              <label className="text-xs font-bold text-slate-700">رقم ترخيص المركز الوطني (NELC)</label>
               <input
                 type="text"
                 value={platformSettings.nelcLicense}
                 onChange={(e) => setPlatformSettings({ ...platformSettings, nelcLicense: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold font-mono focus:outline-none focus:border-[#173A7C] bg-white/80"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold font-mono focus:outline-none focus:border-[#0B3766] bg-white/80"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-black text-slate-700">نقطة نهاية xAPI LRS للمزامنة</label>
+              <label className="text-xs font-bold text-slate-700">نقطة نهاية xAPI LRS للمزامنة</label>
               <input
                 type="url"
                 value={platformSettings.xapiEndpoint}
                 onChange={(e) => setPlatformSettings({ ...platformSettings, xapiEndpoint: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold font-mono focus:outline-none focus:border-[#173A7C] bg-white/80"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold font-mono focus:outline-none focus:border-[#0B3766] bg-white/80"
               />
             </div>
 
@@ -245,7 +244,7 @@ export default function AdminSettingsPage() {
                   type="checkbox"
                   checked={platformSettings.autoCertificates}
                   onChange={(e) => setPlatformSettings({ ...platformSettings, autoCertificates: e.target.checked })}
-                  className="rounded text-[#173A7C]"
+                  className="rounded text-[#0B3766]"
                 />
                 <span>إصدار الشهادات آلياً فور إكمال كافة متطلبات الدورة والامتحان</span>
               </label>
@@ -255,7 +254,7 @@ export default function AdminSettingsPage() {
                   type="checkbox"
                   checked={platformSettings.watermarkEnabled}
                   onChange={(e) => setPlatformSettings({ ...platformSettings, watermarkEnabled: e.target.checked })}
-                  className="rounded text-[#173A7C]"
+                  className="rounded text-[#0B3766]"
                 />
                 <span>تفعيل العلامة المائية الديناميكية لحماية الفيديوهات ضد التسريب</span>
               </label>

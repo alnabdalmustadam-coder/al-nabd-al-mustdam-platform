@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { MessageSquarePlus, Send, MessageCircle, Phone, Mail, MapPin, CheckCircle2, Clock, Headset } from "lucide-react";
 import React, { useState } from "react";
-import { submitToGHL } from "@/lib/ghl";
 
 export default function ComplaintsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,13 +28,6 @@ export default function ComplaintsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      });
-
-      // Submit to GHL from client-side
-      await submitToGHL({
-        name: data.name as string,
-        email: data.email as string,
-        phone: data.phone as string,
       });
 
       if (response.ok) {
@@ -64,7 +56,7 @@ export default function ComplaintsPage() {
         >
           <div className="mb-8">
             <span className="section-badge-glass">
-              <MessageSquarePlus className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              <MessageSquarePlus className="w-4 h-4 text-[#0B3766] ml-1 inline" />
               صوتك مسموع ويهمنا
             </span>
           </div>
@@ -75,15 +67,15 @@ export default function ComplaintsPage() {
           </h1>
           
           <p className="section-desc-premium text-base sm:text-lg max-w-3xl mx-auto mb-10">
-            نسعد ونرحب دائماً باستقبال اقتراحاتكم البنّاءة لسماع آرائكم، كما نلتزم بمعالجة أي شكاوى قد تواجهكم بكل شفافية واحترافية لضمان تقديم أفضل تجربة تدريبية ممكنة في معهد النبض المستدام.
+            نسعد ونرحب دائماً باستقبال اقتراحاتكم البنّاءة لسماع آرائكم، كما نلتزم بمعالجة أي شكاوى قد تواجهكم بكل شفافية واحترافية لضمان تقديم أفضل تجربة تدريبية ممكنة في معهد مَدار للتعلّم.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-bold text-slate-400">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> سرية تامة للبيانات</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> سرية تامة للبيانات</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> رد خلال 24 ساعة</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> رد خلال 24 ساعة</span>
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#5CB07C]" /> معالجة فورية</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-[#19B6C7]" /> معالجة فورية</span>
           </div>
         </motion.div>
       </section>
@@ -97,9 +89,9 @@ export default function ComplaintsPage() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="lg:col-span-7 bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] relative overflow-hidden"
+            className="lg:col-span-7 bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden"
           >
-            <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-[#5CB07C]/[0.03] to-transparent rounded-br-full pointer-events-none" />
+            <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-[#19B6C7]/[0.03] to-transparent rounded-br-full pointer-events-none" />
             
             <div className="mb-10 relative z-10">
               <h2 className="card-title-royal-blue text-2xl mb-3">تواصل معنا للشكاوى والاقتراحات</h2>
@@ -120,7 +112,7 @@ export default function ComplaintsPage() {
                     name="name"
                     required 
                     placeholder="اكتب اسمك هنا" 
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#0B3766]/20 focus:border-[#0B3766] transition-all"
                   />
                 </div>
                 
@@ -133,7 +125,7 @@ export default function ComplaintsPage() {
                     name="phone"
                     required 
                     placeholder="اكتب رقم جوالك للتواصل" 
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#0B3766]/20 focus:border-[#0B3766] transition-all"
                   />
                 </div>
               </div>
@@ -148,7 +140,7 @@ export default function ComplaintsPage() {
                     name="email"
                     required 
                     placeholder="اكتب بريدك الإلكتروني" 
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all text-right"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#0B3766]/20 focus:border-[#0B3766] transition-all text-right"
                     dir="ltr"
                   />
                 </div>
@@ -162,7 +154,7 @@ export default function ComplaintsPage() {
                     name="subject"
                     required 
                     placeholder="اكتب عنوان الرسالة" 
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-[#0B3766]/20 focus:border-[#0B3766] transition-all"
                   />
                 </div>
               </div>
@@ -176,7 +168,7 @@ export default function ComplaintsPage() {
                   required 
                   rows={6}
                   placeholder="اكتب محتوى الرسالة أو الاستفسار بالتفصيل..." 
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all resize-y"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-[15px] font-medium rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#0B3766]/20 focus:border-[#0B3766] transition-all resize-y"
                 ></textarea>
               </div>
 
@@ -188,10 +180,10 @@ export default function ComplaintsPage() {
                   required
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                  className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#0B3766] focus:ring-[#0B3766]"
                 />
                 <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
-                  أوافق على <span className="text-[#173A7C] font-bold">الشروط والأحكام</span> و <span className="text-[#173A7C] font-bold">سياسة الخصوصية</span>
+                  أوافق على <span className="text-[#0B3766] font-bold">الشروط والأحكام</span> و <span className="text-[#0B3766] font-bold">سياسة الخصوصية</span>
                 </label>
               </div>
 
@@ -202,7 +194,7 @@ export default function ComplaintsPage() {
                 className={`w-full py-4 rounded-xl font-bold text-[16px] transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group ${
                   isSubmitted 
                     ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" 
-                    : "bg-[#0A162B] hover:bg-[#173A7C] text-white shadow-xl shadow-[#173A7C]/20 hover:-translate-y-1"
+                    : "bg-[#0A162B] hover:bg-[#0B3766] text-white shadow-xl shadow-[#0B3766]/20 hover:-translate-y-1"
                 }`}
               >
                 {isSubmitting ? (
@@ -229,11 +221,11 @@ export default function ComplaintsPage() {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="lg:col-span-5 relative"
           >
-            <div className="bg-gradient-to-br from-[#0A162B] via-[#0E2242] to-[#173A7C] rounded-[2.5rem] p-10 sm:p-12 text-center shadow-[0_20px_60px_-15px_rgba(23,58,124,0.3)] h-full overflow-hidden relative flex flex-col justify-center items-center">
+            <div className="bg-gradient-to-br from-[#0A162B] via-[#0E2242] to-[#0B3766] rounded-[2.5rem] p-10 sm:p-12 text-center shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] h-full overflow-hidden relative flex flex-col justify-center items-center">
               
               {/* Decorative Background Elements */}
               <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#5CB07C]/10 rounded-full blur-[80px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#19B6C7]/10 rounded-full blur-[80px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-400/10 rounded-full blur-[80px] pointer-events-none translate-y-1/2 -translate-x-1/2" />
 
               <div className="relative z-10 w-full">
@@ -241,7 +233,7 @@ export default function ComplaintsPage() {
                   <Headset className="w-10 h-10 text-white group-hover:scale-110 transition-transform" />
                 </div>
                 
-                <h2 className="text-3xl font-black text-white mb-4">تواصل معنا</h2>
+                <h2 className="text-3xl font-bold text-white mb-4">تواصل معنا</h2>
                 <p className="text-blue-100/70 font-medium text-base mb-12">
                   فريقنا متواجد دائماً للرد على استفساراتكم وملاحظاتكم بكل اهتمام.
                 </p>
@@ -274,7 +266,7 @@ export default function ComplaintsPage() {
                     },
                     {
                       label: "WhatsApp",
-                      href: "https://wa.me/966549105986",
+                      href: "/demo",
                       svg: <MessageCircle className="w-5 h-5" />,
                     },
                     {
@@ -302,7 +294,7 @@ export default function ComplaintsPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={social.label}
-                      className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#173A7C] hover:bg-[#5CB07C] hover:text-white hover:-translate-y-2 hover:shadow-lg hover:shadow-[#5CB07C]/30 transition-all duration-300"
+                      className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#0B3766] hover:bg-[#19B6C7] hover:text-white hover:-translate-y-2 hover:shadow-lg hover:shadow-[#19B6C7]/30 transition-all duration-300"
                     >
                       {social.svg}
                     </a>

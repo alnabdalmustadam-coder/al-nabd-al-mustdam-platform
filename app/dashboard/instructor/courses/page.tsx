@@ -10,7 +10,7 @@ import { ClipboardCheck } from 'lucide-react';
 import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
 import { createCourseQuizDraft, prepareCourseQuizForEditing } from '@/lib/quizzes/course-quiz-draft';
 import React, { useState, useEffect, useRef } from 'react';
-import * as tus from 'tus-js-client';
+import { DEMO_READ_ONLY } from '@/lib/demo/messages';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { BookOpen, Plus, Search, Users, Clock, Trash2, CheckCircle2, Video, Settings, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
@@ -100,45 +100,7 @@ async function uploadVideoSecurely(
   title: string,
   onProgress: (progress: number) => void
 ): Promise<string> {
-  const credentialResponse = await fetch('/api/videos/upload', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title }),
-  });
-  const credentials = await credentialResponse.json();
-
-  if (!credentialResponse.ok || !credentials.success) {
-    throw new Error(credentials.error || 'تعذر إنشاء طلب رفع آمن');
-  }
-
-  return await new Promise<string>((resolve, reject) => {
-    const upload = new tus.Upload(file, {
-      endpoint: credentials.uploadUrl,
-      retryDelays: [0, 3000, 5000, 10000, 20000, 60000],
-      headers: {
-        AuthorizationSignature: credentials.signature,
-        AuthorizationExpire: String(credentials.expirationTime),
-        VideoId: credentials.videoId,
-        LibraryId: credentials.libraryId,
-      },
-      metadata: {
-        filetype: file.type,
-        title,
-      },
-      onProgress(bytesUploaded, bytesTotal) {
-        onProgress(Math.max(1, Math.round((bytesUploaded / bytesTotal) * 100)));
-      },
-      onError(error) {
-        reject(error);
-      },
-      onSuccess() {
-        onProgress(100);
-        resolve(credentials.videoId);
-      },
-    });
-
-    upload.start();
-  });
+  throw new Error(DEMO_READ_ONLY);
 }
 
 export default function InstructorCoursesPage() {
@@ -527,7 +489,7 @@ export default function InstructorCoursesPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-5 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[calc(100%-2rem)] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border text-xs font-black backdrop-blur-md ${
+            className={`fixed top-5 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[calc(100%-2rem)] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border text-xs font-bold backdrop-blur-md ${
               toastMessage.type === 'success'
                 ? 'bg-emerald-600/95 text-white border-emerald-400 shadow-emerald-600/20'
                 : 'bg-rose-600/95 text-white border-rose-400 shadow-rose-600/20'
@@ -541,25 +503,25 @@ export default function InstructorCoursesPage() {
 
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200/90 shadow-xs">
-            <BookOpen className="w-4 h-4 text-[#173A7C]" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#0B3766] text-xs font-bold border border-blue-200/90 shadow-xs">
+            <BookOpen className="w-4 h-4 text-[#0B3766]" />
             <span>إدارة البرامج والمقررات والمناهج الدراسية</span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-300 shadow-xs">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>{courses.length} دورات معتمدة</span>
+            <span>{courses.length} دورات مهنية</span>
           </span>
         </div>
 
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="flex items-center gap-3.5 sm:gap-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#173A7C]/25 border border-white/40 shrink-0">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#0B3766]/25 border border-white/40 shrink-0">
                 <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(11,55,102,0.1)] student-heading-h1">
                   دوراتي ومقرراتي <span className="student-name-gradient">التدريبية</span>
                 </h1>
               </div>
@@ -572,7 +534,7 @@ export default function InstructorCoursesPage() {
           <button
             type="button"
             onClick={openCreateModal}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-[#173A7C]/20 hover:opacity-95 transition-all cursor-pointer border border-white/20"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-[#0B3766]/20 hover:opacity-95 transition-all cursor-pointer border border-white/20"
           >
             <Plus className="w-4 h-4" />
             <span>إضافة دورة تدريبية جديدة</span>
@@ -583,16 +545,16 @@ export default function InstructorCoursesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
           <div className="flex items-center justify-between">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md">
               <BookOpen className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-blue-50 text-[#173A7C] border-blue-200">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-blue-50 text-[#0B3766] border-blue-200">
               مقرراتي
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي المقررات النشطة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#173A7C] tracking-tight">{courses.length} مقرر</h3>
+            <span className="text-xs text-slate-500 font-bold block">إجمالي المقررات النشطة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-[#0B3766] tracking-tight">{courses.length} مقرر</h3>
           </div>
         </div>
 
@@ -601,13 +563,13 @@ export default function InstructorCoursesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md">
               <Users className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-emerald-50 text-emerald-800 border-emerald-300">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-emerald-50 text-emerald-800 border-emerald-300">
               المتدربون
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي المتدربين المسجلين</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">284 متدرب</h3>
+            <span className="text-xs text-slate-500 font-bold block">إجمالي المتدربين المسجلين</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-emerald-700 tracking-tight">284 متدرب</h3>
           </div>
         </div>
 
@@ -616,13 +578,13 @@ export default function InstructorCoursesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-md">
               <Video className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-indigo-50 text-indigo-900 border-indigo-200">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-indigo-50 text-indigo-900 border-indigo-200">
               المحتوى المرئي
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي الدروس المسجلة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">إجمالي الدروس المسجلة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-indigo-700 tracking-tight">
               {courses.reduce((acc, c) => acc + (c.lessonsCount || 8), 0)} درس
             </h3>
           </div>
@@ -633,13 +595,13 @@ export default function InstructorCoursesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md">
               <Clock className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-amber-50 text-amber-900 border-amber-300">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-amber-50 text-amber-900 border-amber-300">
               الساعات الأكاديمية
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي الساعات المعتمدة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-amber-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">إجمالي الساعات المعتمدة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-amber-700 tracking-tight">
               {courses.reduce((acc, c) => acc + (c.hours || 30), 0)} ساعة
             </h3>
           </div>
@@ -654,7 +616,7 @@ export default function InstructorCoursesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="بحث في المقررات والمناهج والوحدات..."
-            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-slate-50/80"
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-slate-50/80"
           />
         </div>
 
@@ -664,7 +626,7 @@ export default function InstructorCoursesPage() {
             onClick={() => setSelectedCategory('all')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               selectedCategory === 'all'
-                ? 'bg-[#173A7C] text-white shadow-sm font-black'
+                ? 'bg-[#0B3766] text-white shadow-sm font-bold'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -677,7 +639,7 @@ export default function InstructorCoursesPage() {
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 selectedCategory === cat.id
-                  ? 'bg-[#173A7C] text-white shadow-sm font-black'
+                  ? 'bg-[#0B3766] text-white shadow-sm font-bold'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -689,17 +651,17 @@ export default function InstructorCoursesPage() {
 
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل المقررات...</p>
         </div>
       ) : filteredCourses.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
-          <BookOpen className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
-          <h3 className="text-base font-black text-slate-900">لا توجد دورات مطابقة للبحث</h3>
+          <BookOpen className="w-12 h-12 text-[#0B3766]/30 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">لا توجد دورات مطابقة للبحث</h3>
           <button
             type="button"
             onClick={openCreateModal}
-            className="px-4 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-[#0B3766] text-white text-xs font-bold cursor-pointer"
           >
             + إضافة دورة تدريبية جديدة
           </button>
@@ -720,11 +682,11 @@ export default function InstructorCoursesPage() {
                 />
 
                 <div className="absolute top-3 right-3 left-3 flex items-center justify-between gap-2 pointer-events-none">
-                  <span className="px-3 py-1 rounded-xl text-[11px] font-black bg-white/95 text-[#173A7C] shadow-md backdrop-blur-md border border-slate-200/60">
+                  <span className="px-3 py-1 rounded-xl text-[11px] font-bold bg-white/95 text-[#0B3766] shadow-md backdrop-blur-md border border-slate-200/60">
                     {course.category || 'تقنية وبرمجة'}
                   </span>
 
-                  <span className="px-2.5 py-1 rounded-xl text-[11px] font-black bg-[#173A7C]/90 text-white shadow-md backdrop-blur-md border border-white/20">
+                  <span className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-[#0B3766]/90 text-white shadow-md backdrop-blur-md border border-white/20">
                     {course.price ? `${course.price} ر.س` : 'معتمد'}
                   </span>
                 </div>
@@ -735,21 +697,21 @@ export default function InstructorCoursesPage() {
                   {course.title}
                 </h3>
                 <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
-                  {course.description || 'برنامج تدريبي متكامل يؤهل المتدرب للحصول على شهادة معتمدة وإتقان المهارات العملية.'}
+                  {course.description || 'برنامج تدريبي متكامل يؤهل المتدرب للحصول على شهادة إتمام وإتقان المهارات العملية.'}
                 </p>
 
                 <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-slate-50/90 border border-slate-200 text-center text-xs font-bold text-slate-700">
                   <div>
                     <span className="text-[10px] text-slate-400 font-bold block">الدروس</span>
-                    <span className="font-black text-[#173A7C]">{course.lessonsCount || 10} درس</span>
+                    <span className="font-bold text-[#0B3766]">{course.lessonsCount || 10} درس</span>
                   </div>
                   <div className="border-r border-l border-slate-200">
                     <span className="text-[10px] text-slate-400 font-bold block">المدة</span>
-                    <span className="font-black text-slate-800">{course.hours || 30} س</span>
+                    <span className="font-bold text-slate-800">{course.hours || 30} س</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 font-bold block">المتدربون</span>
-                    <span className="font-black text-emerald-700">{course.students || 45}</span>
+                    <span className="font-bold text-emerald-700">{course.students || 45}</span>
                   </div>
                 </div>
               </div>
@@ -759,7 +721,7 @@ export default function InstructorCoursesPage() {
                   <button
                     type="button"
                     onClick={() => openEditModal(course)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-[#173A7C] text-white hover:bg-[#1E4D9D] text-xs font-black transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#0B3766] text-white hover:bg-[#168AD3] text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                   >
                     <Settings className="w-3.5 h-3.5" />
                     <span>إدارة المنهج والدروس</span>
@@ -768,7 +730,7 @@ export default function InstructorCoursesPage() {
                   <button
                     type="button"
                     onClick={() => handleDeleteCourse(course.id, course.title)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-600 hover:text-white text-red-700 text-xs font-black transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-red-200"
+                    className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-600 hover:text-white text-red-700 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-red-200"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>حذف</span>
@@ -779,13 +741,13 @@ export default function InstructorCoursesPage() {
                   <Link
                     href={`/courses/${course.slug || course.id}`}
                     target="_blank"
-                    className="text-[#173A7C] hover:underline font-black flex items-center gap-1"
+                    className="text-[#0B3766] hover:underline font-bold flex items-center gap-1"
                   >
                     <span>معاينة صفحة الدورة</span>
                     <ExternalLink className="w-3 h-3" />
                   </Link>
 
-                  <span className="text-[11px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
                     منشور ومتاح
                   </span>
                 </div>

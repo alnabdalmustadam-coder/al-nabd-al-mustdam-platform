@@ -16,7 +16,6 @@ import {
   Check,
   Trash2,
   FileQuestion,
-  Sparkles,
   Layers,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
@@ -151,12 +150,12 @@ export default function InstructorQuizzesPage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         {/* Top Badges Row */}
         <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200/90 shadow-xs">
-            <Award className="w-4 h-4 text-[#173A7C]" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#0B3766] text-xs font-bold border border-blue-200/90 shadow-xs">
+            <Award className="w-4 h-4 text-[#0B3766]" />
             <span>التقييمات والاختبارات الأكاديمية</span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-300 shadow-xs">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>{quizzes.length} اختبارات متاحة</span>
           </span>
@@ -165,11 +164,11 @@ export default function InstructorQuizzesPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="flex items-center gap-3.5 sm:gap-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#173A7C]/25 border border-white/40 shrink-0">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#0B3766]/25 border border-white/40 shrink-0">
                 <Award className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(11,55,102,0.1)] student-heading-h1">
                   بنك الاختبارات <span className="student-name-gradient">والتقييمات الأكاديمية</span>
                 </h1>
               </div>
@@ -182,7 +181,7 @@ export default function InstructorQuizzesPage() {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-[#173A7C]/20 cursor-pointer hover:opacity-95 transition-all border border-white/20"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-[#0B3766]/20 cursor-pointer hover:opacity-95 transition-all border border-white/20"
           >
             <Plus className="w-4 h-4" />
             <span>إنشاء اختبار جديد</span>
@@ -194,16 +193,16 @@ export default function InstructorQuizzesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
           <div className="flex items-center justify-between">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md">
               <Award className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-blue-50 text-[#173A7C] border-blue-200">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-blue-50 text-[#0B3766] border-blue-200">
               بنك الأسئلة
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي الاختبارات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#173A7C] tracking-tight">{quizzes.length} اختبار</h3>
+            <span className="text-xs text-slate-500 font-bold block">إجمالي الاختبارات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-[#0B3766] tracking-tight">{quizzes.length} اختبار</h3>
           </div>
         </div>
 
@@ -212,13 +211,13 @@ export default function InstructorQuizzesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-emerald-50 text-emerald-800 border-emerald-300">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-emerald-50 text-emerald-800 border-emerald-300">
               أسئلة معتمدة
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي الأسئلة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">إجمالي الأسئلة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-emerald-700 tracking-tight">
               {quizzes.reduce((acc, q) => acc + (q.questions_json?.length || 10), 0)} سؤال
             </h3>
           </div>
@@ -229,13 +228,13 @@ export default function InstructorQuizzesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-amber-50 text-amber-900 border-amber-300">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-amber-50 text-amber-900 border-amber-300">
               معدل النجاح
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">متوسط نسبة الاجتياز</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-amber-700 tracking-tight">75%</h3>
+            <span className="text-xs text-slate-500 font-bold block">متوسط نسبة الاجتياز</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-amber-700 tracking-tight">75%</h3>
           </div>
         </div>
 
@@ -244,13 +243,13 @@ export default function InstructorQuizzesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-md">
               <Layers className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-indigo-50 text-indigo-900 border-indigo-200">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-indigo-50 text-indigo-900 border-indigo-200">
               تفاعل الطلاب
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">المحاولات المنجزة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tight">180 محاولة</h3>
+            <span className="text-xs text-slate-500 font-bold block">المحاولات المنجزة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-indigo-700 tracking-tight">180 محاولة</h3>
           </div>
         </div>
       </div>
@@ -263,20 +262,20 @@ export default function InstructorQuizzesPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="بحث في بنك الاختبارات أو المقررات..."
-          className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+          className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
         />
       </div>
 
       {/* ── 4. QUIZZES GRID ── */}
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل الاختبارات...</p>
         </div>
       ) : filteredQuizzes.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
-          <HelpCircle className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
-          <h3 className="text-base font-black text-slate-900">لا توجد اختبارات مسجلة</h3>
+          <HelpCircle className="w-12 h-12 text-[#0B3766]/30 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">لا توجد اختبارات مسجلة</h3>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -288,14 +287,14 @@ export default function InstructorQuizzesPage() {
                 className="p-5 sm:p-6 rounded-3xl liquid-glass-card liquid-glass-hover flex flex-col justify-between space-y-4 student-card-accent"
               >
                 <div className="space-y-2">
-                  <span className="text-xs font-black text-emerald-700 flex items-center gap-1.5 truncate">
+                  <span className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 truncate">
                     <BookOpen className="w-3.5 h-3.5 shrink-0" />
                     <span>{q.course_id}</span>
                   </span>
                   <h3 className="student-heading-h3 !text-sm leading-snug">{q.title}</h3>
                 </div>
 
-                <div className="grid grid-cols-3 p-3 rounded-2xl bg-slate-50/90 border border-slate-200 text-center text-xs font-black">
+                <div className="grid grid-cols-3 p-3 rounded-2xl bg-slate-50/90 border border-slate-200 text-center text-xs font-bold">
                   <div>
                     <span className="text-[10px] text-slate-400 font-bold block">الأسئلة</span>
                     <span className="text-slate-800">{count} سؤال</span>
@@ -344,10 +343,10 @@ export default function InstructorQuizzesPage() {
             >
               <form onSubmit={handleCreateQuiz} className="space-y-4">
                 {/* Header */}
-                <div className="p-5 bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-between">
+                <div className="p-5 bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <FileQuestion className="w-5 h-5 text-amber-300" />
-                    <h3 className="font-black text-sm sm:text-base">إنشاء اختبار تقييمي جديد</h3>
+                    <h3 className="font-bold text-sm sm:text-base">إنشاء اختبار تقييمي جديد</h3>
                   </div>
                   <button
                     type="button"
@@ -368,7 +367,7 @@ export default function InstructorQuizzesPage() {
                       placeholder="مثال: الاختبار النهائي الشامل للوحدة الأولى"
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none"
+                      className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#0B3766] outline-none"
                     />
                   </div>
 
@@ -377,7 +376,7 @@ export default function InstructorQuizzesPage() {
                     <select
                       value={newCourse}
                       onChange={(e) => setNewCourse(e.target.value)}
-                      className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none"
+                      className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-[#0B3766] outline-none"
                     >
                       <option value="دبلوم التسامح والسلام والمواطنة الصالحة">دبلوم التسامح والسلام والمواطنة الصالحة</option>
                       <option value="المهارات الأكاديمية والتفكير الناقد">المهارات الأكاديمية والتفكير الناقد</option>
@@ -392,7 +391,7 @@ export default function InstructorQuizzesPage() {
                         type="number"
                         value={newDuration}
                         onChange={(e) => setNewDuration(e.target.value)}
-                        className="w-full p-2 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none font-mono"
+                        className="w-full p-2 rounded-xl border border-slate-300 focus:border-[#0B3766] outline-none font-mono"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -401,7 +400,7 @@ export default function InstructorQuizzesPage() {
                         type="number"
                         value={newPassScore}
                         onChange={(e) => setNewPassScore(e.target.value)}
-                        className="w-full p-2 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none font-mono"
+                        className="w-full p-2 rounded-xl border border-slate-300 focus:border-[#0B3766] outline-none font-mono"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -410,7 +409,7 @@ export default function InstructorQuizzesPage() {
                         type="number"
                         value={newQuestionsCount}
                         onChange={(e) => setNewQuestionsCount(e.target.value)}
-                        className="w-full p-2 rounded-xl border border-slate-300 focus:border-[#173A7C] outline-none font-mono"
+                        className="w-full p-2 rounded-xl border border-slate-300 focus:border-[#0B3766] outline-none font-mono"
                       />
                     </div>
                   </div>
@@ -429,7 +428,7 @@ export default function InstructorQuizzesPage() {
                   <button
                     type="submit"
                     disabled={isSavingQuiz}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-[#173A7C] text-white font-black text-xs shadow-md hover:opacity-95 flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-[#0B3766] text-white font-bold text-xs shadow-md hover:opacity-95 flex items-center gap-1.5 cursor-pointer"
                   >
                     <Check className="w-4 h-4" />
                     <span>إنشاء ونشر الاختبار</span>

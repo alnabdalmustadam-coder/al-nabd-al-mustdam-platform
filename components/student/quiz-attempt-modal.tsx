@@ -196,11 +196,11 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
       <div className="w-full max-w-4xl max-h-[94vh] overflow-hidden rounded-3xl bg-white border border-white/70 shadow-2xl flex flex-col">
         <header className="shrink-0 px-5 sm:px-7 py-4 border-b border-slate-200 flex items-center justify-between gap-4 bg-gradient-to-l from-blue-50 via-white to-emerald-50">
           <div className="min-w-0 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#173A7C] text-white flex items-center justify-center shrink-0 shadow-lg shadow-[#173A7C]/20">
+            <div className="w-10 h-10 rounded-2xl bg-[#0B3766] text-white flex items-center justify-center shrink-0 shadow-lg shadow-[#0B3766]/20">
               <HelpCircle className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h2 className="font-black text-slate-900 text-sm sm:text-lg truncate">
+              <h2 className="font-bold text-slate-900 text-sm sm:text-lg truncate">
                 {result?.title || session?.title}
               </h2>
               <p className="text-[10px] sm:text-xs font-bold text-slate-500">
@@ -211,10 +211,10 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
 
           <div className="flex items-center gap-2 shrink-0">
             {!result && session && (
-              <div className={`px-3 py-2 rounded-xl flex items-center gap-2 font-black tabular-nums text-xs sm:text-sm border ${
+              <div className={`px-3 py-2 rounded-xl flex items-center gap-2 font-bold tabular-nums text-xs sm:text-sm border ${
                 remainingSeconds <= 60
                   ? 'bg-rose-50 text-rose-700 border-rose-200'
-                  : 'bg-white text-[#173A7C] border-blue-200'
+                  : 'bg-white text-[#0B3766] border-blue-200'
               }`}>
                 <Clock3 className="w-4 h-4" />
                 {formatRemaining(remainingSeconds)}
@@ -245,10 +245,10 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
                 ) : (
                   <AlertCircle className="w-12 h-12 text-amber-600 mx-auto mb-3" />
                 )}
-                <p className="text-xs font-black text-slate-600 mb-1">
+                <p className="text-xs font-bold text-slate-600 mb-1">
                   {result.passed ? 'تم اجتياز الاختبار بنجاح' : 'لم تتحقق نسبة الاجتياز بعد'}
                 </p>
-                <p className="text-4xl font-black text-[#173A7C]">{result.score}%</p>
+                <p className="text-4xl font-bold text-[#0B3766]">{result.score}%</p>
                 <p className="text-xs font-bold text-slate-500 mt-2">
                   {result.correctAnswers} إجابة صحيحة من {result.totalQuestions} — المطلوب {result.passPercentage}%
                 </p>
@@ -262,7 +262,7 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
             </div>
           ) : (
             <div className="space-y-4">
-              {session?.questions.map((question, index) => (<section key={question.id} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"><h3 className="text-sm font-black leading-7 text-slate-900">{index + 1}. {question.text}</h3><QuizQuestionInput question={question} answer={answers[question.id]} onChange={(answer) => { draftTouched.current = true; setAnswers((current) => ({ ...current, [question.id]: answer })); setError(null); }} /></section>))}
+              {session?.questions.map((question, index) => (<section key={question.id} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"><h3 className="text-sm font-bold leading-7 text-slate-900">{index + 1}. {question.text}</h3><QuizQuestionInput question={question} answer={answers[question.id]} onChange={(answer) => { draftTouched.current = true; setAnswers((current) => ({ ...current, [question.id]: answer })); setError(null); }} /></section>))}
             </div>
           )}
         </main>
@@ -279,7 +279,7 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
               type="button"
               onClick={() => void closeWithDraft()}
               disabled={submitting || savingDraft}
-              className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-black hover:bg-slate-50 cursor-pointer disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer disabled:opacity-50"
             >
               {result ? 'إغلاق' : savingDraft ? 'جاري حفظ المسودة...' : 'حفظ والخروج'}
             </button>
@@ -288,7 +288,7 @@ export function QuizAttemptModal({ session, initialResult, onClose, onCompleted 
                 type="button"
                 onClick={() => void submitAttempt(false)}
                 disabled={submitting || remainingSeconds === 0}
-                className="px-5 sm:px-7 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="px-5 sm:px-7 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 <span>{submitting ? 'جاري التصحيح...' : 'اعتماد الإجابات'}</span>

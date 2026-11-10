@@ -31,7 +31,7 @@ export default function TrainingPlanPage() {
         >
           <div className="mb-8">
             <span className="section-badge-glass">
-              <Target className="w-4 h-4 text-[#173A7C] ml-1 inline" />
+              <Target className="w-4 h-4 text-[#0B3766] ml-1 inline" />
               مسارات التعلم والتطوير
             </span>
           </div>
@@ -89,20 +89,20 @@ export default function TrainingPlanPage() {
 
       {/* ═══════════════════════════════════════ TABLES ═══════════════════════════════════════ */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] overflow-hidden">
+        <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] overflow-hidden">
           
           {/* Tabs Header */}
           <div className="premium-tabs flex border-b border-slate-100 flex-col sm:flex-row">
             <button 
               onClick={() => setActiveTab("sync")}
-              className={`premium-tab flex-1 flex items-center justify-center gap-3 py-6 px-4 font-black transition-colors ${activeTab === 'sync' ? 'bg-blue-50/50 text-[#173A7C] border-b-2 border-[#173A7C]' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
+              className={`premium-tab flex-1 flex items-center justify-center gap-3 py-6 px-4 font-bold transition-colors ${activeTab === 'sync' ? 'bg-blue-50/50 text-[#0B3766] border-b-2 border-[#0B3766]' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
             >
               <Presentation className="w-5 h-5" />
               <span className="premium-tab-label">التدريب الإلكتروني (المتزامن)</span>
             </button>
             <button 
               onClick={() => setActiveTab("async")}
-              className={`premium-tab flex-1 flex items-center justify-center gap-3 py-6 px-4 font-black transition-colors ${activeTab === 'async' ? 'bg-emerald-50/50 text-[#5CB07C] border-b-2 border-[#5CB07C]' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
+              className={`premium-tab flex-1 flex items-center justify-center gap-3 py-6 px-4 font-bold transition-colors ${activeTab === 'async' ? 'bg-emerald-50/50 text-[#19B6C7] border-b-2 border-[#19B6C7]' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'}`}
             >
               <PlayCircle className="w-5 h-5" />
               <span className="premium-tab-label">التدريب الإلكتروني (الغير متزامن)</span>
@@ -113,7 +113,7 @@ export default function TrainingPlanPage() {
             {/* Sync Tab Content */}
             {activeTab === 'sync' && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
-                <div className="mb-8 p-5 bg-[#173A7C]/5 rounded-2xl border border-[#173A7C]/10 text-slate-700 font-medium leading-[1.8] text-[15px]">
+                <div className="mb-8 p-5 bg-[#0B3766]/5 rounded-2xl border border-[#0B3766]/10 text-slate-700 font-medium leading-[1.8] text-[15px]">
                   <strong>عبر القاعة الافتراضية:</strong> يتم إعداد جدول للدورات المتزامنة تشرح التعليم الإلكتروني لمدة أربع على فترتين صباحية ومسائية، ويُتاح للمتعلم اختيار الوقت المناسب له، وتتم المناقشة والرد على الاستفسارات خلال الدورات بشكل مباشر.
                 </div>
                 
@@ -131,11 +131,11 @@ export default function TrainingPlanPage() {
                     <tbody className="divide-y divide-slate-50">
                       {synchronousCourses.map((course) => (
                         <tr key={course.id} className="hover:bg-blue-50/30 transition-colors">
-                          <td className="py-4 px-6 font-bold text-[#173A7C]">{course.name}</td>
+                          <td className="py-4 px-6 font-bold text-[#0B3766]">{course.name}</td>
                           <td className="py-4 px-6 font-medium text-slate-500" dir="ltr"><span className="flex items-center justify-end gap-2"><Clock className="w-4 h-4 text-slate-400" />{course.time}</span></td>
                           <td className="py-4 px-6 font-medium text-slate-500" dir="ltr"><span className="flex items-center justify-end gap-2"><CalendarDays className="w-4 h-4 text-slate-400" />{course.date}</span></td>
                           <td className="py-4 px-6">
-                            <span className="bg-[#173A7C]/10 text-[#173A7C] px-3 py-1 rounded-full text-xs font-bold">
+                            <span className="bg-[#0B3766]/10 text-[#0B3766] px-3 py-1 rounded-full text-xs font-bold">
                               {course.status}
                             </span>
                           </td>
@@ -169,7 +169,7 @@ export default function TrainingPlanPage() {
                     <tbody className="divide-y divide-slate-50">
                       {asynchronousCourses.map((course) => (
                         <tr key={course.id} className="hover:bg-emerald-50/30 transition-colors">
-                          <td className="py-4 px-6 font-bold text-[#5CB07C]">{course.name}</td>
+                          <td className="py-4 px-6 font-bold text-[#19B6C7]">{course.name}</td>
                           <td className="py-4 px-6 font-medium text-slate-500" dir="ltr"><span className="flex items-center justify-end gap-2"><Clock className="w-4 h-4 text-slate-400" />{course.time}</span></td>
                           <td className="py-4 px-6 font-medium text-slate-500" dir="ltr"><span className="flex items-center justify-end gap-2"><CalendarDays className="w-4 h-4 text-slate-400" />{course.date}</span></td>
                           <td className="py-4 px-6">
@@ -187,11 +187,11 @@ export default function TrainingPlanPage() {
                 {/* External Video Link Block */}
                 <div className="mt-10 p-6 sm:p-8 bg-slate-900 rounded-3xl relative overflow-hidden text-center sm:text-right flex flex-col sm:flex-row items-center justify-between gap-6">
                   <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none" />
-                  <div className="absolute right-0 top-0 w-32 h-32 bg-[#5CB07C] blur-[60px] opacity-20 rounded-full" />
+                  <div className="absolute right-0 top-0 w-32 h-32 bg-[#19B6C7] blur-[60px] opacity-20 rounded-full" />
                   
                   <div className="relative z-10 flex-1">
-                    <h3 className="text-white font-black text-xl mb-3 flex items-center justify-center sm:justify-start gap-3">
-                      <MonitorPlay className="w-6 h-6 text-[#5CB07C]" />
+                    <h3 className="text-white font-bold text-xl mb-3 flex items-center justify-center sm:justify-start gap-3">
+                      <MonitorPlay className="w-6 h-6 text-[#19B6C7]" />
                       تدريب إلكتروني مرئي
                     </h3>
                     <p className="text-slate-400 font-medium text-[15px] leading-relaxed max-w-2xl">

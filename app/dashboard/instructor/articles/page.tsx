@@ -15,7 +15,6 @@ import {
   ExternalLink,
   CheckCircle2,
   Clock,
-  Sparkles,
   X,
   Check,
   Loader2,
@@ -280,12 +279,12 @@ export default function InstructorArticlesPage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         {/* Top Badges Row */}
         <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200/90 shadow-xs">
-            <Newspaper className="w-4 h-4 text-[#173A7C]" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#0B3766] text-xs font-bold border border-blue-200/90 shadow-xs">
+            <Newspaper className="w-4 h-4 text-[#0B3766]" />
             <span>المدونة المعرفية والأبحاث الأكاديمية</span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-300 shadow-xs">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>{articles.length} مقال أكاديمي</span>
           </span>
@@ -294,11 +293,11 @@ export default function InstructorArticlesPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="flex items-center gap-3.5 sm:gap-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#173A7C]/25 border border-white/40 shrink-0">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#0B3766]/25 border border-white/40 shrink-0">
                 <Newspaper className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(11,55,102,0.1)] student-heading-h1">
                   المقالات والمنشورات <span className="student-name-gradient">الأكاديمية</span>
                 </h1>
               </div>
@@ -311,7 +310,7 @@ export default function InstructorArticlesPage() {
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-[#173A7C]/20 hover:opacity-95 transition-all cursor-pointer border border-white/20"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-[#0B3766]/20 hover:opacity-95 transition-all cursor-pointer border border-white/20"
           >
             <Plus className="w-4 h-4" />
             <span>كتابة مقال جديد</span>
@@ -323,16 +322,16 @@ export default function InstructorArticlesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl liquid-glass-card liquid-glass-hover space-y-3.5 relative overflow-hidden student-card-accent">
           <div className="flex items-center justify-between">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md">
               <Newspaper className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-blue-50 text-[#173A7C] border-blue-200">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-blue-50 text-[#0B3766] border-blue-200">
               مدونة المدرب
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي المقالات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#173A7C] tracking-tight">{articles.length} مقال</h3>
+            <span className="text-xs text-slate-500 font-bold block">إجمالي المقالات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-[#0B3766] tracking-tight">{articles.length} مقال</h3>
           </div>
         </div>
 
@@ -341,13 +340,13 @@ export default function InstructorArticlesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-emerald-50 text-emerald-800 border-emerald-300">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-emerald-50 text-emerald-800 border-emerald-300">
               منشور بالموقع
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">المقالات المنشورة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">المقالات المنشورة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-emerald-700 tracking-tight">
               {articles.filter((a) => a.status === 'published').length} منشورة
             </h3>
           </div>
@@ -358,13 +357,13 @@ export default function InstructorArticlesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-md">
               <Eye className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-blue-50 text-blue-800 border-blue-200">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-blue-50 text-blue-800 border-blue-200">
               تفاعل القراء
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي القراءات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-blue-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">إجمالي القراءات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-blue-700 tracking-tight">
               {articles.reduce((acc, a) => acc + a.views_count, 0).toLocaleString()} قراءة
             </h3>
           </div>
@@ -375,13 +374,13 @@ export default function InstructorArticlesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md">
               <FileText className="w-5 h-5" />
             </div>
-            <span className="px-3.5 py-1.5 rounded-xl text-xs font-black border bg-amber-50 text-amber-900 border-amber-300">
+            <span className="px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-amber-50 text-amber-900 border-amber-300">
               قيد التحرير
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">المسودات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-amber-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">المسودات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-amber-700 tracking-tight">
               {articles.filter((a) => a.status === 'draft').length} مسودة
             </h3>
           </div>
@@ -397,7 +396,7 @@ export default function InstructorArticlesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="بحث في المقالات والوسوم والمحتوى..."
-            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-slate-50/80"
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-slate-50/80"
           />
         </div>
 
@@ -408,7 +407,7 @@ export default function InstructorArticlesPage() {
             onClick={() => setSelectedCategory('all')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               selectedCategory === 'all'
-                ? 'bg-[#173A7C] text-white shadow-sm font-black'
+                ? 'bg-[#0B3766] text-white shadow-sm font-bold'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -421,7 +420,7 @@ export default function InstructorArticlesPage() {
               onClick={() => setSelectedCategory(cat)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 selectedCategory === cat
-                  ? 'bg-[#173A7C] text-white shadow-sm font-black'
+                  ? 'bg-[#0B3766] text-white shadow-sm font-bold'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -434,17 +433,17 @@ export default function InstructorArticlesPage() {
       {/* ── 4. ARTICLES GRID ── */}
       {loading ? (
         <div className="p-16 text-center rounded-3xl liquid-glass-card border border-slate-200 flex flex-col items-center justify-center space-y-3">
-          <Loader2 className="w-8 h-8 text-[#173A7C] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#0B3766] animate-spin" />
           <p className="text-sm font-bold text-slate-600">جاري تحميل المقالات من قاعدة البيانات...</p>
         </div>
       ) : filteredArticles.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
-          <Newspaper className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
-          <h3 className="text-base font-black text-slate-900">لا توجد مقالات مطابقة للبحث</h3>
+          <Newspaper className="w-12 h-12 text-[#0B3766]/30 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">لا توجد مقالات مطابقة للبحث</h3>
           <button
             type="button"
             onClick={handleOpenCreateModal}
-            className="px-4 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black"
+            className="px-4 py-2 rounded-xl bg-[#0B3766] text-white text-xs font-bold"
           >
             + كتابة أول مقال
           </button>
@@ -467,12 +466,12 @@ export default function InstructorArticlesPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
 
                 <div className="absolute top-3 right-3 left-3 flex items-center justify-between gap-2">
-                  <span className="px-3 py-1 rounded-xl text-[11px] font-black bg-white/95 text-[#173A7C] shadow-md backdrop-blur-md">
+                  <span className="px-3 py-1 rounded-xl text-[11px] font-bold bg-white/95 text-[#0B3766] shadow-md backdrop-blur-md">
                     {art.category}
                   </span>
 
                   <span
-                    className={`px-2.5 py-1 rounded-xl text-[11px] font-black border backdrop-blur-md shadow-md ${
+                    className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border backdrop-blur-md shadow-md ${
                       art.status === 'published'
                         ? 'bg-emerald-500/90 text-white border-emerald-400'
                         : 'bg-amber-500/90 text-slate-950 border-amber-400'
@@ -482,7 +481,7 @@ export default function InstructorArticlesPage() {
                   </span>
                 </div>
 
-                <div className="absolute bottom-2.5 right-3 left-3 flex items-center justify-between text-white text-[11px] font-black drop-shadow-md">
+                <div className="absolute bottom-2.5 right-3 left-3 flex items-center justify-between text-white text-[11px] font-bold drop-shadow-md">
                   <span className="flex items-center gap-1 bg-black/40 px-2 py-0.5 rounded-lg backdrop-blur-sm">
                     <Calendar className="w-3.5 h-3.5 text-slate-200" />
                     <span>{art.published_at}</span>
@@ -522,7 +521,7 @@ export default function InstructorArticlesPage() {
                   <button
                     type="button"
                     onClick={() => handleOpenEditModal(art)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-[#173A7C] hover:text-white text-slate-700 text-xs font-black transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-[#0B3766] hover:text-white text-slate-700 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                     <span>تعديل المقال</span>
@@ -531,7 +530,7 @@ export default function InstructorArticlesPage() {
                   <button
                     type="button"
                     onClick={() => handleDeleteArticle(art.id)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-600 hover:text-white text-red-700 text-xs font-black transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-red-200"
+                    className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-600 hover:text-white text-red-700 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-red-200"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>حذف</span>
@@ -542,13 +541,13 @@ export default function InstructorArticlesPage() {
                   <Link
                     href={`/blog/${art.slug}`}
                     target="_blank"
-                    className="text-[#173A7C] hover:underline font-black flex items-center gap-1"
+                    className="text-[#0B3766] hover:underline font-bold flex items-center gap-1"
                   >
                     <span>معاينة في المدونة</span>
                     <ExternalLink className="w-3 h-3" />
                   </Link>
 
-                  <span className="text-[11px] font-black text-slate-400">
+                  <span className="text-[11px] font-bold text-slate-400">
                     وقت القراءة: {art.read_time}
                   </span>
                 </div>
@@ -575,13 +574,13 @@ export default function InstructorArticlesPage() {
             >
               <form onSubmit={handleSaveArticle} className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] px-4 py-3 text-white sm:px-6 sm:py-4">
+                <div className="flex shrink-0 items-center justify-between bg-gradient-to-r from-[#0B3766] to-[#168AD3] px-4 py-3 text-white sm:px-6 sm:py-4">
                   <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
                     <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs text-amber-300">
                       <Newspaper className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="truncate text-sm font-black leading-tight sm:text-base">
+                      <h3 className="truncate text-sm font-bold leading-tight sm:text-base">
                         {editingArticle.id ? 'تعديل المقال الأكاديمي' : 'كتابة مقال أكاديمي جديد'}
                       </h3>
                       <p className="mt-0.5 hidden text-[11px] text-blue-100/90 sm:block">النشر والمشاركة في المدونة الرسمية للمنصة</p>
@@ -606,25 +605,25 @@ export default function InstructorArticlesPage() {
                     {/* ── RIGHT COLUMN (7 COLS): Info, Excerpt & Content ── */}
                     <div className="lg:col-span-7 space-y-4 text-xs font-bold">
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">عنوان المقال الأكاديمي *</label>
+                        <label className="text-slate-700 text-xs font-bold block">عنوان المقال الأكاديمي *</label>
                         <input
                           type="text"
                           required
                           value={editingArticle.title || ''}
                           onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
                           placeholder="مثال: أسس القيادة الأخلاقية في المنظمات الحديثة..."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-bold text-slate-900"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none text-xs font-bold text-slate-900"
                         />
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">
-                            <label className="text-slate-700 text-xs font-black block">التصنيف الأكاديمي *</label>
+                            <label className="text-slate-700 text-xs font-bold block">التصنيف الأكاديمي *</label>
                             <button
                               type="button"
                               onClick={() => setIsAddingNewCat(!isAddingNewCat)}
-                              className="text-[#173A7C] text-[10px] hover:underline font-black cursor-pointer"
+                              className="text-[#0B3766] text-[10px] hover:underline font-bold cursor-pointer"
                             >
                               {isAddingNewCat ? 'إلغاء' : '+ تصنيف جديد'}
                             </button>
@@ -642,7 +641,7 @@ export default function InstructorArticlesPage() {
                               <button
                                 type="button"
                                 onClick={handleAddNewCategory}
-                                className="px-3 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-black cursor-pointer"
+                                className="px-3 py-2 rounded-xl bg-[#0B3766] text-white text-xs font-bold cursor-pointer"
                               >
                                 +
                               </button>
@@ -651,7 +650,7 @@ export default function InstructorArticlesPage() {
                             <select
                               value={editingArticle.category || categoriesList[0]}
                               onChange={(e) => setEditingArticle({ ...editingArticle, category: e.target.value })}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none bg-white text-xs font-bold text-slate-800"
+                              className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none bg-white text-xs font-bold text-slate-800"
                             >
                               {categoriesList.map((cat) => (
                                 <option key={cat} value={cat}>
@@ -663,43 +662,43 @@ export default function InstructorArticlesPage() {
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-slate-700 text-xs font-black block">وقت القراءة المقدر</label>
+                          <label className="text-slate-700 text-xs font-bold block">وقت القراءة المقدر</label>
                           <input
                             type="text"
                             value={editingArticle.read_time || '6 دقائق'}
                             onChange={(e) => setEditingArticle({ ...editingArticle, read_time: e.target.value })}
-                            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-bold text-slate-800"
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none text-xs font-bold text-slate-800"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">المقدمة والملخص التنفيذي *</label>
+                        <label className="text-slate-700 text-xs font-bold block">المقدمة والملخص التنفيذي *</label>
                         <textarea
                           rows={2}
                           required
                           value={editingArticle.excerpt || ''}
                           onChange={(e) => setEditingArticle({ ...editingArticle, excerpt: e.target.value })}
                           placeholder="نبذة موجزة تشرح الفكرة الرئيسية للمقال وتجذب القارئ..."
-                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none resize-none text-xs font-medium text-slate-800 leading-relaxed"
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none resize-none text-xs font-medium text-slate-800 leading-relaxed"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">نص المحتوى والمقال بالكامل *</label>
+                        <label className="text-slate-700 text-xs font-bold block">نص المحتوى والمقال بالكامل *</label>
                         <textarea
                           rows={6}
                           required
                           value={editingArticle.content || ''}
                           onChange={(e) => setEditingArticle({ ...editingArticle, content: e.target.value })}
                           placeholder="اكتب المحتوى الأكاديمي، المحاور، النتائج والتوصيات بالتفصيل..."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs font-medium leading-relaxed text-slate-800"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none text-xs font-medium leading-relaxed text-slate-800"
                         />
                       </div>
 
                       {/* Tags Manager */}
                       <div className="space-y-1.5">
-                        <label className="text-slate-700 text-xs font-black block">الوسوم والكلمات المفتاحية</label>
+                        <label className="text-slate-700 text-xs font-bold block">الوسوم والكلمات المفتاحية</label>
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
@@ -712,12 +711,12 @@ export default function InstructorArticlesPage() {
                               }
                             }}
                             placeholder="أدخل وسماً ثم اضغط إضافة..."
-                            className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none text-xs"
+                            className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none text-xs"
                           />
                           <button
                             type="button"
                             onClick={handleAddTag}
-                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black cursor-pointer transition-colors"
+                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer transition-colors"
                           >
                             + إضافة
                           </button>
@@ -733,7 +732,7 @@ export default function InstructorArticlesPage() {
                               <button
                                 type="button"
                                 onClick={() => handleRemoveTag(t)}
-                                className="text-slate-400 hover:text-rose-600 font-black cursor-pointer mr-0.5"
+                                className="text-slate-400 hover:text-rose-600 font-bold cursor-pointer mr-0.5"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -760,7 +759,7 @@ export default function InstructorArticlesPage() {
 
                       {/* Status Card */}
                       <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2">
-                        <label className="text-slate-700 text-xs font-black block">حالة النشر والظهور</label>
+                        <label className="text-slate-700 text-xs font-bold block">حالة النشر والظهور</label>
                         <select
                           value={editingArticle.status || 'published'}
                           onChange={(e) =>
@@ -769,7 +768,7 @@ export default function InstructorArticlesPage() {
                               status: e.target.value as 'published' | 'draft',
                             })
                           }
-                          className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#173A7C] outline-none bg-white text-xs font-bold text-slate-800"
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-[#0B3766] outline-none bg-white text-xs font-bold text-slate-800"
                         >
                           <option value="published">🟢 منشور ومتاح للجميع بالمدونة</option>
                           <option value="draft">🟡 مسودة خاصة غير منشورة</option>
@@ -778,7 +777,7 @@ export default function InstructorArticlesPage() {
 
                       {/* Live Store Card Preview */}
                       <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-50/50 to-slate-50 border border-blue-100 space-y-1.5">
-                        <div className="flex items-center justify-between text-[11px] font-black text-[#173A7C]">
+                        <div className="flex items-center justify-between text-[11px] font-bold text-[#0B3766]">
                           <span>معاينة فورية لكارت المقال:</span>
                           <span className="text-[10px] font-mono text-slate-400">Live Preview</span>
                         </div>
@@ -792,12 +791,12 @@ export default function InstructorArticlesPage() {
                             />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className="text-xs font-black text-slate-800 truncate">
+                            <h4 className="text-xs font-bold text-slate-800 truncate">
                               {editingArticle.title || 'عنوان المقال الأكاديمي'}
                             </h4>
                             <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold mt-1">
                               <span>{editingArticle.category || 'عام'}</span>
-                              <span className="text-[#173A7C] font-mono">{editingArticle.read_time || '6 دقائق'}</span>
+                              <span className="text-[#0B3766] font-mono">{editingArticle.read_time || '6 دقائق'}</span>
                             </div>
                           </div>
                         </div>
@@ -823,7 +822,7 @@ export default function InstructorArticlesPage() {
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#173A7C] to-emerald-600 px-6 py-2.5 text-xs font-black text-white shadow-md transition-all hover:opacity-95 disabled:opacity-50 sm:flex-none"
+                    className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0B3766] to-emerald-600 px-6 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:opacity-95 disabled:opacity-50 sm:flex-none"
                   >
                     {isSaving ? (
                       <>

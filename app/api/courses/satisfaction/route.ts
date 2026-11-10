@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { requireCourseLearner, LearningError } from '@/lib/learning/course-access';
+import { requireCourseLearner,LearningError } from '@/lib/learning/course-access';
 import { getLearningContent } from '@/lib/learning/journey';
-import { assertCpdLessonAccess, assertCpdQuizAccess } from '@/lib/learning/cpd';
+import { assertCpdLessonAccess,assertCpdQuizAccess } from '@/lib/learning/cpd';
 import { resolveCourseQuiz } from '@/lib/quizzes/course-quiz';
-import { readJsonObject, ValidationError } from '@/lib/security/validation';
-import { consumeRateLimit } from '@/lib/security/rate-limit';
+import { ValidationError } from '@/lib/security/validation';
 
 export const dynamic = 'force-dynamic';
 const reply = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { 'Cache-Control': 'private, no-store' } });
@@ -45,23 +44,6 @@ export async function GET(request: Request) {
   try {
     const ctx = await context(request, Object.fromEntries(new URL(request.url).searchParams));
     if ('rejected' in ctx) return ctx.rejected;
-    return reply(await read(ctx));
-  } catch (error) { return failure(error); }
-}
-export async function PUT(request: Request) {
-  try {
-    const body = await readJsonObject(request);
-    const ctx = await context(request, body);
-    if ('rejected' in ctx) return ctx.rejected;
-    if (!consumeRateLimit(`satisfaction:${ctx.auth.user.id}`, 30, 60_000).allowed) throw new LearningError('طلبات كثيرة، حاول بعد قليل', 429);
-    if (typeof body.liked !== 'boolean') throw new LearningError('قيمة الرضا غير صالحة', 400);
-    const query = body.liked ? ctx.admin.from('content_satisfaction').upsert({
-      user_id: ctx.auth.user.id, course_id: ctx.course.id, content_kind: ctx.kind, content_key: ctx.key, content_title: ctx.title,
-    }, { onConflict: 'user_id,course_id,content_kind,content_key' })
-      : ctx.admin.from('content_satisfaction').delete().eq('user_id', ctx.auth.user.id)
-        .eq('course_id', ctx.course.id).eq('content_kind', ctx.kind).eq('content_key', ctx.key);
-    const { error } = await query;
-    if (error) throw error;
     return reply(await read(ctx));
   } catch (error) { return failure(error); }
 }

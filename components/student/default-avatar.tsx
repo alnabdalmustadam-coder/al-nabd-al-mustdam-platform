@@ -54,7 +54,7 @@ export function DefaultAvatar({
         style={{
           background: showImage
             ? '#0f172a'
-            : 'linear-gradient(135deg, #173A7C 0%, #1E4D9D 50%, #0D9488 100%)',
+            : 'linear-gradient(135deg, #0B3766 0%, #168AD3 50%, #0D9488 100%)',
         }}
       >
         {/* Ambient top glass highlight */}
@@ -70,7 +70,7 @@ export function DefaultAvatar({
             crossOrigin="anonymous"
           />
         ) : initials ? (
-          <span className="font-black text-white tracking-wider relative z-10 drop-shadow-sm font-[family-name:var(--font-cairo)]">
+          <span className="font-bold text-white tracking-wider relative z-10 drop-shadow-sm font-[family-name:var(--font-cairo)]">
             {initials}
           </span>
         ) : (

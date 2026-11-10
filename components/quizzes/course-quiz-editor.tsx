@@ -1,5 +1,6 @@
 'use client';
 
+import { createDraftId } from '@/lib/client-draft-id';
 import { ClipboardList, HelpCircle, Lightbulb, ListChecks, Plus, Target, Trash2 } from 'lucide-react';
 import { useId, useMemo, useState } from 'react';
 import type { QuizData, QuizQuestion } from '@/types';
@@ -28,9 +29,9 @@ export function CourseQuizEditor({ value, onChange, diagnostic = false }: { valu
   const update = (index: number, patch: Partial<QuizQuestion>) => onChange({ ...value,
     questions: value.questions.map((question, i) => i === index ? { ...question, ...patch } : question) });
   const add = (matching: boolean) => { if (value.questions.length >= 200) return; onChange({ ...value, questions: [...value.questions, {
-    id: `q-${crypto.randomUUID()}`, type: matching ? 'matching' : 'multiple_choice', question: '',
+    id: `q-${createDraftId()}`, type: matching ? 'matching' : 'multiple_choice', question: '',
     options: matching ? [] : ['', '', '', ''], correctIndex: matching ? -1 : 0,
-    ...(matching ? { pairs: [0, 1].map(() => ({ id: crypto.randomUUID(), prompt: '', answer: '' })) } : {}),
+    ...(matching ? { pairs: [0, 1].map(() => ({ id: createDraftId(), prompt: '', answer: '' })) } : {}),
   }] }); };
   const field = editorInput;
   return <div className="space-y-6" dir="rtl">
@@ -59,7 +60,7 @@ export function CourseQuizEditor({ value, onChange, diagnostic = false }: { valu
           {(question.pairs?.length || 0) > 2 ? <button type="button" className="flex h-12 w-9 shrink-0 items-center justify-center rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600" aria-label={`حذف الزوج ${pairIndex + 1}`}
             onClick={() => update(index, { pairs: question.pairs?.filter((_, i) => i !== pairIndex) })}><Trash2 className="h-4 w-4" /></button> : <span className="hidden w-9 shrink-0 sm:block" />}
         </div>)}
-        {(question.pairs?.length || 0) < 10 && <button type="button" className={editorButton} onClick={() => update(index, { pairs: [...(question.pairs || []), { id: crypto.randomUUID(), prompt: '', answer: '' }] })}><Plus className="h-4 w-4" />إضافة عبارة وإجابة</button>}
+        {(question.pairs?.length || 0) < 10 && <button type="button" className={editorButton} onClick={() => update(index, { pairs: [...(question.pairs || []), { id: createDraftId(), prompt: '', answer: '' }] })}><Plus className="h-4 w-4" />إضافة عبارة وإجابة</button>}
         <MatchingPreview key={JSON.stringify(question.pairs)} question={question} />
       </div> : <div className="space-y-4">
         <p className="text-sm leading-7 text-slate-500">أضف الاختيارات، وحدّد الإجابة الصحيحة من الدائرة بجانبها.</p>

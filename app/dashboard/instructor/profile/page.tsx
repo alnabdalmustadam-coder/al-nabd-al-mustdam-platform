@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   ShieldCheck,
   GraduationCap,
-  Sparkles,
   Loader2,
   UploadCloud,
 } from 'lucide-react';
@@ -255,12 +254,12 @@ export default function InstructorProfilePage() {
       <div className="relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent">
         {/* Top Badges Row */}
         <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200/50 mb-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#173A7C] text-xs font-black border border-blue-200/90 shadow-xs">
-            <User className="w-4 h-4 text-[#173A7C]" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-[#0B3766] text-xs font-bold border border-blue-200/90 shadow-xs">
+            <User className="w-4 h-4 text-[#0B3766]" />
             <span>الملف الشخصي والبيانات الأكاديمية</span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-black border border-emerald-300 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-300 shadow-xs">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>حساب أكاديمي موثق</span>
           </span>
@@ -268,11 +267,11 @@ export default function InstructorProfilePage() {
 
         <div className="space-y-3 max-w-2xl">
           <div className="flex items-center gap-3.5 sm:gap-4">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#173A7C]/25 border border-white/40 shrink-0">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#2563EB] text-white flex items-center justify-center shadow-xl shadow-[#0B3766]/25 border border-white/40 shrink-0">
               <User className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] student-heading-h1">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight tracking-tight drop-shadow-[0_1px_1px_rgba(11,55,102,0.1)] student-heading-h1">
                 الملف التعريفي <span className="student-name-gradient">للمدرب المعتمد</span>
               </h1>
             </div>
@@ -289,7 +288,7 @@ export default function InstructorProfilePage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-black text-xs flex items-center gap-2"
+            className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs flex items-center gap-2"
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>تم حفظ وتحديث بيانات الملف الشخصي بنجاح!</span>
@@ -299,7 +298,7 @@ export default function InstructorProfilePage() {
 
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل الملف الشخصي...</p>
         </div>
       ) : (
@@ -308,10 +307,10 @@ export default function InstructorProfilePage() {
           <div className="p-6 rounded-3xl liquid-glass-card space-y-5 student-card-accent flex flex-col justify-between overflow-hidden relative">
             {/* Top Badge */}
             <div className="flex items-center justify-between">
-              <span className="px-3.5 py-1 rounded-xl text-xs font-black bg-blue-50 text-[#173A7C] border border-blue-200">
+              <span className="px-3.5 py-1 rounded-xl text-xs font-bold bg-blue-50 text-[#0B3766] border border-blue-200">
                 الهوية الأكاديمية
               </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-800 text-[11px] font-black border border-emerald-300">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-300">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>محاضر معتمد</span>
               </span>
@@ -319,7 +318,7 @@ export default function InstructorProfilePage() {
 
             {/* Large Portrait Frame */}
             <div className="space-y-4 text-center">
-              <div className="relative mx-auto w-full max-w-[240px] aspect-[4/4.5] sm:aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white ring-4 ring-blue-100/80 bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#2563EB] flex items-center justify-center group">
+              <div className="relative mx-auto w-full max-w-[240px] aspect-[4/4.5] sm:aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white ring-4 ring-blue-100/80 bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#2563EB] flex items-center justify-center group">
                 {profileData.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -329,10 +328,10 @@ export default function InstructorProfilePage() {
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center text-white space-y-3 p-4">
-                    <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/30 text-4xl font-black shadow-inner">
+                    <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/30 text-4xl font-bold shadow-inner">
                       {profileData.fullName ? profileData.fullName.charAt(0) : 'م'}
                     </div>
-                    <span className="text-xs font-black text-blue-100 tracking-wider">
+                    <span className="text-xs font-bold text-blue-100 tracking-wider">
                       {profileData.fullName || 'المدرب المعتمد'}
                     </span>
                   </div>
@@ -342,7 +341,7 @@ export default function InstructorProfilePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
 
                 {/* Status Dot & Upload Quick Trigger */}
-                <div className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-white text-[11px] font-black border border-white/20 shadow-md">
+                <div className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-white text-[11px] font-bold border border-white/20 shadow-md">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span>نشط على المنصة</span>
                 </div>
@@ -352,7 +351,7 @@ export default function InstructorProfilePage() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploadingAvatar}
-                  className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 text-white font-black text-xs cursor-pointer backdrop-blur-xs"
+                  className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 text-white font-bold text-xs cursor-pointer backdrop-blur-xs"
                 >
                   {isUploadingAvatar ? (
                     <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
@@ -376,7 +375,7 @@ export default function InstructorProfilePage() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploadingAvatar}
-                className="w-full py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-[#173A7C] hover:text-white text-slate-800 text-xs font-black transition-colors flex items-center justify-center gap-2 border border-slate-200 shadow-xs cursor-pointer disabled:opacity-50"
+                className="w-full py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-[#0B3766] hover:text-white text-slate-800 text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-slate-200 shadow-xs cursor-pointer disabled:opacity-50"
               >
                 {isUploadingAvatar ? (
                   <>
@@ -385,7 +384,7 @@ export default function InstructorProfilePage() {
                   </>
                 ) : (
                   <>
-                    <UploadCloud className="w-4 h-4 text-[#173A7C] group-hover:text-white" />
+                    <UploadCloud className="w-4 h-4 text-[#0B3766] group-hover:text-white" />
                     <span>رفع صورة شخصية جديدة (WebP)</span>
                   </>
                 )}
@@ -393,10 +392,10 @@ export default function InstructorProfilePage() {
 
               {/* Name and Designation */}
               <div className="space-y-1 pt-1">
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 leading-snug">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
                   {profileData.fullName || 'المدرب المعتمد'}
                 </h3>
-                <p className="text-xs font-extrabold text-emerald-700 flex items-center justify-center gap-1">
+                <p className="text-xs font-bold text-emerald-700 flex items-center justify-center gap-1">
                   <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
                   <span>عضو هيئة التدريب الأكاديمية</span>
                 </p>
@@ -406,7 +405,7 @@ export default function InstructorProfilePage() {
             {/* Academic Credentials Box */}
             <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/90 text-right text-xs font-bold text-slate-700 space-y-2.5 shadow-xs">
               <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#173A7C] shrink-0" />
+                <Mail className="w-4 h-4 text-[#0B3766] shrink-0" />
                 <span className="truncate font-medium" dir="ltr">{profileData.email}</span>
               </div>
               <div className="flex items-center gap-2.5">
@@ -425,18 +424,18 @@ export default function InstructorProfilePage() {
             <form onSubmit={handleSave} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">الاسم الكامل *</label>
+                  <label className="text-xs font-bold text-slate-700">الاسم الكامل *</label>
                   <input
                     type="text"
                     required
                     value={profileData.fullName}
                     onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">البريد الإلكتروني (غير قابل للتعديل)</label>
+                  <label className="text-xs font-bold text-slate-700">البريد الإلكتروني (غير قابل للتعديل)</label>
                   <input
                     type="email"
                     disabled
@@ -448,47 +447,47 @@ export default function InstructorProfilePage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">رقم الهاتف</label>
+                  <label className="text-xs font-bold text-slate-700">رقم الهاتف</label>
                   <input
                     type="text"
                     value={profileData.phone}
                     onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                     placeholder="+966 50 000 0000"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">رقم الهوية الوطنية / الإقامة</label>
+                  <label className="text-xs font-bold text-slate-700">رقم الهوية الوطنية / الإقامة</label>
                   <input
                     type="text"
                     value={profileData.nationalId}
                     onChange={(e) => setProfileData({ ...profileData, nationalId: e.target.value })}
                     placeholder="10xxxxxxxx"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-black text-slate-700">رابط الصورة الشخصية (Avatar URL)</label>
+                <label className="text-xs font-bold text-slate-700">رابط الصورة الشخصية (Avatar URL)</label>
                 <input
                   type="text"
                   value={profileData.avatarUrl || ''}
                   onChange={(e) => setProfileData({ ...profileData, avatarUrl: e.target.value })}
                   placeholder="https://... أو مسار الصورة"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-black text-slate-700">النبذة التعريفية والمؤهلات الأكاديمية</label>
+                <label className="text-xs font-bold text-slate-700">النبذة التعريفية والمؤهلات الأكاديمية</label>
                 <textarea
                   rows={4}
                   value={profileData.bio}
                   onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                   placeholder="اكتب نبذة عن خبراتك الأكاديمية، الشهادات المهنية، والبرامج التي تقدمها..."
-                  className="w-full p-4 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80 leading-relaxed"
+                  className="w-full p-4 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80 leading-relaxed"
                 />
               </div>
 
@@ -496,7 +495,7 @@ export default function InstructorProfilePage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-emerald-600 hover:opacity-95 text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer disabled:opacity-60"
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-emerald-600 hover:opacity-95 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all cursor-pointer disabled:opacity-60"
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   <span>{saving ? 'جاري الحفظ...' : 'حفظ وتحديث الملف الشخصي'}</span>

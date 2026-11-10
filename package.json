@@ -1,33 +1,26 @@
 {
-  "name": "sustainsulse",
+  "name": "madar-learning-demo",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "test": "node --test --test-isolation=none tests/*.test.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
-    "@emailjs/browser": "^4.4.1",
-    "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.6.0",
     "next": "^16.2.6",
-    "next-auth": "^5.0.0-beta.30",
-    "nodemailer": "^8.0.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.10.1",
-    "sharp": "^0.34.5",
-    "tus-js-client": "^4.3.1"
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/nodemailer": "^7.0.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
@@ -35,5 +28,8 @@
     "eslint-config-next": "16.2.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

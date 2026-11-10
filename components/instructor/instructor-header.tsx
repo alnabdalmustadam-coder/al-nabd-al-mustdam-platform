@@ -17,7 +17,6 @@ import {
   Briefcase,
   X,
   ArrowLeft,
-  Sparkles,
 } from 'lucide-react';
 import { DefaultAvatar } from '@/components/student/default-avatar';
 import Link from 'next/link';
@@ -199,19 +198,13 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
             {isSidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
           </button>
 
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-white/20">
-              <GraduationCap className="w-5 h-5 text-emerald-400" />
-            </div>
-            <div className="hidden sm:block">
-              <span className="text-xs sm:text-sm font-black text-[#173A7C] block leading-tight">
-                لوحة تحكم المحاضر
-              </span>
-              <span className="text-[10px] font-bold text-slate-500 block">
-                البوابة الأكاديمية المعتمدة
-              </span>
-            </div>
-          </div>
+          <Link
+            href="/dashboard/instructor"
+            className="flex items-center gap-2 shrink-0 transition-transform hover:scale-105"
+            title="لوحة المدرب - منصة مَدار للتعلّم"
+          >
+            <img src="/madar-learning-logo-compact.svg" alt="شعار منصة مَدار للتعلّم" className="h-8 sm:h-9 w-auto object-contain" />
+          </Link>
         </div>
 
         {/* 2. Global Real-time Search Bar */}
@@ -224,7 +217,7 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               placeholder="اكتب للبحث في الطلاب، المقررات، المقالات، الخدمات... واضغط Enter"
-              className="w-full pl-9 pr-10 py-2.5 sm:py-3 rounded-2xl border border-slate-200/90 text-xs font-bold focus:outline-none focus:border-[#173A7C] focus:bg-white bg-slate-50/90 transition-all shadow-2xs"
+              className="w-full pl-9 pr-10 py-2.5 sm:py-3 rounded-2xl border border-slate-200/90 text-xs font-bold focus:outline-none focus:border-[#0B3766] focus:bg-white bg-slate-50/90 transition-all shadow-2xs"
             />
             {searchQuery && (
               <button
@@ -240,9 +233,9 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
           {/* Search Dropdown Quick Links */}
           {isSearchFocused && (
             <div className="absolute top-full right-0 left-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 z-50 space-y-1 text-right animate-in fade-in zoom-in-95 duration-150">
-              <div className="px-3 py-1.5 text-[11px] font-black text-slate-500 flex items-center justify-between border-b border-slate-100 mb-1">
+              <div className="px-3 py-1.5 text-[11px] font-bold text-slate-500 flex items-center justify-between border-b border-slate-100 mb-1">
                 <span>{searchQuery ? `نتائج البحث عن: "${searchQuery}" (اضغط Enter)` : 'البحث السريع في أقسام المنصة'}</span>
-                <Search className="w-3.5 h-3.5 text-[#173A7C]" />
+                <Search className="w-3.5 h-3.5 text-[#0B3766]" />
               </div>
 
               {quickSearchShortcuts.map((item, idx) => {
@@ -258,12 +251,12 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
                       <div className={`p-2 rounded-xl ${item.color}`}>
                         <Icon className="w-4 h-4" />
                       </div>
-                      <span className="text-xs font-bold text-slate-700 group-hover:text-[#173A7C]">
+                      <span className="text-xs font-bold text-slate-700 group-hover:text-[#0B3766]">
                         {item.title}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600">
                         {item.badge}
                       </span>
                       <ArrowLeft className="w-3 h-3 text-slate-400 group-hover:-translate-x-1 transition-transform" />
@@ -279,7 +272,7 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
         <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
           <Link
             href="/"
-            className="hidden md:flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:text-[#173A7C] hover:bg-slate-100 border border-slate-200/80 transition-colors"
+            className="hidden md:flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:text-[#0B3766] hover:bg-slate-100 border border-slate-200/80 transition-colors"
           >
             <Home className="w-4 h-4 text-slate-500" />
             <span>الموقع الرئيسي</span>
@@ -292,7 +285,7 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
               className="flex items-center gap-2.5 p-1.5 sm:p-2 rounded-2xl hover:bg-slate-100 cursor-pointer border border-transparent hover:border-slate-200 transition-colors"
             >
               <div className="relative shrink-0">
-                <div className="w-10 h-10 rounded-xl overflow-hidden shadow-xs ring-2 ring-[#173A7C]/20 border border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl overflow-hidden shadow-xs ring-2 ring-[#0B3766]/20 border border-white bg-gradient-to-br from-[#0B3766] to-[#2563EB] flex items-center justify-center">
                   {userProfile.avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -301,7 +294,7 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
                       className="w-full h-full object-cover object-top"
                     />
                   ) : (
-                    <span className="text-xs font-black text-white">
+                    <span className="text-xs font-bold text-white">
                       {userProfile.fullName.charAt(0)}
                     </span>
                   )}
@@ -309,10 +302,10 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
                 <span className="absolute -bottom-0.5 -left-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white shadow-2xs animate-pulse" />
               </div>
               <div className="hidden sm:block text-right">
-                <span className="text-xs font-black text-slate-900 block max-w-[130px] truncate leading-tight">
+                <span className="text-xs font-bold text-slate-900 block max-w-[130px] truncate leading-tight">
                   {userProfile.fullName}
                 </span>
-                <span className="text-[10px] font-extrabold text-emerald-700 block">
+                <span className="text-[10px] font-bold text-emerald-700 block">
                   محاضر معتمد
                 </span>
               </div>
@@ -321,7 +314,7 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
             {showProfileMenu && (
               <div className="absolute left-0 mt-2 w-52 rounded-2xl bg-white p-2.5 shadow-2xl border border-slate-200 z-50 text-right space-y-1">
                 <div className="p-2 border-b border-slate-100 mb-1">
-                  <span className="text-xs font-black text-slate-800 block truncate">{userProfile.fullName}</span>
+                  <span className="text-xs font-bold text-slate-800 block truncate">{userProfile.fullName}</span>
                   <span className="text-[10px] text-slate-400 font-bold">عضو هيئة التدريب</span>
                 </div>
                 <Link
@@ -329,7 +322,7 @@ export const InstructorHeader: React.FC<InstructorHeaderProps> = ({
                   onClick={() => setShowProfileMenu(false)}
                   className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50"
                 >
-                  <User className="w-4 h-4 text-[#173A7C]" />
+                  <User className="w-4 h-4 text-[#0B3766]" />
                   <span>الملف التعريفي</span>
                 </Link>
                 <button

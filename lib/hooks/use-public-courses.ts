@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { COURSES_LOAD_ERROR, fetchPublicCourses } from '@/lib/public-courses';
+import { courses as initialPublishedCourses } from '@/data/courses';
 import type { Course } from '@/types';
 
 /** Refresh public course views from the same authoritative catalog. */
 export function usePublicCourses() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState<Course[]>(() => initialPublishedCourses || []);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
   const reload = useCallback(() => setRetryKey(key => key + 1), []);
@@ -45,7 +46,7 @@ export function usePublicCourses() {
     const whenVisible = () => {
       if (document.visibilityState === 'visible') void refresh();
     };
-    const events = ['nabd_courses_updated', 'focus', 'online', 'pageshow'];
+    const events = ['madar_demo_courses_updated', 'focus', 'online', 'pageshow'];
     void refresh();
     events.forEach(event => window.addEventListener(event, refresh));
     document.addEventListener('visibilitychange', whenVisible);

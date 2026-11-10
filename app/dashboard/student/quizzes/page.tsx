@@ -179,12 +179,12 @@ export default function StudentQuizzesPage() {
         custom={0}
         className="relative z-20 liquid-glass-hero p-6 sm:p-8 md:p-9 space-y-4 liquid-glass-hover overflow-hidden student-card-accent rounded-2xl sm:rounded-3xl"
       >
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#173A7C]/8 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#0B3766]/8 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2.5 sm:space-y-3 pr-2">
-            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50/90 text-[#173A7C] border border-blue-200/80 shadow-xs">
-              <Award className="w-3 h-3 text-[#173A7C]" />
+            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50/90 text-[#0B3766] border border-blue-200/80 shadow-xs">
+              <Award className="w-3 h-3 text-[#0B3766]" />
               <span>التقييمات والاختبارات الأكاديمية</span>
             </motion.div>
 
@@ -199,15 +199,15 @@ export default function StudentQuizzesPage() {
 
           <motion.div variants={textItemVariants} className="flex items-center justify-around gap-2 sm:gap-4 liquid-glass-inner p-3.5 sm:p-4 rounded-2xl shadow-xs">
             <div className="text-center px-2 sm:px-3 border-l border-slate-200/60">
-              <span className="block text-base sm:text-lg font-black text-[#5CB07C]">{totalQuizzes}</span>
+              <span className="block text-base sm:text-lg font-bold text-[#19B6C7]">{totalQuizzes}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">إجمالي الاختبارات</span>
             </div>
             <div className="text-center px-2 sm:px-3 border-l border-slate-200/60">
-              <span className="block text-base sm:text-lg font-black text-amber-600">{pendingCount}</span>
+              <span className="block text-base sm:text-lg font-bold text-amber-600">{pendingCount}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">متبقية</span>
             </div>
             <div className="text-center px-2 sm:px-3">
-              <span className="block text-base sm:text-lg font-black text-[#173A7C]">{bestScore > 0 ? `${bestScore}%` : '—'}</span>
+              <span className="block text-base sm:text-lg font-bold text-[#0B3766]">{bestScore > 0 ? `${bestScore}%` : '—'}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-500 font-bold whitespace-nowrap">أعلى درجة</span>
             </div>
           </motion.div>
@@ -229,8 +229,8 @@ export default function StudentQuizzesPage() {
                 idx === 2 ? 'col-span-2 sm:col-span-1' : ''
               } ${
                 filter === tab.key
-                  ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                  : 'text-slate-600 hover:text-[#173A7C] hover:bg-white/60 bg-slate-50/60 sm:bg-transparent'
+                  ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                  : 'text-slate-600 hover:text-[#0B3766] hover:bg-white/60 bg-slate-50/60 sm:bg-transparent'
               }`}
             >
               <span className="premium-tab-label">{tab.label}</span>
@@ -238,7 +238,7 @@ export default function StudentQuizzesPage() {
           ))}
         </div>
 
-        <div className="text-[10px] sm:text-xs text-slate-700 font-extrabold flex items-center gap-1.5 drop-shadow-xs">
+        <div className="text-[10px] sm:text-xs text-slate-700 font-bold flex items-center gap-1.5 drop-shadow-xs">
           <CheckCircle2 className="w-3.5 h-3.5 text-[#0D5C3A] shrink-0" />
           <span>فرص الإعادة متاحة للاختبارات غير المجتازة</span>
         </div>
@@ -247,16 +247,16 @@ export default function StudentQuizzesPage() {
       {/* Content */}
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل الاختبارات...</p>
         </div>
       ) : filteredQuizzes.length === 0 ? (
         <div className="p-10 sm:p-14 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-4">
-          <div className="w-16 h-16 rounded-3xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-3xl bg-[#0B3766]/10 text-[#0B3766] flex items-center justify-center mx-auto">
             <Award className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-black text-slate-900">لا توجد اختبارات {filter !== 'all' ? 'في هذا التصنيف' : 'متاحة حالياً'}</h3>
+            <h3 className="text-lg font-bold text-slate-900">لا توجد اختبارات {filter !== 'all' ? 'في هذا التصنيف' : 'متاحة حالياً'}</h3>
             <p className="text-xs font-bold text-slate-500 max-w-md mx-auto">
               ستظهر هنا الاختبارات المرتبطة بالدورات المسجل فيها بمجرد إضافتها من المدرب.
             </p>
@@ -274,32 +274,32 @@ export default function StudentQuizzesPage() {
             >
               <div className="space-y-3.5 mb-5">
                 <div className="flex items-center justify-between gap-2.5 flex-wrap">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-black text-[#0D5C3A] leading-relaxed break-words" style={{ textShadow: '0 1px 0px rgba(255,255,255,0.6)' }}>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D5C3A] leading-relaxed break-words" style={{ textShadow: '0 1px 0px rgba(255, 255, 255, 0.8)' }}>
                     <BookOpen className="w-3.5 h-3.5 text-[#0D5C3A] shrink-0" />
                     <span>{quiz.courseTitle}</span>
                   </span>
 
                   {quiz.status === 'passed' && (
-                    <span className="shrink-0 px-4 py-1.5 rounded-full text-xs font-black bg-emerald-500 text-white border border-emerald-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
+                    <span className="shrink-0 px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-500 text-white border border-emerald-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>ناجح ({quiz.score}%)</span>
                     </span>
                   )}
                   {quiz.status === 'failed' && (
-                    <span className="shrink-0 px-4 py-1.5 rounded-full text-xs font-black bg-rose-500 text-white border border-rose-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
+                    <span className="shrink-0 px-4 py-1.5 rounded-full text-xs font-bold bg-rose-500 text-white border border-rose-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
                       <AlertCircle className="w-3.5 h-3.5" />
                       <span>لم يجتاز ({quiz.score}%)</span>
                     </span>
                   )}
                   {quiz.status === 'pending' && (
-                    <span className="shrink-0 px-4 py-1.5 rounded-full text-xs font-black bg-amber-500 text-white border border-amber-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
+                    <span className="shrink-0 px-4 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-white border border-amber-400 shadow-xs flex items-center gap-1.5 whitespace-nowrap">
                       <Clock className="w-3.5 h-3.5" />
                       <span>متاح الآن</span>
                     </span>
                   )}
                 </div>
 
-                <h3 className="student-heading-h3 group-hover:text-[#173A7C] transition-colors pt-1">
+                <h3 className="student-heading-h3 group-hover:text-[#0B3766] transition-colors pt-1">
                   {quiz.title}
                 </h3>
               </div>
@@ -307,15 +307,15 @@ export default function StudentQuizzesPage() {
               <div className="grid grid-cols-3 p-4 rounded-2xl mb-5 text-center border border-slate-200/90 bg-slate-100/90 shadow-inner">
                 <div className="px-2">
                   <span className="block text-[11px] text-slate-500 font-bold mb-0.5">عدد الأسئلة</span>
-                  <span className="text-xs sm:text-sm font-black text-slate-900">{quiz.questionsCount} سؤال</span>
+                  <span className="text-xs sm:text-sm font-bold text-slate-900">{quiz.questionsCount} سؤال</span>
                 </div>
-                <div className="px-2 border-r border-l border-slate-300/80 shadow-[inset_1px_0_0_rgba(255,255,255,0.8),inset_-1px_0_0_rgba(255,255,255,0.8)]">
+                <div className="px-2 border-r border-l border-slate-300/80 shadow-[inset_1px_0_0_rgba(11,55,102,0.08),inset_-1px_0_0_rgba(11,55,102,0.08)]">
                   <span className="block text-[11px] text-slate-500 font-bold mb-0.5">المدة المحددة</span>
-                  <span className="text-xs sm:text-sm font-black text-slate-900">{quiz.durationMinutes} دقيقة</span>
+                  <span className="text-xs sm:text-sm font-bold text-slate-900">{quiz.durationMinutes} دقيقة</span>
                 </div>
                 <div className="px-2">
                   <span className="block text-[11px] text-slate-500 font-bold mb-0.5">نسبة النجاح</span>
-                  <span className="text-xs sm:text-sm font-black text-[#173A7C]">{quiz.passPercentage}%</span>
+                  <span className="text-xs sm:text-sm font-bold text-[#0B3766]">{quiz.passPercentage}%</span>
                 </div>
               </div>
 
@@ -331,7 +331,7 @@ export default function StudentQuizzesPage() {
                       setActiveQuizModal(quiz);
                       setQuizActionError(null);
                     }}
-                    className="w-full xs:w-auto px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-[#173A7C]/20 transition-all hover:-translate-y-0.5 cursor-pointer"
+                    className="w-full xs:w-auto px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-[#0B3766]/20 transition-all hover:-translate-y-0.5 cursor-pointer"
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />
                     <span>بدء الاختبار</span>
@@ -344,7 +344,7 @@ export default function StudentQuizzesPage() {
                       setActiveQuizModal(quiz);
                       setQuizActionError(null);
                     }}
-                    className="w-full xs:w-auto px-5 py-2.5 sm:py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-amber-500/20 transition-all hover:-translate-y-0.5 cursor-pointer"
+                    className="w-full xs:w-auto px-5 py-2.5 sm:py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-amber-500/20 transition-all hover:-translate-y-0.5 cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>إعادة الاختبار ({quiz.attemptsUsed}/{quiz.maxAttempts})</span>
@@ -355,14 +355,14 @@ export default function StudentQuizzesPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <button
                       onClick={() => void openLatestReview(quiz)}
-                      className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-extrabold text-xs border border-slate-300/90 shadow-xs flex items-center justify-center gap-1.5 transition-all hover:-translate-y-0.5 cursor-pointer"
+                      className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs border border-slate-300/90 shadow-xs flex items-center justify-center gap-1.5 transition-all hover:-translate-y-0.5 cursor-pointer"
                     >
-                      <FileCheck className="w-3.5 h-3.5 text-[#173A7C]" />
+                      <FileCheck className="w-3.5 h-3.5 text-[#0B3766]" />
                       <span>تفاصيل الإجابات</span>
                     </button>
                     <Link
                       href="/dashboard/student/certificates"
-                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-teal-600 hover:to-emerald-600 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs hover:-translate-y-0.5 cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-teal-600 hover:to-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs hover:-translate-y-0.5 cursor-pointer"
                     >
                       <Award className="w-3.5 h-3.5" />
                       <span>عرض الشهادة 📜</span>
@@ -392,7 +392,7 @@ export default function StudentQuizzesPage() {
             >
               <div className="flex items-center justify-between border-b pb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-[#173A7C]/10 text-[#173A7C]">
+                  <div className="p-2 rounded-xl bg-[#0B3766]/10 text-[#0B3766]">
                     <HelpCircle className="w-5 h-5" />
                   </div>
                   <div>
@@ -411,16 +411,16 @@ export default function StudentQuizzesPage() {
 
               {quizActionLoading && activeQuizModal.status === 'passed' ? (
                 <div className="py-10 flex flex-col items-center justify-center gap-3 text-slate-500">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
-                  <p className="text-xs font-black">جاري تحميل تفاصيل المحاولة...</p>
+                  <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
+                  <p className="text-xs font-bold">جاري تحميل تفاصيل المحاولة...</p>
                 </div>
               ) : (
                 <div className="space-y-3 text-xs text-slate-600 font-bold leading-relaxed p-4 rounded-2xl bg-slate-50 border border-slate-200/60">
-                  <h4 className="font-black text-slate-800 text-sm">تعليمات الاختبار المهمة:</h4>
+                  <h4 className="font-bold text-slate-800 text-sm">تعليمات الاختبار المهمة:</h4>
                   <ul className="list-disc list-inside space-y-1.5 text-slate-600">
-                    <li>عدد الأسئلة المتضمنة: <strong className="text-[#173A7C]">{activeQuizModal.questionsCount} سؤال</strong></li>
-                    <li>الزمن المتاح للإجابة: <strong className="text-[#173A7C]">{activeQuizModal.durationMinutes} دقيقة</strong> (سيبدأ العداد فور البدء)</li>
-                    <li>درجة النجاح المطلوبة: <strong className="text-[#5CB07C]">{activeQuizModal.passPercentage}%</strong></li>
+                    <li>عدد الأسئلة المتضمنة: <strong className="text-[#0B3766]">{activeQuizModal.questionsCount} سؤال</strong></li>
+                    <li>الزمن المتاح للإجابة: <strong className="text-[#0B3766]">{activeQuizModal.durationMinutes} دقيقة</strong> (سيبدأ العداد فور البدء)</li>
+                    <li>درجة النجاح المطلوبة: <strong className="text-[#19B6C7]">{activeQuizModal.passPercentage}%</strong></li>
                     <li>محاولات التشغيل المتاحة: <strong>{activeQuizModal.maxAttempts - activeQuizModal.attemptsUsed} من {activeQuizModal.maxAttempts}</strong></li>
                   </ul>
                 </div>
@@ -437,7 +437,7 @@ export default function StudentQuizzesPage() {
                 <button
                   onClick={closeQuiz}
                   disabled={quizActionLoading}
-                  className="px-5 py-2.5 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                  className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                 >
                   إلغاء
                 </button>
@@ -445,7 +445,7 @@ export default function StudentQuizzesPage() {
                   <button
                     onClick={() => void startQuizAttempt()}
                     disabled={quizActionLoading}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 hover:opacity-95 cursor-pointer disabled:opacity-60"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 hover:opacity-95 cursor-pointer disabled:opacity-60"
                   >
                     {quizActionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronLeft className="w-4 h-4" />}
                     <span>{quizActionLoading ? 'جاري تجهيز المحاولة...' : 'تأكيد والبدء الآن'}</span>

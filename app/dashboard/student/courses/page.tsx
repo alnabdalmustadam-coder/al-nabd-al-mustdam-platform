@@ -57,7 +57,7 @@ export default function StudentCoursesPage() {
   return (
     <Suspense fallback={
       <div className="p-12 flex justify-center items-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
       </div>
     }>
       <StudentCoursesContent />
@@ -164,8 +164,8 @@ function StudentCoursesContent() {
 
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', handleStorage);
-      window.addEventListener('nabd_progress_updated', handleStorage);
-      window.addEventListener('nabd_courses_updated', handleStorage);
+      window.addEventListener('madar_demo_progress_updated', handleStorage);
+      window.addEventListener('madar_demo_courses_updated', handleStorage);
       window.addEventListener('focus', handleStorage);
     }
 
@@ -173,8 +173,8 @@ function StudentCoursesContent() {
       active = false;
       if (typeof window !== 'undefined') {
         window.removeEventListener('storage', handleStorage);
-        window.removeEventListener('nabd_progress_updated', handleStorage);
-        window.removeEventListener('nabd_courses_updated', handleStorage);
+        window.removeEventListener('madar_demo_progress_updated', handleStorage);
+        window.removeEventListener('madar_demo_courses_updated', handleStorage);
         window.removeEventListener('focus', handleStorage);
       }
     };
@@ -211,9 +211,9 @@ function StudentCoursesContent() {
           <div className="space-y-2.5 sm:space-y-3 pr-2">
             <motion.div
               variants={textItemVariants}
-              className="student-tag-badge bg-blue-50/90 text-[#173A7C] border border-blue-200/80 shadow-xs"
+              className="student-tag-badge bg-blue-50/90 text-[#0B3766] border border-blue-200/80 shadow-xs"
             >
-              <BookOpen className="w-3.5 h-3.5 text-[#173A7C]" />
+              <BookOpen className="w-3.5 h-3.5 text-[#0B3766]" />
               <span>المساقات المسجل بها فقط</span>
             </motion.div>
 
@@ -234,19 +234,19 @@ function StudentCoursesContent() {
             className="flex items-center justify-around gap-2 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-white/90 border border-white/80 backdrop-blur-md shadow-xs shrink-0"
           >
             <div className="text-center px-3 border-l border-slate-200">
-              <span className="block text-base sm:text-lg font-black text-[#173A7C]">{myCourses.length}</span>
+              <span className="block text-base sm:text-lg font-bold text-[#0B3766]">{myCourses.length}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-600 font-bold whitespace-nowrap">
                 إجمالي دوراتي
               </span>
             </div>
             <div className="text-center px-3 border-l border-slate-200">
-              <span className="block text-base sm:text-lg font-black text-amber-600">{inProgressCount}</span>
+              <span className="block text-base sm:text-lg font-bold text-amber-600">{inProgressCount}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-600 font-bold whitespace-nowrap">
                 قيد التقدم
               </span>
             </div>
             <div className="text-center px-3">
-              <span className="block text-base sm:text-lg font-black text-[#0D5C3A]">{completedCount}</span>
+              <span className="block text-base sm:text-lg font-bold text-[#0D5C3A]">{completedCount}</span>
               <span className="text-[9px] sm:text-[10px] text-slate-600 font-bold whitespace-nowrap">
                 دورات مكتملة
               </span>
@@ -264,7 +264,7 @@ function StudentCoursesContent() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="ابحث في دوراتك المسجل بها..."
-            className="w-full pl-4 pr-10 py-2.5 rounded-2xl bg-white/90 border border-slate-200/80 text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] transition-all shadow-xs"
+            className="w-full pl-4 pr-10 py-2.5 rounded-2xl bg-white/90 border border-slate-200/80 text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#0B3766]/20 focus:border-[#0B3766] transition-all shadow-xs"
           />
           <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
@@ -273,9 +273,9 @@ function StudentCoursesContent() {
         <div className="premium-tabs flex items-center gap-1.5 p-1 bg-white/80 border border-slate-200/80 rounded-2xl shadow-xs self-start sm:self-auto">
           <button
             onClick={() => setFilterTab('all')}
-            className={`premium-tab px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            className={`premium-tab px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               filterTab === 'all'
-                ? 'bg-[#173A7C] text-white shadow-xs'
+                ? 'bg-[#0B3766] text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -283,9 +283,9 @@ function StudentCoursesContent() {
           </button>
           <button
             onClick={() => setFilterTab('in_progress')}
-            className={`premium-tab px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            className={`premium-tab px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               filterTab === 'in_progress'
-                ? 'bg-[#173A7C] text-white shadow-xs'
+                ? 'bg-[#0B3766] text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -293,9 +293,9 @@ function StudentCoursesContent() {
           </button>
           <button
             onClick={() => setFilterTab('completed')}
-            className={`premium-tab px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+            className={`premium-tab px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               filterTab === 'completed'
-                ? 'bg-[#173A7C] text-white shadow-xs'
+                ? 'bg-[#0B3766] text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -308,7 +308,7 @@ function StudentCoursesContent() {
       <motion.div variants={sectionFadeVariants} initial="hidden" animate="visible" custom={1} className="space-y-6">
         {loading ? (
           <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+            <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
             <p className="text-xs font-bold text-slate-500">جاري تحميل دوراتك المشترك بها...</p>
           </div>
         ) : filteredEnrolled.length > 0 ? (
@@ -330,11 +330,11 @@ function StudentCoursesContent() {
         ) : (
           /* Clean Empty State */
           <div className="p-8 sm:p-12 rounded-3xl bg-white/90 border border-slate-200 text-center space-y-4 shadow-xs">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-blue-50 text-[#173A7C] flex items-center justify-center border border-blue-100">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-blue-50 text-[#0B3766] flex items-center justify-center border border-blue-100">
               <BookOpen className="w-8 h-8" />
             </div>
             <div className="max-w-md mx-auto space-y-1.5">
-              <h3 className="text-base font-black text-slate-900">
+              <h3 className="text-base font-bold text-slate-900">
                 {searchQuery ? 'لا توجد دورات تطابق بحثك' : 'لا توجد دورات في هذا القسم'}
               </h3>
               <p className="text-xs text-slate-500 font-bold">
@@ -346,7 +346,7 @@ function StudentCoursesContent() {
             <div className="pt-2">
               <Link
                 href="/dashboard/student/pathways"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black shadow-xs hover:shadow-md transition-all hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white text-xs font-bold shadow-xs hover:shadow-md transition-all hover:-translate-y-0.5"
               >
                 <Library className="w-4 h-4" />
                 <span>استعراض مكتبة الدورات والكتب 🚀</span>

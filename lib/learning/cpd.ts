@@ -1,18 +1,16 @@
 import { getLearningContent, isLearningJourney } from '@/lib/learning/journey';
 import 'server-only';
-import { createHash } from 'node:crypto';
+import { lessonContentKey } from '@/lib/learning/lesson-content-key';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Course } from '@/types';
-import { isLessonUnlocked, type LessonContent } from '@/lib/learning/course-content';
+import { isLessonUnlocked } from '@/lib/learning/course-content';
 import { LearningError } from '@/lib/learning/course-access';
 import { getQuizActivity } from '@/lib/quizzes/activity';
 
+export { lessonContentKey };
+
 export type CpdProgress = { lesson_id: string; content_key: string; duration_seconds: number; watched_seconds: number;
   session_id: string | null; completed_at: string | null };
-export function lessonContentKey(lesson: LessonContent): string {
-  return createHash('sha256').update(JSON.stringify({ type: lesson.type, video: lesson.videoUrl,
-    file: lesson.fileUrl, quiz: lesson.requiredQuiz, description: lesson.description, blocks: lesson.contentBlocks, diagnostic: lesson.diagnostic })).digest('hex');
-}
 export async function readCpdProgress(admin: SupabaseClient, course: Course, userId: string) {
   const lessons = getLearningContent(course);
   const { data, error } = await admin.from('course_lesson_progress').select('lesson_id, content_key, duration_seconds, watched_seconds, session_id, completed_at')

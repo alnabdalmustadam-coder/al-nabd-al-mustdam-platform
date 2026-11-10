@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { InstructorSidebar } from '@/components/instructor/instructor-sidebar';
 import { InstructorHeader } from '@/components/instructor/instructor-header';
+import { DemoNotice } from '@/components/demo/notice';
 
 export default function InstructorDashboardLayout({
   children,
@@ -15,8 +16,8 @@ export default function InstructorDashboardLayout({
   return (
     <div className="min-h-screen liquid-dashboard-backdrop text-slate-800 font-[family-name:var(--font-cairo)] relative overflow-x-clip" dir="rtl">
       {/* Ambient Glowing Orbs Background for Balanced Depth */}
-      <div className="fixed top-12 right-10 w-[500px] h-[500px] bg-[#173A7C]/8 rounded-full blur-[140px] pointer-events-none -z-10 animate-pulse" />
-      <div className="fixed bottom-10 left-10 w-[500px] h-[500px] bg-[#5CB07C]/8 rounded-full blur-[140px] pointer-events-none -z-10" />
+      <div className="fixed top-12 right-10 w-[500px] h-[500px] bg-[#0B3766]/8 rounded-full blur-[140px] pointer-events-none -z-10 animate-pulse" />
+      <div className="fixed bottom-10 left-10 w-[500px] h-[500px] bg-[#19B6C7]/8 rounded-full blur-[140px] pointer-events-none -z-10" />
       <div className="fixed top-1/2 left-1/3 w-[400px] h-[400px] bg-sky-500/6 rounded-full blur-[150px] pointer-events-none -z-10" />
 
       {/* Sidebar */}
@@ -42,6 +43,7 @@ export default function InstructorDashboardLayout({
 
         {/* Page Content - Full Width Workspace */}
         <main className="flex-1 min-w-0 p-3 sm:p-4 lg:p-5 xl:p-6">
+          <DemoNotice />
           {children}
         </main>
       </div>

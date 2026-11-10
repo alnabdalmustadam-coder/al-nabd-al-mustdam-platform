@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Clock, CheckCircle2, XCircle, ArrowLeft, ArrowRight, Send, Trophy, RotateCcw, GraduationCap, Target, AlertCircle, Mail, MessageCircle, Loader2, Award, Pencil, SpellCheck } from "lucide-react";
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { submitToGHL } from "@/lib/ghl";
 
 /* ═══════════════════════════════════════════════════════════════════════
    QUESTIONS
@@ -151,21 +150,6 @@ export default function EnglishEvaluationPage() {
         }),
       });
 
-      // Submit to GHL from client-side
-      await submitToGHL({
-        type: "placement-test",
-        student_name: name,
-        student_email: email,
-        student_phone: phone,
-        student_id: idNumber,
-        student_specialization: specialization,
-        student_section: section,
-        score, total: totalPoints, percentage: pct,
-        level: level.label, levelAr: level.labelAr,
-        correct_count: correctCount, total_questions: questions.length,
-        writing_answer: writingAnswer || "N/A",
-      });
-
       if (res.ok) setEmailStatus("sent");
       else setEmailStatus("error");
     } catch {
@@ -179,7 +163,7 @@ export default function EnglishEvaluationPage() {
     const { pct, level, correctCount, details } = buildResultsSummary();
     let body = `Placement Test Results\n\nName: ${name}\nPhone: ${phone}\nID: ${idNumber}\nEmail: ${email}\nSpecialization: ${specialization}\nSection: ${section}\n\n`;
     body += `Score: ${score}/${totalPoints} (${pct}%)\nLevel: ${level.label} (${level.labelAr})\nCorrect: ${correctCount}/${questions.length}\n\nWriting:\n${writingAnswer || "N/A"}\n\nDetailed Answers:\n${details}`;
-    window.open(`mailto:alnabdalmustadam@gmail.com?subject=${encodeURIComponent(`Placement Test - ${name}`)}&body=${encodeURIComponent(body)}`, "_blank");
+    window.open(`mailto:hello@madar.example?subject=${encodeURIComponent(`Placement Test - ${name}`)}&body=${encodeURIComponent(body)}`, "_blank");
   };
 
   const handleRestart = () => {
@@ -191,7 +175,7 @@ export default function EnglishEvaluationPage() {
   const answeredCount = answers.filter(a => a !== null).length;
   const progressPct = (answeredCount / questions.length) * 100;
 
-  const inputClass = "w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-[15px] font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#173A7C]/15 focus:border-[#173A7C]/40 transition-all duration-300 shadow-sm";
+  const inputClass = "w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-[15px] font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0B3766]/15 focus:border-[#0B3766]/40 transition-all duration-300 shadow-sm";
 
   return (
     <div className="min-h-screen relative overflow-hidden" dir="ltr">
@@ -200,8 +184,8 @@ export default function EnglishEvaluationPage() {
         <img src="/bg.webp" alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.92] via-slate-50/[0.88] to-blue-50/[0.85]" />
       </div>
-      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-[#5CB07C]/[0.06] rounded-full blur-[200px] pointer-events-none -translate-y-1/2 translate-x-1/3 z-0" />
-      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-[#173A7C]/[0.06] rounded-full blur-[180px] pointer-events-none translate-y-1/2 -translate-x-1/3 z-0" />
+      <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-[#19B6C7]/[0.06] rounded-full blur-[200px] pointer-events-none -translate-y-1/2 translate-x-1/3 z-0" />
+      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-[#0B3766]/[0.06] rounded-full blur-[180px] pointer-events-none translate-y-1/2 -translate-x-1/3 z-0" />
 
       <div className="relative z-10 pb-24 pt-20 md:pt-[calc(10vh+5rem)]">
         {/* ═══════════ HEADER ═══════════ */}
@@ -209,8 +193,8 @@ export default function EnglishEvaluationPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="mb-6">
               <span className="section-badge-glass">
-                <GraduationCap className="w-4 h-4 text-[#173A7C] mr-1 inline" />
-                Sustain Pulse Institute
+                <GraduationCap className="w-4 h-4 text-[#0B3766] mr-1 inline" />
+                Madar Learning Institute
               </span>
             </div>
             <h1 className="section-main-title-premium text-4xl sm:text-5xl lg:text-6xl mb-5 tracking-tight leading-tight">
@@ -220,11 +204,11 @@ export default function EnglishEvaluationPage() {
               Assess your English proficiency level with our comprehensive Written Test. Choose the best answer for each question — stop when the questions become too difficult.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-5 mt-8 text-sm font-bold text-slate-400">
-              <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-[#5CB07C]" /> 10 Minutes</span>
+              <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-[#19B6C7]" /> 10 Minutes</span>
               <span className="w-1 h-1 rounded-full bg-slate-300 hidden sm:block" />
-              <span className="flex items-center gap-2"><Target className="w-4 h-4 text-[#5CB07C]" /> 25 Questions</span>
+              <span className="flex items-center gap-2"><Target className="w-4 h-4 text-[#19B6C7]" /> 25 Questions</span>
               <span className="w-1 h-1 rounded-full bg-slate-300 hidden sm:block" />
-              <span className="flex items-center gap-2"><Trophy aria-hidden="true" className="w-4 h-4 text-[#5CB07C]" /> {totalPoints} Points</span>
+              <span className="flex items-center gap-2"><Trophy aria-hidden="true" className="w-4 h-4 text-[#19B6C7]" /> {totalPoints} Points</span>
             </div>
           </motion.div>
         </section>
@@ -233,14 +217,14 @@ export default function EnglishEvaluationPage() {
           {/* ═══════════════════ REGISTER ═══════════════════ */}
           {step === "register" && (
             <motion.section key="register" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }} className="max-w-2xl mx-auto px-4 sm:px-6">
-              <form onSubmit={handleRegister} className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.1)] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#5CB07C]/[0.04] to-transparent rounded-bl-full pointer-events-none" />
+              <form onSubmit={handleRegister} className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#19B6C7]/[0.04] to-transparent rounded-bl-full pointer-events-none" />
                 <div className="flex items-center gap-4 mb-8 relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#2F66D6] flex items-center justify-center shadow-lg shadow-[#173A7C]/20">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] flex items-center justify-center shadow-lg shadow-[#0B3766]/20">
                     <BookOpen className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900">Student Information</h2>
+                    <h2 className="text-2xl font-bold text-slate-900">Student Information</h2>
                     <p className="text-sm text-slate-400 font-medium mt-1"><span className="text-red-500">*</span> Indicates required question</p>
                   </div>
                 </div>
@@ -284,14 +268,14 @@ export default function EnglishEvaluationPage() {
                     required
                     checked={agreed}
                     onChange={(e) => setAgreed(e.target.checked)}
-                    className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#173A7C] focus:ring-[#173A7C]"
+                    className="mt-1.5 w-4 h-4 rounded border-slate-300 text-[#0B3766] focus:ring-[#0B3766]"
                   />
                   <label htmlFor="agreed" className="text-sm font-medium text-slate-600 leading-relaxed cursor-pointer select-none">
-                    I agree to the <span className="text-[#173A7C] font-bold">Terms & Conditions</span> and <span className="text-[#173A7C] font-bold">Privacy Policy</span>
+                    I agree to the <span className="text-[#0B3766] font-bold">Terms & Conditions</span> and <span className="text-[#0B3766] font-bold">Privacy Policy</span>
                   </label>
                 </div>
 
-                <button type="submit" disabled={!agreed} className="w-full mt-8 py-4 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#2F66D6] hover:shadow-xl text-white font-bold text-base transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-[#173A7C]/20 flex items-center justify-center gap-3 relative z-10 disabled:opacity-50 disabled:cursor-not-allowed">
+                <button type="submit" disabled={!agreed} className="w-full mt-8 py-4 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:shadow-xl text-white font-bold text-base transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-[#0B3766]/20 flex items-center justify-center gap-3 relative z-10 disabled:opacity-50 disabled:cursor-not-allowed">
                   <span>Start the Test</span><ArrowRight className="w-5 h-5" />
                 </button>
               </form>
@@ -303,19 +287,19 @@ export default function EnglishEvaluationPage() {
             <motion.section key="test" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }} className="max-w-4xl mx-auto px-4 sm:px-6">
               {/* Top Bar */}
               <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-md mb-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                <div className={`flex items-center gap-2.5 px-5 py-3 rounded-xl font-mono text-lg font-black border ${timeLeft <= 60 ? "bg-red-50 text-red-600 border-red-200 animate-pulse" : "bg-slate-50 text-slate-700 border-slate-200"}`}>
+                <div className={`flex items-center gap-2.5 px-5 py-3 rounded-xl font-mono text-lg font-bold border ${timeLeft <= 60 ? "bg-red-50 text-red-600 border-red-200 animate-pulse" : "bg-slate-50 text-slate-700 border-slate-200"}`}>
                   <Clock className="w-5 h-5" /><span>{formatTime(timeLeft)}</span>
                 </div>
                 <div className="flex-1 w-full">
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs font-bold text-slate-400">{answeredCount} / {questions.length} Answered</span>
-                    <span className="text-xs font-bold text-[#5CB07C]">{Math.round(progressPct)}%</span>
+                    <span className="text-xs font-bold text-[#19B6C7]">{Math.round(progressPct)}%</span>
                   </div>
                   <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                    <motion.div className="h-full bg-gradient-to-r from-[#173A7C] to-[#5CB07C] rounded-full" animate={{ width: `${progressPct}%` }} transition={{ duration: 0.4 }} />
+                    <motion.div className="h-full bg-gradient-to-r from-[#0B3766] to-[#19B6C7] rounded-full" animate={{ width: `${progressPct}%` }} transition={{ duration: 0.4 }} />
                   </div>
                 </div>
-                <button onClick={handleFinish} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#5CB07C] to-[#3d9060] text-white text-sm font-bold transition-all hover:-translate-y-0.5 shadow-lg shadow-[#5CB07C]/20 whitespace-nowrap">Finish Test →</button>
+                <button onClick={handleFinish} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#19B6C7] to-[#3d9060] text-white text-sm font-bold transition-all hover:-translate-y-0.5 shadow-lg shadow-[#19B6C7]/20 whitespace-nowrap">Finish Test →</button>
               </div>
 
               {/* Navigator */}
@@ -324,7 +308,7 @@ export default function EnglishEvaluationPage() {
                   {questions.map((_, i) => (
                     <button key={i} onClick={() => setCurrentQ(i)} className={`w-9 h-9 rounded-xl text-xs font-bold transition-all duration-200 border ${
                       i === currentQ
-                        ? "bg-[#173A7C] text-white border-[#173A7C] shadow-lg shadow-[#173A7C]/20 scale-110"
+                        ? "bg-[#0B3766] text-white border-[#0B3766] shadow-lg shadow-[#0B3766]/20 scale-110"
                         : answers[i] !== null
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : "bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100"
@@ -335,29 +319,29 @@ export default function EnglishEvaluationPage() {
 
               {/* Question */}
               <AnimatePresence mode="wait">
-                <motion.div key={currentQ} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }} className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-48 h-48 bg-gradient-to-br from-[#173A7C]/[0.03] to-transparent rounded-br-full pointer-events-none" />
+                <motion.div key={currentQ} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }} className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-48 h-48 bg-gradient-to-br from-[#0B3766]/[0.03] to-transparent rounded-br-full pointer-events-none" />
                   <div className="flex items-center justify-between mb-8 relative z-10">
                     <div className="flex items-center gap-4">
-                      <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#2F66D6] text-white flex items-center justify-center font-black text-xl shadow-lg shadow-[#173A7C]/20">{questions[currentQ].id}</span>
+                      <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-[#0B3766]/20">{questions[currentQ].id}</span>
                       <div>
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Question {questions[currentQ].id} of {questions.length}</p>
-                        <p className="text-sm font-bold text-[#5CB07C]">{questions[currentQ].points} Points</p>
+                        <p className="text-sm font-bold text-[#19B6C7]">{questions[currentQ].points} Points</p>
                       </div>
                     </div>
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-10 leading-relaxed relative z-10">{questions[currentQ].text}</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-10 leading-relaxed relative z-10">{questions[currentQ].text}</h2>
                   <div className="space-y-3 relative z-10">
                     {questions[currentQ].options.map((opt, idx) => {
                       const isSelected = answers[currentQ] === idx;
                       const letter = String.fromCharCode(65 + idx);
                       return (
                         <button key={idx} onClick={() => selectAnswer(idx)} className={`w-full text-left px-6 py-5 rounded-2xl border-2 transition-all duration-300 flex items-center gap-4 group ${
-                          isSelected ? "border-[#173A7C] bg-[#173A7C]/5 shadow-lg shadow-[#173A7C]/10" : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-white hover:shadow-sm"
+                          isSelected ? "border-[#0B3766] bg-[#0B3766]/5 shadow-lg shadow-[#0B3766]/10" : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-white hover:shadow-sm"
                         }`}>
-                          <span className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 transition-all ${isSelected ? "bg-[#173A7C] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{letter}</span>
-                          <span className={`text-[15px] sm:text-base font-semibold transition-colors ${isSelected ? "text-[#173A7C]" : "text-slate-600"}`}>{opt}</span>
-                          {isSelected && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="ml-auto"><CheckCircle2 className="w-5 h-5 text-[#173A7C]" /></motion.div>}
+                          <span className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 transition-all ${isSelected ? "bg-[#0B3766] text-white shadow-lg" : "bg-white text-slate-500 border border-slate-200"}`}>{letter}</span>
+                          <span className={`text-[15px] sm:text-base font-semibold transition-colors ${isSelected ? "text-[#0B3766]" : "text-slate-600"}`}>{opt}</span>
+                          {isSelected && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="ml-auto"><CheckCircle2 className="w-5 h-5 text-[#0B3766]" /></motion.div>}
                         </button>
                       );
                     })}
@@ -365,9 +349,9 @@ export default function EnglishEvaluationPage() {
                   <div className="flex items-center justify-between mt-10 relative z-10">
                     <button onClick={goPrev} disabled={currentQ === 0} className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all disabled:opacity-30"><ArrowLeft className="w-4 h-4" /> Previous</button>
                     {currentQ < questions.length - 1 ? (
-                      <button onClick={goNext} className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white bg-[#173A7C] hover:bg-[#0A162B] transition-all shadow-md hover:-translate-y-0.5">Next <ArrowRight className="w-4 h-4" /></button>
+                      <button onClick={goNext} className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white bg-[#0B3766] hover:bg-[#0A162B] transition-all shadow-md hover:-translate-y-0.5">Next <ArrowRight className="w-4 h-4" /></button>
                     ) : (
-                      <button onClick={handleFinish} className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#5CB07C] to-[#3d9060] shadow-lg transition-all hover:-translate-y-0.5">Finish <Send className="w-4 h-4" /></button>
+                      <button onClick={handleFinish} className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#19B6C7] to-[#3d9060] shadow-lg transition-all hover:-translate-y-0.5">Finish <Send className="w-4 h-4" /></button>
                     )}
                   </div>
                 </motion.div>
@@ -378,18 +362,18 @@ export default function EnglishEvaluationPage() {
           {/* ═══════════════════ WRITING ═══════════════════ */}
           {step === "writing" && (
             <motion.section key="writing" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }} className="max-w-2xl mx-auto px-4 sm:px-6">
-              <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.08)] relative overflow-hidden">
+              <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-purple-500/[0.04] to-transparent rounded-bl-full pointer-events-none" />
                 <div className="flex items-center gap-4 mb-3 relative z-10">
                   <div className="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center shadow-inner"><BookOpen className="w-7 h-7 text-purple-600" /></div>
-                  <div><p className="text-xs font-bold text-slate-400 uppercase tracking-widest">The Second Quotation</p><h2 className="text-2xl font-black text-slate-900">Writing Section</h2></div>
+                  <div><p className="text-xs font-bold text-slate-400 uppercase tracking-widest">The Second Quotation</p><h2 className="text-2xl font-bold text-slate-900">Writing Section</h2></div>
                 </div>
                 <p className="text-sm text-slate-400 font-medium mb-8 relative z-10">This section is reviewed separately and does not affect your multiple-choice score.</p>
                 <div className="space-y-2 relative z-10">
                   <label className="text-base font-bold text-slate-800">Talk about yourself: <span className="text-red-500">*</span></label>
                   <textarea value={writingAnswer} onChange={e => setWritingAnswer(e.target.value)} rows={8} placeholder="Write about yourself in English..." className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-5 text-[15px] font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all resize-y leading-relaxed shadow-sm" />
                 </div>
-                <button onClick={handleSubmitAll} className="w-full mt-8 py-4 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#5CB07C] text-white font-bold text-base transition-all duration-300 hover:-translate-y-1 shadow-xl flex items-center justify-center gap-3 relative z-10"><Send className="w-5 h-5" /><span>Submit Test</span></button>
+                <button onClick={handleSubmitAll} className="w-full mt-8 py-4 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#19B6C7] text-white font-bold text-base transition-all duration-300 hover:-translate-y-1 shadow-xl flex items-center justify-center gap-3 relative z-10"><Send className="w-5 h-5" /><span>Submit Test</span></button>
               </div>
             </motion.section>
           )}
@@ -397,29 +381,29 @@ export default function EnglishEvaluationPage() {
           {/* ═══════════════════ RESULTS ═══════════════════ */}
           {step === "results" && (
             <motion.section key="results" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }} className="max-w-4xl mx-auto px-4 sm:px-6 space-y-8">
-              <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(23,58,124,0.1)] text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#173A7C]/[0.02] to-[#5CB07C]/[0.02] pointer-events-none" />
+              <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_60px_-15px_rgba(11,55,102,0.12)] text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0B3766]/[0.02] to-[#19B6C7]/[0.02] pointer-events-none" />
 
                 <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: "spring" }} className="relative z-10">
-                  <div className="w-28 h-28 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-[#173A7C] to-[#5CB07C] flex items-center justify-center shadow-2xl shadow-[#173A7C]/20">
+                  <div className="w-28 h-28 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-[#0B3766] to-[#19B6C7] flex items-center justify-center shadow-2xl shadow-[#0B3766]/20">
                     <Trophy className="w-14 h-14 text-white" />
                   </div>
-                  <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">Test Completed!</h2>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">Test Completed!</h2>
                   <p className="text-slate-400 font-medium mb-10">{name}, here are your results</p>
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-2xl mx-auto mb-10">
                   <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
                     <p className="text-xs font-bold text-slate-400 uppercase mb-2">Score</p>
-                    <p className="text-4xl font-black text-slate-900">{score}<span className="text-lg text-slate-300">/{totalPoints}</span></p>
+                    <p className="text-4xl font-bold text-slate-900">{score}<span className="text-lg text-slate-300">/{totalPoints}</span></p>
                   </div>
                   <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
                     <p className="text-xs font-bold text-slate-400 uppercase mb-2">Percentage</p>
-                    <p className={`text-4xl font-black ${level.color}`}>{Math.round((score / totalPoints) * 100)}%</p>
+                    <p className={`text-4xl font-bold ${level.color}`}>{Math.round((score / totalPoints) * 100)}%</p>
                   </div>
                   <div className={`rounded-2xl p-6 border ${level.bg}`}>
                     <p className="text-xs font-bold text-slate-400 uppercase mb-2">Level</p>
-                    <p className={`flex items-center justify-center gap-2 text-lg font-black ${level.color}`}><LevelIcon aria-hidden="true" className="h-5 w-5 shrink-0" /><span>{level.label}</span></p>
+                    <p className={`flex items-center justify-center gap-2 text-lg font-bold ${level.color}`}><LevelIcon aria-hidden="true" className="h-5 w-5 shrink-0" /><span>{level.label}</span></p>
                   </div>
                 </motion.div>
 
@@ -453,7 +437,7 @@ export default function EnglishEvaluationPage() {
                   <button onClick={() => setShowReview(!showReview)} className="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-sm font-bold text-slate-600 transition-all flex items-center gap-2">
                     <BookOpen className="w-4 h-4" /> {showReview ? "Hide Review" : "Review Answers"}
                   </button>
-                  <button onClick={handleRestart} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#2F66D6] text-sm font-bold text-white transition-all flex items-center gap-2 shadow-lg hover:-translate-y-0.5">
+                  <button onClick={handleRestart} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-sm font-bold text-white transition-all flex items-center gap-2 shadow-lg hover:-translate-y-0.5">
                     <RotateCcw className="w-4 h-4" /> Retake Test
                   </button>
                 </div>

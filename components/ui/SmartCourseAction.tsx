@@ -102,7 +102,7 @@ export default function SmartCourseAction({
         <Button 
           href={courseUrl} 
           size="md" 
-          className={`w-full text-sm sm:text-base py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black shadow-md shadow-emerald-600/20 active:scale-95 flex items-center justify-center gap-2 ${className}`}
+          className={`w-full text-sm sm:text-base py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-md shadow-emerald-600/20 active:scale-95 flex items-center justify-center gap-2 ${className}`}
         >
           <Play className="w-4 h-4 fill-white shrink-0" />
           <span>متابعة التعلم</span>
@@ -114,7 +114,7 @@ export default function SmartCourseAction({
   // Not enrolled or guest -> go to local checkout
   const checkoutUrl = courseSlug ? `/checkout?slug=${courseSlug}` : "/checkout";
   return (
-    <Button href={checkoutUrl} size="md" className={`w-full text-sm sm:text-base py-3 font-black ${className}`}>
+    <Button href={checkoutUrl} size="md" className={`w-full text-sm sm:text-base py-3 font-bold ${className}`}>
       سجّل مجاناً وابدأ الآن
     </Button>
   );

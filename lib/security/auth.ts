@@ -3,7 +3,6 @@ import 'server-only';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { consumeRateLimit } from '@/lib/security/rate-limit';
 import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
@@ -53,17 +52,7 @@ function hasAllowedOrigin(request?: Request): boolean {
   if (!origin) return true;
 
   try {
-    const requestUrl = new URL(request.url);
-    const originUrl = new URL(origin);
-    const configuredOrigins = (process.env.ALLOWED_ORIGINS || process.env.NEXT_PUBLIC_SITE_URL || '')
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
-
-    return (
-      originUrl.origin === requestUrl.origin ||
-      configuredOrigins.some((allowed) => new URL(allowed).origin === originUrl.origin)
-    );
+    return new URL(origin).origin === new URL(request.url).origin;
   } catch {
     return false;
   }
@@ -137,45 +126,7 @@ export async function requireRoles(
 }
 
 export async function requireAdmin(request?: Request): Promise<AuthorizationResult> {
-  const auth = await requireRoles(request, ADMIN_ROLES);
-  if (!auth.ok) return auth;
-
-  const method = request?.method.toUpperCase() || 'GET';
-  const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method);
-  // MFA is opt-in while the platform is being configured. Set
-  // REQUIRE_ADMIN_MFA=true before launch to enforce AAL2 for mutations.
-  const requireMfa = process.env.REQUIRE_ADMIN_MFA === 'true';
-
-  if (isMutation && requireMfa && auth.assuranceLevel !== 'aal2') {
-    return {
-      ok: false,
-      response: errorResponse('يلزم التحقق بخطوتين قبل تنفيذ هذا الإجراء', 403),
-    };
-  }
-
-  if (isMutation) {
-    const rate = consumeRateLimit(`admin:${auth.user.id}`, 120, 60_000);
-    if (!rate.allowed) {
-      return {
-        ok: false,
-        response: NextResponse.json(
-          { success: false, message: 'طلبات إدارية كثيرة، حاول مرة أخرى بعد قليل' },
-          { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } },
-        ),
-      };
-    }
-  }
-
-  return auth;
-}
-
-export async function requireSuperAdmin(request?: Request): Promise<AuthorizationResult> {
-  const auth = await requireAdmin(request);
-  if (!auth.ok) return auth;
-  if (!['SUPERADMIN', 'SUPER_ADMIN'].includes(auth.role)) {
-    return { ok: false, response: errorResponse('هذا الإجراء متاح للمدير الأعلى فقط', 403) };
-  }
-  return auth;
+  return requireRoles(request, ADMIN_ROLES);
 }
 
 export async function requireInstructorOrAdmin(request?: Request): Promise<AuthorizationResult> {

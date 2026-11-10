@@ -231,7 +231,7 @@ const allServicesMap: Record<string, any> = {
       { title: 'خارطة طريق الامتثال حتى صدور الترخيص', desc: 'متابعة الخطوات الفنية والإدارية خطوة بخطوة لتفادي أي ملاحظات' },
       { title: 'جلسة تدريبية وتأهيلية لفريق العمل', desc: 'تدريب فريقك على إدارة المحتوى ومتطلبات الفحص والتحقق' },
     ],
-    detailed_text: `الحصول على ترخيص المركز الوطني للتعليم الإلكتروني هو الخطوة الأساسية لضمان قانونية ومصداقية برامجك التدريبية.
+    detailed_text: `الحصول على ترخيص منصة مَدار للتعلّم هو الخطوة الأساسية لضمان قانونية ومصداقية برامجك التدريبية.
 
 أقدم لك خلاصة خبرتي الطويلة في تأهيل عشرات الجهات الحكومية والخاصة للحصول على التراخيص والاعتمادات الرسمية بسلاسة وسرعة.`,
     price: 950,
@@ -420,7 +420,7 @@ export default function ServiceDetailPage() {
               completed_orders: svc.orders_count || 0,
               response_time: 'خلال ساعة',
               member_since: '2024',
-              bio: profile?.bio || 'مقدم خدمة معتمد وموثق في منصة النبض المستدام.',
+              bio: profile?.bio || 'مقدم خدمة معتمد وموثق في منصة مَدار للتعلّم.',
             },
           });
         }
@@ -483,7 +483,7 @@ export default function ServiceDetailPage() {
   const installmentPrice = Math.round(service.price / 4);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-[family-name:var(--font-cairo)] text-slate-900 selection:bg-[#5CB07C] selection:text-white" dir="rtl">
+    <div className="min-h-screen bg-[#F8FAFC] font-[family-name:var(--font-cairo)] text-slate-900 selection:bg-[#19B6C7] selection:text-white" dir="rtl">
       
       {/* ═════════════════════════════════════════════════════════════════ */}
       {/* 1. TOP BREADCRUMB STRIP (Clear of Fixed Navbar: pt-28 sm:pt-36)   */}
@@ -494,15 +494,15 @@ export default function ServiceDetailPage() {
             
             {/* Breadcrumb Navigation */}
             <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-500">
-              <Link href="/" className="hover:text-[#173A7C] transition-colors">
+              <Link href="/" className="hover:text-[#0B3766] transition-colors">
                 الرئيسية
               </Link>
               <ChevronLeft className="w-3.5 h-3.5 text-slate-400" />
-              <Link href="/marketplace" className="hover:text-[#173A7C] transition-colors">
+              <Link href="/marketplace" className="hover:text-[#0B3766] transition-colors">
                 متجر الخدمات
               </Link>
               <ChevronLeft className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[#173A7C] font-black">{service.category_name}</span>
+              <span className="text-[#0B3766] font-bold">{service.category_name}</span>
               <ChevronLeft className="w-3.5 h-3.5 text-slate-400 hidden sm:inline" />
               <span className="text-slate-400 truncate max-w-[280px] hidden sm:inline">{service.title}</span>
             </div>
@@ -547,7 +547,7 @@ export default function ServiceDetailPage() {
             
             {/* Header Title Card */}
             <div className="bg-white rounded-[2rem] border border-slate-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 sm:p-8 space-y-4 relative overflow-hidden">
-              <div className="absolute top-0 left-8 right-8 h-[3px] bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] rounded-b-full" />
+              <div className="absolute top-0 left-8 right-8 h-[3px] bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] rounded-b-full" />
               
               {/* Badges Row */}
               <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -559,7 +559,7 @@ export default function ServiceDetailPage() {
                   {service.category_name}
                 </span>
                 {service.is_featured && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#173A7C]/[0.08] text-[#173A7C] border border-[#173A7C]/20 text-xs font-black">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#0B3766]/[0.08] text-[#0B3766] border border-[#0B3766]/20 text-xs font-bold">
                     <BadgeCheck aria-hidden="true" className="w-3.5 h-3.5 text-amber-500" />
                     <span>خدمة مميزة</span>
                   </span>
@@ -573,12 +573,12 @@ export default function ServiceDetailPage() {
 
               {/* Provider Row Summary */}
               <div className="flex items-center gap-3 pt-2 border-t border-slate-100 flex-wrap">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-sm shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white flex items-center justify-center font-bold text-sm shadow-sm">
                   {service.provider?.name?.charAt(0) || 'م'}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-black text-slate-800">{service.provider?.name}</span>
+                    <span className="text-sm font-bold text-slate-800">{service.provider?.name}</span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">مقدم خدمة معتمد</span>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-slate-500 font-medium mt-0.5">
@@ -589,7 +589,7 @@ export default function ServiceDetailPage() {
                         <span>({service.rating_count} تقييم)</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-200">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
                         <Star className="w-3 h-3 text-emerald-600 fill-emerald-600" />
                         <span>خدمة جديدة ومتاحة</span>
                       </span>
@@ -605,7 +605,7 @@ export default function ServiceDetailPage() {
             </div>
 
             {/* Real Photo Banner Card */}
-            <div className="rounded-[2rem] border border-slate-200/90 shadow-[0_12px_40px_rgba(23,58,124,0.08)] overflow-hidden bg-white">
+            <div className="rounded-[2rem] border border-slate-200/90 shadow-[0_12px_40px_rgba(11,55,102,0.1)] overflow-hidden bg-white">
               <div className="w-full relative overflow-hidden bg-slate-100">
                 <CardImage
                   src={service.image_url || '/services/branding.jpg'}
@@ -626,15 +626,15 @@ export default function ServiceDetailPage() {
               <div className="grid grid-cols-3 divide-x divide-x-reverse divide-slate-100 bg-slate-50/80 border-t border-slate-200/80 p-3.5 sm:p-4 text-center">
                 <div className="space-y-0.5">
                   <span className="text-[11px] text-slate-500 font-bold block">تسليم سريع خلال</span>
-                  <span className="text-sm font-black text-[#173A7C]">{service.delivery_days} أيام عمل</span>
+                  <span className="text-sm font-bold text-[#0B3766]">{service.delivery_days} أيام عمل</span>
                 </div>
                 <div className="space-y-0.5">
                   <span className="text-[11px] text-slate-500 font-bold block">مراجعات مجانية</span>
-                  <span className="text-sm font-black text-emerald-600">{service.revision_count} تعديلات</span>
+                  <span className="text-sm font-bold text-emerald-600">{service.revision_count} تعديلات</span>
                 </div>
                 <div className="space-y-0.5">
                   <span className="text-[11px] text-slate-500 font-bold block">الملفات المسلمة</span>
-                  <span className="text-sm font-black text-slate-800">مفتوحة المصدر</span>
+                  <span className="text-sm font-bold text-slate-800">مفتوحة المصدر</span>
                 </div>
               </div>
             </div>
@@ -643,18 +643,18 @@ export default function ServiceDetailPage() {
 
           {/* Left Column (4 Cols): Unified Single Card (Purchase, Trust & Navigation) */}
           <aside className="lg:col-span-4 h-full">
-            <div className="bg-white rounded-[2rem] border border-slate-200/90 shadow-[0_12px_40px_rgba(23,58,124,0.08)] p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between space-y-5 h-full">
-              <div className="absolute top-0 left-6 right-6 h-[3px] bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] rounded-b-full" />
+            <div className="bg-white rounded-[2rem] border border-slate-200/90 shadow-[0_12px_40px_rgba(11,55,102,0.1)] p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between space-y-5 h-full">
+              <div className="absolute top-0 left-6 right-6 h-[3px] bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] rounded-b-full" />
 
               {/* 1. Price Block */}
               <div className="pt-2 pb-4 border-b border-slate-100 space-y-1">
                 <span className="text-xs text-slate-400 font-bold block">سعر الخدمة</span>
                 <div className="flex items-baseline justify-between">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl sm:text-4xl font-black text-[#173A7C] font-mono">
+                    <span className="text-3xl sm:text-4xl font-bold text-[#0B3766] font-mono">
                       {service.price}
                     </span>
-                    <span className="text-sm font-black text-emerald-600">ر.س</span>
+                    <span className="text-sm font-bold text-emerald-600">ر.س</span>
                   </div>
                   {originalPrice > service.price && (
                     <span className="text-xs text-slate-400 line-through font-bold">
@@ -668,7 +668,7 @@ export default function ServiceDetailPage() {
               {/* 2. Tabby & Tamara Installment */}
               <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs font-medium text-slate-700">
                 <span>أو 4 دفعات بقيمة <strong className="text-emerald-700 font-bold">{installmentPrice} ر.س</strong></span>
-                <div className="flex items-center gap-1 font-black text-[9px]">
+                <div className="flex items-center gap-1 font-bold text-[9px]">
                   <span className="px-1.5 py-0.5 bg-slate-900 text-white rounded">tabby</span>
                   <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded">tamara</span>
                 </div>
@@ -678,17 +678,17 @@ export default function ServiceDetailPage() {
               <div className="space-y-2.5 py-1 text-xs sm:text-sm font-medium">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-[#173A7C]" />
+                    <Clock className="w-4 h-4 text-[#0B3766]" />
                     <span>مدة التسليم المضمونة</span>
                   </span>
-                  <span className="text-slate-900 font-black">{service.delivery_days} أيام عمل</span>
+                  <span className="text-slate-900 font-bold">{service.delivery_days} أيام عمل</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 flex items-center gap-2">
                     <RefreshCw className="w-4 h-4 text-emerald-600" />
                     <span>عدد التعديلات المجانية</span>
                   </span>
-                  <span className="text-slate-900 font-black">{service.revision_count} مراجعات</span>
+                  <span className="text-slate-900 font-bold">{service.revision_count} مراجعات</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 flex items-center gap-2">
@@ -702,7 +702,7 @@ export default function ServiceDetailPage() {
                     <Award className="w-4 h-4 text-amber-600" />
                     <span>حقوق الاستخدام التجاري</span>
                   </span>
-                  <span className="text-slate-900 font-black">100% ملكك</span>
+                  <span className="text-slate-900 font-bold">100% ملكك</span>
                 </div>
               </div>
 
@@ -710,7 +710,7 @@ export default function ServiceDetailPage() {
               <div className="space-y-2.5 pt-1">
                 <button
                   onClick={() => setShowOrderModal(true)}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-sm sm:text-base font-black flex items-center justify-center gap-2 shadow-[0_10px_28px_rgba(23,58,124,0.25)] hover:shadow-lg transition-all cursor-pointer active:scale-[0.99]"
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-sm sm:text-base font-bold flex items-center justify-center gap-2 shadow-[0_10px_28px_rgba(11,55,102,0.1)] hover:shadow-lg transition-all cursor-pointer active:scale-[0.99]"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   <span>اطلب الخدمة الآن</span>
@@ -730,7 +730,7 @@ export default function ServiceDetailPage() {
                 {[
                   { icon: <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />, text: 'ضمان كامل للمبلغ 100% حتى استلامك للعمل' },
                   { icon: <Zap className="w-3.5 h-3.5 text-amber-600" />, text: 'دعم فني وتنسيق مستمر مع فريق المنصة' },
-                  { icon: <FileCheck className="w-3.5 h-3.5 text-[#173A7C]" />, text: 'فاتورة ضريبية رسمية معتمدة قابلة للتحميل' },
+                  { icon: <FileCheck className="w-3.5 h-3.5 text-[#0B3766]" />, text: 'فاتورة ضريبية رسمية معتمدة قابلة للتحميل' },
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-slate-600 font-medium">
                     <div className="w-6 h-6 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 border border-slate-200/60">
@@ -745,7 +745,7 @@ export default function ServiceDetailPage() {
               <div className="pt-2 border-t border-slate-100">
                 <Link
                   href="/marketplace"
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-600 text-xs font-bold hover:bg-slate-100 hover:text-[#173A7C] transition-all text-center w-full"
+                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-600 text-xs font-bold hover:bg-slate-100 hover:text-[#0B3766] transition-all text-center w-full"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>العودة إلى متجر الخدمات</span>
@@ -778,7 +778,7 @@ export default function ServiceDetailPage() {
                   onClick={() => setActiveTab(tab.key as any)}
                   className={`premium-tab shrink-0 flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm transition-all cursor-pointer ${
                     active
-                      ? 'bg-[#173A7C] text-white shadow-md shadow-[#173A7C]/20'
+                      ? 'bg-[#0B3766] text-white shadow-md shadow-[#0B3766]/20'
                       : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80'
                   }`}
                 >
@@ -798,7 +798,7 @@ export default function ServiceDetailPage() {
             >
               {/* Right 50% Card: Deliverables (ماذا ستحصل عليه) */}
               <div className="bg-white rounded-[2rem] border border-slate-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 sm:p-8 flex flex-col justify-between space-y-5 h-full relative overflow-hidden">
-                <div className="absolute top-0 left-6 right-6 h-[3px] bg-gradient-to-r from-emerald-500 to-[#5CB07C] rounded-b-full" />
+                <div className="absolute top-0 left-6 right-6 h-[3px] bg-gradient-to-r from-emerald-500 to-[#19B6C7] rounded-b-full" />
                 
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2.5">
@@ -810,7 +810,7 @@ export default function ServiceDetailPage() {
                       <span className="card-desc-premium text-xs block">المخرجات المضمونة المسلمة لك</span>
                     </div>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">
+                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
                     مضمون 100%
                   </span>
                 </div>
@@ -820,7 +820,7 @@ export default function ServiceDetailPage() {
                   {(service.deliverables || allServicesMap['demo-1'].deliverables).map((item: any, idx: number) => (
                     <div
                       key={idx}
-                      className="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/70 flex items-start gap-3 hover:bg-white hover:border-[#173A7C]/30 hover:shadow-xs transition-all group"
+                      className="p-3 sm:p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/70 flex items-start gap-3 hover:bg-white hover:border-[#0B3766]/30 hover:shadow-xs transition-all group"
                     >
                       <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
                         <Check className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -848,7 +848,7 @@ export default function ServiceDetailPage() {
                       <span className="card-desc-premium text-xs block">تجارب العملاء الحقيقيين بعد الاستلام</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 font-black text-xs">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 font-bold text-xs">
                     <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
                     <span>{service.rating_avg} من 5</span>
                   </div>
@@ -863,11 +863,11 @@ export default function ServiceDetailPage() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#173A7C]/15 to-[#5CB07C]/15 text-[#173A7C] font-black text-xs flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0B3766]/15 to-[#19B6C7]/15 text-[#0B3766] font-bold text-xs flex items-center justify-center">
                             {rev.avatar || rev.reviewer.charAt(0)}
                           </div>
                           <div>
-                            <span className="text-xs sm:text-sm font-black text-slate-900 block leading-none">{rev.reviewer}</span>
+                            <span className="text-xs sm:text-sm font-bold text-slate-900 block leading-none">{rev.reviewer}</span>
                             <div className="flex items-center gap-0.5 mt-1">
                               {[...Array(5)].map((_, i) => (
                                 <Star key={i} className={`w-3 h-3 ${i < rev.rating ? 'text-amber-500 fill-amber-500' : 'text-slate-200'}`} />
@@ -905,7 +905,7 @@ export default function ServiceDetailPage() {
               {/* Requirements Box */}
               {service.requirements && (
                 <div className="p-5 sm:p-6 rounded-2xl bg-amber-50/80 border border-amber-200/80 space-y-2">
-                  <div className="flex items-center gap-2 text-amber-900 font-black text-sm">
+                  <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
                     <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
                     <span className="card-title-royal-blue text-sm">متطلبات البدء من العميل</span>
                   </div>
@@ -936,7 +936,7 @@ export default function ServiceDetailPage() {
                   { step: '04', title: 'التسليم النهائي والاعتماد', desc: 'إرسال جميع الملفات المصدرية المفتوحة والتقارير بجودة عالية مع ضمان الاستخدام.' },
                 ].map((s) => (
                   <div key={s.step} className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 relative overflow-hidden">
-                    <span className="text-3xl font-black text-slate-200 font-mono absolute top-3 left-4">{s.step}</span>
+                    <span className="text-3xl font-bold text-slate-200 font-mono absolute top-3 left-4">{s.step}</span>
                     <h3 className="card-title-royal-blue text-sm relative z-10">{s.title}</h3>
                     <p className="card-desc-premium text-xs relative z-10">{s.desc}</p>
                   </div>
@@ -953,7 +953,7 @@ export default function ServiceDetailPage() {
               className="bg-white rounded-[2rem] border border-slate-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 sm:p-8 space-y-6 w-full"
             >
               <div className="flex items-center gap-4 border-b border-slate-100 pb-6 flex-wrap">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white flex items-center justify-center font-black text-2xl shadow-md">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white flex items-center justify-center font-bold text-2xl shadow-md">
                   {service.provider?.name?.charAt(0) || 'م'}
                 </div>
                 <div>
@@ -972,17 +972,17 @@ export default function ServiceDetailPage() {
               <div className="grid grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-50 text-center">
                 <div>
                   <span className="text-xs text-slate-500 font-medium block">التقييم العام</span>
-                  <span className="text-lg font-black text-amber-600 font-mono">★ {service.provider?.rating || 5.0}</span>
+                  <span className="text-lg font-bold text-amber-600 font-mono">★ {service.provider?.rating || 5.0}</span>
                 </div>
                 <div>
                   <span className="text-xs text-slate-500 font-medium block">الطلبات المكتملة</span>
-                  <span className="text-base sm:text-lg font-black text-[#173A7C] font-mono">
+                  <span className="text-base sm:text-lg font-bold text-[#0B3766] font-mono">
                     {(service.provider?.completed_orders || 0) > 0 ? `${service.provider.completed_orders}` : 'متاح للطلب'}
                   </span>
                 </div>
                 <div>
                   <span className="text-xs text-slate-500 font-medium block">متوسط الرد</span>
-                  <span className="text-lg font-black text-emerald-600">{service.provider?.response_time || 'خلال ساعة'}</span>
+                  <span className="text-lg font-bold text-emerald-600">{service.provider?.response_time || 'خلال ساعة'}</span>
                 </div>
               </div>
 
@@ -999,11 +999,11 @@ export default function ServiceDetailPage() {
       {/* ═════════════════════════════════════════════════════════════════ */}
       {/* MOBILE STICKY BOTTOM BAR (Always accessible on phones)            */}
       {/* ═════════════════════════════════════════════════════════════════ */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 p-3.5 px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] z-40 flex items-center justify-between gap-4">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 p-3.5 px-4 shadow-[0_-10px_30px_rgba(11,55,102,0.08)] z-40 flex items-center justify-between gap-4">
         <div>
           <span className="text-[10px] text-slate-400 font-bold block">إجمالي السعر</span>
           <div className="flex items-baseline gap-1 -mt-0.5">
-            <span className="text-xl font-black text-[#173A7C] font-mono">{service.price}</span>
+            <span className="text-xl font-bold text-[#0B3766] font-mono">{service.price}</span>
             <span className="text-xs font-bold text-slate-500">ر.س</span>
           </div>
         </div>
@@ -1011,7 +1011,7 @@ export default function ServiceDetailPage() {
         <div className="flex items-center gap-2 flex-1 justify-end">
           <button
             onClick={() => setShowOrderModal(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
           >
             <ShoppingCart className="w-4 h-4" />
             <span>اطلب الآن</span>
@@ -1031,25 +1031,25 @@ export default function ServiceDetailPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="relative w-full max-w-lg rounded-[2rem] p-6 sm:p-8 bg-white shadow-2xl border border-slate-200 text-right space-y-5"
             >
-              <div className="absolute top-0 left-8 right-8 h-[3px] bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#5CB07C] rounded-b-full" />
+              <div className="absolute top-0 left-8 right-8 h-[3px] bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#19B6C7] rounded-b-full" />
 
               <div>
-                <h3 className="text-xl font-black text-slate-900 pt-1">تأكيد طلب الخدمة</h3>
+                <h3 className="text-xl font-bold text-slate-900 pt-1">تأكيد طلب الخدمة</h3>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">يرجى كتابة متطلباتك للبدء في تنفيذ طلبك فوراً</p>
               </div>
 
               {/* Summary Card */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
-                <p className="text-sm font-black text-slate-800 line-clamp-2">{service.title}</p>
+                <p className="text-sm font-bold text-slate-800 line-clamp-2">{service.title}</p>
                 <div className="flex items-center justify-between text-xs font-bold text-slate-600 pt-1 border-t border-slate-200/60">
-                  <span>السعر الإجمالي: <strong className="text-[#173A7C] font-black">{service.price} ر.س</strong></span>
+                  <span>السعر الإجمالي: <strong className="text-[#0B3766] font-bold">{service.price} ر.س</strong></span>
                   <span>التسليم خلال: {service.delivery_days} أيام عمل</span>
                 </div>
               </div>
 
               {/* Requirements Input */}
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-700 block">
+                <label className="text-xs font-bold text-slate-700 block">
                   متطلباتك وملاحظاتك لمقدم الخدمة (اختياري)
                 </label>
                 <textarea
@@ -1057,7 +1057,7 @@ export default function ServiceDetailPage() {
                   onChange={(e) => setOrderRequirements(e.target.value)}
                   placeholder="اكتب هنا أي تفاصيل، روابط، أسماء، أو ألوان ترغب بتزويد مقدم الخدمة بها..."
                   rows={4}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-medium focus:outline-none focus:bg-white focus:border-[#173A7C]/40 focus:ring-4 focus:ring-[#173A7C]/5 resize-none transition-all"
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-medium focus:outline-none focus:bg-white focus:border-[#0B3766]/40 focus:ring-4 focus:ring-[#0B3766]/5 resize-none transition-all"
                 />
               </div>
 
@@ -1071,14 +1071,14 @@ export default function ServiceDetailPage() {
               <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={() => setShowOrderModal(false)}
-                  className="flex-1 py-3 rounded-2xl bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-black hover:bg-slate-200 cursor-pointer transition-all"
+                  className="flex-1 py-3 rounded-2xl bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold hover:bg-slate-200 cursor-pointer transition-all"
                 >
                   إلغاء
                 </button>
                 <button
                   onClick={handleOrderSubmit}
                   disabled={ordering}
-                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs sm:text-sm font-black flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-60 transition-all"
+                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-60 transition-all"
                 >
                   {ordering ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShoppingCart className="w-4 h-4" />}
                   <span>{ordering ? 'جاري إرسال الطلب...' : 'تأكيد وإرسال الطلب'}</span>
@@ -1106,9 +1106,9 @@ export default function ServiceDetailPage() {
               </div>
 
               <div>
-                <h3 className="text-xl font-black text-slate-900">تم إرسال طلبك بنجاح! 🎉</h3>
+                <h3 className="text-xl font-bold text-slate-900">تم إرسال طلبك بنجاح! 🎉</h3>
                 <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
-                  رقم طلبك هو: <strong className="text-[#173A7C] font-mono">{generatedOrderNumber || 'SRV-839210'}</strong>
+                  رقم طلبك هو: <strong className="text-[#0B3766] font-mono">{generatedOrderNumber || 'SRV-839210'}</strong>
                 </p>
                 <p className="text-xs text-slate-600 font-medium mt-2 leading-relaxed">
                   سيقوم مقدم الخدمة بالتواصل معك فوراً والبدء في تنفيذ متطلباتك.
@@ -1118,13 +1118,13 @@ export default function ServiceDetailPage() {
               <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
                 <Link
                   href="/marketplace"
-                  className="flex-1 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black text-center transition-all"
+                  className="flex-1 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold text-center transition-all"
                 >
                   تصفح خدمات أخرى
                 </Link>
                 <Link
                   href="/dashboard/student"
-                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black text-center shadow-md hover:shadow-lg transition-all"
+                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white text-xs font-bold text-center shadow-md hover:shadow-lg transition-all"
                 >
                   لوحة التحكم ومتابعة الطلبات
                 </Link>

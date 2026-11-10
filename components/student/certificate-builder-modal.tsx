@@ -54,21 +54,21 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
 
   const tpl = initialData.template;
   const activeCertificateImg = tpl?.imageUrl || initialData.imageUrl || '/1.png';
-  const headerTitle = tpl?.headerTitle || 'شهادة إتمام وتفوق معتمدة';
+  const headerTitle = tpl?.headerTitle || 'شهادة إتمام';
   const subtitle = tpl?.subtitle || 'CERTIFICATE OF COMPLETION & EXCELLENCE';
-  const statement = tpl?.statement || 'يشهد معهد النبض المستدام العالي للتدريب بأن المتدرب/ـة:';
+  const statement = tpl?.statement || 'يشهد أكاديمية مَدار للتعلّم بأن المتدرب/ـة:';
   const bodyText =
     tpl?.bodyText ||
     'قد اجتاز/ت بنجاح متطلبات البرنامج التدريبي واكتملت كافة ساعاته النظرية والتطبيقية المعتمدة بكفاءة واقتدار.';
-  const issuerName = tpl?.issuerName || 'معهد النبض المستدام العالي للتدريب';
+  const issuerName = tpl?.issuerName || 'أكاديمية مَدار للتعلّم';
   const sig1Title = tpl?.signatory1Title || 'المشرف الأكاديمي والتدريب';
-  const sig1Name = tpl?.signatory1Name || 'د. عبدالرحمن الغامدي';
+  const sig1Name = tpl?.signatory1Name || 'فريق التدريب';
   const sig2Title = tpl?.signatory2Title || 'المدير التنفيذي للمعهد';
-  const sig2Name = tpl?.signatory2Name || 'أ. نورة الشمري';
+  const sig2Name = tpl?.signatory2Name || 'إدارة البرامج';
   const showQr = tpl?.showQrCode !== false;
   const showSeal = tpl?.showInstituteSeal !== false;
   const showNatSeal = tpl?.showNationalSeal !== false;
-  const accentColor = tpl?.accentColor || '#173A7C';
+  const accentColor = tpl?.accentColor || '#0B3766';
 
   // Helper to interpolate dynamic variables in custom drag-and-drop elements
   const resolveElementText = (el: CertificateCanvasElement) => {
@@ -136,13 +136,13 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
         {/* Modal Header */}
         <div className="p-4 sm:p-6 bg-[#0B132B] border-b border-white/10 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-gradient-to-br from-emerald-400 to-[#5CB07C] text-slate-950 font-black shadow-lg shadow-emerald-500/20 shrink-0">
+            <div className="p-2.5 rounded-2xl bg-gradient-to-br from-emerald-400 to-[#19B6C7] text-slate-950 font-bold shadow-lg shadow-emerald-500/20 shrink-0">
               <Award className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="font-black text-sm sm:text-base text-white">الشهادة الأكاديمية المعتمدة</h2>
-                <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                <h2 className="font-bold text-sm sm:text-base text-white">الشهادة الأكاديمية المعتمدة</h2>
+                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3" />
                   موثقة ومعتمدة رسمياً
                 </span>
@@ -157,7 +157,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
               <button
                 onClick={() => setViewMode('canvas')}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                  viewMode === 'canvas' ? 'bg-[#173A7C] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  viewMode === 'canvas' ? 'bg-[#0B3766] text-white shadow-xs' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 التصميم الأكاديمي
@@ -165,7 +165,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
               <button
                 onClick={() => setViewMode('original')}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                  viewMode === 'original' ? 'bg-[#173A7C] text-white shadow-xs' : 'text-slate-400 hover:text-white'
+                  viewMode === 'original' ? 'bg-[#0B3766] text-white shadow-xs' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 القالب الكامل
@@ -189,7 +189,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
             <div
               ref={certificateRef}
               id="printable-certificate"
-              className="w-full max-w-4xl aspect-[1.414/1] relative rounded-2xl overflow-hidden border-2 border-amber-400/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] bg-white text-slate-900 select-none"
+              className="w-full max-w-4xl aspect-[1.414/1] relative rounded-2xl overflow-hidden border-2 border-amber-400/40 shadow-[0_25px_60px_-15px_rgba(11,55,102,0.12)] bg-white text-slate-900 select-none"
               style={{
                 backgroundImage: `url(${activeCertificateImg})`,
                 backgroundSize: 'cover',
@@ -222,7 +222,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                           top: `${el.y}%`,
                           transform: 'translate(-50%, -50%)',
                           textAlign: el.textAlign || 'center',
-                          color: el.color || '#173A7C',
+                          color: el.color || '#0B3766',
                         }}
                       >
                         {el.type === 'qr' ? (
@@ -231,9 +231,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                             style={{ width: `${el.width || 60}px`, height: `${el.height || 60}px` }}
                           >
                             <img
-                              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
-                                `https://alnabdalmustadam.com/verify?code=${initialData.code}`
-                              )}`}
+                              src="/demo/madar/avatar.svg"
                               alt="QR Code"
                               className="w-full h-full object-contain"
                             />
@@ -247,11 +245,11 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                             style={{ width: `${el.width || 75}px`, height: `${el.height || 75}px` }}
                           >
                             <Award className="w-5 h-5 text-amber-200" />
-                            <span className="text-[7px] font-black leading-tight mt-0.5">ختم المعهد</span>
+                            <span className="text-[7px] font-bold leading-tight mt-0.5">ختم المعهد</span>
                             <span className="text-[6px] opacity-80">معتمد</span>
                           </div>
                         ) : el.type === 'badge' ? (
-                          <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border-2 border-emerald-400 shadow-sm flex items-center gap-1 font-black text-[10px]">
+                          <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border-2 border-emerald-400 shadow-sm flex items-center gap-1 font-bold text-[10px]">
                             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                             <span>{el.content || 'معتمد رسمياً'}</span>
                           </div>
@@ -295,14 +293,12 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                       <div className="flex flex-col items-center gap-1 bg-white/90 p-2 sm:p-3 rounded-xl border border-slate-200 shadow-sm">
                         <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-100 rounded flex items-center justify-center p-1 border border-slate-300">
                           <img
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
-                              `https://alnabdalmustadam.com/verify?code=${initialData.code}`
-                            )}`}
+                            src="/demo/madar/avatar.svg"
                             alt="QR Code"
                             className="w-full h-full object-contain"
                           />
                         </div>
-                        <span className="text-[7px] sm:text-[9px] font-mono font-black text-slate-600">
+                        <span className="text-[7px] sm:text-[9px] font-mono font-bold text-slate-600">
                           {initialData.code}
                         </span>
                       </div>
@@ -310,12 +306,12 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
 
                     {/* Center: Official Title */}
                     <div className="text-center flex-1 px-4 space-y-1">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/10 text-amber-800 border border-amber-500/30 text-[9px] sm:text-xs font-black">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/10 text-amber-800 border border-amber-500/30 text-[9px] sm:text-xs font-bold">
                         <BadgeCheck aria-hidden="true" className="w-3 h-3 text-amber-600" />
                         <span>المملكة العربية السعودية • الاعتماد المهني</span>
                       </div>
                       <h1
-                        className="text-lg sm:text-2xl md:text-3xl font-black tracking-tight"
+                        className="text-lg sm:text-2xl md:text-3xl font-bold tracking-tight"
                         style={{ color: accentColor }}
                       >
                         {headerTitle}
@@ -330,13 +326,13 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                       {showNatSeal && (
                         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex flex-col items-center justify-center p-1 border-2 border-emerald-300 shadow-md text-center">
                           <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-200" />
-                          <span className="text-[6px] sm:text-[7px] font-black leading-tight mt-0.5">المركز الوطني</span>
+                          <span className="text-[6px] sm:text-[7px] font-bold leading-tight mt-0.5">المركز الوطني</span>
                         </div>
                       )}
                       {showSeal && (
                         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-white flex flex-col items-center justify-center p-1 border-2 border-amber-300 shadow-md text-center">
                           <Award className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200" />
-                          <span className="text-[6px] sm:text-[7px] font-black leading-tight mt-0.5">ختم المعهد</span>
+                          <span className="text-[6px] sm:text-[7px] font-bold leading-tight mt-0.5">ختم المعهد</span>
                         </div>
                       )}
                     </div>
@@ -349,7 +345,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                     {/* Student Full Name Calligraphy Highlight */}
                     <div className="relative inline-block py-1 px-8 sm:px-14">
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/20 to-transparent rounded-full -skew-y-1" />
-                      <h2 className="relative text-xl sm:text-3xl md:text-4xl font-black text-slate-950 tracking-wide">
+                      <h2 className="relative text-xl sm:text-3xl md:text-4xl font-bold text-slate-950 tracking-wide">
                         {initialData.studentName}
                       </h2>
                     </div>
@@ -359,22 +355,22 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                     </p>
 
                     {/* Course Name Banner */}
-                    <div className="inline-block px-5 py-1.5 rounded-xl bg-slate-900 text-amber-400 font-black text-xs sm:text-base border border-amber-400/30 shadow-md">
+                    <div className="inline-block px-5 py-1.5 rounded-xl bg-slate-900 text-amber-400 font-bold text-xs sm:text-base border border-amber-400/30 shadow-md">
                       {initialData.courseTitle}
                     </div>
 
                     {/* Metadata Pills */}
                     <div className="flex items-center justify-center gap-3 sm:gap-6 text-[10px] sm:text-xs pt-1 flex-wrap font-bold text-slate-700">
                       <span>
-                        التقدير العام: <strong className="text-emerald-700 font-black">{initialData.grade}</strong>
+                        التقدير العام: <strong className="text-emerald-700 font-bold">{initialData.grade}</strong>
                       </span>
                       <span>•</span>
                       <span>
-                        الساعات المعتمدة: <strong className="text-slate-900 font-black">{initialData.hours}</strong>
+                        الساعات المعتمدة: <strong className="text-slate-900 font-bold">{initialData.hours}</strong>
                       </span>
                       <span>•</span>
                       <span>
-                        تاريخ التحرير: <strong className="text-slate-900 font-black">{initialData.issueDate}</strong>
+                        تاريخ التحرير: <strong className="text-slate-900 font-bold">{initialData.issueDate}</strong>
                       </span>
                     </div>
                   </div>
@@ -388,12 +384,12 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                           {sig1Name}
                         </span>
                       </div>
-                      <span className="text-[10px] sm:text-xs font-black text-slate-900 block">{sig1Name}</span>
+                      <span className="text-[10px] sm:text-xs font-bold text-slate-900 block">{sig1Name}</span>
                     </div>
 
                     <div className="text-center hidden sm:block">
                       <span className="text-[9px] font-bold text-slate-500 block">{issuerName}</span>
-                      <span className="text-[9px] font-black text-emerald-800 block">
+                      <span className="text-[9px] font-bold text-emerald-800 block">
                         معتمد بترخيص المنشأة التدريبية برقم 10293847
                       </span>
                     </div>
@@ -405,7 +401,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
                           {sig2Name}
                         </span>
                       </div>
-                      <span className="text-[10px] sm:text-xs font-black text-slate-900 block">{sig2Name}</span>
+                      <span className="text-[10px] sm:text-xs font-bold text-slate-900 block">{sig2Name}</span>
                     </div>
                   </div>
                 </div>
@@ -413,7 +409,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
             </div>
           ) : (
             /* 🖼️ ORIGINAL IMAGE PREVIEW */
-            <div className="w-full max-w-4xl relative rounded-2xl overflow-hidden border border-white/20 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] bg-slate-900 group">
+            <div className="w-full max-w-4xl relative rounded-2xl overflow-hidden border border-white/20 shadow-[0_25px_60px_-15px_rgba(11,55,102,0.12)] bg-slate-900 group">
               <img
                 src={activeCertificateImg}
                 alt={`شهادة ${initialData.studentName}`}
@@ -426,13 +422,13 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
           <div className="w-full max-w-4xl bg-white/5 border border-white/10 rounded-2xl p-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-xs">
             <div className="space-y-0.5">
               <span className="text-slate-400 text-[10px] block">اسم المتدرب</span>
-              <span className="font-black text-white text-sm block">{initialData.studentName}</span>
+              <span className="font-bold text-white text-sm block">{initialData.studentName}</span>
             </div>
             <div className="space-y-0.5">
               <span className="text-slate-400 text-[10px] block">رمز التوثيق</span>
               <button
                 onClick={handleCopyCode}
-                className="inline-flex items-center gap-1 font-mono font-black text-amber-400 text-xs sm:text-sm hover:text-amber-300 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 font-mono font-bold text-amber-400 text-xs sm:text-sm hover:text-amber-300 transition-colors cursor-pointer"
                 title="انقر لنسخ رمز التوثيق"
               >
                 <span>{initialData.code}</span>
@@ -445,7 +441,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
             </div>
             <div className="space-y-0.5">
               <span className="text-slate-400 text-[10px] block">التقدير النهائي</span>
-              <span className="font-black text-emerald-400 text-xs block">
+              <span className="font-bold text-emerald-400 text-xs block">
                 {initialData.grade} ({initialData.hours})
               </span>
             </div>
@@ -471,7 +467,7 @@ export const CertificateBuilderModal: React.FC<CertificateViewerModalProps> = ({
             <button
               onClick={handleDirectDownload}
               disabled={isDownloading}
-              className="flex-1 sm:flex-initial px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-400 via-[#5CB07C] to-emerald-500 hover:from-[#5CB07C] hover:to-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/25 cursor-pointer disabled:opacity-50 border border-emerald-300/40"
+              className="flex-1 sm:flex-initial px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-400 via-[#19B6C7] to-emerald-500 hover:from-[#19B6C7] hover:to-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/25 cursor-pointer disabled:opacity-50 border border-emerald-300/40"
             >
               {isDownloading ? (
                 <>

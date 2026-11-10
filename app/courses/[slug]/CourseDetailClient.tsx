@@ -106,7 +106,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
   const courseFaqs = [
     {
       q: "هل الشهادة الممنوحة معتمدة رسمياً في المملكة؟",
-      a: "نعم، جميع الشهادات الصادرة معتمدة وتحمل رقم تحقق وطني، ومناسبة للتقديم في القطاعين الحكومي والخاص وإضافتها إلى السيرة الذاتية وLinkedIn.",
+      a: "نعم، جميع الشهادات الصادرة توضيحية وتحمل رمزًا داخل العرض، ومناسبة للتقديم في القطاعين الحكومي والخاص وإضافتها إلى السيرة الذاتية وLinkedIn.",
     },
     {
       q: "كيف يمكنني متابعة الدورة بعد الاشتراك؟",
@@ -123,7 +123,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-[family-name:var(--font-cairo)] text-slate-900 selection:bg-[#5CB07C] selection:text-white" dir="rtl">
+    <div className="min-h-screen bg-[#F8FAFC] font-[family-name:var(--font-cairo)] text-slate-900 selection:bg-[#19B6C7] selection:text-white" dir="rtl">
       
       {/* ═════════════════════════════════════════════════════════════════ */}
       {/* 1. HERO SECTION (LIGHT THEME WITH BG.WEBP & GLASS CARDS)        */}
@@ -136,8 +136,8 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
         </div>
 
         {/* Ambient Subtle Glows */}
-        <div className="absolute top-12 right-10 w-96 h-96 bg-[#173A7C]/[0.05] rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-12 left-10 w-96 h-96 bg-[#5CB07C]/[0.06] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-12 right-10 w-96 h-96 bg-[#0B3766]/[0.05] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-12 left-10 w-96 h-96 bg-[#19B6C7]/[0.06] rounded-full blur-[100px] pointer-events-none" />
         <div className="particles-grid opacity-30" />
 
         <div className="relative max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 z-10 py-4">
@@ -182,7 +182,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                     <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                   </div>
                   <div>
-                    <span className="text-xs font-black text-[#173A7C] block leading-tight">{course.rating}</span>
+                    <span className="text-xs font-bold text-[#0B3766] block leading-tight">{course.rating}</span>
                     <span className="text-[10px] text-slate-500 font-bold block">تقييم المتدربين</span>
                   </div>
                 </div>
@@ -193,7 +193,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                     <Users className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="text-xs font-black text-[#173A7C] block leading-tight">
+                    <span className="text-xs font-bold text-[#0B3766] block leading-tight">
                       {(course.studentsCount || course.enrollees || 0) > 0 ? `${course.studentsCount || course.enrollees}` : 'متاح للتسجيل'}
                     </span>
                     <span className="text-[10px] text-slate-500 font-bold block">
@@ -204,11 +204,11 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
 
                 {/* Duration */}
                 <div className="flex items-center gap-2 p-2 rounded-xl bg-blue-50/70 border border-blue-100">
-                  <div className="w-7 h-7 rounded-lg bg-blue-100 text-[#173A7C] flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-blue-100 text-[#0B3766] flex items-center justify-center shrink-0">
                     <Clock className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="text-xs font-black text-[#173A7C] block leading-tight">{course.duration}</span>
+                    <span className="text-xs font-bold text-[#0B3766] block leading-tight">{course.duration}</span>
                     <span className="text-[10px] text-slate-500 font-bold block">المدة الإجمالية</span>
                   </div>
                 </div>
@@ -219,14 +219,14 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                     <BookOpen className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="text-xs font-black text-[#173A7C] block leading-tight">{course.lessonsCount} دروس</span>
+                    <span className="text-xs font-bold text-[#0B3766] block leading-tight">{course.lessonsCount} دروس</span>
                     <span className="text-[10px] text-slate-500 font-bold block">منهج تفاعلي</span>
                   </div>
                 </div>
               </div>
 
               {/* Bottom Block: Pricing & Actions Box */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_8px_25px_rgba(23,58,124,0.06)] space-y-4 shrink-0">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_8px_25px_rgba(11,55,102,0.1)] space-y-4 shrink-0">
                 
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
@@ -234,13 +234,13 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                       {isEnrolled ? "حالة التسجيل في البرنامج:" : "حالة الإتاحة الحالية:"}
                     </span>
                     {isEnrolled ? (
-                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-xs">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-xs">
                         <CheckCircle className="w-4 h-4 text-emerald-600" />
                         <span>أنت مشترك بالفعل في هذه الدورة</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl sm:text-3xl font-black text-emerald-700">مجاناً مؤقتاً</span>
+                        <span className="text-2xl sm:text-3xl font-bold text-emerald-700">مجاناً مؤقتاً</span>
                         {Number(course.price || 0) > 0 && (
                           <span className="text-xs text-slate-400 line-through font-bold">{course.price} ر.س</span>
                         )}
@@ -320,7 +320,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
 
             {/* Left Side: Course Image Showcase (Span 6) */}
             <div className="lg:col-span-6 flex flex-col">
-              <div className="h-full flex flex-col justify-between rounded-3xl bg-white/95 backdrop-blur-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-[0_15px_40px_rgba(23,58,124,0.08)] group overflow-hidden">
+              <div className="h-full flex flex-col justify-between rounded-3xl bg-white/95 backdrop-blur-xl p-3.5 sm:p-4 border border-slate-200/90 shadow-[0_15px_40px_rgba(11,55,102,0.1)] group overflow-hidden">
                 
                 <div className="relative w-full rounded-2xl bg-slate-100 border border-slate-200/80 overflow-hidden">
                   <CardImage
@@ -338,10 +338,10 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                       className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 cursor-pointer"
                       aria-label="معاينة فيديو الدورة"
                     >
-                      <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-[#5CB07C]/95 hover:bg-[#4EA06E] text-white flex items-center justify-center shadow-lg shadow-[#5CB07C]/30 group-hover:scale-110 transition-all backdrop-blur-xs">
+                      <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-[#19B6C7]/95 hover:bg-[#19B6C7] text-white flex items-center justify-center shadow-lg shadow-[#19B6C7]/30 group-hover:scale-110 transition-all backdrop-blur-xs">
                         <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-white translate-x-[-1px]" />
                       </div>
-                      <span className="px-3.5 py-1 rounded-full bg-slate-900/75 backdrop-blur-md text-white text-xs font-black border border-white/20 shadow-md">
+                      <span className="px-3.5 py-1 rounded-full bg-slate-900/75 backdrop-blur-md text-white text-xs font-bold border border-white/20 shadow-md">
                         مشاهدة مقدمة الدورة
                       </span>
                     </button>
@@ -379,7 +379,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
       {/* ═════════════════════════════════════════════════════════════════ */}
       <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="premium-tabs grid grid-cols-2 sm:flex sm:justify-center sm:items-center gap-2 sm:gap-3">
+          <div className="premium-tabs flex overflow-x-auto no-scrollbar sm:flex-wrap sm:justify-center sm:items-center gap-2 sm:gap-3 pb-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.key;
@@ -387,14 +387,14 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`premium-tab flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+                  className={`premium-tab shrink-0 flex items-center justify-center gap-2 px-3.5 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                     isActive
-                      ? "text-white bg-[#173A7C] shadow-md shadow-[#173A7C]/20"
+                      ? "text-white bg-[#0B3766] shadow-md shadow-[#0B3766]/20"
                       : "text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/80"
                   }`}
                 >
                   <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-400" : "text-slate-400"}`} />
-                  <span className="premium-tab-label truncate">{tab.label}</span>
+                  <span className="premium-tab-label whitespace-nowrap">{tab.label}</span>
                 </button>
               );
             })}
@@ -467,7 +467,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                   {/* Target Audience */}
                   <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
                     <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                      <div className="w-10 h-10 rounded-2xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-2xl bg-[#0B3766]/10 text-[#0B3766] flex items-center justify-center shrink-0">
                         <Target className="w-6 h-6" />
                       </div>
                       <div>
@@ -484,7 +484,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                         { title: "الراغبون في تطوير مهاراتهم الرقمية", desc: "لمواكبة التحول الرقمي وإتقان التطبيقات المكتبية الحديثة." },
                       ].map((aud, idx) => (
                         <div key={idx} className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                          <Briefcase className="w-5 h-5 text-[#173A7C] shrink-0 mt-0.5" />
+                          <Briefcase className="w-5 h-5 text-[#0B3766] shrink-0 mt-0.5" />
                           <div>
                             <h4 className="card-title-royal-blue text-xs sm:text-sm mb-0.5">{aud.title}</h4>
                             <p className="card-desc-premium text-xs leading-relaxed">{aud.desc}</p>
@@ -496,7 +496,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
 
                   {/* Requirements */}
                   <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-slate-100 text-[#173A7C] flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-2xl bg-slate-100 text-[#0B3766] flex items-center justify-center shrink-0">
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
@@ -543,7 +543,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                               className="w-full flex items-center justify-between p-4 sm:p-5 text-right cursor-pointer hover:bg-slate-50 transition-colors"
                             >
                               <div className="flex items-center gap-3.5">
-                                <div className="w-8 h-8 rounded-xl bg-[#173A7C]/10 text-[#173A7C] font-black text-xs flex items-center justify-center shrink-0">
+                                <div className="w-8 h-8 rounded-xl bg-[#0B3766]/10 text-[#0B3766] font-bold text-xs flex items-center justify-center shrink-0">
                                   {idx + 1}
                                 </div>
                                 <div>
@@ -555,7 +555,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                                   </span>
                                 </div>
                               </div>
-                              <div className={`p-1.5 rounded-lg ${isOpen ? "text-[#173A7C]" : "text-slate-400"}`}>
+                              <div className={`p-1.5 rounded-lg ${isOpen ? "text-[#0B3766]" : "text-slate-400"}`}>
                                 {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                               </div>
                             </button>
@@ -632,7 +632,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                         <Award className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="card-title-royal-blue text-sm sm:text-base">شهادة إتمام معتمدة برقم تحقق وطني</h3>
+                        <h3 className="card-title-royal-blue text-sm sm:text-base">شهادة إتمام برمز عرض</h3>
                         <p className="card-desc-premium text-xs mt-0.5">تصدر الشهادة فور إكمال متطلبات الدورة ومشاهدة الدروس.</p>
                       </div>
                     </div>
@@ -644,7 +644,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                       </div>
                       <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-emerald-600" />
-                        <span>رمز QR للتحقق السريع</span>
+                        <span>رمز شهادة للعرض</span>
                       </div>
                       <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-emerald-600" />
@@ -664,12 +664,12 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                   </div>
 
                   <div className="flex items-start gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-200">
-                    <div className="w-16 h-16 rounded-2xl bg-[#173A7C] text-white font-black text-xl flex items-center justify-center shrink-0">
+                    <div className="w-16 h-16 rounded-2xl bg-[#0B3766] text-white font-bold text-xl flex items-center justify-center shrink-0">
                       {course.instructor ? course.instructor[0] : "ن"}
                     </div>
                     <div className="space-y-1">
                       <h3 className="card-title-royal-blue text-base">
-                        {course.instructor || "أكاديمية النبض المستدام"}
+                        {course.instructor || "أكاديمية مَدار للتعلّم"}
                       </h3>
                       <span className="text-xs text-emerald-700 font-bold block">مدرب معتمد واستشاري تدريب</span>
                       <p className="card-desc-premium text-xs sm:text-sm leading-relaxed pt-1">
@@ -702,7 +702,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                             className="w-full flex items-center justify-between p-4 text-right cursor-pointer hover:bg-slate-50 transition-colors"
                           >
                             <span className="card-title-royal-blue text-xs sm:text-sm">{faq.q}</span>
-                            <div className={`p-1 rounded-lg ${isOpen ? "text-[#173A7C]" : "text-slate-400"}`}>
+                            <div className={`p-1 rounded-lg ${isOpen ? "text-[#0B3766]" : "text-slate-400"}`}>
                               {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </div>
                           </button>
@@ -806,7 +806,7 @@ export default function CourseDetailClient({ course, relatedCourses }: CourseDet
                 </span>
                 <Link
                   href={course.slug ? `/checkout?slug=${course.slug}` : "/checkout"}
-                  className="px-4 py-2 rounded-xl bg-[#5CB07C] hover:bg-[#4EA06E] text-white font-black transition-colors"
+                  className="px-4 py-2 rounded-xl bg-[#19B6C7] hover:bg-[#19B6C7] text-white font-bold transition-colors"
                 >
                   سجّل مجاناً في الدورة
                 </Link>

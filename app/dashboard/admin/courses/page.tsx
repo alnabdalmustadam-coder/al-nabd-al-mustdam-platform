@@ -11,7 +11,7 @@ import { ClipboardCheck } from 'lucide-react';
 import { CourseQuizEditor } from '@/components/quizzes/course-quiz-editor';
 import { createCourseQuizDraft, prepareCourseQuizForEditing } from '@/lib/quizzes/course-quiz-draft';
 import React, { useState, useEffect, useRef } from 'react';
-import * as tus from 'tus-js-client';
+import { DEMO_READ_ONLY } from '@/lib/demo/messages';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Plus, Search, Clock, Edit3, Trash2, CheckCircle2, Video, GraduationCap, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { QuizData, CourseAttachment, LearningJourneySettings } from '@/types';
@@ -104,45 +104,7 @@ async function uploadVideoSecurely(
   title: string,
   onProgress: (progress: number) => void,
 ): Promise<string> {
-  const credentialResponse = await fetch('/api/videos/upload', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title }),
-  });
-  const credentials = await credentialResponse.json();
-
-  if (!credentialResponse.ok || !credentials.success) {
-    throw new Error(credentials.error || 'تعذر إنشاء طلب رفع آمن');
-  }
-
-  return await new Promise<string>((resolve, reject) => {
-    const upload = new tus.Upload(file, {
-      endpoint: credentials.uploadUrl,
-      retryDelays: [0, 3000, 5000, 10000, 20000, 60000],
-      headers: {
-        AuthorizationSignature: credentials.signature,
-        AuthorizationExpire: String(credentials.expirationTime),
-        VideoId: credentials.videoId,
-        LibraryId: credentials.libraryId,
-      },
-      metadata: {
-        filetype: file.type,
-        title,
-      },
-      onProgress(bytesUploaded, bytesTotal) {
-        onProgress(Math.max(1, Math.round((bytesUploaded / bytesTotal) * 100)));
-      },
-      onError(error) {
-        reject(error);
-      },
-      onSuccess() {
-        onProgress(100);
-        resolve(credentials.videoId);
-      },
-    });
-
-    upload.start();
-  });
+  throw new Error(DEMO_READ_ONLY);
 }
 
 export default function AdminCoursesPage() {
@@ -693,7 +655,7 @@ export default function AdminCoursesPage() {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className={`fixed top-6 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[calc(100%-2rem)] px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-black border backdrop-blur-md ${
+            className={`fixed top-6 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[calc(100%-2rem)] px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-bold border backdrop-blur-md ${
               toastMessage.type === 'success'
                 ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/40 shadow-emerald-950/40'
                 : 'bg-rose-950/90 text-rose-200 border-rose-500/40 shadow-rose-950/40'
@@ -710,20 +672,20 @@ export default function AdminCoursesPage() {
       </AnimatePresence>
 
       {/* Header Banner - Unified Liquid Glass Brand Theme */}
-      <div className={`${heroStyles.hero} relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-9 liquid-glass-hero border border-white/80 shadow-[0_10px_35px_-10px_rgba(23,58,124,0.08)]`}>
+      <div className={`${heroStyles.hero} relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-9 liquid-glass-hero border border-white/80 shadow-[0_10px_35px_-10px_rgba(11,55,102,0.12)]`}>
         {/* Subtle Ambient Reflections */}
-        <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#173A7C]/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#5CB07C]/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#0B3766]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-[#19B6C7]/8 rounded-full blur-3xl pointer-events-none" />
         <div className="specular-card-reflection" />
 
         <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6`}>
           <div className={`${heroStyles.intro} space-y-2.5`}>
-            <div className={`${heroStyles.badge} admin-hero-tag bg-[#173A7C]/10 text-[#173A7C] border border-[#173A7C]/15`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-[#0B3766]/10 text-[#0B3766] border border-[#0B3766]/15`}>
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
               <span className="sm:hidden">المساقات والمحتوى التدريبي</span>
               <span className="hidden sm:inline">إدارة المساقات ومكتبة الفيديو الذكية</span>
             </div>
-            <h1 className={`${heroStyles.title} text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#173A7C]`}>
+            <h1 className={`${heroStyles.title} text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#0B3766]`}>
               <BookOpen aria-hidden="true" className="sm:hidden" />
               <span className="sm:hidden">إدارة الدورات والمحتوى</span>
               <span className="hidden sm:inline">إدارة الدورات والمحتوى الأكاديمي 📚</span>
@@ -736,7 +698,7 @@ export default function AdminCoursesPage() {
           <div className={`${heroStyles.actions} flex items-center gap-3 shrink-0`}>
             <button
               onClick={openCreateModal}
-              className="px-5 py-3 rounded-xl sm:rounded-2xl bg-[#173A7C] hover:bg-[#1E4D9D] text-white text-xs sm:text-sm font-black shadow-lg shadow-[#173A7C]/20 transition-all flex items-center gap-2 cursor-pointer hover:-translate-y-0.5 active:scale-95"
+              className="px-5 py-3 rounded-xl sm:rounded-2xl bg-[#0B3766] hover:bg-[#168AD3] text-white text-xs sm:text-sm font-bold shadow-lg shadow-[#0B3766]/20 transition-all flex items-center gap-2 cursor-pointer hover:-translate-y-0.5 active:scale-95"
             >
               <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-300" />
               <span className="sm:hidden">إضافة دورة جديدة</span>
@@ -764,7 +726,7 @@ export default function AdminCoursesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="بحث باسم الدورة أو المدرب..."
-            className="w-full pl-4 pr-10 py-2 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#173A7C] focus:bg-white transition-all"
+            className="w-full pl-4 pr-10 py-2 text-xs font-bold text-slate-800 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-[#0B3766] focus:bg-white transition-all"
           />
         </div>
 
@@ -783,7 +745,7 @@ export default function AdminCoursesPage() {
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-3.5 py-1.5 rounded-xl whitespace-nowrap transition-colors cursor-pointer text-xs ${
                 selectedCategory === cat.id
-                  ? 'bg-[#173A7C] text-white font-black shadow-xs'
+                  ? 'bg-[#0B3766] text-white font-bold shadow-xs'
                   : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
               }`}
             >
@@ -796,19 +758,19 @@ export default function AdminCoursesPage() {
       {/* Courses Grid - Restored Clean Brand Card Design */}
       {loading ? (
         <div className="p-16 text-center text-slate-500 text-sm font-bold flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <span>جاري تحميل الدورات التدريبية من السحابة...</span>
         </div>
       ) : filteredCourses.length === 0 ? (
         <div className="p-16 rounded-3xl bg-white border border-slate-200 text-center space-y-4 shadow-xs">
           <BookOpen className="w-12 h-12 text-slate-300 mx-auto" />
           <div className="space-y-1">
-            <h3 className="text-base font-black text-slate-800">لا توجد دورات مطابقة</h3>
+            <h3 className="text-base font-bold text-slate-800">لا توجد دورات مطابقة</h3>
             <p className="text-xs text-slate-500">جرب البحث بكلمات أخرى أو أضف دورة تدريبية جديدة</p>
           </div>
           <button
             onClick={openCreateModal}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#173A7C] text-white text-xs font-black cursor-pointer shadow-sm hover:bg-[#1E4D9D] transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0B3766] text-white text-xs font-bold cursor-pointer shadow-sm hover:bg-[#168AD3] transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>إضافة أول دورة</span>
@@ -836,14 +798,14 @@ export default function AdminCoursesPage() {
 
                   {/* Category Badge on Top-Right */}
                   <div className="absolute top-3 right-3 z-20">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-black bg-white/90 text-[#173A7C] border border-blue-100/80 shadow-xs backdrop-blur-md">
+                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-white/90 text-[#0B3766] border border-blue-100/80 shadow-xs backdrop-blur-md">
                       {course.category}
                     </span>
                   </div>
 
                   {/* Status Badge on Top-Left */}
                   <div className="absolute top-3 left-3 z-20">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-black bg-slate-900/75 text-white shadow-xs backdrop-blur-md">
+                    <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-900/75 text-white shadow-xs backdrop-blur-md">
                       منشورة ⚡
                     </span>
                   </div>
@@ -851,7 +813,7 @@ export default function AdminCoursesPage() {
 
                 {/* 2. Course Title & Description */}
                 <div className="space-y-2">
-                  <h3 className="text-base font-black text-slate-900 group-hover:text-[#173A7C] transition-colors leading-snug line-clamp-2" title={course.title}>
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-[#0B3766] transition-colors leading-snug line-clamp-2" title={course.title}>
                     {course.title}
                   </h3>
                   <p className="text-xs text-slate-600 font-medium leading-relaxed line-clamp-2">
@@ -864,23 +826,23 @@ export default function AdminCoursesPage() {
               <div className="space-y-3.5 pt-4 mt-4 border-t border-slate-100">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-500">
                   <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-[#173A7C]" />
+                    <Clock className="w-3.5 h-3.5 text-[#0B3766]" />
                     <span>{course.hours} ساعة</span>
                   </span>
                   <span className="flex items-center gap-1.5">
                     <BookOpen className="w-3.5 h-3.5 text-[#0D5C3A]" />
                     <span>{course.lessonsCount} درس / مقطع</span>
                   </span>
-                  <span className="text-emerald-700 font-black">
+                  <span className="text-emerald-700 font-bold">
                     {course.price}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-xs font-bold text-slate-600 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
                   <div className="flex items-center gap-1.5">
-                    <GraduationCap className="w-4 h-4 text-[#173A7C]" />
+                    <GraduationCap className="w-4 h-4 text-[#0B3766]" />
                     <span className="text-slate-500 text-[11px]">المحاضر:</span>
-                    <span className="text-slate-800 font-black">{course.trainer}</span>
+                    <span className="text-slate-800 font-bold">{course.trainer}</span>
                   </div>
                 </div>
 
@@ -888,7 +850,7 @@ export default function AdminCoursesPage() {
                 <div className="flex items-center justify-between gap-2 pt-1">
                   <button
                     onClick={() => openLessonsManager(course)}
-                    className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#2A65C7] text-white font-black text-xs shadow-sm hover:shadow transition-all cursor-pointer active:scale-95"
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#2A65C7] text-white font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer active:scale-95"
                   >
                     <Video className="w-4 h-4 text-emerald-300" />
                     <span>إدارة المحتوى والميديا ({course.lessonsCount})</span>
@@ -896,7 +858,7 @@ export default function AdminCoursesPage() {
 
                   <button
                     onClick={() => openEditModal(course)}
-                    className="p-2.5 rounded-xl bg-white hover:bg-blue-50 text-slate-600 hover:text-[#173A7C] border border-slate-200 hover:border-blue-200 transition-all cursor-pointer shadow-xs"
+                    className="p-2.5 rounded-xl bg-white hover:bg-blue-50 text-slate-600 hover:text-[#0B3766] border border-slate-200 hover:border-blue-200 transition-all cursor-pointer shadow-xs"
                     title="تعديل الدورة والمنهج والمرفقات"
                   >
                     <Edit3 className="w-4 h-4" />

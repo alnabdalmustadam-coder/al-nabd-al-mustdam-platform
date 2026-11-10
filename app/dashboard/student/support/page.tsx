@@ -76,7 +76,7 @@ function getStatusBadge(status: string) {
     case 'OPEN':
       return { label: 'مفتوحة - قيد المراجعة', color: 'bg-amber-50 text-amber-700 border-amber-200' };
     case 'IN_PROGRESS':
-      return { label: 'جاري المعالجة', color: 'bg-blue-50 text-[#173A7C] border-blue-200' };
+      return { label: 'جاري المعالجة', color: 'bg-blue-50 text-[#0B3766] border-blue-200' };
     case 'ANSWERED':
       return { label: 'تم الرد من الفريق', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
     case 'CLOSED':
@@ -237,8 +237,8 @@ export default function StudentSupportPage() {
 
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2.5 sm:space-y-3 pr-2">
-            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50 text-[#173A7C] border border-blue-200/80 shadow-xs">
-              <Headphones className="w-3.5 h-3.5 text-[#173A7C]" />
+            <motion.div variants={textItemVariants} className="student-tag-badge bg-blue-50 text-[#0B3766] border border-blue-200/80 shadow-xs">
+              <Headphones className="w-3.5 h-3.5 text-[#0B3766]" />
               <span>مركز الدعم الأكاديمي والخدمات الذاتية</span>
             </motion.div>
 
@@ -256,8 +256,8 @@ export default function StudentSupportPage() {
               onClick={() => setActiveTab('tickets')}
               className={`premium-tab px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
                 activeTab === 'tickets'
-                  ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                  : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60'
+                  ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                  : 'text-slate-600 hover:text-[#0B3766] hover:bg-slate-100/60'
               }`}
             >
               <span className="premium-tab-label">تذاكري ({ticketsList.length})</span>
@@ -266,8 +266,8 @@ export default function StudentSupportPage() {
               onClick={() => setActiveTab('new')}
               className={`premium-tab px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
                 activeTab === 'new'
-                  ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                  : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60'
+                  ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                  : 'text-slate-600 hover:text-[#0B3766] hover:bg-slate-100/60'
               }`}
             >
               <span className="premium-tab-label">+ تقديم تذكرة</span>
@@ -276,8 +276,8 @@ export default function StudentSupportPage() {
               onClick={() => setActiveTab('faq')}
               className={`premium-tab px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-center col-span-2 xs:col-span-1 cursor-pointer ${
                 activeTab === 'faq'
-                  ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20'
-                  : 'text-slate-600 hover:text-[#173A7C] hover:bg-slate-100/60'
+                  ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-md shadow-[#0B3766]/20'
+                  : 'text-slate-600 hover:text-[#0B3766] hover:bg-slate-100/60'
               }`}
             >
               <span className="premium-tab-label">الأسئلة الشائعة</span>
@@ -294,7 +294,7 @@ export default function StudentSupportPage() {
             initial="hidden"
             animate="visible"
             custom={1}
-            className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]"
+            className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#19B6C7]"
           >
             <div className="p-1.5 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
               <MessageSquare className="w-4 h-4" />
@@ -304,23 +304,23 @@ export default function StudentSupportPage() {
 
           {loading ? (
             <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+              <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
               <p className="text-xs font-bold text-slate-500">جاري تحميل تذاكر الدعم...</p>
             </div>
           ) : ticketsList.length === 0 ? (
             <div className="p-10 sm:p-14 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-4">
-              <div className="w-16 h-16 rounded-3xl bg-[#173A7C]/10 text-[#173A7C] flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-3xl bg-[#0B3766]/10 text-[#0B3766] flex items-center justify-center mx-auto">
                 <Headphones className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-lg font-black text-slate-900">لا توجد تذاكر مسجلة</h3>
+                <h3 className="text-lg font-bold text-slate-900">لا توجد تذاكر مسجلة</h3>
                 <p className="text-xs font-bold text-slate-500 max-w-md mx-auto">
                   يمكنك تقديم تذكرة استفسار جديدة وسيتم الرد عليك في أقرب وقت من فريق الدعم.
                 </p>
               </div>
               <button
                 onClick={() => setActiveTab('new')}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white font-black text-xs shadow-md hover:shadow-lg transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white font-bold text-xs shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <Send className="w-4 h-4" />
                 <span>تقديم تذكرة جديدة</span>
@@ -344,18 +344,18 @@ export default function StudentSupportPage() {
                   >
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 pb-4 border-b border-slate-200/50">
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <span className="font-mono font-black text-[#173A7C] text-xs bg-blue-50/90 px-3.5 py-1.5 rounded-xl border border-blue-200/80 shadow-2xs">
+                        <span className="font-mono font-bold text-[#0B3766] text-xs bg-blue-50/90 px-3.5 py-1.5 rounded-xl border border-blue-200/80 shadow-2xs">
                           {ticket.ticket_number}
                         </span>
                         <span className="px-3.5 py-1.5 rounded-xl bg-slate-100/80 text-slate-500 font-bold text-xs border border-slate-200/60">
                           {formatDate(ticket.created_at)}
                         </span>
-                        <span className="text-xs font-black text-slate-700 bg-slate-100/90 px-3.5 py-1.5 rounded-full border border-slate-200/60">
+                        <span className="text-xs font-bold text-slate-700 bg-slate-100/90 px-3.5 py-1.5 rounded-full border border-slate-200/60">
                           القسم: {getCategoryLabel(ticket.category)}
                         </span>
                       </div>
 
-                      <span className={`text-xs font-black px-4 py-1.5 rounded-full border shadow-xs whitespace-nowrap ${statusInfo.color}`}>
+                      <span className={`text-xs font-bold px-4 py-1.5 rounded-full border shadow-xs whitespace-nowrap ${statusInfo.color}`}>
                         {statusInfo.label}
                       </span>
                     </div>
@@ -367,7 +367,7 @@ export default function StudentSupportPage() {
 
                       {/* Original message */}
                       <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200/60 text-xs text-slate-600 font-bold leading-relaxed space-y-1 mb-3">
-                        <span className="text-[#173A7C] font-black block text-xs">رسالتك الأصلية:</span>
+                        <span className="text-[#0B3766] font-bold block text-xs">رسالتك الأصلية:</span>
                         <p className="text-slate-700">{ticket.message}</p>
                       </div>
 
@@ -383,7 +383,7 @@ export default function StudentSupportPage() {
                                   : 'bg-blue-50/80 border border-blue-200/60'
                               }`}
                             >
-                              <span className={`font-black block text-xs ${reply.is_admin_reply ? 'text-emerald-700' : 'text-[#173A7C]'}`}>
+                              <span className={`font-bold block text-xs ${reply.is_admin_reply ? 'text-emerald-700' : 'text-[#0B3766]'}`}>
                                 {reply.is_admin_reply ? 'رد فريق الدعم:' : 'ردك:'}
                               </span>
                               <p className="text-slate-700">{reply.message}</p>
@@ -418,7 +418,7 @@ export default function StudentSupportPage() {
           className="relative overflow-hidden rounded-2xl sm:rounded-[28px] p-6 sm:p-8 space-y-6 liquid-glass-card liquid-glass-hover student-card-accent"
         >
           <div className="space-y-1">
-            <h2 className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]">
+            <h2 className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#19B6C7]">
               <div className="p-1.5 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
                 <Send className="w-4 h-4" />
               </div>
@@ -430,8 +430,8 @@ export default function StudentSupportPage() {
           </div>
 
           {submittedSuccess && (
-            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-black flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-[#5CB07C]" />
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-[#19B6C7]" />
               <span>تم إرسال تذكرتك بنجاح وجاري إحالتها للقسم المختص!</span>
             </div>
           )}
@@ -439,23 +439,23 @@ export default function StudentSupportPage() {
           <form onSubmit={handleSubmitTicket} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-700">عنوان الاستفسار</label>
+                <label className="text-xs font-bold text-slate-700">عنوان الاستفسار</label>
                 <input
                   type="text"
                   required
                   value={ticketSubject}
                   onChange={(e) => setTicketSubject(e.target.value)}
                   placeholder="مثال: استفسار بخصوص موعد الاختبار النهائي"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C] bg-white/70"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#0B3766] bg-white/70"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-700">تحديد القسم</label>
+                <label className="text-xs font-bold text-slate-700">تحديد القسم</label>
                 <select
                   value={ticketCategory}
                   onChange={(e) => setTicketCategory(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C] bg-white/70"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#0B3766] bg-white/70"
                 >
                   <option value="academic">استفسار أكاديمي / شؤون تعليمية</option>
                   <option value="technical">الدعم التقني والمشغل</option>
@@ -466,21 +466,21 @@ export default function StudentSupportPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-700">تفاصيل الاستفسار والرسالة</label>
+              <label className="text-xs font-bold text-slate-700">تفاصيل الاستفسار والرسالة</label>
               <textarea
                 required
                 rows={5}
                 value={ticketDetails}
                 onChange={(e) => setTicketDetails(e.target.value)}
                 placeholder="اكتب جميع التفاصيل المطلوبة لمساعدتك بسرعة وبشكل دقيق..."
-                className="w-full p-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C] bg-white/70 leading-relaxed"
+                className="w-full p-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#0B3766] bg-white/70 leading-relaxed"
               />
             </div>
 
             <button
               type="submit"
               disabled={submitting}
-              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#173A7C]/20 cursor-pointer disabled:opacity-60"
+              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#0B3766]/20 cursor-pointer disabled:opacity-60"
             >
               {submitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -501,7 +501,7 @@ export default function StudentSupportPage() {
             initial="hidden"
             animate="visible"
             custom={1}
-            className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#5CB07C]"
+            className="student-heading-h2 flex items-center gap-2.5 pr-2.5 border-r-4 border-[#19B6C7]"
           >
             <div className="p-1.5 rounded-xl text-[#0D5C3A] bg-emerald-100/90 border border-emerald-300/80 shadow-xs">
               <HelpCircle className="w-4 h-4" />
@@ -519,7 +519,7 @@ export default function StudentSupportPage() {
                 className="p-6 sm:p-7 rounded-2xl sm:rounded-3xl space-y-2.5 liquid-glass-card liquid-glass-hover student-card-accent"
               >
                 <h3 className="student-heading-h3 text-xs sm:text-base flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#5CB07C] shrink-0" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#19B6C7] shrink-0" />
                   <span>{item.q}</span>
                 </h3>
                 <p className="text-xs text-slate-600 font-semibold leading-relaxed pr-5">

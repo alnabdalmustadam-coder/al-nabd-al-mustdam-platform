@@ -10,7 +10,6 @@ import {
   Search,
   CheckCircle2,
   Clock,
-  Sparkles,
   Percent,
   Copy,
   Trash2,
@@ -141,12 +140,12 @@ export default function AdminCouponsPage() {
       <div className={`${heroStyles.hero} relative z-20 liquid-glass-hero p-6 sm:p-8 rounded-2xl sm:rounded-3xl liquid-glass-hover overflow-hidden student-card-accent`}>
         <div className={`${heroStyles.layout} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
           <div className={`${heroStyles.intro} space-y-2`}>
-            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#0B3766] border border-blue-200`}>
               <Ticket className="w-4 h-4 text-blue-600 shrink-0" />
               <span className="sm:hidden">الحملات والخصومات</span>
               <span className="hidden sm:inline">الحملات التسويقية والخصومات</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black student-heading-h1">
+            <h1 className="text-xl sm:text-2xl font-bold student-heading-h1">
               <span className="sm:hidden">إدارة كوبونات الخصم</span>
               <span className="hidden sm:inline">إدارة <span className="student-name-gradient">كوبونات وقسائم الخصم</span> 🏷️</span>
             </h1>
@@ -157,7 +156,7 @@ export default function AdminCouponsPage() {
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className={`${heroStyles.soloAction} px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/20 transition-all cursor-pointer whitespace-nowrap`}
+            className={`${heroStyles.soloAction} px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#0B3766]/20 transition-all cursor-pointer whitespace-nowrap`}
           >
             <Plus className="w-4 h-4" />
             <span>إنشاء كود جديد</span>
@@ -174,20 +173,20 @@ export default function AdminCouponsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="بحث بكود الكوبون..."
-            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
           />
         </div>
       </div>
 
       {loading ? (
         <div className="p-12 rounded-3xl bg-white/80 border border-slate-200/80 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
           <p className="text-xs font-bold text-slate-500">جاري تحميل الكوبونات...</p>
         </div>
       ) : filteredCoupons.length === 0 ? (
         <div className="p-12 rounded-3xl bg-white/90 border border-slate-200/80 shadow-sm text-center space-y-3">
-          <Tag className="w-12 h-12 text-[#173A7C]/30 mx-auto" />
-          <h3 className="text-base font-black text-slate-900">لا توجد كوبونات مسجلة</h3>
+          <Tag className="w-12 h-12 text-[#0B3766]/30 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">لا توجد كوبونات مسجلة</h3>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -198,12 +197,12 @@ export default function AdminCouponsPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-sm font-black text-[#173A7C] bg-blue-50 px-3 py-1 rounded-xl border border-blue-200">
+                  <span className="font-mono text-sm font-bold text-[#0B3766] bg-blue-50 px-3 py-1 rounded-xl border border-blue-200">
                     {c.code}
                   </span>
                   <button
                     onClick={() => handleCopyCode(c.code)}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-[#173A7C] cursor-pointer"
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-[#0B3766] cursor-pointer"
                     title="نسخ الكود"
                   >
                     {copiedCode === c.code ? (
@@ -225,7 +224,7 @@ export default function AdminCouponsPage() {
 
               <div className="flex items-center justify-between text-xs font-bold pt-2 border-t border-slate-200/60">
                 <span className="text-slate-500">نسبة الخصم:</span>
-                <span className="text-emerald-700 font-black text-sm">{c.discount_percent}%</span>
+                <span className="text-emerald-700 font-bold text-sm">{c.discount_percent}%</span>
               </div>
 
               <div className="flex items-center justify-between text-xs font-bold">
@@ -236,7 +235,7 @@ export default function AdminCouponsPage() {
               <div className="flex items-center justify-between text-xs font-bold">
                 <span className="text-slate-500">الحالة:</span>
                 <span
-                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                     c.is_active
                       ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
                       : 'bg-red-50 text-red-800 border border-red-300'
@@ -277,20 +276,20 @@ export default function AdminCouponsPage() {
 
               <form onSubmit={handleCreateCoupon} className="space-y-3.5">
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">كود الخصم (Code)</label>
+                  <label className="text-xs font-bold text-slate-700">كود الخصم (Code)</label>
                   <input
                     type="text"
                     required
                     value={newCode}
                     onChange={(e) => setNewCode(e.target.value.toUpperCase())}
                     placeholder="مثال: SUSTAIN20"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase font-mono focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase font-mono focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">نسبة الخصم (%)</label>
+                    <label className="text-xs font-bold text-slate-700">نسبة الخصم (%)</label>
                     <input
                       type="number"
                       min="1"
@@ -298,29 +297,29 @@ export default function AdminCouponsPage() {
                       required
                       value={newPercent}
                       onChange={(e) => setNewPercent(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-black text-slate-700">الحد الأقصى للاستخدام</label>
+                    <label className="text-xs font-bold text-slate-700">الحد الأقصى للاستخدام</label>
                     <input
                       type="number"
                       min="1"
                       required
                       value={newLimit}
                       onChange={(e) => setNewLimit(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-700">تاريخ انتهاء الصلاحية</label>
+                  <label className="text-xs font-bold text-slate-700">تاريخ انتهاء الصلاحية</label>
                   <input
                     type="date"
                     value={newExpiry}
                     onChange={(e) => setNewExpiry(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766]"
                   />
                 </div>
 
@@ -328,14 +327,14 @@ export default function AdminCouponsPage() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 text-xs font-black text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                    className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
                     disabled={creating}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white text-xs font-black flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-60"
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-60"
                   >
                     {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     <span>{creating ? 'جاري الحفظ...' : 'حفظ وتفعيل الكوبون'}</span>

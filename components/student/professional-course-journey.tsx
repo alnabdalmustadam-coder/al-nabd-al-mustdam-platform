@@ -22,14 +22,10 @@ const stationIcon = (type: string) => type === 'video' ? Video : type === 'quiz'
 
 function JourneyStation({ course, lesson, completed, busy, onContinue }: { course: Course; lesson: LessonContent; completed: boolean; busy: boolean; onContinue: () => void }) {
   const [videoReady, setVideoReady] = useState(false);
-  const [blocksReady, setBlocksReady] = useState(!lesson.contentBlocks?.some((block) => ['cards', 'tabs'].includes(block.type)));
-  const [quizReady, setQuizReady] = useState(false);
-  const [documentRead, setDocumentRead] = useState(false);
   const document = ['pdf', 'doc', 'ppt'].includes(lesson.type);
   const canRateLesson = lesson.type === 'video' ? Boolean(lesson.videoUrl?.trim())
     : document ? Boolean(lesson.fileUrl?.trim())
     : lesson.type === 'article' && Boolean(lesson.description?.trim() || lesson.contentBlocks?.length);
-  const ready = completed || ((lesson.type !== 'video' || videoReady) && blocksReady && (!lesson.requiredQuiz || quizReady) && (!document || documentRead));
   const resources = getLessonResourceGroups(course, lesson.id, true);
   return <>
     <div className={styles.stationBody}>
@@ -41,18 +37,23 @@ function JourneyStation({ course, lesson, completed, busy, onContinue }: { cours
       </div> : <>
         {lesson.description && <p className={styles.introduction}>{lesson.description}</p>}
         {lesson.type === 'video' && <StudentVideoPlayer courseSlug={course.slug} lessonId={lesson.id} lessonTitle={lesson.title} videoUrl={lesson.videoUrl} professionalDevelopment hideToolbar isCompleted={completed} onVideoVerified={() => setVideoReady(true)} />}
-        {lesson.contentBlocks?.length ? <LessonContentBlocks blocks={lesson.contentBlocks} onReady={setBlocksReady} /> : null}
-        {document && <><CourseDocumentViewer fileUrl={lesson.fileUrl} title={lesson.title} type={lesson.type} /><label className={styles.readConfirmation}><input type="checkbox" checked={completed || documentRead} disabled={completed} onChange={(event) => setDocumentRead(event.target.checked)} />اطّلعت على مستند الدرس</label></>}
+        {lesson.contentBlocks?.length ? <LessonContentBlocks blocks={lesson.contentBlocks} /> : null}
+        {document && <><CourseDocumentViewer fileUrl={lesson.fileUrl} title={lesson.title} type={lesson.type} /><label className={styles.readConfirmation}><input type="checkbox" checked={completed} readOnly disabled />اطّلعت على مستند الدرس</label></>}
         {canRateLesson && <SatisfactionHeart courseId={course.slug} lessonId={lesson.id} kind="lesson" />}
         {lesson.requiredQuiz && (lesson.type !== 'video' || videoReady || completed) && <section aria-label={lesson.diagnostic ? 'الاختبار القبلي' : 'اختبار المحطة'} className="space-y-5">
           {lesson.type !== 'quiz' && <h3 className="text-base font-semibold text-blue-950">اختبار هذه المحطة</h3>}
-          <InternalQuizPanel courseId={course.slug} lessonId={lesson.id} diagnostic={lesson.diagnostic} sequential onResult={setQuizReady} />
+          <InternalQuizPanel courseId={course.slug} lessonId={lesson.id} diagnostic={lesson.diagnostic} sequential />
         </section>}
         {lesson.type === 'video' && lesson.requiredQuiz && !videoReady && !completed && <p className={styles.helper}>يظهر اختبار المحطة بعد اكتمال مشاهدة الفيديو.</p>}
       </>}
       {resources.length > 0 && <details className={styles.resources}><summary>ملفات هذه المحطة ومراجع الدورة <ChevronDown aria-hidden="true" /></summary><div className="pt-5"><CourseResourcesPanel groups={resources} /></div></details>}
     </div>
-    <div className={styles.continueBar}><p role="status">{completed ? 'هذه المحطة مكتملة ومحفوظة في حسابك.' : ready ? 'أكمل المحطة واحفظ تقدمك للانتقال إلى التالية.' : lesson.type === 'video' && !videoReady ? 'شاهد الفيديو كاملًا لفتح المتابعة.' : lesson.requiredQuiz && !quizReady ? lesson.diagnostic ? 'سلّم إجابات التقييم القبلي للمتابعة.' : 'اجتز اختبار المحطة للمتابعة.' : document ? 'اطّلع على المستند وأكّد القراءة للمتابعة.' : 'افتح جميع أجزاء المحتوى التفاعلي للمتابعة.'}</p><button type="button" disabled={!ready || busy} onClick={onContinue} className={styles.primary}>{busy ? <Loader2 className="animate-spin" /> : completed ? <ArrowLeft /> : <CheckCircle2 />}{completed ? 'المحطة التالية' : lesson.type === 'welcome' ? 'ابدأ الرحلة' : 'إكمال ومتابعة'}</button></div>
+    <div className={styles.continueBar}>
+      <p role="status">{completed ? 'محطة مكتملة في بيانات العرض.' : 'معاينة المحطة باستخدام بيانات العرض الثابتة.'}</p>
+      {completed && <button type="button" disabled={busy} onClick={onContinue} className={styles.primary}>
+        <ArrowLeft /> المحطة التالية
+      </button>}
+    </div>
   </>;
 }
 
@@ -71,7 +72,7 @@ export function ProfessionalCourseJourney({ course, initialLessonId }: { course:
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const heading = useRef<HTMLHeadingElement>(null);
   const courseId = course.slug;
-  const bookmarkKey = `nabd-journey-bookmarks:${courseId}`;
+  const bookmarkKey = `madar-demo-journey-bookmarks:${courseId}`;
   useEffect(() => {
     try { const saved: unknown = JSON.parse(localStorage.getItem(bookmarkKey) || '[]'); if (Array.isArray(saved)) setBookmarks(saved.filter((value): value is string => typeof value === 'string')); } catch { /* Bookmarks are optional on this device. */ }
   }, [bookmarkKey]);

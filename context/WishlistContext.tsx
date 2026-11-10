@@ -28,7 +28,7 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'sustainsulse_user_wishlist';
+const LOCAL_STORAGE_KEY = 'madar-learning-demo_user_wishlist';
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);

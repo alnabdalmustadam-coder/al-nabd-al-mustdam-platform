@@ -26,7 +26,6 @@ import {
   Star,
   Filter,
   ArrowUpRight,
-  Sparkles,
 } from 'lucide-react';
 import { blogPosts } from '@/data/blogPosts';
 import { DeviceImageUploader } from '@/components/dashboard/DeviceImageUploader';
@@ -381,15 +380,15 @@ export default function AdminArticlesPage() {
       >
         <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6`}>
           <div className={`${heroStyles.intro} space-y-2`}>
-            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#173A7C] border border-blue-200`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-blue-50 text-[#0B3766] border border-blue-200`}>
               <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
               <span className="sm:hidden">المدونة والنشر الأكاديمي</span>
               <span className="hidden sm:inline">لوحة الإدارة العليا • المدونة والنشر الأكاديمي</span>
             </div>
-            <h1 className={`${heroStyles.title} text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3`}>
+            <h1 className={`${heroStyles.title} text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3`}>
               <span className="sm:hidden">المقالات والمنشورات</span>
               <span className="hidden sm:inline">إدارة المقالات والمنشورات الأكاديمية</span>
-              <Newspaper className="w-7 h-7 text-[#173A7C] shrink-0" />
+              <Newspaper className="w-7 h-7 text-[#0B3766] shrink-0" />
             </h1>
             <p className={`${heroStyles.description} text-xs sm:text-sm text-slate-600 font-bold max-w-2xl leading-relaxed`}>
               تحرير، مراجعة، ونشر المقالات والدراسات العلمية، تصنيف المحتوى وإدارته بالكامل، وربطه مع المدونة العامة للمنصة.
@@ -400,7 +399,7 @@ export default function AdminArticlesPage() {
             <Link
               href="/blog"
               target="_blank"
-              className="px-4 py-3 rounded-2xl bg-white hover:bg-slate-50 text-[#173A7C] font-black text-xs flex items-center gap-2 border border-slate-200 shadow-sm transition-all"
+              className="px-4 py-3 rounded-2xl bg-white hover:bg-slate-50 text-[#0B3766] font-bold text-xs flex items-center gap-2 border border-slate-200 shadow-sm transition-all"
             >
               <Eye className="w-4 h-4" />
               <span className="sm:hidden">معاينة المدونة</span>
@@ -410,7 +409,7 @@ export default function AdminArticlesPage() {
 
             <button
               onClick={handleOpenCreateModal}
-              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#132F64] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all hover:scale-[1.02]"
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#132F64] hover:to-[#0B3766] text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#0B3766]/25 cursor-pointer transition-all hover:scale-[1.02]"
             >
               <Plus className="w-4 h-4" />
               <span className="sm:hidden">مقال جديد</span>
@@ -459,13 +458,13 @@ export default function AdminArticlesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md">
               <Newspaper className="w-5 h-5" />
             </div>
-            <span className="px-3 py-1 rounded-xl text-xs font-black border bg-blue-50 text-blue-800 border-blue-200">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold border bg-blue-50 text-blue-800 border-blue-200">
               إجمالي المحتوى
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي المقالات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#173A7C] tracking-tight">{articles.length} مقال</h3>
+            <span className="text-xs text-slate-500 font-bold block">إجمالي المقالات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-[#0B3766] tracking-tight">{articles.length} مقال</h3>
           </div>
         </div>
 
@@ -474,13 +473,13 @@ export default function AdminArticlesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <span className="px-3 py-1 rounded-xl text-xs font-black border bg-emerald-50 text-emerald-800 border-emerald-200">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold border bg-emerald-50 text-emerald-800 border-emerald-200">
               منشور بالمدونة
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">المقالات المنشورة</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">{publishedCount} مقال</h3>
+            <span className="text-xs text-slate-500 font-bold block">المقالات المنشورة</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-emerald-700 tracking-tight">{publishedCount} مقال</h3>
           </div>
         </div>
 
@@ -489,13 +488,13 @@ export default function AdminArticlesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md">
               <Eye className="w-5 h-5" />
             </div>
-            <span className="px-3 py-1 rounded-xl text-xs font-black border bg-amber-50 text-amber-900 border-amber-300">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold border bg-amber-50 text-amber-900 border-amber-300">
               التفاعل والمشاهدات
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">إجمالي القراءات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-amber-700 tracking-tight">
+            <span className="text-xs text-slate-500 font-bold block">إجمالي القراءات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-amber-700 tracking-tight">
               {totalViews.toLocaleString()} <span className="text-xs font-bold">قراءة</span>
             </h3>
           </div>
@@ -506,13 +505,13 @@ export default function AdminArticlesPage() {
             <div className="p-3 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-md">
               <Clock className="w-5 h-5" />
             </div>
-            <span className="px-3 py-1 rounded-xl text-xs font-black border bg-purple-50 text-purple-800 border-purple-200">
+            <span className="px-3 py-1 rounded-xl text-xs font-bold border bg-purple-50 text-purple-800 border-purple-200">
               مسودات قيد المراجعة
             </span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-slate-500 font-extrabold block">المسودات</span>
-            <h3 className="text-2xl sm:text-3xl font-black text-purple-700 tracking-tight">{draftCount} مسودة</h3>
+            <span className="text-xs text-slate-500 font-bold block">المسودات</span>
+            <h3 className="text-2xl sm:text-3xl font-bold text-purple-700 tracking-tight">{draftCount} مسودة</h3>
           </div>
         </div>
       </div>
@@ -528,7 +527,7 @@ export default function AdminArticlesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="البحث في المقالات، الكاتب، الوسوم، أو الكلمات المفتاحية..."
-              className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white/80"
+              className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white/80"
             />
             {searchQuery && (
               <button
@@ -544,9 +543,9 @@ export default function AdminArticlesPage() {
           <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100/90 rounded-2xl border border-slate-200/80">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === 'all'
-                  ? 'bg-white text-[#173A7C] shadow-xs'
+                  ? 'bg-white text-[#0B3766] shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -554,7 +553,7 @@ export default function AdminArticlesPage() {
             </button>
             <button
               onClick={() => setStatusFilter('published')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === 'published'
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-emerald-700'
@@ -564,7 +563,7 @@ export default function AdminArticlesPage() {
             </button>
             <button
               onClick={() => setStatusFilter('featured')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === 'featured'
                   ? 'bg-amber-500 text-white shadow-xs'
                   : 'text-slate-600 hover:text-amber-700'
@@ -574,7 +573,7 @@ export default function AdminArticlesPage() {
             </button>
             <button
               onClick={() => setStatusFilter('draft')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === 'draft'
                   ? 'bg-purple-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -587,15 +586,15 @@ export default function AdminArticlesPage() {
 
         {/* Category Pills */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2 border-t border-slate-100">
-          <span className="text-[11px] font-black text-slate-500 shrink-0 flex items-center gap-1">
-            <Filter className="w-3 h-3 text-[#173A7C]" />
+          <span className="text-[11px] font-bold text-slate-500 shrink-0 flex items-center gap-1">
+            <Filter className="w-3 h-3 text-[#0B3766]" />
             <span>المجال:</span>
           </span>
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 cursor-pointer ${
+            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
               selectedCategory === 'all'
-                ? 'bg-[#173A7C] text-white shadow-xs'
+                ? 'bg-[#0B3766] text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -605,9 +604,9 @@ export default function AdminArticlesPage() {
             <button
               key={idx}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1 rounded-xl text-xs font-black transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 selectedCategory === cat
-                  ? 'bg-[#173A7C] text-white shadow-xs'
+                  ? 'bg-[#0B3766] text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -620,23 +619,23 @@ export default function AdminArticlesPage() {
       {/* ── 4. ARTICLES GRID ── */}
       {loading ? (
         <div className="p-16 text-center rounded-3xl liquid-glass-card border border-slate-200 flex flex-col items-center justify-center space-y-3">
-          <Loader2 className="w-8 h-8 text-[#173A7C] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#0B3766] animate-spin" />
           <p className="text-sm font-bold text-slate-600">جاري تحميل المقالات من قاعدة البيانات...</p>
         </div>
       ) : filteredArticles.length === 0 ? (
         <div className="p-12 text-center rounded-3xl liquid-glass-card border border-slate-200 space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#173A7C] flex items-center justify-center mx-auto border border-blue-100">
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#0B3766] flex items-center justify-center mx-auto border border-blue-100">
             <Newspaper className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-black text-slate-900">لا توجد مقالات مطابقة لبحثك</h3>
+            <h3 className="text-base font-bold text-slate-900">لا توجد مقالات مطابقة لبحثك</h3>
             <p className="text-xs text-slate-500 font-bold">
               جرّب تغيير كلمات البحث أو تصفية الحالة، أو أضف مقالاً ودراسة جديدة.
             </p>
           </div>
           <button
             onClick={handleOpenCreateModal}
-            className="px-4 py-2.5 rounded-xl bg-[#173A7C] text-white text-xs font-black inline-flex items-center gap-2 cursor-pointer shadow-xs hover:bg-[#1E4D9D]"
+            className="px-4 py-2.5 rounded-xl bg-[#0B3766] text-white text-xs font-bold inline-flex items-center gap-2 cursor-pointer shadow-xs hover:bg-[#168AD3]"
           >
             <Plus className="w-4 h-4" />
             <span>كتابة مقال جديد الآن</span>
@@ -665,20 +664,20 @@ export default function AdminArticlesPage() {
 
                   {/* Top Badges */}
                   <div className="absolute top-3 right-3 left-3 flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-xl text-[11px] font-black backdrop-blur-md bg-white/90 text-[#173A7C] border border-white shadow-xs">
+                    <span className="px-3 py-1 rounded-xl text-[11px] font-bold backdrop-blur-md bg-white/90 text-[#0B3766] border border-white shadow-xs">
                       {art.category}
                     </span>
 
                     <div className="flex items-center gap-1.5">
                       {art.isFeatured && (
-                        <span className="p-1.5 rounded-xl bg-amber-500 text-white shadow-md flex items-center gap-1 text-[10px] font-black">
+                        <span className="p-1.5 rounded-xl bg-amber-500 text-white shadow-md flex items-center gap-1 text-[10px] font-bold">
                           <Star className="w-3.5 h-3.5 fill-white" />
                           <span>مميز</span>
                         </span>
                       )}
                       <button
                         onClick={(e) => handleToggleStatus(art.id, e)}
-                        className={`px-2.5 py-1 rounded-xl text-[10px] font-black border flex items-center gap-1 backdrop-blur-md cursor-pointer transition-all ${
+                        className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border flex items-center gap-1 backdrop-blur-md cursor-pointer transition-all ${
                           art.status === 'published'
                             ? 'bg-emerald-600 text-white border-emerald-500'
                             : 'bg-purple-600 text-white border-purple-500'
@@ -692,7 +691,7 @@ export default function AdminArticlesPage() {
                   </div>
 
                   {/* Bottom Meta on Image */}
-                  <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between text-white text-xs font-black">
+                  <div className="absolute bottom-3 right-3 left-3 flex items-center justify-between text-white text-xs font-bold">
                     <div className="flex items-center gap-1.5 bg-slate-900/60 backdrop-blur-md px-2.5 py-1 rounded-xl">
                       <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
                       <span className="truncate max-w-[150px]">{art.authorName}</span>
@@ -706,7 +705,7 @@ export default function AdminArticlesPage() {
 
                 {/* Content Body */}
                 <div className="p-5 space-y-3.5">
-                  <h3 className="font-black text-sm sm:text-base text-slate-900 leading-snug line-clamp-2">
+                  <h3 className="font-bold text-sm sm:text-base text-slate-900 leading-snug line-clamp-2">
                     {art.title}
                   </h3>
 
@@ -720,7 +719,7 @@ export default function AdminArticlesPage() {
                       {art.tags.slice(0, 3).map((tag, i) => (
                         <span
                           key={i}
-                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-extrabold border border-slate-200/80"
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold border border-slate-200/80"
                         >
                           <Tag className="w-2.5 h-2.5 text-slate-400" />
                           <span>{tag}</span>
@@ -748,7 +747,7 @@ export default function AdminArticlesPage() {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleOpenEditModal(art)}
-                    className="p-2 rounded-xl text-[#173A7C] hover:bg-blue-50 border border-slate-200 bg-white shadow-2xs transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-[#0B3766] hover:bg-blue-50 border border-slate-200 bg-white shadow-2xs transition-colors cursor-pointer"
                     title="تعديل المقال"
                   >
                     <Edit3 className="w-4 h-4" />
@@ -776,7 +775,7 @@ export default function AdminArticlesPage() {
                 <Link
                   href={`/blog/${art.slug}`}
                   target="_blank"
-                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-[#173A7C] text-[11px] font-black border border-slate-200 flex items-center gap-1 shadow-2xs transition-colors"
+                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-[#0B3766] text-[11px] font-bold border border-slate-200 flex items-center gap-1 shadow-2xs transition-colors"
                 >
                   <span>قراءة</span>
                   <ExternalLink className="w-3 h-3" />
@@ -800,11 +799,11 @@ export default function AdminArticlesPage() {
               {/* Fixed Header */}
               <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-3 sm:px-6 sm:py-4">
                 <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#173A7C] to-[#1E4D9D] text-white shadow-md sm:h-10 sm:w-10">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0B3766] to-[#168AD3] text-white shadow-md sm:h-10 sm:w-10">
                     <Newspaper className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="truncate text-sm font-black leading-tight text-slate-900 sm:text-base">
+                    <h3 className="truncate text-sm font-bold leading-tight text-slate-900 sm:text-base">
                       {editingArticle.id && typeof editingArticle.id === 'string' && editingArticle.id.startsWith('art-')
                         ? 'تعديل بيانات المقال'
                         : 'كتابة مقال ودراسة جديدة'}
@@ -833,14 +832,14 @@ export default function AdminArticlesPage() {
                     <div className="lg:col-span-7 space-y-4">
                       {/* Title */}
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">عنوان المقال الرئيسي *</label>
+                        <label className="text-slate-700 text-xs font-bold block">عنوان المقال الرئيسي *</label>
                         <input
                           type="text"
                           required
                           value={editingArticle.title || ''}
                           onChange={(e) => setEditingArticle({ ...editingArticle, title: e.target.value })}
                           placeholder="مثال: الدليل الشامل في تطبيق معايير الآيزو 9001..."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#173A7C] transition-colors"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0B3766] transition-colors"
                         />
                       </div>
 
@@ -848,11 +847,11 @@ export default function AdminArticlesPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">
-                            <label className="text-slate-700 text-xs font-black block">المجال / التصنيف *</label>
+                            <label className="text-slate-700 text-xs font-bold block">المجال / التصنيف *</label>
                             <button
                               type="button"
                               onClick={() => setIsAddingNewCat(!isAddingNewCat)}
-                              className="text-[10px] font-black text-[#173A7C] hover:underline cursor-pointer"
+                              className="text-[10px] font-bold text-[#0B3766] hover:underline cursor-pointer"
                             >
                               {isAddingNewCat ? 'إلغاء' : '+ جديد'}
                             </button>
@@ -870,7 +869,7 @@ export default function AdminArticlesPage() {
                               <button
                                 type="button"
                                 onClick={handleAddNewCategory}
-                                className="px-3 py-2 bg-[#173A7C] text-white rounded-xl text-xs font-black cursor-pointer"
+                                className="px-3 py-2 bg-[#0B3766] text-white rounded-xl text-xs font-bold cursor-pointer"
                               >
                                 إضافة
                               </button>
@@ -879,7 +878,7 @@ export default function AdminArticlesPage() {
                             <select
                               value={editingArticle.category || categoriesList[0]}
                               onChange={(e) => setEditingArticle({ ...editingArticle, category: e.target.value })}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#173A7C] bg-white text-slate-800"
+                              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:border-[#0B3766] bg-white text-slate-800"
                             >
                               {categoriesList.map((c, i) => (
                                 <option key={i} value={c}>
@@ -891,58 +890,58 @@ export default function AdminArticlesPage() {
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-slate-700 text-xs font-black block">الكاتب / الباحث *</label>
+                          <label className="text-slate-700 text-xs font-bold block">الكاتب / الباحث *</label>
                           <input
                             type="text"
                             required
                             value={editingArticle.authorName || ''}
                             onChange={(e) => setEditingArticle({ ...editingArticle, authorName: e.target.value })}
                             placeholder="اسم الكاتب..."
-                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C]"
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#0B3766]"
                           />
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-slate-700 text-xs font-black block">وقت القراءة</label>
+                          <label className="text-slate-700 text-xs font-bold block">وقت القراءة</label>
                           <input
                             type="text"
                             value={editingArticle.read_time || '5 دقائق'}
                             onChange={(e) => setEditingArticle({ ...editingArticle, read_time: e.target.value })}
                             placeholder="5 دقائق"
-                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#173A7C]"
+                            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#0B3766]"
                           />
                         </div>
                       </div>
 
                       {/* Excerpt */}
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">المقدمة والملخص التعريفي *</label>
+                        <label className="text-slate-700 text-xs font-bold block">المقدمة والملخص التعريفي *</label>
                         <textarea
                           rows={2}
                           required
                           value={editingArticle.excerpt || ''}
                           onChange={(e) => setEditingArticle({ ...editingArticle, excerpt: e.target.value })}
                           placeholder="نبذة موجزة تظهر في بطاقة المقال بمحركات البحث والمدونة..."
-                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:border-[#173A7C] resize-none leading-relaxed text-slate-800"
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:border-[#0B3766] resize-none leading-relaxed text-slate-800"
                         />
                       </div>
 
                       {/* Content */}
                       <div className="space-y-1">
-                        <label className="text-slate-700 text-xs font-black block">محتوى المقال الكامل *</label>
+                        <label className="text-slate-700 text-xs font-bold block">محتوى المقال الكامل *</label>
                         <textarea
                           rows={6}
                           required
                           value={editingArticle.content || ''}
                           onChange={(e) => setEditingArticle({ ...editingArticle, content: e.target.value })}
                           placeholder="اكتب نص المقال كاملاً هنا، يمكنك استخدام العناوين والفقرات والرموز..."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:border-[#173A7C] leading-relaxed text-slate-800"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:border-[#0B3766] leading-relaxed text-slate-800"
                         />
                       </div>
 
                       {/* Tags */}
                       <div className="space-y-2">
-                        <label className="text-slate-700 text-xs font-black block">الوسوم والكلمات المفتاحية (Tags)</label>
+                        <label className="text-slate-700 text-xs font-bold block">الوسوم والكلمات المفتاحية (Tags)</label>
                         <div className="flex gap-2">
                           <input
                             type="text"
@@ -960,7 +959,7 @@ export default function AdminArticlesPage() {
                           <button
                             type="button"
                             onClick={handleAddTag}
-                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs cursor-pointer transition-colors"
+                            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs cursor-pointer transition-colors"
                           >
                             إضافة
                           </button>
@@ -1006,7 +1005,7 @@ export default function AdminArticlesPage() {
 
                       {/* Publishing Status Settings */}
                       <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-2.5">
-                        <span className="text-xs font-black text-slate-800 block">حالة المقال والظهور بالمنصة</span>
+                        <span className="text-xs font-bold text-slate-800 block">حالة المقال والظهور بالمنصة</span>
                         
                         <label className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200 cursor-pointer hover:border-slate-300 transition-colors">
                           <div className="flex items-center gap-2.5">
@@ -1022,7 +1021,7 @@ export default function AdminArticlesPage() {
                                 status: e.target.checked ? 'published' : 'draft',
                               })
                             }
-                            className="w-4 h-4 rounded text-[#173A7C] focus:ring-0 cursor-pointer"
+                            className="w-4 h-4 rounded text-[#0B3766] focus:ring-0 cursor-pointer"
                           />
                         </label>
 
@@ -1042,7 +1041,7 @@ export default function AdminArticlesPage() {
 
                       {/* Mini Live Preview */}
                       <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-50/50 to-slate-50 border border-blue-100 space-y-1.5">
-                        <div className="flex items-center justify-between text-[11px] font-black text-[#173A7C]">
+                        <div className="flex items-center justify-between text-[11px] font-bold text-[#0B3766]">
                           <span>معاينة فورية لبطاقة المقال:</span>
                           <span className="text-[10px] font-mono text-slate-400">Live Blog Card</span>
                         </div>
@@ -1056,12 +1055,12 @@ export default function AdminArticlesPage() {
                             />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className="text-xs font-black text-slate-800 truncate">
+                            <h4 className="text-xs font-bold text-slate-800 truncate">
                               {editingArticle.title || 'عنوان المقال'}
                             </h4>
                             <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold mt-1">
                               <span className="truncate max-w-[110px]">{editingArticle.authorName || 'الكاتب'}</span>
-                              <span className="text-[#173A7C] font-mono">{editingArticle.read_time || '5 دقائق'}</span>
+                              <span className="text-[#0B3766] font-mono">{editingArticle.read_time || '5 دقائق'}</span>
                             </div>
                           </div>
                         </div>
@@ -1080,14 +1079,14 @@ export default function AdminArticlesPage() {
                     <button
                       type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="flex-1 cursor-pointer rounded-xl px-4 py-2.5 text-xs font-black text-slate-600 transition-colors hover:bg-slate-200/60 sm:flex-none sm:py-2"
+                      className="flex-1 cursor-pointer rounded-xl px-4 py-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200/60 sm:flex-none sm:py-2"
                     >
                       إلغاء
                     </button>
                     <button
                       type="submit"
                       disabled={isSaving}
-                      className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#173A7C] px-6 py-2.5 text-xs font-black text-white shadow-md transition-all hover:bg-[#1E4D9D] disabled:opacity-50 sm:flex-none sm:py-2"
+                      className="flex flex-[2] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B3766] px-6 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:bg-[#168AD3] disabled:opacity-50 sm:flex-none sm:py-2"
                     >
                       {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                       <span>{editingArticle.id ? 'حفظ المقال' : 'نشر المقال الآن'}</span>
@@ -1114,7 +1113,7 @@ export default function AdminArticlesPage() {
                 <Trash2 className="w-7 h-7" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-black text-slate-900">هل أنت متأكد من حذف هذا المقال؟</h3>
+                <h3 className="text-base font-bold text-slate-900">هل أنت متأكد من حذف هذا المقال؟</h3>
                 <p className="text-xs font-bold text-slate-500">
                   سيتم حذف المقال نهائياً من قاعدة البيانات وإلغاء نشره من المدونة العامة.
                 </p>
@@ -1122,13 +1121,13 @@ export default function AdminArticlesPage() {
               <div className="flex items-center justify-center gap-3 pt-2">
                 <button
                   onClick={() => setDeleteConfirmId(null)}
-                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-black cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold cursor-pointer"
                 >
                   تراجع
                 </button>
                 <button
                   onClick={() => handleDeleteArticle(deleteConfirmId)}
-                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black cursor-pointer shadow-md"
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold cursor-pointer shadow-md"
                 >
                   تأكيد الحذف
                 </button>

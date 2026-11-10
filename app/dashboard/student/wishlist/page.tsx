@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { CardImage } from '@/components/ui/CardImage';
 import { motion, Variants } from 'framer-motion';
-import { Heart, ShoppingBag, ArrowLeft, Trash2, BookOpen, Clock, Users, Sparkles, Check } from 'lucide-react';
+import { Heart, ShoppingBag, ArrowLeft, Trash2, BookOpen, Clock, Users, Check } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 
@@ -51,7 +51,7 @@ export default function StudentWishlistPage() {
       >
         {/* Ambient Glowing Orbs */}
         <div className="absolute -top-16 -right-16 w-56 h-56 bg-gradient-to-br from-rose-500/20 to-pink-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-gradient-to-br from-[#173A7C]/20 to-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-gradient-to-br from-[#0B3766]/20 to-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2.5 sm:space-y-3 pr-2">
@@ -70,7 +70,7 @@ export default function StudentWishlistPage() {
           </div>
 
           <motion.div variants={textItemVariants} className="flex items-center gap-3 shrink-0">
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/90 text-rose-700 text-xs font-black border border-white/80 shadow-xs backdrop-blur-md">
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/90 text-rose-700 text-xs font-bold border border-white/80 shadow-xs backdrop-blur-md">
               <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
               <span>{wishlistCount} دورة في المفضلة</span>
             </div>
@@ -89,14 +89,14 @@ export default function StudentWishlistPage() {
             <Heart className="w-10 h-10" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-lg font-black text-slate-800">قائمة المفضلة فارغة حالياً</h3>
+            <h3 className="text-lg font-bold text-slate-800">قائمة المفضلة فارغة حالياً</h3>
             <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed font-medium">
               استكشف باقة دوراتنا ودبلوماتنا المعتمدة واضغط على أيقونة القلب في أي دورة لحفظها هنا.
             </p>
           </div>
           <Link
             href="/courses"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs shadow-md shadow-[#173A7C]/20 transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs shadow-md shadow-[#0B3766]/20 transition-all cursor-pointer"
           >
             <span>تصفح أحدث الدورات</span>
             <ArrowLeft className="w-4 h-4" />
@@ -139,7 +139,7 @@ export default function StudentWishlistPage() {
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                   <div className="space-y-2">
                     <Link href={`/courses/${course.slug}`}>
-                      <h3 className="font-black text-sm text-slate-900 line-clamp-2 hover:text-[#173A7C] transition-colors leading-snug">
+                      <h3 className="font-bold text-sm text-slate-900 line-clamp-2 hover:text-[#0B3766] transition-colors leading-snug">
                         {course.title}
                       </h3>
                     </Link>
@@ -147,13 +147,13 @@ export default function StudentWishlistPage() {
                     <div className="flex items-center gap-3 text-[11px] text-slate-500 font-bold">
                       {course.duration && (
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-[#5CB07C]" />
+                          <Clock className="w-3 h-3 text-[#19B6C7]" />
                           {course.duration}
                         </span>
                       )}
                       {course.lessonsCount && (
                         <span className="flex items-center gap-1">
-                          <BookOpen className="w-3 h-3 text-[#173A7C]" />
+                          <BookOpen className="w-3 h-3 text-[#0B3766]" />
                           {course.lessonsCount} درس
                         </span>
                       )}
@@ -164,7 +164,7 @@ export default function StudentWishlistPage() {
                   <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold block">السعر</span>
-                      <span className="text-base font-black text-[#173A7C]">
+                      <span className="text-base font-bold text-[#0B3766]">
                         {Number(course.price) === 0 ? 'مجاناً' : `${course.price} ر.س`}
                       </span>
                     </div>
@@ -172,10 +172,10 @@ export default function StudentWishlistPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => addToCart(course)}
-                        className={`px-3 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                        className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                           inCart
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-slate-100 hover:bg-[#173A7C] text-slate-700 hover:text-white'
+                            : 'bg-slate-100 hover:bg-[#0B3766] text-slate-700 hover:text-white'
                         }`}
                         title={inCart ? 'موجود بالسلة' : 'إضافة إلى السلة'}
                       >
@@ -194,7 +194,7 @@ export default function StudentWishlistPage() {
 
                       <Link
                         href={`/checkout?slug=${course.slug}`}
-                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#0D5C3A] to-[#127A4D] hover:from-[#127A4D] hover:to-[#0D5C3A] text-white text-xs font-black shadow-sm transition-all"
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#0D5C3A] to-[#127A4D] hover:from-[#127A4D] hover:to-[#0D5C3A] text-white text-xs font-bold shadow-sm transition-all"
                       >
                         تسجيل
                       </Link>

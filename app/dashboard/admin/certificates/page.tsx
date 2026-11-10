@@ -146,19 +146,19 @@ export default function AdminCertificatesPage() {
     bgType: 'preset',
     bgPreset: 'royal-gold',
     imageUrl: '/1.png',
-    headerTitle: 'شهادة إتمام وتفوق معتمدة',
+    headerTitle: 'شهادة إتمام',
     subtitle: 'CERTIFICATE OF COMPLETION & EXCELLENCE',
-    statement: 'يشهد معهد النبض المستدام العالي للتدريب بأن المتدرب/ـة:',
+    statement: 'يشهد أكاديمية مَدار للتعلّم بأن المتدرب/ـة:',
     bodyText: 'قد اجتاز/ت بنجاح متطلبات الدورة التدريبية واكتملت كافة ساعاتها النظرية والتطبيقية بكفاءة واقتدار.',
-    issuerName: 'معهد النبض المستدام العالي للتدريب',
+    issuerName: 'أكاديمية مَدار للتعلّم',
     signatory1Title: 'المشرف الأكاديمي والتدريب',
-    signatory1Name: 'د. عبدالرحمن الغامدي',
+    signatory1Name: 'فريق التدريب',
     signatory2Title: 'المدير التنفيذي للمعهد',
-    signatory2Name: 'أ. نورة الشمري',
+    signatory2Name: 'إدارة البرامج',
     showQrCode: true,
     showNationalSeal: true,
     showInstituteSeal: true,
-    accentColor: '#173A7C',
+    accentColor: '#0B3766',
     autoIssue: true,
   });
   const [isUploadingBg, setIsUploadingBg] = useState(false);
@@ -224,19 +224,19 @@ export default function AdminCertificatesPage() {
       bgType: 'preset',
       bgPreset: 'royal-gold',
       imageUrl: '/1.png',
-      headerTitle: 'شهادة إتمام وتفوق معتمدة',
+      headerTitle: 'شهادة إتمام',
       subtitle: 'CERTIFICATE OF COMPLETION & EXCELLENCE',
-      statement: 'يشهد معهد النبض المستدام العالي للتدريب بأن المتدرب/ـة:',
+      statement: 'يشهد أكاديمية مَدار للتعلّم بأن المتدرب/ـة:',
       bodyText: 'قد اجتاز/ت بنجاح متطلبات الدورة التدريبية واكتملت كافة ساعاتها النظرية والتطبيقية بكفاءة واقتدار.',
-      issuerName: 'معهد النبض المستدام العالي للتدريب',
+      issuerName: 'أكاديمية مَدار للتعلّم',
       signatory1Title: 'المشرف الأكاديمي والتدريب',
-      signatory1Name: 'د. عبدالرحمن الغامدي',
+      signatory1Name: 'فريق التدريب',
       signatory2Title: 'المدير التنفيذي للمعهد',
-      signatory2Name: 'أ. نورة الشمري',
+      signatory2Name: 'إدارة البرامج',
       showQrCode: true,
       showNationalSeal: true,
       showInstituteSeal: true,
-      accentColor: '#173A7C',
+      accentColor: '#0B3766',
       autoIssue: true,
     });
     setDesignerActiveTab('elements');
@@ -305,9 +305,9 @@ export default function AdminCertificatesPage() {
     text = text.replace(/{grade}/g, sample.grade);
     text = text.replace(/{hours}/g, sample.hours);
     text = text.replace(/{issue_date}/g, sample.issueDate);
-    text = text.replace(/{header_title}/g, designerForm.headerTitle || 'شهادة إتمام وتفوق معتمدة');
+    text = text.replace(/{header_title}/g, designerForm.headerTitle || 'شهادة إتمام');
     text = text.replace(/{subtitle}/g, designerForm.subtitle || 'CERTIFICATE OF ACHIEVEMENT');
-    text = text.replace(/{issuer_name}/g, designerForm.issuerName || 'معهد النبض المستدام العالي للتدريب');
+    text = text.replace(/{issuer_name}/g, designerForm.issuerName || 'أكاديمية مَدار للتعلّم');
     return text;
   };
 
@@ -366,7 +366,7 @@ export default function AdminCertificatesPage() {
       fontSize: 14,
       fontWeight: 'bold',
       fontFamily: 'cairo',
-      color: '#173A7C',
+      color: '#0B3766',
       textAlign: 'center',
       visible: true,
     };
@@ -644,7 +644,7 @@ export default function AdminCertificatesPage() {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-black border backdrop-blur-xl ${
+            className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-bold border backdrop-blur-xl ${
               toastMessage.type === 'success'
                 ? 'bg-slate-900/95 text-white border-emerald-500/50 shadow-emerald-950/40'
                 : 'bg-rose-950/95 text-white border-rose-500/50 shadow-rose-950/40'
@@ -665,12 +665,12 @@ export default function AdminCertificatesPage() {
         <div className="specular-card-reflection" />
         <div className={`${heroStyles.layout} relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6`}>
           <div className={`${heroStyles.intro} space-y-2`}>
-            <div className={`${heroStyles.badge} admin-hero-tag bg-[#173A7C]/10 border border-[#173A7C]/20 text-[#173A7C]`}>
+            <div className={`${heroStyles.badge} admin-hero-tag bg-[#0B3766]/10 border border-[#0B3766]/20 text-[#0B3766]`}>
               <Award className="w-4 h-4 text-amber-600 shrink-0" />
               <span className="sm:hidden">الشهادات والاعتمادات</span>
               <span className="hidden sm:inline">استوديو الشهادات والاعتمادات الرسمية</span>
             </div>
-            <h1 className={`${heroStyles.title} text-xl sm:text-2xl font-black text-[#152C5B] student-heading-h1`}>
+            <h1 className={`${heroStyles.title} text-xl sm:text-2xl font-bold text-[#152C5B] student-heading-h1`}>
               <Award aria-hidden="true" className="sm:hidden" />
               <span className="sm:hidden">إدارة قوالب الشهادات</span>
               <span className="hidden sm:inline">إدارة وتصميم قوالب الشهادات</span>
@@ -683,7 +683,7 @@ export default function AdminCertificatesPage() {
           <div className={`${heroStyles.actions} flex flex-wrap items-center gap-3`}>
             <button
               onClick={handleOpenNewTemplate}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] hover:from-[#0F2D69] hover:to-[#173A7C] text-white text-xs font-black flex items-center gap-2 shadow-lg shadow-[#173A7C]/25 transition-all cursor-pointer border border-white/20 hover:scale-[1.02] active:scale-[0.98]"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0B3766] via-[#168AD3] to-[#0F2D69] hover:from-[#0F2D69] hover:to-[#0B3766] text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-[#0B3766]/25 transition-all cursor-pointer border border-white/20 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Palette className="w-4 h-4 text-amber-300" />
               <span className="sm:hidden">قالب جديد</span>
@@ -692,7 +692,7 @@ export default function AdminCertificatesPage() {
 
             <button
               onClick={() => setIsIssuingModalOpen(true)}
-              className="px-4 py-2.5 rounded-xl bg-white/90 hover:bg-white text-[#173A7C] border border-[#173A7C]/30 text-xs font-black flex items-center gap-2 shadow-xs transition-all cursor-pointer hover:shadow-md"
+              className="px-4 py-2.5 rounded-xl bg-white/90 hover:bg-white text-[#0B3766] border border-[#0B3766]/30 text-xs font-bold flex items-center gap-2 shadow-xs transition-all cursor-pointer hover:shadow-md"
             >
               <UserPlus className="w-4 h-4 text-emerald-600" />
               <span className="sm:hidden">إصدار شهادة</span>
@@ -702,28 +702,28 @@ export default function AdminCertificatesPage() {
         </div>
 
         {/* Quick Stats Grid */}
-        <div className={`${heroStyles.quickStats} grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-[#173A7C]/15`}>
+        <div className={`${heroStyles.quickStats} grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-[#0B3766]/15`}>
           <div className="liquid-glass-inset p-3 rounded-xl border border-white/60">
             <span className="block text-[11px] text-slate-500 font-bold">إجمالي الشهادات الصادرة</span>
-            <span className="text-lg sm:text-xl font-black text-[#152C5B]">
+            <span className="text-lg sm:text-xl font-bold text-[#152C5B]">
               {totalIssued.toLocaleString('en-US')}
             </span>
           </div>
           <div className="liquid-glass-inset p-3 rounded-xl border border-white/60">
             <span className="block text-[11px] text-slate-500 font-bold">القوالب الفعالة</span>
-            <span className="text-lg sm:text-xl font-black text-emerald-700">
+            <span className="text-lg sm:text-xl font-bold text-emerald-700">
               {templates.length.toLocaleString('en-US')}
             </span>
           </div>
           <div className="liquid-glass-inset p-3 rounded-xl border border-white/60">
             <span className="block text-[11px] text-slate-500 font-bold">الإصدار التلقائي</span>
-            <span className="text-lg sm:text-xl font-black text-amber-700">
+            <span className="text-lg sm:text-xl font-bold text-amber-700">
               {templates.filter((t) => t.autoIssue).length.toLocaleString('en-US')} قوالب
             </span>
           </div>
           <div className="liquid-glass-inset p-3 rounded-xl border border-white/60">
             <span className="block text-[11px] text-slate-500 font-bold">التوثيق السحابي</span>
-            <span className="text-lg sm:text-xl font-black text-sky-700 flex items-center gap-1">
+            <span className="text-lg sm:text-xl font-bold text-sky-700 flex items-center gap-1">
               <span>نشط 24/7</span>
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
             </span>
@@ -737,7 +737,7 @@ export default function AdminCertificatesPage() {
           onClick={() => setSelectedTab('templates')}
           className={`premium-tab px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
             selectedTab === 'templates'
-              ? 'bg-[#173A7C] text-white shadow-md shadow-[#173A7C]/20'
+              ? 'bg-[#0B3766] text-white shadow-md shadow-[#0B3766]/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
@@ -752,7 +752,7 @@ export default function AdminCertificatesPage() {
           onClick={() => setSelectedTab('registry')}
           className={`premium-tab px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
             selectedTab === 'registry'
-              ? 'bg-[#173A7C] text-white shadow-md shadow-[#173A7C]/20'
+              ? 'bg-[#0B3766] text-white shadow-md shadow-[#0B3766]/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
@@ -769,17 +769,17 @@ export default function AdminCertificatesPage() {
         <div className="space-y-4">
           {isLoading ? (
             <div className="py-16 text-center text-slate-500 font-bold flex flex-col items-center justify-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-[#173A7C]" />
+              <Loader2 className="w-8 h-8 animate-spin text-[#0B3766]" />
               <span>جاري تحميل قوالب الشهادات من السيرفر...</span>
             </div>
           ) : templates.length === 0 ? (
             <div className="p-12 text-center bg-white/80 rounded-2xl border border-slate-200 space-y-4">
               <Award className="w-12 h-12 text-slate-300 mx-auto" />
-              <h3 className="font-black text-slate-800">لا توجد قوالب شهادات حالياً</h3>
+              <h3 className="font-bold text-slate-800">لا توجد قوالب شهادات حالياً</h3>
               <p className="text-xs text-slate-500 font-bold">ابدأ بتصميم أول قالب شهادة معتمد لدوراتك الآن.</p>
               <button
                 onClick={handleOpenNewTemplate}
-                className="px-4 py-2 rounded-xl bg-[#173A7C] text-white text-xs font-bold inline-flex items-center gap-2 cursor-pointer shadow-md"
+                className="px-4 py-2 rounded-xl bg-[#0B3766] text-white text-xs font-bold inline-flex items-center gap-2 cursor-pointer shadow-md"
               >
                 <Plus className="w-4 h-4" />
                 <span>تصميم قالب جديد</span>
@@ -800,7 +800,7 @@ export default function AdminCertificatesPage() {
 
                   {/* Template Image Header */}
                   <div>
-                    <div className="aspect-[1.414/1] relative bg-slate-950 overflow-hidden border-b border-[#173A7C]/10 group cursor-pointer"
+                    <div className="aspect-[1.414/1] relative bg-slate-950 overflow-hidden border-b border-[#0B3766]/10 group cursor-pointer"
                       onClick={() => {
                         setPreviewTemplate(tpl);
                         setIsPreviewModalOpen(true);
@@ -825,7 +825,7 @@ export default function AdminCertificatesPage() {
                     <div className="p-4 sm:p-5 pt-3 space-y-2.5">
                       <div className="space-y-1">
                         <div className="flex items-center justify-between gap-2">
-                          <h3 className="font-extrabold text-sm text-[#152C5B] student-heading-h3 truncate">
+                          <h3 className="font-bold text-sm text-[#152C5B] student-heading-h3 truncate">
                             {tpl.name}
                           </h3>
                         </div>
@@ -848,13 +848,13 @@ export default function AdminCertificatesPage() {
                   </div>
 
                   {/* Actions & Settings Footer */}
-                  <div className="p-4 sm:p-5 pt-0 border-t border-[#173A7C]/10 flex items-center justify-between text-xs mt-auto">
+                  <div className="p-4 sm:p-5 pt-0 border-t border-[#0B3766]/10 flex items-center justify-between text-xs mt-auto">
                     <label className="flex items-center gap-1.5 font-bold text-slate-700 cursor-pointer text-[11px]">
                       <input
                         type="checkbox"
                         checked={tpl.autoIssue}
                         onChange={() => handleToggleAutoIssue(tpl)}
-                        className="w-3.5 h-3.5 accent-[#173A7C] rounded cursor-pointer"
+                        className="w-3.5 h-3.5 accent-[#0B3766] rounded cursor-pointer"
                       />
                       <span>الإصدار التلقائي</span>
                     </label>
@@ -863,7 +863,7 @@ export default function AdminCertificatesPage() {
                       <button
                         onClick={() => handleEditTemplate(tpl)}
                         title="تعديل القالب وتصميمه"
-                        className="p-2 rounded-lg text-slate-700 hover:text-[#173A7C] hover:bg-[#173A7C]/10 transition-colors cursor-pointer border border-slate-200 bg-white"
+                        className="p-2 rounded-lg text-slate-700 hover:text-[#0B3766] hover:bg-[#0B3766]/10 transition-colors cursor-pointer border border-slate-200 bg-white"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
@@ -895,7 +895,7 @@ export default function AdminCertificatesPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="البحث باسم المتدرب أو كود التوثيق..."
-                className="w-full py-2 pr-9 pl-3.5 text-xs font-bold text-slate-800 bg-white/90 rounded-xl border border-slate-200/80 focus:outline-none focus:border-[#173A7C] focus:ring-2 focus:ring-[#173A7C]/15 transition-all shadow-2xs"
+                className="w-full py-2 pr-9 pl-3.5 text-xs font-bold text-slate-800 bg-white/90 rounded-xl border border-slate-200/80 focus:outline-none focus:border-[#0B3766] focus:ring-2 focus:ring-[#0B3766]/15 transition-all shadow-2xs"
               />
             </div>
 
@@ -910,7 +910,7 @@ export default function AdminCertificatesPage() {
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-right text-xs">
-                <thead className="bg-[#173A7C]/5 text-[#173A7C] font-black border-b border-[#173A7C]/10">
+                <thead className="bg-[#0B3766]/5 text-[#0B3766] font-bold border-b border-[#0B3766]/10">
                   <tr>
                     <th className="p-4">اسم المتدرب</th>
                     <th className="p-4">المساق التدريبي</th>
@@ -921,7 +921,7 @@ export default function AdminCertificatesPage() {
                     <th className="p-4 text-center">الإجراءات</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#173A7C]/8 font-bold text-slate-800">
+                <tbody className="divide-y divide-[#0B3766]/8 font-bold text-slate-800">
                   {issuedCertificates
                     .filter(
                       (c) =>
@@ -931,17 +931,17 @@ export default function AdminCertificatesPage() {
                     )
                     .map((cert) => (
                       <tr key={cert.id} className="hover:bg-white/60 transition-colors">
-                        <td className="p-4 font-extrabold text-[#152C5B] text-sm student-heading-h3">
+                        <td className="p-4 font-bold text-[#152C5B] text-sm student-heading-h3">
                           {cert.studentName}
                         </td>
                         <td className="p-4 text-slate-700">{cert.courseTitle}</td>
-                        <td className="p-4 font-mono font-black text-[#173A7C]">
-                          <span className="bg-[#173A7C]/10 px-2.5 py-1 rounded-lg border border-[#173A7C]/20 text-[11px]">
+                        <td className="p-4 font-mono font-bold text-[#0B3766]">
+                          <span className="bg-[#0B3766]/10 px-2.5 py-1 rounded-lg border border-[#0B3766]/20 text-[11px]">
                             {cert.code}
                           </span>
                         </td>
                         <td className="p-4 text-slate-600">{cert.issueDate}</td>
-                        <td className="p-4 text-emerald-700 font-black">
+                        <td className="p-4 text-emerald-700 font-bold">
                           {cert.grade} {cert.hours && `(${cert.hours})`}
                         </td>
                         <td className="p-4">
@@ -977,7 +977,7 @@ export default function AdminCertificatesPage() {
                             <a
                               href={cert.imageUrl || '/1.png'}
                               download={`شهادة_${cert.studentName}_${cert.code}.png`}
-                              className="p-2 rounded-xl text-[#173A7C] hover:bg-[#173A7C] hover:text-white transition-colors cursor-pointer border border-[#173A7C]/20 bg-white"
+                              className="p-2 rounded-xl text-[#0B3766] hover:bg-[#0B3766] hover:text-white transition-colors cursor-pointer border border-[#0B3766]/20 bg-white"
                             >
                               <Download className="w-4 h-4" />
                             </a>
@@ -990,7 +990,7 @@ export default function AdminCertificatesPage() {
             </div>
 
             {/* Mobile Cards View */}
-            <div className="md:hidden divide-y divide-[#173A7C]/8">
+            <div className="md:hidden divide-y divide-[#0B3766]/8">
               {issuedCertificates
                 .filter(
                   (c) =>
@@ -1002,7 +1002,7 @@ export default function AdminCertificatesPage() {
                   <div key={cert.id} className="p-4 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h4 className="font-extrabold text-sm text-[#152C5B] student-heading-h3">{cert.studentName}</h4>
+                        <h4 className="font-bold text-sm text-[#152C5B] student-heading-h3">{cert.studentName}</h4>
                         <p className="text-[11px] text-slate-500 font-bold mt-0.5">{cert.courseTitle}</p>
                       </div>
                       <span
@@ -1019,11 +1019,11 @@ export default function AdminCertificatesPage() {
                     <div className="grid grid-cols-3 gap-2 text-center text-[10px]">
                       <div className="liquid-glass-inset p-2 rounded-lg border border-white/60">
                         <span className="block text-slate-500 font-bold">كود التوثيق</span>
-                        <span className="font-mono font-bold text-[#173A7C]">{cert.code}</span>
+                        <span className="font-mono font-bold text-[#0B3766]">{cert.code}</span>
                       </div>
                       <div className="liquid-glass-inset p-2 rounded-lg border border-white/60">
                         <span className="block text-slate-500 font-bold">التقدير</span>
-                        <span className="font-black text-emerald-700">{cert.grade}</span>
+                        <span className="font-bold text-emerald-700">{cert.grade}</span>
                       </div>
                       <div className="liquid-glass-inset p-2 rounded-lg border border-white/60">
                         <span className="block text-slate-500 font-bold">تاريخ الإصدار</span>
@@ -1035,7 +1035,7 @@ export default function AdminCertificatesPage() {
                       <a
                         href={cert.imageUrl || '/1.png'}
                         download={`شهادة_${cert.code}.png`}
-                        className="flex-1 py-2 rounded-lg bg-[#173A7C] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm"
+                        className="flex-1 py-2 rounded-lg bg-[#0B3766] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>تحميل الشهادة</span>
@@ -1088,7 +1088,7 @@ export default function AdminCertificatesPage() {
                       value={designerForm.name || ''}
                       onChange={(e) => setDesignerForm({ ...designerForm, name: e.target.value })}
                       placeholder="اسم القالب..."
-                      className="w-full max-w-[280px] bg-white/10 hover:bg-white/15 focus:bg-white/20 text-white font-black text-xs sm:text-sm px-3 py-1.5 rounded-xl border border-white/20 focus:border-amber-400 outline-none transition-all"
+                      className="w-full max-w-[280px] bg-white/10 hover:bg-white/15 focus:bg-white/20 text-white font-bold text-xs sm:text-sm px-3 py-1.5 rounded-xl border border-white/20 focus:border-amber-400 outline-none transition-all"
                     />
                     <select
                       value={designerForm.courseTitle || ''}
@@ -1114,7 +1114,7 @@ export default function AdminCertificatesPage() {
                     onClick={() => setDesignerForm({ ...designerForm, imageUrl: '/1.png' })}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       designerForm.imageUrl === '/1.png'
-                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -1125,7 +1125,7 @@ export default function AdminCertificatesPage() {
                     onClick={() => setDesignerForm({ ...designerForm, imageUrl: '/2.png' })}
                     className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       designerForm.imageUrl === '/2.png'
-                        ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
+                        ? 'bg-emerald-500 text-slate-950 font-bold shadow-xs'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -1169,7 +1169,7 @@ export default function AdminCertificatesPage() {
                     type="button"
                     onClick={handleSaveTemplate}
                     disabled={isSavingTemplate}
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer transition-all border border-emerald-400/30 disabled:opacity-50"
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer transition-all border border-emerald-400/30 disabled:opacity-50"
                   >
                     {isSavingTemplate ? (
                       <>
@@ -1271,7 +1271,7 @@ export default function AdminCertificatesPage() {
                                     fontSize: Math.max(9, (currentEl.fontSize || 14) - 1),
                                   })
                                 }
-                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-black cursor-pointer"
+                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
                                 title="تصغير الخط"
                               >
                                 -
@@ -1286,7 +1286,7 @@ export default function AdminCertificatesPage() {
                                     fontSize: Math.min(64, (currentEl.fontSize || 14) + 1),
                                   })
                                 }
-                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-black cursor-pointer"
+                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
                                 title="تكبير الخط"
                               >
                                 +
@@ -1300,7 +1300,7 @@ export default function AdminCertificatesPage() {
                                   const nw = Math.max(30, (currentEl.width || 60) - 5);
                                   handleUpdateElement(currentEl.id, { width: nw, height: nw });
                                 }}
-                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-black cursor-pointer"
+                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
                                 title="تصغير الحجم"
                               >
                                 -
@@ -1314,7 +1314,7 @@ export default function AdminCertificatesPage() {
                                   const nw = Math.min(200, (currentEl.width || 60) + 5);
                                   handleUpdateElement(currentEl.id, { width: nw, height: nw });
                                 }}
-                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-black cursor-pointer"
+                                className="px-2 py-1 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
                                 title="تكبير الحجم"
                               >
                                 +
@@ -1331,7 +1331,7 @@ export default function AdminCertificatesPage() {
                                   fontWeight: currentEl.fontWeight === 'bold' || currentEl.fontWeight === 'black' ? 'normal' : 'bold',
                                 })
                               }
-                              className={`px-2.5 py-1 rounded-lg border text-xs font-black transition-colors cursor-pointer ${
+                              className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition-colors cursor-pointer ${
                                 currentEl.fontWeight === 'bold' || currentEl.fontWeight === 'black'
                                   ? 'bg-blue-600 text-white border-blue-500'
                                   : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
@@ -1378,7 +1378,7 @@ export default function AdminCertificatesPage() {
                           {/* Color Palette Dots */}
                           {currentEl.color !== undefined && (
                             <div className="flex items-center gap-1 bg-slate-800 border border-slate-700 p-1 rounded-lg">
-                              {['#173A7C', '#152C5B', '#B45309', '#065F46', '#1E293B', '#B91C1C'].map((c) => (
+                              {['#0B3766', '#152C5B', '#B45309', '#065F46', '#1E293B', '#B91C1C'].map((c) => (
                                 <button
                                   key={c}
                                   type="button"
@@ -1391,7 +1391,7 @@ export default function AdminCertificatesPage() {
                               ))}
                               <input
                                 type="color"
-                                value={currentEl.color || '#173A7C'}
+                                value={currentEl.color || '#0B3766'}
                                 onChange={(e) => handleUpdateElement(currentEl.id, { color: e.target.value })}
                                 className="w-4 h-4 rounded cursor-pointer border-0 bg-transparent p-0"
                                 title="اختر لوناً مخصصاً"
@@ -1459,7 +1459,7 @@ export default function AdminCertificatesPage() {
                   ref={canvasRef}
                   onPointerMove={handleCanvasPointerMove}
                   onPointerUp={handleCanvasPointerUp}
-                  className="w-full max-w-[820px] aspect-[1.414/1] bg-white rounded-xl sm:rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-amber-400/40 relative overflow-hidden text-slate-900 select-none touch-none cursor-default"
+                  className="w-full max-w-[820px] aspect-[1.414/1] bg-white rounded-xl sm:rounded-2xl shadow-[0_20px_50px_rgba(11,55,102,0.1)] border border-amber-400/40 relative overflow-hidden text-slate-900 select-none touch-none cursor-default"
                   style={{
                     backgroundImage: `url(${designerForm.imageUrl || '/1.png'})`,
                     backgroundSize: 'cover',
@@ -1475,7 +1475,7 @@ export default function AdminCertificatesPage() {
                       className="absolute inset-0 pointer-events-none opacity-15"
                       style={{
                         backgroundImage:
-                          'linear-gradient(to right, #173A7C 1px, transparent 1px), linear-gradient(to bottom, #173A7C 1px, transparent 1px)',
+                          'linear-gradient(to right, #0B3766 1px, transparent 1px), linear-gradient(to bottom, #0B3766 1px, transparent 1px)',
                         backgroundSize: '10% 10%',
                       }}
                     />
@@ -1484,7 +1484,7 @@ export default function AdminCertificatesPage() {
                   {/* Center Snap Guideline */}
                   {snapGuidelineX !== null && (
                     <div
-                      className="absolute top-0 bottom-0 w-[1.5px] bg-blue-500 z-30 pointer-events-none shadow-[0_0_6px_rgba(59,130,246,0.9)]"
+                      className="absolute top-0 bottom-0 w-[1.5px] bg-blue-500 z-30 pointer-events-none shadow-[0_0_6px_rgba(11,55,102,0.08)]"
                       style={{ left: `${snapGuidelineX}%` }}
                     />
                   )}
@@ -1518,7 +1518,7 @@ export default function AdminCertificatesPage() {
                             top: `${el.y}%`,
                             transform: 'translate(-50%, -50%)',
                             textAlign: el.textAlign || 'center',
-                            color: el.color || '#173A7C',
+                            color: el.color || '#0B3766',
                             userSelect: 'none',
                             padding: isSelected ? '2px 4px' : '2px 4px',
                           }}
@@ -1578,11 +1578,11 @@ export default function AdminCertificatesPage() {
                               style={{ width: `${el.width || 75}px`, height: `${el.height || 75}px` }}
                             >
                               <Award className="w-5 h-5 text-amber-200" />
-                              <span className="text-[7px] font-black leading-tight mt-0.5">ختم المعهد</span>
+                              <span className="text-[7px] font-bold leading-tight mt-0.5">ختم المعهد</span>
                               <span className="text-[6px] opacity-80">معتمد</span>
                             </div>
                           ) : el.type === 'badge' ? (
-                            <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs flex items-center gap-1 font-black text-[10px] pointer-events-none">
+                            <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-400 shadow-xs flex items-center gap-1 font-bold text-[10px] pointer-events-none">
                               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                               <span>{el.content || 'معتمد رسمياً'}</span>
                             </div>
@@ -1677,7 +1677,7 @@ export default function AdminCertificatesPage() {
                   <button
                     type="button"
                     onClick={handleAddNewCustomText}
-                    className="px-3 py-1 rounded-lg bg-[#173A7C] hover:bg-[#1E4D9D] text-white font-bold text-xs flex items-center gap-1 shadow-sm cursor-pointer transition-colors"
+                    className="px-3 py-1 rounded-lg bg-[#0B3766] hover:bg-[#168AD3] text-white font-bold text-xs flex items-center gap-1 shadow-sm cursor-pointer transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>إضافة نص</span>
@@ -1696,7 +1696,7 @@ export default function AdminCertificatesPage() {
                         onClick={() => setSelectedElementId(el.id)}
                         className={`px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-2 ${
                           isSelected
-                            ? 'bg-blue-600 text-white border-blue-400 font-black shadow-xs'
+                            ? 'bg-blue-600 text-white border-blue-400 font-bold shadow-xs'
                             : el.visible
                             ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
                             : 'bg-slate-900 text-slate-500 border-slate-800 opacity-60'
@@ -1732,7 +1732,7 @@ export default function AdminCertificatesPage() {
           >
             <div className="w-full max-w-4xl bg-slate-900 rounded-2xl border border-white/20 p-5 space-y-4 shadow-2xl">
               <div className="flex items-center justify-between text-white border-b border-white/10 pb-3">
-                <h3 className="font-black text-sm">{previewTemplate.name}</h3>
+                <h3 className="font-bold text-sm">{previewTemplate.name}</h3>
                 <button
                   onClick={() => setIsPreviewModalOpen(false)}
                   className="p-1 rounded-lg text-slate-400 hover:text-white"
@@ -1754,7 +1754,7 @@ export default function AdminCertificatesPage() {
                     setIsPreviewModalOpen(false);
                     handleEditTemplate(previewTemplate);
                   }}
-                  className="px-4 py-2 rounded-xl bg-[#173A7C] text-white font-bold flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-[#0B3766] text-white font-bold flex items-center gap-1.5"
                 >
                   <Edit3 className="w-4 h-4" />
                   <span>تعديل هذا القالب</span>
@@ -1780,7 +1780,7 @@ export default function AdminCertificatesPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="w-full max-w-lg bg-white/95 backdrop-blur-xl text-slate-900 rounded-2xl border border-white/80 p-6 sm:p-8 space-y-6 shadow-2xl overflow-hidden relative my-8"
             >
-              <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-amber-400 via-[#173A7C] to-emerald-400" />
+              <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-amber-400 via-[#0B3766] to-emerald-400" />
 
               <div className="flex items-center justify-between pb-3 border-b border-slate-200/70">
                 <div className="flex items-center gap-3">
@@ -1788,7 +1788,7 @@ export default function AdminCertificatesPage() {
                     <UserPlus className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg text-[#152C5B] student-heading-h3">إصدار شهادة معتمدة جديدة</h3>
+                    <h3 className="font-bold text-lg text-[#152C5B] student-heading-h3">إصدار شهادة إتمام جديدة</h3>
                     <p className="text-xs text-slate-500 font-bold">توليد رمز توثيق رقمي فوري وحفظ بالسجل الدائم</p>
                   </div>
                 </div>

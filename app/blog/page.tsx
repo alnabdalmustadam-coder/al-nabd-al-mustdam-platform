@@ -11,7 +11,6 @@ import {
   ArrowLeft,
   ChevronLeft,
   Search,
-  Sparkles,
   Tag,
   GraduationCap,
   Award
@@ -22,6 +21,7 @@ const categories = [
   { key: "all", label: "جميع المقالات" },
   { key: "management", label: "إدارة ومشاريع" },
   { key: "governance", label: "الجودة والحوكمة" },
+  { key: "data", label: "البيانات والتحليل" },
   { key: "safety", label: "السلامة والبيئة" },
 ];
 
@@ -35,7 +35,9 @@ export default function BlogIndexPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.articles) && data.articles.length > 0) {
-          setPosts(data.articles);
+          const liveArticles = data.articles;
+          const liveSlugs = new Set(liveArticles.map((article: { slug: string }) => article.slug));
+          setPosts([...liveArticles, ...blogPosts.filter(post => !liveSlugs.has(post.slug))]);
         }
       })
       .catch((err) => console.error('Failed to fetch live articles:', err));
@@ -54,24 +56,24 @@ export default function BlogIndexPage() {
   const featuredPost = posts.find((p) => p.is_featured) || posts[0] || blogPosts[0];
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900 selection:bg-[#173A7C] selection:text-white" dir="rtl">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900 selection:bg-[#0B3766] selection:text-white" dir="rtl">
       {/* ═══════════════════════════════════════ HERO BANNER ═══════════════════════════════════════ */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-[#173A7C]/[0.08] via-[#173A7C]/[0.02] to-transparent relative overflow-hidden">
+      <section className="pt-32 pb-16 bg-gradient-to-b from-[#0B3766]/[0.08] via-[#0B3766]/[0.02] to-transparent relative overflow-hidden">
         {/* Background glow */}
-        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[#173A7C]/[0.04] rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-1/2 left-10 w-[400px] h-[400px] bg-[#5CB07C]/[0.04] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[#0B3766]/[0.04] rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-1/2 left-10 w-[400px] h-[400px] bg-[#19B6C7]/[0.04] rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           {/* Badge */}
           <span className="section-badge-glass mb-6">
-            <BookOpen className="w-4 h-4 text-[#5CB07C]" />
+            <BookOpen className="w-4 h-4 text-[#19B6C7]" />
             المدونة المعرفية والأكاديمية
           </span>
 
           <motion.h1
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-4"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight mb-4"
           >
             المعرفة والتميز في <span className="gradient-text">عالم التدريب</span>
           </motion.h1>
@@ -87,7 +89,7 @@ export default function BlogIndexPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ابحث عن مقال، موضوع، أو وسم..."
-              className="w-full pl-5 pr-12 py-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#173A7C]/30 text-sm font-medium text-slate-800 placeholder:text-slate-400"
+              className="w-full pl-5 pr-12 py-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0B3766]/30 text-sm font-medium text-slate-800 placeholder:text-slate-400"
             />
             <Search className="w-5 h-5 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
@@ -100,7 +102,7 @@ export default function BlogIndexPage() {
                 onClick={() => setSelectedCategory(cat.key)}
                 className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                   selectedCategory === cat.key
-                    ? "bg-[#173A7C] text-white shadow-md shadow-[#173A7C]/20"
+                    ? "bg-[#0B3766] text-white shadow-md shadow-[#0B3766]/20"
                     : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
                 }`}
               >
@@ -114,7 +116,7 @@ export default function BlogIndexPage() {
       {/* ═══════════════════════════════════════ FEATURED HERO ARTICLE ═══════════════════════════════════════ */}
       {selectedCategory === "all" && !searchQuery && featuredPost && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-          <div className="p-1 rounded-[2.5rem] bg-gradient-to-r from-[#173A7C]/20 via-[#5CB07C]/20 to-[#173A7C]/20 shadow-xl">
+          <div className="p-1 rounded-[2.5rem] bg-gradient-to-r from-[#0B3766]/20 via-[#19B6C7]/20 to-[#0B3766]/20 shadow-xl">
             <div className="rounded-[2.4rem] bg-white p-6 sm:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               {/* Image side */}
               <div className="lg:col-span-6 relative rounded-3xl overflow-hidden bg-slate-900 shadow-md">
@@ -124,7 +126,7 @@ export default function BlogIndexPage() {
                   preload
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
-                <span className="absolute top-4 right-4 bg-[#173A7C] text-white text-xs font-bold px-3.5 py-1.5 rounded-full shadow-md">
+                <span className="absolute top-4 right-4 bg-[#0B3766] text-white text-xs font-bold px-3.5 py-1.5 rounded-full shadow-md">
                   مقال مميز
                 </span>
               </div>
@@ -132,7 +134,7 @@ export default function BlogIndexPage() {
               {/* Text side */}
               <div className="lg:col-span-6 space-y-4">
                 <div className="flex items-center gap-3 text-xs text-slate-500 font-medium">
-                  <span className="bg-emerald-50 text-[#5CB07C] font-bold px-3 py-1 rounded-full border border-[#5CB07C]/20">
+                  <span className="bg-[#19B6C7]/10 text-[#19B6C7] font-bold px-3 py-1 rounded-full border border-[#19B6C7]/20">
                     {featuredPost.category}
                   </span>
                   <span>{featuredPost.date}</span>
@@ -140,7 +142,7 @@ export default function BlogIndexPage() {
                   <span>{featuredPost.readTime}</span>
                 </div>
 
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 leading-snug">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 leading-snug">
                   {featuredPost.title}
                 </h2>
 
@@ -150,7 +152,7 @@ export default function BlogIndexPage() {
 
                 <div className="pt-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#173A7C] text-white flex items-center justify-center font-bold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-[#0B3766] text-white flex items-center justify-center font-bold text-sm">
                       {featuredPost.author.name.charAt(0)}
                     </div>
                     <div>
@@ -161,7 +163,7 @@ export default function BlogIndexPage() {
 
                   <Link
                     href={`/blog/${featuredPost.slug}`}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#173A7C] hover:bg-[#122e63] text-white text-xs sm:text-sm font-bold transition-all shadow-md"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0B3766] hover:bg-[#122e63] text-white text-xs sm:text-sm font-bold transition-all shadow-md"
                   >
                     <span>قراءة المقال</span>
                     <ChevronLeft className="w-4 h-4" />
@@ -176,7 +178,7 @@ export default function BlogIndexPage() {
       {/* ═══════════════════════════════════════ ARTICLES GRID ═══════════════════════════════════════ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
             {searchQuery
               ? `نتائج البحث عن "${searchQuery}" (${filteredPosts.length})`
               : "جميع المقالات والدراسات"}
@@ -209,7 +211,7 @@ export default function BlogIndexPage() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                       <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-                      <span className="absolute top-3.5 right-3.5 bg-white/95 backdrop-blur-md text-[#173A7C] text-[11px] font-bold px-3 py-1 rounded-full shadow-xs border border-white/80">
+                      <span className="absolute top-3.5 right-3.5 bg-white/95 backdrop-blur-md text-[#0B3766] text-[11px] font-bold px-3 py-1 rounded-full shadow-xs border border-white/80">
                         {post.category}
                       </span>
                       <div className="absolute bottom-2.5 right-3 left-3 flex items-center justify-between text-white text-[11px] font-medium">
@@ -220,7 +222,7 @@ export default function BlogIndexPage() {
 
                     {/* Content */}
                     <div className="p-5 flex flex-col flex-grow">
-                      <h3 className="text-base font-bold text-slate-900 mb-2 leading-snug group-hover:text-[#173A7C] transition-colors line-clamp-2">
+                      <h3 className="text-base font-bold text-slate-900 mb-2 leading-snug group-hover:text-[#0B3766] transition-colors line-clamp-2">
                         {post.shortTitle || post.title}
                       </h3>
                       <p className="text-slate-500 text-xs sm:text-[13px] leading-relaxed mb-4 line-clamp-3 flex-grow">
@@ -228,7 +230,7 @@ export default function BlogIndexPage() {
                       </p>
 
                       <div className="pt-3 border-t border-slate-100 flex items-center justify-between mt-auto">
-                        <span className="text-xs font-bold text-[#5CB07C] flex items-center gap-1 group-hover:gap-1.5 transition-all">
+                        <span className="text-xs font-bold text-[#19B6C7] flex items-center gap-1 group-hover:gap-1.5 transition-all">
                           اقرأ المزيد
                           <ChevronLeft className="w-3.5 h-3.5" />
                         </span>

@@ -1,610 +1,965 @@
 [
   {
-    "id": 1,
-    "title": "دورة استخدام الحاسب الالي في الاعمال المكتبية",
-    "slug": "computer-basics-office",
-    "description": "للمبتدئين والخريجين الجدد، تعلم اساسيات الحاسب الالي لرفع مستوى إنتاجيتك في الأعمال المكتبية. هذه الدورة تتضمن استخدام برامج إدارة البيانات مثل Microsoft Office. استعد للمنافسة في سوق العمل بكل ثقة.",
-    "image": "/logo.webp",
-    "category": "admin",
-    "level": "all",
-    "price": 900,
-    "rating": 5,
-    "enrollees": 0,
-    "duration": "4 ساعة تدريبية معتمدة",
-    "lessonsCount": 1,
-    "featured": true,
-    "trainerId": "tr-1",
-    "instructor": "د. محمد القحطاني",
-    "curriculum": [
-      {
-        "id": "les-1788027738877",
-        "title": "الدرس الاول المفاهيم",
-        "duration": "8 ثانية",
-        "isLocked": false,
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "الدرس الاول المفاهيم"
-        ]
-      }
-    ],
-    "outcomes": [
-      "إتقان استخدام نظام التشغيل Windows وتطبيقاته.",
-      "إنشاء وتنسيق المستندات الاحترافية باستخدام Word.",
-      "إعداد وتصميم الجداول الإلكترونية وتحليل البيانات في Excel.",
-      "تصميم العروض التقديمية الفعالة والجذابة في PowerPoint.",
-      "إدارة رسائل البريد الإلكتروني والمهام باستخدام Outlook."
-    ],
-    "requirements": "لا توجد متطلبات مسبقة. الدورة مصممة للمبتدئين تماماً.",
-    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
-    "ghlCourseId": "course-haceb",
-    "attachments": [],
-    "studentsCount": 0,
-    "reviewsCount": 0
-  },
-  {
-    "id": 2,
-    "title": "دورات ادخال بيانات ومعالجة نصوص",
-    "slug": "data-entry-word-processing",
-    "description": "كن متميزا بين أقرانك وامتلك مهارة جديدة من خلال تعلم كيفية إدخال البيانات ومعالجة النصوص بكفاءة باستخدام أحدث البرامج. هذه الدورة تمنحك القدرة على العمل في المجالات المدنية وتوسيع فرصك الوظيفية.",
-    "image": "/logo.webp",
-    "category": "data",
-    "level": "intermediate",
-    "price": 1300,
-    "rating": 5,
-    "enrollees": 0,
-    "duration": "30 ساعة",
-    "lessonsCount": 15,
-    "featured": true,
-    "trainerId": "tr-2",
-    "instructor": "أ. د. سارة العتيبي",
-    "curriculum": [
-      {
-        "id": "d-m1",
-        "title": "الدرس الأول: أساسيات الكتابة السريعة ولوحة المفاتيح",
-        "isLocked": false,
-        "duration": "3 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "تقنيات وضعية الأصابع الصحيحة للكتابة دون النظر",
-          "تمارين مكثفة لزيادة سرعة الكتابة باللغتين العربية والإنجليزية"
-        ]
-      },
-      {
-        "id": "d-m2",
-        "title": "الدرس الثاني: معالجة النصوص المتقدمة وإعداد الخطابات",
-        "isLocked": true,
-        "duration": "10 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "إعداد الخطابات الإدارية والمعاملات الحكومية الرسمية",
-          "استخدام الأنماط الجاهزة والتحكم المتقدم في الفقرات والهوامش"
-        ]
-      },
-      {
-        "id": "d-m3",
-        "title": "الدرس الثالث: دقة وجودة إدخال البيانات وتدقيق المعاملات",
-        "isLocked": true,
-        "duration": "12 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "آليات إدخال السجلات وقواعد البيانات بطرق علمية دقيقة",
-          "فحص وتدقيق البيانات وتجنب الأخطاء الشائعة أثناء الرصد السريع"
-        ]
-      },
-      {
-        "id": "d-m4",
-        "title": "الدرس الرابع: مشروع تطبيقي شامل ومحاكاة بيئة العمل",
-        "isLocked": true,
-        "duration": "5 ساعات",
-        "type": "quiz",
-        "videoUrl": "",
-        "lessons": [
-          "تنفيذ مشروع إدخال سجلات متكامل تحت ضغط الوقت",
-          "تقييم دقة وسرعة المتدرب وإعطائه تقرير فني بالأداء"
-        ]
-      }
-    ],
-    "outcomes": [
-      "رفع سرعة ودقة الكتابة على لوحة المفاتيح.",
-      "احتراف معالجة النصوص وتنسيق المعاملات الرسمية.",
-      "التعامل مع ملفات البيانات الضخمة وضمان جودتها.",
-      "توسيع الفرص الوظيفية في القطاعين العام والخاص."
-    ],
-    "requirements": "معرفة أساسية بسيطة باستخدام الحاسب الآلي.",
-    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
-    "ghlCourseId": "course-data-entry",
-    "studentsCount": 0,
-    "reviewsCount": 0
-  },
-  {
-    "id": 3,
-    "title": "دورة اللغة الانجليزية",
-    "slug": "english-language-course",
-    "description": "هل ترغب في تحسين مهاراتك في الإنجليزية؟ تعلم اللغة الإنجليزية من خلال دورات تفاعلية تساعدك على التحدث والكتابة بثقة. هذه الكورسات موجهة لجميع المستويات وتفتح لك فرصا واسعة في العمل والدراسة.",
-    "image": "/logo.webp",
-    "category": "languages",
-    "level": "all",
+    "id": 9101,
+    "slug": "madar-quality",
+    "title": "إدارة الجودة وتحسين العمليات",
+    "description": "اختر مؤشرًا واضحًا، وجرّب تحسينًا صغيرًا، ثم قارن أثره بخط الأساس.",
     "price": 0,
-    "rating": 5,
-    "enrollees": 0,
-    "duration": "60 ساعة",
-    "lessonsCount": 40,
+    "currency": "SAR",
+    "category": "management",
+    "level": "beginner",
+    "rating": 4.8,
+    "reviewsCount": 12,
+    "studentsCount": 24,
+    "duration": "ساعتان",
+    "lessonsCount": 4,
+    "image": "/images/blog/iso-risk-management.jpg",
+    "instructor": "سارة ناصر",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "مدرّبة في تطوير المهارات وتحسين العمليات.",
     "featured": true,
-    "trainerId": "tr-3",
-    "instructor": "د. خالد الدوسري",
+    "outcomes": [
+      "تطبيق المهارة في مثال من بيئة العمل.",
+      "مراجعة نتائج التطبيق وكتابة الخطوة التالية."
+    ],
     "curriculum": [
       {
-        "id": "e-m1",
-        "title": "الدرس الأول: مقدمة وتحديد المستوى التفاعلي",
-        "isLocked": false,
-        "duration": "ساعتان",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "اختبار تحديد مستوى شامل لقياس المهارات اللغوية الأربعة",
-          "بناء خطة الدراسة المخصصة بناءً على نقاط القوة والضعف"
-        ]
-      },
-      {
-        "id": "e-m2",
-        "title": "الدرس الثاني: المحادثة اليومية والتركيبات الأساسية للمبتدئين",
-        "isLocked": true,
-        "duration": "15 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "التعرف على المفردات والجمل الشائعة في التعارف والمطاعم والتسوق",
-          "ممارسة النطق الصحيح وتجنب الأخطاء الصوتية الشائعة"
-        ]
-      },
-      {
-        "id": "e-m3",
-        "title": "الدرس الثالث: القواعد الأساسية والأزمنة في اللغة",
-        "isLocked": true,
-        "duration": "15 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "شرح مبسط للأزمنة الأساسية (المضارع، الماضي، المستقبل)",
-          "تطبيق القواعد في صياغة جمل صحيحة وتجنب الأخطاء النحوية"
-        ]
-      },
-      {
-        "id": "e-m4",
-        "title": "الدرس الرابع: مهارات الكتابة والمراسلات البريدية والمهنية",
-        "isLocked": true,
-        "duration": "15 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "هيكلة البريد الإلكتروني والرسائل الإدارية باللغة الإنجليزية",
-          "اختيار الأسلوب المناسب للمراسلات الرسمية والمهنية"
-        ]
-      },
-      {
-        "id": "e-m5",
-        "title": "الدرس الخامس: تطوير مهارات الاستماع والفهم للغات المختلفة",
-        "isLocked": true,
-        "duration": "13 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "الاستماع لمقاطع صوتية بلهجات مختلفة (بريطانية، أمريكية)",
-          "تطوير تقنيات الاستخلاص والتلخيص وفهم سياق الحوار السريع"
+        "id": "unit-1",
+        "title": "المحتوى والتطبيق العملي",
+        "duration": "25 دقيقة",
+        "items": [
+          {
+            "id": "quality-video",
+            "title": "من الملاحظة إلى التحسين",
+            "type": "video",
+            "duration": "16 ثانية",
+            "videoUrl": "/demo/madar/quality.mp4",
+            "description": "شاهد مثالًا مبسّطًا على قياس الوضع الحالي قبل تجربة التغيير."
+          },
+          {
+            "id": "quality-pdf",
+            "title": "قائمة فحص تحسين الجودة",
+            "type": "pdf",
+            "duration": "5 دقائق",
+            "fileUrl": "/demo/madar/quality-checklist.pdf",
+            "fileName": "quality-checklist.pdf"
+          },
+          {
+            "id": "quality-word",
+            "title": "ورقة عمل خطة التحسين",
+            "type": "doc",
+            "duration": "5 دقائق",
+            "fileUrl": "/demo/madar/improvement-template.docx",
+            "fileName": "improvement-template.docx"
+          },
+          {
+            "id": "quality-slides",
+            "title": "قراءة مؤشرات الجودة",
+            "type": "ppt",
+            "duration": "5 دقائق",
+            "fileUrl": "/demo/madar/quality-slides.pptx",
+            "fileName": "quality-slides.pptx"
+          }
         ]
       }
     ],
-    "outcomes": [
-      "التحدث بطلاقة في مواقف الحياة اليومية والمهنية.",
-      "تحسين مستويات الفهم والاستماع للكنات المختلفة.",
-      "إتقان بناء الجمل وكتابة المراسلات باللغة الإنجليزية.",
-      "التحضير لاجتياز اختبارات تحديد المستوى العالمية."
-    ],
-    "requirements": "الرغبة في التعلم والتطور المستمر.",
-    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
-    "ghlCourseId": "course-english",
-    "studentsCount": 0,
-    "reviewsCount": 0
+    "trainerId": "11111111-1111-4111-8111-111111111112",
+    "enrollees": 24,
+    "status": "published",
+    "professionalDevelopment": true,
+    "learningJourney": {
+      "enabled": true,
+      "introduction": "في هذا المسار ستبني تجربة تحسين قصيرة لعملية من بيئة العمل.",
+      "summary": "ثبّت تعريف المؤشر وحدد موعد المراجعة التالي.",
+      "preAssessment": {
+        "id": "quality-pre",
+        "title": "الاختبار القبلي",
+        "passingScore": 0,
+        "durationMinutes": 8,
+        "questions": [
+          {
+            "id": "p1",
+            "type": "multiple_choice",
+            "question": "ما أول خطوة قبل تحسين عملية؟",
+            "options": [
+              "قياس الوضع الحالي",
+              "تغيير كل الخطوات",
+              "إعلان النتائج"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    },
+    "finalExam": {
+      "id": "quality-final",
+      "title": "الاختبار البعدي",
+      "passingScore": 80,
+      "durationMinutes": 8,
+      "questions": [
+        {
+          "id": "f1",
+          "type": "multiple_choice",
+          "question": "كيف تجهّز مقارنة موثوقة؟",
+          "options": [
+            "تثبيت تعريف المؤشر",
+            "تغيير تعريف المؤشر",
+            "حذف خط الأساس"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "f2",
+          "type": "matching",
+          "question": "صِل كل عنصر بوصفه",
+          "options": [],
+          "correctIndex": 0,
+          "pairs": [
+            {
+              "id": "baseline",
+              "prompt": "خط الأساس",
+              "answer": "القياس قبل التغيير"
+            },
+            {
+              "id": "experiment",
+              "prompt": "التجربة",
+              "answer": "تطبيق تعديل محدود"
+            },
+            {
+              "id": "review",
+              "prompt": "المراجعة",
+              "answer": "مقارنة النتيجة بخط الأساس"
+            }
+          ]
+        }
+      ]
+    },
+    "attachments": [
+      {
+        "id": "doc-pdf",
+        "title": "قائمة فحص الجودة",
+        "fileUrl": "/demo/madar/quality-checklist.pdf",
+        "fileType": "pdf"
+      },
+      {
+        "id": "doc-word",
+        "title": "نموذج خطة التحسين",
+        "fileUrl": "/demo/madar/improvement-template.docx",
+        "fileType": "doc"
+      },
+      {
+        "id": "doc-slides",
+        "title": "ملخّص المؤشرات",
+        "fileUrl": "/demo/madar/quality-slides.pptx",
+        "fileType": "ppt"
+      }
+    ]
   },
   {
-    "id": 4,
-    "title": "دورة الذكاء الاصطناعي",
-    "slug": "ai-course",
-    "description": "استعد لمستقبل التكنولوجيا مع دورة الذكاء الاصطناعي. تعلم كيف يتم استخدام تقنيات الذكاء الاصطناعي في تطبيقات متعددة مثل التحليل والروبوتات. ستكتسب المهارات التي تؤهلك للعمل في هذا مجال المتقدم.",
-    "image": "/logo.webp",
-    "category": "tech",
-    "level": "all",
-    "price": 450,
-    "rating": 5,
-    "enrollees": 0,
-    "duration": "45 ساعة",
-    "lessonsCount": 30,
+    "id": 9102,
+    "slug": "madar-data",
+    "title": "تحليل البيانات لاتخاذ القرار",
+    "description": "حوّل الأرقام إلى سؤال، وقارن البدائل، ثم صِغ قرارًا قابلًا للمراجعة.",
+    "price": 0,
+    "currency": "SAR",
+    "category": "data",
+    "level": "beginner",
+    "rating": 4.8,
+    "reviewsCount": 12,
+    "studentsCount": 24,
+    "duration": "ساعتان",
+    "lessonsCount": 2,
+    "image": "/services/data.jpg",
+    "instructor": "م. فيصل الشمري",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "مدرّبة في تطوير المهارات وتحسين العمليات.",
     "featured": true,
-    "trainerId": "tr-1",
-    "instructor": "د. محمد القحطاني",
+    "outcomes": [
+      "تطبيق المهارة في مثال من بيئة العمل.",
+      "مراجعة نتائج التطبيق وكتابة الخطوة التالية."
+    ],
     "curriculum": [
       {
-        "id": "a-m1",
-        "title": "الدرس الأول: مقدمة في الذكاء الاصطناعي وتاريخه",
-        "isLocked": false,
-        "duration": "4 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "التعرف على المفاهيم التأسيسية للذكاء الاصطناعي وتطورها التاريخي",
-          "فهم خوارزميات التعلم الآلي والشبكات العصبية والفرق بينها"
-        ]
-      },
-      {
-        "id": "a-m2",
-        "title": "الدرس الثاني: تطبيقات الذكاء الاصطناعي العملية في قطاع الأعمال",
-        "isLocked": true,
-        "duration": "20 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "كيفية توظيف أدوات الذكاء الاصطناعي لرفع الإنتاجية وصناعة المحتوى",
-          "استكشاف نماذج لغة التوليد التلقائي (Generative AI) وكتابة الأوامر الهندسية"
-        ]
-      },
-      {
-        "id": "a-m3",
-        "title": "الدرس الثالث: الأخلاقيات ومستقبل تقنيات الذكاء الاصطناعي",
-        "isLocked": true,
-        "duration": "21 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "دراسة قضايا التحيز والأمان الرقمي وحماية الملكية الفكرية",
-          "استعراض الفرص المستقبلية لوظائف الذكاء الاصطناعي وطرق التأهيل لها"
+        "id": "unit-1",
+        "title": "المحتوى والتطبيق العملي",
+        "duration": "25 دقيقة",
+        "items": [
+          {
+            "id": "data-start",
+            "title": "من البيانات إلى السؤال",
+            "type": "article",
+            "duration": "5 دقائق",
+            "description": "حدّد سؤالًا واحدًا يمكن الإجابة عنه باستخدام البيانات.",
+            "contentBlocks": [
+              {
+                "id": "data-example",
+                "type": "text",
+                "title": "سؤال القرار",
+                "text": "ما الخطوة التي يمكن تحسينها؟ وما المقياس الذي يكشف أثر التغيير؟"
+              }
+            ]
+          },
+          {
+            "id": "data-end",
+            "title": "تلخيص النتيجة",
+            "type": "article",
+            "duration": "5 دقائق",
+            "description": "صِغ قرارًا وأضف خطوة للتحقق منه لاحقًا."
+          }
         ]
       }
     ],
-    "outcomes": [
-      "فهم أسس الذكاء الاصطناعي والتعلم الآلي.",
-      "تطبيقات الذكاء الاصطناعي التوليدي العملية.",
-      "مبادئ وأخلاقيات هندسة الأوامر (Prompt Engineering)."
-    ],
-    "requirements": "أساسيات الحاسب الآلي.",
-    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
-    "ghlCourseId": "course-ai",
-    "studentsCount": 0,
-    "reviewsCount": 0
+    "trainerId": "11111111-1111-4111-8111-111111111116",
+    "enrollees": 24,
+    "status": "published"
   },
   {
-    "id": 5,
-    "title": "دورة محلل الأمن السيبراني",
-    "slug": "cybersecurity-analyst",
-    "description": "هل ترغب في حماية البيانات والشبكات من الهجمات الالكترونية؟ تعلم كيف تصبح محلل أمن سيبراني مع هذه الدورة المتخصصة. ستكتسب المهارات الأساسية لحماية الأنظمة المعلوماتية في بيئة العمل.",
-    "image": "/logo.webp",
+    "id": 9103,
+    "slug": "madar-teams",
+    "title": "التواصل الفعّال وإدارة فرق العمل",
+    "description": "تدرّب على تحديد التوقعات وإعطاء تغذية راجعة واضحة.",
+    "price": 0,
+    "currency": "SAR",
+    "category": "management",
+    "level": "beginner",
+    "rating": 4.8,
+    "reviewsCount": 12,
+    "studentsCount": 24,
+    "duration": "ساعتان",
+    "lessonsCount": 2,
+    "image": "/images/blog/pmp-management.jpg",
+    "instructor": "نورة علي",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "مدرّبة في تطوير المهارات وتحسين العمليات.",
+    "featured": true,
+    "outcomes": [
+      "تطبيق المهارة في مثال من بيئة العمل.",
+      "مراجعة نتائج التطبيق وكتابة الخطوة التالية."
+    ],
+    "curriculum": [
+      {
+        "id": "unit-1",
+        "title": "المحتوى والتطبيق العملي",
+        "duration": "25 دقيقة",
+        "items": [
+          {
+            "id": "teams-start",
+            "title": "إدارة التوقعات",
+            "type": "article",
+            "duration": "5 دقائق",
+            "description": "اكتب تعريفًا واضحًا للنتيجة التي يتفق عليها الفريق."
+          },
+          {
+            "id": "teams-feedback",
+            "title": "تغذية راجعة قابلة للتطبيق",
+            "type": "article",
+            "duration": "5 دقائق",
+            "description": "اذكر ملاحظة محددة، ثم اقترح خطوة واحدة قابلة للقياس."
+          }
+        ]
+      }
+    ],
+    "trainerId": "11111111-1111-4111-8111-111111111115",
+    "enrollees": 24,
+    "status": "published"
+  },
+  {
+    "id": 9104,
+    "slug": "madar-digital",
+    "title": "تصميم تجربة تدريب رقمية",
+    "description": "مسودة لتوضيح حالة النشر في محرّر الدورات.",
+    "price": 0,
+    "currency": "SAR",
     "category": "tech",
+    "level": "beginner",
+    "rating": 4.8,
+    "reviewsCount": 0,
+    "studentsCount": 0,
+    "duration": "ساعتان",
+    "lessonsCount": 1,
+    "image": "/services/data.jpg",
+    "instructor": "سارة ناصر",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "مدرّبة في تطوير المهارات وتحسين العمليات.",
+    "featured": false,
+    "outcomes": [
+      "تطبيق المهارة في مثال من بيئة العمل.",
+      "مراجعة نتائج التطبيق وكتابة الخطوة التالية."
+    ],
+    "curriculum": [
+      {
+        "id": "unit-1",
+        "title": "المحتوى والتطبيق العملي",
+        "duration": "25 دقيقة",
+        "items": [
+          {
+            "id": "digital-start",
+            "title": "رسم رحلة المتدرّب",
+            "type": "article",
+            "duration": "5 دقائق",
+            "description": "حدد نقطة البداية والنتيجة المتوقعة."
+          }
+        ]
+      }
+    ],
+    "trainerId": "11111111-1111-4111-8111-111111111112",
+    "enrollees": 0,
+    "status": "draft"
+  },
+  {
+    "id": 9110,
+    "slug": "preview-cyber",
+    "title": "أساسيات الأمن السيبراني في بيئة العمل",
+    "description": "فهم التهديدات الرقمية الشائعة وطرق حماية الحسابات والملفات والبيانات المؤسسية.",
+    "longDescription": "برنامج تدريبي تطبيقي يركز على تزويد الكوادر والموظفين بالوعي السيبراني الضروري لحماية الأنظمة، كلمات المرور، واكتشاف محاولات التصيد الاحتيالي والهندسة الاجتماعية في بيئة العمل اليومية.",
+    "price": 0,
+    "currency": "SAR",
+    "category": "tech",
+    "level": "beginner",
+    "rating": 4.9,
+    "reviewsCount": 18,
+    "studentsCount": 38,
+    "duration": "3 ساعات",
+    "lessonsCount": 4,
+    "image": "/images/blog/osha-safety.jpg",
+    "instructor": "م. فيصل الشمري",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "مهندس وخبير أمن سيبراني واستجابة للحوادث الرقمية.",
+    "featured": true,
+    "professionalDevelopment": true,
+    "trainerId": "11111111-1111-4111-8111-111111111116",
+    "enrollees": 38,
+    "status": "published",
+    "outcomes": [
+      "التعرف على أحدث أساليب التصيد الإلكتروني والهندسة الاجتماعية وكيفية تجنبها.",
+      "تطبيق سياسات كلمات المرور القوية والمصادقة متعددة العوامل MFA.",
+      "حماية البيانات الحساسة أثناء المشاركة والتخزين السحابي داخل المؤسسة."
+    ],
+    "curriculum": [
+      {
+        "id": "cyber-unit-1",
+        "title": "المفاهيم السيبرانية الأساسية والتطبيق",
+        "duration": "35 دقيقة",
+        "items": [
+          {
+            "id": "cyber-lesson-1",
+            "title": "مدخل إلى التهديدات السيبرانية المعاصرة",
+            "type": "video",
+            "duration": "18 ثانية",
+            "videoUrl": "/demo/madar/quality.mp4",
+            "description": "جولة عملية توضح أكثر ثغرات بيئة العمل شيوعاً."
+          },
+          {
+            "id": "cyber-lesson-2",
+            "title": "دليل إدارة كلمات المرور وتأمين الأجهزة",
+            "type": "pdf",
+            "duration": "8 دقائق",
+            "fileUrl": "/demo/madar/quality-checklist.pdf",
+            "fileName": "cybersecurity-guide.pdf"
+          },
+          {
+            "id": "cyber-lesson-3",
+            "title": "قالب تقرير الإبلاغ عن الحوادث المشبوهة",
+            "type": "doc",
+            "duration": "6 دقائق",
+            "fileUrl": "/demo/madar/improvement-template.docx",
+            "fileName": "incident-report-template.docx"
+          }
+        ]
+      }
+    ],
+    "learningJourney": {
+      "enabled": true,
+      "introduction": "ستتعلم في هذا المسار كيفية التصدي للهجمات السيبرانية وحماية أصول المؤسسة الرقمية.",
+      "summary": "احرص على تفعيل التحقق الثنائي وعدم فتح روابط غير موثوقة.",
+      "preAssessment": {
+        "id": "cyber-pre",
+        "title": "الاختبار القبلي للوعي السيبراني",
+        "passingScore": 0,
+        "durationMinutes": 8,
+        "questions": [
+          {
+            "id": "cp1",
+            "type": "multiple_choice",
+            "question": "ما التصرف الصحيح عند تلقي بريد إلكتروني يطلب كلمة مرورك العاجلة؟",
+            "options": [
+              "الإبلاغ فوراً لفريق أمن المعلومات دون النقر على أي رابط",
+              "الرد بكلمة المرور المؤقتة",
+              "إعادة توجيه الرسالة لكل الزملاء"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    },
+    "finalExam": {
+      "id": "cyber-final",
+      "title": "الاختبار البعدي للأمن السيبراني",
+      "passingScore": 80,
+      "durationMinutes": 10,
+      "questions": [
+        {
+          "id": "cf1",
+          "type": "multiple_choice",
+          "question": "ما هي الخاصية التي توفر أماناً إضافياً فوق كلمة المرور؟",
+          "options": [
+            "المصادقة متعددة العوامل (MFA)",
+            "استخدام كلمة مرور سهلة الحفظ",
+            "إلغاء قفل الشاشة"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "attachments": [
+      {
+        "id": "cyber-att-1",
+        "title": "دليل الأمان السيبراني للموظفين",
+        "fileUrl": "/demo/madar/quality-checklist.pdf",
+        "fileName": "cyber-checklist.pdf",
+        "fileSize": "1.2 MB",
+        "type": "pdf"
+      }
+    ]
+  },
+  {
+    "id": 9111,
+    "slug": "preview-projects",
+    "title": "إدارة المشاريع من التخطيط إلى التنفيذ",
+    "description": "تعلّم تنظيم نطاق المشروع والجدول الزمني والمخاطر، ومتابعة تقدم العمل مع الفريق.",
+    "longDescription": "منهج عملي يستند إلى أفضل الممارسات المعتمدة عالمياً في إدارة المشاريع، يشمل تحديد الميثاق، وجدولة المعالم، ومصفوفة المخاطر، ولوحات متابعة مؤشرات الأداء.",
+    "price": 0,
+    "currency": "SAR",
+    "category": "management",
     "level": "intermediate",
-    "price": 349,
-    "rating": 5,
-    "enrollees": 0,
-    "duration": "40 ساعة",
-    "lessonsCount": 25,
+    "rating": 4.9,
+    "reviewsCount": 22,
+    "studentsCount": 45,
+    "duration": "4 ساعات",
+    "lessonsCount": 4,
+    "image": "/services/consulting.jpg",
+    "instructor": "سارة ناصر",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "مدرّبة معتمدة في إدارة المشاريع والعمليات المؤسسية.",
     "featured": true,
-    "trainerId": "tr-2",
-    "instructor": "أ. د. سارة العتيبي",
+    "professionalDevelopment": true,
+    "trainerId": "11111111-1111-4111-8111-111111111112",
+    "enrollees": 45,
+    "status": "published",
+    "outcomes": [
+      "صياغة ميثاق المشروع وتحديد نطاق العمل Scope بدقة.",
+      "بناء الجدول الزمني وتحديد المسار الحرج وإدارة الموارد.",
+      "تطبيق مصفوفة إدارة المخاطر وتحديث تقارير الإنجاز الدورية."
+    ],
     "curriculum": [
       {
-        "id": "c-m1",
-        "title": "الدرس الأول: مبادئ الأمن السيبراني والمخاطر الشائعة",
-        "isLocked": false,
-        "duration": "5 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "فهم ركائز الأمان الثلاثة (السرية، السلامة، التوافرية)",
-          "التعرف على أساليب الهندسة الاجتماعية والبرمجيات الخبيثة وطرق التصدي لها"
-        ]
-      },
-      {
-        "id": "c-m2",
-        "title": "الدرس الثاني: تأمين الشبكات وحوكمة البيانات المؤسسية",
-        "isLocked": true,
-        "duration": "20 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "إعداد وضبط جدران الحماية وأنظمة الكشف عن التسلل (IDS/IPS)",
-          "مبادئ التشفير المتماثل وغير المتماثل وتأمين قنوات الاتصال"
-        ]
-      },
-      {
-        "id": "c-m3",
-        "title": "الدرس الثالث: الاستجابة للحوادث الأمنية والتحقيق الرقمي",
-        "isLocked": true,
-        "duration": "15 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "خطوات احتواء الهجمات الإلكترونية وتقليل الأضرار بعد الاختراق",
-          "أدوات جمع الأدلة الرقمية وكتابة تقارير الحوادث الفنية للإدارة"
+        "id": "proj-unit-1",
+        "title": "تخطيط ومتابعة المشاريع الاحترافية",
+        "duration": "40 دقيقة",
+        "items": [
+          {
+            "id": "proj-lesson-1",
+            "title": "بناء هيكل تجزئة العمل WBS",
+            "type": "video",
+            "duration": "18 ثانية",
+            "videoUrl": "/demo/madar/quality.mp4",
+            "description": "شرح مرئي لكيفية تقسيم المهام والمخرجات بكفاءة."
+          },
+          {
+            "id": "proj-lesson-2",
+            "title": "قالب ميثاق المشروع الاحترافي",
+            "type": "doc",
+            "duration": "10 دقائق",
+            "fileUrl": "/demo/madar/improvement-template.docx",
+            "fileName": "project-charter.docx"
+          }
         ]
       }
     ],
-    "outcomes": [
-      "معرفة أنواع الهجمات الإلكترونية وطرق الحماية.",
-      "تأمين الشبكات والبيانات المؤسسية."
-    ],
-    "requirements": "معرفة جيدة بالشبكات وأنظمة التشغيل.",
-    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
-    "ghlCourseId": "course-cybersecurity",
-    "studentsCount": 0,
-    "reviewsCount": 0
+    "learningJourney": {
+      "enabled": true,
+      "introduction": "تعلّم أدوات الإدارة الاحترافية لقيادة مشاريعك بنجاح وفي الوقت المحدد.",
+      "summary": "راقب المعالم الرئيسية وتواصل بشفافية مع أصحاب المصلحة.",
+      "preAssessment": {
+        "id": "proj-pre",
+        "title": "الاختبار القبلي لإدارة المشاريع",
+        "passingScore": 0,
+        "durationMinutes": 8,
+        "questions": [
+          {
+            "id": "pp1",
+            "type": "multiple_choice",
+            "question": "ما هي الوثيقة التي تمنح مدير المشروع الصلاحية الرسمية للبدء؟",
+            "options": [
+              "ميثاق المشروع (Project Charter)",
+              "الفاتورة الأولية",
+              "عقد الصيانة"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    },
+    "finalExam": {
+      "id": "proj-final",
+      "title": "الاختبار البعدي لإدارة المشاريع",
+      "passingScore": 80,
+      "durationMinutes": 10,
+      "questions": [
+        {
+          "id": "pf1",
+          "type": "multiple_choice",
+          "question": "ماذا يقصد بالمسار الحرج في المشروع؟",
+          "options": [
+            "أطول تسلسل للأنشطة المحددة لزمن انتهاء المشروع بدون أي تراخٍ",
+            "المسار الأقل تكلفة فقط",
+            "قائمة الأخطار الملغاة"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "attachments": [
+      {
+        "id": "proj-att-1",
+        "title": "قالب ميثاق المشروع وملف المخاطر",
+        "fileUrl": "/demo/madar/improvement-template.docx",
+        "fileName": "project-templates.docx",
+        "fileSize": "1.5 MB",
+        "type": "doc"
+      }
+    ]
   },
   {
-    "id": 6,
-    "title": "دورة صيانة الجوالات",
-    "slug": "mobile-maintenance",
-    "description": "لراغبي الدخول إلى عالم صيانة الجوالات احصل على المهارات اللازمة لإصلاح الهواتف الذكية من خلال دورة متكاملة. ستكون مؤهلاً للعمل في هذا المجال المتطور وفتح ورشة صيانة خاصة بك.",
-    "image": "/logo.webp",
+    "id": 9112,
+    "slug": "preview-ai",
+    "title": "الذكاء الاصطناعي والإنتاجية المهنية",
+    "description": "تعرّف إلى طرق استخدام أدوات الذكاء الاصطناعي في التخطيط والبحث وصياغة التقارير مع مراجعة النتائج بشريًا.",
+    "longDescription": "دورة تفاعلية تدربك على توظيف الذكاء الاصطناعي التوليدي وهندسة الأوامر (Prompt Engineering) لرفع كفاءتك الإنتاجية، وتسريع التحليل وصياغة المحتوى المهني.",
+    "price": 0,
+    "currency": "SAR",
     "category": "tech",
-    "level": "all",
-    "price": 750,
+    "level": "beginner",
     "rating": 5,
-    "enrollees": 0,
-    "duration": "60 ساعة",
-    "lessonsCount": 40,
+    "reviewsCount": 31,
+    "studentsCount": 62,
+    "duration": "3 ساعات",
+    "lessonsCount": 4,
+    "image": "/services/development.jpg",
+    "instructor": "م. فيصل الشمري",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "مستشار التحول الرقمي وحلول الذكاء الاصطناعي للأعمال.",
     "featured": true,
-    "trainerId": "tr-3",
-    "instructor": "د. خالد الدوسري",
+    "professionalDevelopment": true,
+    "trainerId": "11111111-1111-4111-8111-111111111116",
+    "enrollees": 62,
+    "status": "published",
+    "outcomes": [
+      "إتقان تقنيات هندسة الأوامر Prompts للحصول على مخرجات دقيقة وعالية الجودة.",
+      "أتمتة المهام المكتبية الروتينية وتلخيص المستندات المعقدة في ثوانٍ.",
+      "مراعاة أخلاقيات الذكاء الاصطناعي وحماية خصوصية بيانات المنشأة."
+    ],
     "curriculum": [
       {
-        "id": "mo-m1",
-        "title": "الدرس الأول: مبادئ الإلكترونيات وفحص القطع والعتاد",
-        "isLocked": false,
-        "duration": "6 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "التعرف على المكونات الداخلية للهاتف وأدوات الفحص والقياس",
-          "طرق تفكيك وتركيب الأجهزة الذكية وتحديد القطع التالفة بأمان"
-        ]
-      },
-      {
-        "id": "mo-m2",
-        "title": "الدرس الثاني: صيانة العتاد الصلب (Hardware) واستبدال الأجزاء",
-        "isLocked": true,
-        "duration": "24 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "مبادئ وتقنيات اللحام الدقيق (Micro-soldering) وإصلاح الدوائر",
-          "استبدال الشاشات، البطاريات، منافذ الشحن، والكاميرات التالفة"
-        ]
-      },
-      {
-        "id": "mo-m3",
-        "title": "الدرس الثالث: صيانة البرمجيات (Software) وحل المشاكل الفنية",
-        "isLocked": true,
-        "duration": "20 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "تثبيت وتحديث أنظمة التشغيل iOS و Android وحل تعليق النظام",
-          "طرق استرجاع البيانات المفقودة، وعمل النسخ الاحتياطي، وفك الأقفال البرمجية"
-        ]
-      },
-      {
-        "id": "mo-m4",
-        "title": "الدرس الرابع: دراسة السوق وتأسيس مشروع صيانة خاص بك",
-        "isLocked": true,
-        "duration": "10 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "مصادر شراء قطع الغيار الأصلية وأدوات الصيانة بأسعار اقتصادية",
-          "خطوات الترخيص وتجهيز المحل وجذب العملاء وتسعير الخدمات"
+        "id": "ai-unit-1",
+        "title": "تطبيقات الذكاء الاصطناعي في بيئة العمل",
+        "duration": "30 دقيقة",
+        "items": [
+          {
+            "id": "ai-lesson-1",
+            "title": "قواعد كتابة البرومبت الفعال",
+            "type": "video",
+            "duration": "18 ثانية",
+            "videoUrl": "/demo/madar/quality.mp4",
+            "description": "شرح تطبيقي لبناء أوامر ذكية تلبي متطلبات الأعمال."
+          },
+          {
+            "id": "ai-lesson-2",
+            "title": "دليل الأوامر الجاهزة للمديرين وفرق العمل",
+            "type": "pdf",
+            "duration": "10 دقائق",
+            "fileUrl": "/demo/madar/quality-checklist.pdf",
+            "fileName": "ai-prompts-guide.pdf"
+          }
         ]
       }
     ],
-    "outcomes": [
-      "تشخيص أعطال الهواتف بكفاءة.",
-      "إصلاح المشاكل البرمجية والعتاد (Hardware/Software)."
-    ],
-    "requirements": "لا توجد متطلبات سابقة.",
-    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
-    "ghlCourseId": "course-mobile",
-    "studentsCount": 0,
-    "reviewsCount": 0
+    "learningJourney": {
+      "enabled": true,
+      "introduction": "ضاعف إنتاجيتك باستخدام أحدث تقنيات ونماذج الذكاء الاصطناعي.",
+      "summary": "اعتمد دائماً المراجعة البشرية للتحقق من دقة وملاءمة المخرجات.",
+      "preAssessment": {
+        "id": "ai-pre",
+        "title": "الاختبار القبلي للذكاء الاصطناعي",
+        "passingScore": 0,
+        "durationMinutes": 8,
+        "questions": [
+          {
+            "id": "aip1",
+            "type": "multiple_choice",
+            "question": "ما العنصر الأهم للحصول على إجابة احترافية من نموذج الذكاء الاصطناعي؟",
+            "options": [
+              "تحديد السياق، الدور، والمخرجات المطلوبة بدقة",
+              "كتابة كلمة واحدة عامة",
+              "تكرار السؤال دون تفاصيل"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    },
+    "finalExam": {
+      "id": "ai-final",
+      "title": "الاختبار البعدي للذكاء الاصطناعي",
+      "passingScore": 80,
+      "durationMinutes": 10,
+      "questions": [
+        {
+          "id": "aif1",
+          "type": "multiple_choice",
+          "question": "لماذا يُوصى بالمراجعة البشرية لمخرجات نماذج اللغة الكبيرة؟",
+          "options": [
+            "لتفادي الأخطاء والتأكد من مطابقتها للسياق الواقعي وسرية البيانات",
+            "لأن النماذج لا تستطيع الكتابة",
+            "لحذف الكلمات العربية"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "attachments": [
+      {
+        "id": "ai-att-1",
+        "title": "كتيب هندسة الأوامر الاحترافية",
+        "fileUrl": "/demo/madar/quality-checklist.pdf",
+        "fileName": "prompt-engineering-handbook.pdf",
+        "fileSize": "2.1 MB",
+        "type": "pdf"
+      }
+    ]
   },
   {
-    "id": 7,
-    "title": "دورة الأوشا",
-    "slug": "osha-course",
-    "description": "حافظ على سلامتك في العمل مع دورة الأوشا المتخصصة في الأمن والسلامة. تعلم كيف تساهم في توفير بيئة عمل آمنة وتلتزم بالمعايير المحلية والدولية. هذه الدورة ضرورية لكل من يسعى لتحسين مستوى الأمان في مكان عمله.",
-    "image": "/logo.webp",
-    "category": "corporate",
-    "level": "all",
-    "price": 249,
-    "rating": 5,
-    "enrollees": 0,
-    "duration": "30 ساعة",
-    "lessonsCount": 15,
+    "id": 9113,
+    "slug": "preview-digital-marketing",
+    "title": "التسويق الرقمي وقياس أداء الحملات",
+    "description": "تعلّم بناء خطة محتوى، وتحديد الجمهور المناسب، وقراءة مؤشرات الحملات لتحسين القرارات التسويقية.",
+    "longDescription": "برنامج عملي شامل يغطي استراتيجيات التسويق الرقمي، بناء الشرائح المستهدفة، إدارة الإعلانات الممولة، وتحليل مؤشرات العائد على الإنفاق الإعلاني ROAS.",
+    "price": 0,
+    "currency": "SAR",
+    "category": "management",
+    "level": "intermediate",
+    "rating": 4.8,
+    "reviewsCount": 14,
+    "studentsCount": 29,
+    "duration": "3 ساعات",
+    "lessonsCount": 4,
+    "image": "/services/marketing.jpg",
+    "instructor": "نورة علي",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "استشارية تسويق رقمي وإدارة حملات النمو المؤسسي.",
     "featured": true,
-    "trainerId": "tr-1",
-    "instructor": "د. محمد القحطاني",
+    "professionalDevelopment": true,
+    "trainerId": "11111111-1111-4111-8111-111111111115",
+    "enrollees": 29,
+    "status": "published",
+    "outcomes": [
+      "تصميم قمع المبيعات والتسويق الرقمي Funnel بما يتناسب مع الجمهور المستهدف.",
+      "إطلاق ومتابعة الحملات الإعلانية على القنوات الرقمية ومحركات البحث.",
+      "قراءة وتحليل مؤشرات CAC و LTV و ROAS لترشيد وتوجيه الميزانية."
+    ],
     "curriculum": [
       {
-        "id": "os-m1",
-        "title": "الدرس الأول: معايير الأوشا الأساسية ومقدمة في السلامة المهنية",
-        "isLocked": false,
-        "duration": "5 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "تاريخ الأوشا وأهميتها والتعرف على الحقوق والمسؤوليات القانونية",
-          "تصنيف المخاطر المهنية في مكان العمل (فيزيائية، كيميائية، بيولوجية)"
-        ]
-      },
-      {
-        "id": "os-m2",
-        "title": "الدرس الثاني: المخاطر الهندسية وخطط الوقاية والحماية من السقوط",
-        "isLocked": true,
-        "duration": "15 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "معايير الحماية من السقوط والعمل بأمان في المرتفعات والسحالات",
-          "مبادئ السلامة الكهربائية، وسلامة الآلات، وخطوات العزل الميكانيكي والكهربائي"
-        ]
-      },
-      {
-        "id": "os-m3",
-        "title": "الدرس الثالث: إدارة الحرائق وخطط الإخلاء في الحالات الطارئة",
-        "isLocked": true,
-        "duration": "10 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "أنواع الحرائق واستخدام مطافئ الحريق المختلفة بمهارة",
-          "تصميم وتطبيق خطة طوارئ وإخلاء متكاملة للمنشأة"
+        "id": "mkt-unit-1",
+        "title": "إدارة وقياس الحملات الرقمية",
+        "duration": "35 دقيقة",
+        "items": [
+          {
+            "id": "mkt-lesson-1",
+            "title": "بناء الاستراتيجية وقمع المبيعات الرقمي",
+            "type": "video",
+            "duration": "18 ثانية",
+            "videoUrl": "/demo/madar/quality.mp4",
+            "description": "شرح خطوات تحويل الزائر إلى عميل مستمر."
+          },
+          {
+            "id": "mkt-lesson-2",
+            "title": "جدول قياس مؤشرات أداء التسويق",
+            "type": "doc",
+            "duration": "8 دقائق",
+            "fileUrl": "/demo/madar/improvement-template.docx",
+            "fileName": "marketing-kpi-tracker.docx"
+          }
         ]
       }
     ],
-    "outcomes": [
-      "فهم معايير السلامة المهنية.",
-      "تطبيق سياسات الأوشا في بيئة العمل."
-    ],
-    "requirements": "لا توجد متطلبات مسبقة.",
-    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
-    "ghlCourseId": "course-osha",
-    "studentsCount": 0,
-    "reviewsCount": 0
+    "learningJourney": {
+      "enabled": true,
+      "introduction": "تعلّم أسرار التسويق الرقمي الحديث المبني على الأرقام والنتائج المحققة.",
+      "summary": "اختبر الحملات بنماذج A/B واعتمد القرارات بناء على البيانات الفعلية.",
+      "preAssessment": {
+        "id": "mkt-pre",
+        "title": "الاختبار القبلي للتسويق الرقمي",
+        "passingScore": 0,
+        "durationMinutes": 8,
+        "questions": [
+          {
+            "id": "mp1",
+            "type": "multiple_choice",
+            "question": "ماذا يقيس مؤشر ROAS في التسويق الرقمي؟",
+            "options": [
+              "العائد المالي المباشر على الإنفاق الإعلاني",
+              "عدد الإعجابات بالصفحة",
+              "سرعة تحميل الموقع"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    },
+    "finalExam": {
+      "id": "mkt-final",
+      "title": "الاختبار البعدي للتسويق الرقمي",
+      "passingScore": 80,
+      "durationMinutes": 10,
+      "questions": [
+        {
+          "id": "mf1",
+          "type": "multiple_choice",
+          "question": "ما أول خطوة لإطلاق حملة تسويقية ناجحة؟",
+          "options": [
+            "تحديد الهدف بدقة وتعريف الجمهور المستهدف (Buyer Persona)",
+            "إنفاق كامل الميزانية في اليوم الأول",
+            "تغيير الشعار أسبوعياً"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "attachments": [
+      {
+        "id": "mkt-att-1",
+        "title": "نموذج خطة التسويق والحملات الرقمية",
+        "fileUrl": "/demo/madar/improvement-template.docx",
+        "fileName": "marketing-plan-template.docx",
+        "fileSize": "1.4 MB",
+        "type": "doc"
+      }
+    ]
   },
   {
-    "id": 8,
-    "title": "دورة النيبوش",
-    "slug": "nebosh-course",
-    "description": "احصل على شهادة النيبوش التي تفتح لك أبواب العمل في مجال الأمن والسلامة. تعلم كيف تدير المخاطر وتحافظ على السلامة في بيئة العمل باستخدام النظام السعودي المعتمد. الدورة موجهة للمهتمين بتطوير مهاراتهم في هذا المجال الحيوي.",
-    "image": "/logo.webp",
-    "category": "corporate",
-    "level": "advanced",
-    "price": 255,
-    "rating": 5,
-    "enrollees": 0,
-    "duration": "40 ساعة",
-    "lessonsCount": 20,
+    "id": 9114,
+    "slug": "preview-ux-design",
+    "title": "أساسيات تجربة المستخدم وتصميم الواجهات",
+    "description": "استكشف البحث عن احتياجات المستخدمين، وتنظيم الشاشات، واختبار سهولة الاستخدام بأسلوب عملي.",
+    "longDescription": "رحلة متكاملة في عالم تصميم المنتجات الرقمية UI/UX؛ تبدأ من أبحاث المستخدمين ورسم رحلة العميل Wireframes، وحتى بناء الواجهات البصرية التفاعلية واختبارها.",
+    "price": 0,
+    "currency": "SAR",
+    "category": "tech",
+    "level": "beginner",
+    "rating": 4.9,
+    "reviewsCount": 19,
+    "studentsCount": 34,
+    "duration": "4 ساعات",
+    "lessonsCount": 4,
+    "image": "/services/uiux.jpg",
+    "instructor": "نورة علي",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "مصممة منتجات رقمية وخبير واجهات وتجربة مستخدم.",
     "featured": true,
-    "trainerId": "tr-2",
-    "instructor": "أ. د. سارة العتيبي",
+    "professionalDevelopment": true,
+    "trainerId": "11111111-1111-4111-8111-111111111115",
+    "enrollees": 34,
+    "status": "published",
+    "outcomes": [
+      "إجراء أبحاث المستخدمين وبناء شخصيات الاستخدام Persona ورحلة العميل.",
+      "رسم المخططات الهيكلية السلكية Wireframes وبناء النماذج التفاعلية.",
+      "تطبيق مبادئ إمكانية الوصول والتسلسل البصري وفق معايير التصميم الحديثة."
+    ],
     "curriculum": [
       {
-        "id": "ne-m1",
-        "title": "الدرس الأول: مقدمة عن النيبوش ونظم إدارة السلامة العالمية",
-        "isLocked": false,
-        "duration": "4 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "هيكل وتصنيف شهادة النيبوش وأهميتها في الأسواق الدولية",
-          "كيفية بناء نظام إدارة أمان وصحة مهنية متكامل (OHSMS)"
-        ]
-      },
-      {
-        "id": "ne-m2",
-        "title": "الدرس الثاني: تقييم المخاطر المهنية والتحكم والسيطرة عليها",
-        "isLocked": true,
-        "duration": "20 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "خطوات وإعداد دراسات تقييم المخاطر (Risk Assessment)",
-          "تطبيق هرم إجراءات التحكم والسيطرة للحد من حوادث العمل"
-        ]
-      },
-      {
-        "id": "ne-m3",
-        "title": "الدرس الثالث: مراقبة وتقييم ومراجعة الأداء الأمني للمؤسسة",
-        "isLocked": true,
-        "duration": "16 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "أدوات التفتيش والتدقيق الداخلي على إجراءات السلامة",
-          "التحقيق في الحوادث واستخلاص الدروس وتحسين الخطط الوقائية"
+        "id": "ux-unit-1",
+        "title": "من البحث إلى التصميم التفاعلي",
+        "duration": "40 دقيقة",
+        "items": [
+          {
+            "id": "ux-lesson-1",
+            "title": "أساسيات التصميم المتمركز حول المستخدم",
+            "type": "video",
+            "duration": "18 ثانية",
+            "videoUrl": "/demo/madar/quality.mp4",
+            "description": "شرح تفاعلي لكيفية حل مشكلات المستخدمين عبر التصميم."
+          },
+          {
+            "id": "ux-lesson-2",
+            "title": "قائمة مراجعة سهولة الاستخدام Usability Checklist",
+            "type": "pdf",
+            "duration": "8 دقائق",
+            "fileUrl": "/demo/madar/quality-checklist.pdf",
+            "fileName": "ux-checklist.pdf"
+          }
         ]
       }
     ],
-    "outcomes": [
-      "الحصول على التأهيل اللازم لشهادة النيبوش العالمية.",
-      "إدارة المخاطر المهنية المتقدمة."
-    ],
-    "requirements": "يفضل خبرة سابقة في السلامة المهنية.",
-    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
-    "ghlCourseId": "course-nebosh",
-    "studentsCount": 0,
-    "reviewsCount": 0
+    "learningJourney": {
+      "enabled": true,
+      "introduction": "تعلّم كيف تصمم تجارب وتطبيقات يحبها المستخدمون وتحقق أهداف العمل.",
+      "summary": "اختبر النموذج المبدئي مبكراً وبشكل مستمر مع مستخدمين حقيقيين.",
+      "preAssessment": {
+        "id": "ux-pre",
+        "title": "الاختبار القبلي لتجربة المستخدم",
+        "passingScore": 0,
+        "durationMinutes": 8,
+        "questions": [
+          {
+            "id": "uxp1",
+            "type": "multiple_choice",
+            "question": "ما الفرق الأساسي بين UI و UX؟",
+            "options": [
+              "UX تهتم بتجربة وسهولة الاستخدام بينما UI تهتم بالمظهر والعناصر البصرية",
+              "كلاهما يعني برمجة السيرفرات فقط",
+              "UI تهتم بالحسابات المالية فقط"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    },
+    "finalExam": {
+      "id": "ux-final",
+      "title": "الاختبار البعدي لتجربة المستخدم",
+      "passingScore": 80,
+      "durationMinutes": 10,
+      "questions": [
+        {
+          "id": "uxf1",
+          "type": "multiple_choice",
+          "question": "ما الهدف الرئيسي من اختبار قابلية الاستخدام (Usability Testing)؟",
+          "options": [
+            "اكتشاف صعوبات الاستخدام وتعديل الواجهة قبل إطلاقها للجمهور",
+            "تغيير ألوان شعار الشركة",
+            "زيادة عدد الصفحات دون داعٍ"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "attachments": [
+      {
+        "id": "ux-att-1",
+        "title": "أوراق عمل أبحاث المستخدم وتصميم الشاشات",
+        "fileUrl": "/demo/madar/quality-checklist.pdf",
+        "fileName": "ux-design-kit.pdf",
+        "fileSize": "1.8 MB",
+        "type": "pdf"
+      }
+    ]
   },
   {
-    "id": 9,
-    "title": "دورة القدرات",
-    "slug": "qudurat-course",
-    "description": "استعد لاختبارات القدرات بكل ثقة مع هذه الدورة المكثفة. تعلم استراتيجيات التفكير وحل المشكلات لرفع درجاتك في الاختبارات. ستكون مستعداً للتفوق في اختبارات القبول الجامعي أو الوظائف الحكومية.",
-    "image": "/logo.webp",
-    "category": "admin",
-    "level": "all",
-    "price": 550,
-    "rating": 5,
-    "enrollees": 0,
-    "duration": "50 ساعة",
-    "lessonsCount": 35,
+    "id": 9115,
+    "slug": "preview-business-writing",
+    "title": "كتابة التقارير والعروض المهنية",
+    "description": "طوّر مهارات صياغة التقارير المختصرة، وعرض النتائج، وبناء توصيات واضحة قابلة للتنفيذ.",
+    "longDescription": "دورة مكثفة لتطوير مهارات الكتابة الإدارية والمهنية الموجهة للقيادات وفرق العمل؛ تركز على الإيجاز، الدقة، هيكلة التوصيات، وعرض البيانات بطرق بصرية مقنعة.",
+    "price": 0,
+    "currency": "SAR",
+    "category": "data",
+    "level": "beginner",
+    "rating": 4.8,
+    "reviewsCount": 15,
+    "studentsCount": 26,
+    "duration": "2 ساعة",
+    "lessonsCount": 4,
+    "image": "/services/writing.jpg",
+    "instructor": "سارة ناصر",
+    "instructorImage": "/demo/madar/avatar.svg",
+    "instructorBio": "استشارية تواصل مهني وتطوير مهارات الاتصال المؤسسي.",
     "featured": true,
-    "trainerId": "tr-3",
-    "instructor": "د. خالد الدوسري",
+    "professionalDevelopment": true,
+    "trainerId": "11111111-1111-4111-8111-111111111112",
+    "enrollees": 26,
+    "status": "published",
+    "outcomes": [
+      "هيكلة التقارير التنفيذية وكتابة الملخص التنفيذي Executive Summary بإيجاز مقنع.",
+      "صياغة التوصيات والقرارات بلغة محددة وقابلة للتطبيق العملي.",
+      "تحويل الأرقام والبيانات المعقدة إلى رسائل سردية واضحة ومباشرة."
+    ],
     "curriculum": [
       {
-        "id": "qu-m1",
-        "title": "الدرس الأول: استراتيجيات الحل السريع والمهارات الرياضية (الكمي)",
-        "isLocked": false,
-        "duration": "5 ساعات",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "قوانين الجذور، الأسس، والنسب المئوية وطرق الحل السريع بدون استخدام حاسبة",
-          "مهارات الهندسة والإحصاء وحل المسائل الحسابية والمنطقية المعقدة"
-        ]
-      },
-      {
-        "id": "qu-m2",
-        "title": "الدرس الثاني: استراتيجيات الفهم والتحليل واستيعاب المقروء (اللفظي)",
-        "isLocked": true,
-        "duration": "25 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "تقنيات حل التناظر اللفظي، إكمال الجمل، والخطأ السياقي",
-          "فهم وتحليل النصوص الطويلة واستنتاج المعاني والعلاقات الضمنية"
-        ]
-      },
-      {
-        "id": "qu-m3",
-        "title": "الدرس الثالث: اختبارات تجريبية شاملة وتحليل نقاط الضعف",
-        "isLocked": true,
-        "duration": "20 ساعة",
-        "type": "video",
-        "videoUrl": "",
-        "lessons": [
-          "محاكاة اختبار القدرات الفعلي تحت قيود زمنية محددة",
-          "مراجعة إجابات المتدرب وتحليل الأخطاء وتوفير شروحات مسجلة لها"
+        "id": "wri-unit-1",
+        "title": "الكتابة التنفيذية وصياغة التوصيات",
+        "duration": "30 دقيقة",
+        "items": [
+          {
+            "id": "wri-lesson-1",
+            "title": "بناء الملخص التنفيذي الفعّال",
+            "type": "video",
+            "duration": "18 ثانية",
+            "videoUrl": "/demo/madar/quality.mp4",
+            "description": "طرق صياغة النقاط الجوهرية للقيادات التنفيذية."
+          },
+          {
+            "id": "wri-lesson-2",
+            "title": "نماذج تقارير إدارية وتنفيذية جاهزة",
+            "type": "doc",
+            "duration": "8 دقائق",
+            "fileUrl": "/demo/madar/improvement-template.docx",
+            "fileName": "executive-report-templates.docx"
+          }
         ]
       }
     ],
-    "outcomes": [
-      "إتقان المهارات الكمية واللفظية.",
-      "تطوير سرعة الحل وفهم الأسئلة المعقدة."
-    ],
-    "requirements": "الاستعداد النفسي والالتزام بالتدريب.",
-    "ghlCheckoutUrl": "https://members.nabdtraining.com/login",
-    "ghlCourseId": "course-qudurat",
-    "studentsCount": 0,
-    "reviewsCount": 0
+    "learningJourney": {
+      "enabled": true,
+      "introduction": "اكتسب مهارة صياغة التقارير التي تقود لاتخاذ القرارات الصائبة.",
+      "summary": "ركز دائماً على الإيجاز وقدم الخلاصة والتوصيات أولاً.",
+      "preAssessment": {
+        "id": "wri-pre",
+        "title": "الاختبار القبلي للكتابة المهنية",
+        "passingScore": 0,
+        "durationMinutes": 8,
+        "questions": [
+          {
+            "id": "wp1",
+            "type": "multiple_choice",
+            "question": "ما الغرض الرئيسي من الملخص التنفيذي في بداية التقرير؟",
+            "options": [
+              "تقديم لمحة سريعة عن المشكلة والنتائج والتوصيات للمسؤولين المشغولين",
+              "إعادة تكرار كل تفاصيل التقرير كاملة",
+              "إخفاء التوصيات النهائية"
+            ],
+            "correctIndex": 0
+          }
+        ]
+      }
+    },
+    "finalExam": {
+      "id": "wri-final",
+      "title": "الاختبار البعدي للكتابة المهنية",
+      "passingScore": 80,
+      "durationMinutes": 10,
+      "questions": [
+        {
+          "id": "wf1",
+          "type": "multiple_choice",
+          "question": "كيف تصاغ التوصيات في التقرير المهني عالي الجودة؟",
+          "options": [
+            "كنقاط محددة بوضوح، مرتبطة بمسؤوليات وأطر زمنية قابلة للتنفيذ",
+            "كنصوص فلسفية طويلة غير قابلة للقياس",
+            "دون ذكر أي جهة مسؤولة"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    "attachments": [
+      {
+        "id": "wri-att-1",
+        "title": "حزمة قوالب التقارير والعروض الإدارية",
+        "fileUrl": "/demo/madar/improvement-template.docx",
+        "fileName": "business-writing-kit.docx",
+        "fileSize": "1.1 MB",
+        "type": "doc"
+      }
+    ]
   }
 ]

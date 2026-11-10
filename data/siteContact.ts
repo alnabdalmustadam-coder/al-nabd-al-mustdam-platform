@@ -1,10 +1,10 @@
 export const SITE_CONTACT = {
-  phoneDisplay: '0559924441',
-  phoneInternational: '+966 55 992 4441',
-  phoneHref: 'tel:+966559924441',
-  whatsappUrl: 'https://wa.me/966559924441',
-  primaryEmail: 'nabdtraining@gmail.com',
-  supportEmail: 'support@support.nabdtraining.com',
-  address: 'المملكة العربية السعودية - جدة - حي الربوة - شارع السبعين - مركز العلى للأعمال - مقابل اكسترا',
-  workingHours: 'السبت إلى الخميس: 05:00 ص - 08:00 م',
+  phoneDisplay: 'رقم تواصل للعرض',
+  phoneInternational: 'رقم تواصل للعرض',
+  phoneHref: '/demo',
+  whatsappUrl: '/demo',
+  primaryEmail: 'hello@madar.example',
+  supportEmail: 'support@madar.example',
+  address: 'أكاديمية مَدار للتعلّم',
+  workingHours: 'من الأحد إلى الخميس، 9 ص إلى 5 م',
 } as const;

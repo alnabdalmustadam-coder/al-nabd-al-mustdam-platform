@@ -17,7 +17,7 @@ export function QuizQuestionInput({ question, answer, onChange }: {
 
 export function QuizQuestionReview({ question }: { question: GradedQuizQuestion }) {
   return <div className={`space-y-3 rounded-xl border p-4 ${question.isCorrect ? 'border-emerald-200 bg-emerald-50/50' : 'border-rose-200 bg-rose-50/40'}`}>
-    <h4 className="text-sm font-black leading-7 text-slate-900">{question.text}</h4>
+    <h4 className="text-sm font-bold leading-7 text-slate-900">{question.text}</h4>
     <p className={`text-xs font-bold ${question.isCorrect ? 'text-emerald-800' : 'text-rose-800'}`}>{question.isCorrect ? 'إجابة صحيحة' : 'تحتاج مراجعة'}</p>
     {question.type === 'matching' ? (question.prompts || []).map((prompt, index) => <div key={index} className="rounded-lg bg-white p-3 text-xs leading-6 text-slate-700">
       <p className="font-bold">{prompt}</p>

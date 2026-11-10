@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   Lock,
   Loader2,
-  Sparkles,
   Award,
   Key,
   Calendar,
@@ -83,7 +82,7 @@ export default function AdminProfilePage() {
   const [adminData, setAdminData] = useState({
     id: '',
     fullName: 'سعود القحطاني',
-    email: 'admin@sustainpulse.org',
+    email: 'admin@madar-learning.org',
     phone: '+966 50 123 4567',
     bio: 'المدير التنفيذي والمشرف العام على المنصة الأكاديمية ونظم التدريب وتراخيص المركز الوطني للتعليم الإلكتروني.',
     roleTitle: 'مدير المنصة الرئيسي',
@@ -128,7 +127,7 @@ export default function AdminProfilePage() {
           setAdminData({
             id: user.id,
             fullName: resolvedName,
-            email: profile?.email || userEmail || 'admin@sustainpulse.org',
+            email: profile?.email || userEmail || 'admin@madar-learning.org',
             phone: profile?.phone || user.user_metadata?.phone || '+966 50 123 4567',
             bio: profile?.bio || 'المدير التنفيذي والمشرف العام على المنصة الأكاديمية ونظم التدريب وتراخيص المركز الوطني للتعليم الإلكتروني.',
             roleTitle: 'مدير المنصة الرئيسي',
@@ -317,10 +316,10 @@ export default function AdminProfilePage() {
   const displayName = adminData.fullName.replace(/\s*\(Super Admin\)/gi, '').trim() || 'المدير العام';
 
   const glassCard = {
-    background: 'linear-gradient(145deg, rgba(255,255,255,0.92) 0%, rgba(248,250,252,0.85) 100%)',
+    background: 'linear-gradient(145deg, rgba(11,55,102,0.08) 0%, rgba(11,55,102,0.08) 100%)',
     backdropFilter: 'blur(24px) saturate(1.8)',
     WebkitBackdropFilter: 'blur(24px) saturate(1.8)',
-    boxShadow: '0 8px 32px rgba(23, 58, 124, 0.06), 0 1px 0 rgba(255,255,255,0.9) inset',
+    boxShadow: '0 8px 32px rgba(11,55,102,0.08), 0 1px 0 rgba(11,55,102,0.08) inset',
   };
 
   return (
@@ -345,7 +344,7 @@ export default function AdminProfilePage() {
           <div className={`${heroStyles.profileIdentity} flex items-center gap-4 sm:gap-6`}>
             {/* Prominent Admin Avatar Container with Camera Overlay */}
             <div className="relative shrink-0 group">
-              <div className={`${heroStyles.avatar} w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-3xl overflow-hidden shadow-xl ring-4 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] via-[#1E4D9D] to-[#0F2D69] flex items-center justify-center relative transition-transform duration-300 group-hover:scale-[1.02]`}>
+              <div className={`${heroStyles.avatar} w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-3xl overflow-hidden shadow-xl ring-4 ring-[#0B3766]/20 border-2 border-white bg-gradient-to-br from-[#0B3766] via-[#168AD3] to-[#0F2D69] flex items-center justify-center relative transition-transform duration-300 group-hover:scale-[1.02]`}>
                 {adminData.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -364,7 +363,7 @@ export default function AdminProfilePage() {
                 {isUploadingAvatar && (
                   <div className="absolute inset-0 bg-slate-900/75 backdrop-blur-xs flex flex-col items-center justify-center text-white z-20">
                     <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
-                    <span className="text-[10px] font-black mt-1">جاري الحفظ...</span>
+                    <span className="text-[10px] font-bold mt-1">جاري الحفظ...</span>
                   </div>
                 )}
 
@@ -378,9 +377,9 @@ export default function AdminProfilePage() {
                   title="تغيير صورة المدير"
                 >
                   <Camera className="w-6 h-6 text-white drop-shadow-md" />
-                  <span className="text-[10px] font-black mt-1">تغيير الصورة</span>
+                  <span className="text-[10px] font-bold mt-1">تغيير الصورة</span>
                 </button>
-                <span aria-hidden="true" className="absolute bottom-1 right-1 rounded-lg bg-[#173A7C]/90 p-1.5 text-white pointer-events-none sm:hidden">
+                <span aria-hidden="true" className="absolute bottom-1 right-1 rounded-lg bg-[#0B3766]/90 p-1.5 text-white pointer-events-none sm:hidden">
                   <Camera className="w-3 h-3" />
                 </span>
               </div>
@@ -394,7 +393,7 @@ export default function AdminProfilePage() {
                 <Crown className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>{adminData.roleTitle}</span>
               </div>
-              <h1 className={`${heroStyles.title} text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2`}>
+              <h1 className={`${heroStyles.title} text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2`}>
                 <span className={heroStyles.profileName}>{displayName}</span>
                 <ShieldCheck className="w-6 h-6 text-emerald-600 shrink-0" />
               </h1>
@@ -414,7 +413,7 @@ export default function AdminProfilePage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-black text-xs flex items-center gap-2 shadow-xs"
+            className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs flex items-center gap-2 shadow-xs"
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>تم حفظ وتحديث بيانات وصورة المدير بنجاح عبر النظام!</span>
@@ -432,8 +431,8 @@ export default function AdminProfilePage() {
           style={glassCard}
         >
           <div className="flex items-center justify-between border-b border-slate-200/50 pb-4">
-            <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-              <User className="w-4 h-4 text-[#173A7C]" />
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <User className="w-4 h-4 text-[#0B3766]" />
               <span>البيانات الرسمية والإدارية</span>
             </h3>
           </div>
@@ -441,21 +440,21 @@ export default function AdminProfilePage() {
           <form onSubmit={handleSaveProfile} className="space-y-5 text-xs font-bold">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div className="space-y-2">
-                <label className="text-slate-700 font-extrabold flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-[#173A7C]" />
+                <label className="text-slate-700 font-bold flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-[#0B3766]" />
                   <span>الاسم الكامل</span>
                 </label>
                 <input
                   type="text"
                   value={adminData.fullName}
                   onChange={(e) => setAdminData({ ...adminData, fullName: e.target.value })}
-                  className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all bg-white"
+                  className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] focus:ring-4 focus:ring-[#0B3766]/15 transition-all bg-white"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-slate-700 font-extrabold flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-[#173A7C]" />
+                <label className="text-slate-700 font-bold flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-[#0B3766]" />
                   <span>البريد الإلكتروني الإداري</span>
                 </label>
                 <input
@@ -467,21 +466,21 @@ export default function AdminProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-slate-700 font-extrabold flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-[#173A7C]" />
+                <label className="text-slate-700 font-bold flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-[#0B3766]" />
                   <span>رقم الهاتف المعتمد</span>
                 </label>
                 <input
                   type="tel"
                   value={adminData.phone}
                   onChange={(e) => setAdminData({ ...adminData, phone: e.target.value })}
-                  className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all bg-white"
+                  className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] focus:ring-4 focus:ring-[#0B3766]/15 transition-all bg-white"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-slate-700 font-extrabold flex items-center gap-1.5">
-                  <Building className="w-3.5 h-3.5 text-[#173A7C]" />
+                <label className="text-slate-700 font-bold flex items-center gap-1.5">
+                  <Building className="w-3.5 h-3.5 text-[#0B3766]" />
                   <span>القسم / الإدارة</span>
                 </label>
                 <input
@@ -494,14 +493,14 @@ export default function AdminProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-slate-700 font-extrabold flex items-center gap-1.5">
+              <label className="text-slate-700 font-bold flex items-center gap-1.5">
                 <span>نبذة تعريفية للمسؤول</span>
               </label>
               <textarea
                 rows={3}
                 value={adminData.bio}
                 onChange={(e) => setAdminData({ ...adminData, bio: e.target.value })}
-                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] focus:ring-4 focus:ring-[#173A7C]/15 transition-all bg-white"
+                className="w-full p-3.5 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] focus:ring-4 focus:ring-[#0B3766]/15 transition-all bg-white"
               />
             </div>
 
@@ -509,7 +508,7 @@ export default function AdminProfilePage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-[#173A7C]/25 cursor-pointer transition-all disabled:opacity-60"
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#0B3766]/25 cursor-pointer transition-all disabled:opacity-60"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 <span>{saving ? 'جاري الحفظ...' : 'حفظ بيانات المدير'}</span>
@@ -527,8 +526,8 @@ export default function AdminProfilePage() {
           style={glassCard}
         >
           <div className="border-b border-slate-200/50 pb-4">
-            <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[#173A7C]" />
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-[#0B3766]" />
               <span>الأمان وكلمة المرور</span>
             </h3>
           </div>
@@ -549,42 +548,42 @@ export default function AdminProfilePage() {
             )}
 
             <div className="space-y-2">
-              <label className="text-slate-700 font-extrabold">كلمة المرور الحالية</label>
+              <label className="text-slate-700 font-bold">كلمة المرور الحالية</label>
               <input
                 type="password"
                 value={passwords.current}
                 onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
                 placeholder="••••••••"
-                className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] bg-white"
+                className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] bg-white"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-slate-700 font-extrabold">كلمة المرور الجديدة</label>
+              <label className="text-slate-700 font-bold">كلمة المرور الجديدة</label>
               <input
                 type="password"
                 value={passwords.newPass}
                 onChange={(e) => setPasswords({ ...passwords, newPass: e.target.value })}
                 placeholder="8 أحرف على الأقل"
-                className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] bg-white"
+                className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] bg-white"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-slate-700 font-extrabold">تأكيد كلمة المرور الجديدة</label>
+              <label className="text-slate-700 font-bold">تأكيد كلمة المرور الجديدة</label>
               <input
                 type="password"
                 value={passwords.confirmPass}
                 onChange={(e) => setPasswords({ ...passwords, confirmPass: e.target.value })}
                 placeholder="••••••••"
-                className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#173A7C] bg-white"
+                className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 font-bold focus:outline-none focus:border-[#0B3766] bg-white"
               />
             </div>
 
             <button
               type="submit"
               disabled={isSavingPassword}
-              className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-60"
+              className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-60"
             >
               {isSavingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />}
               <span>{isSavingPassword ? 'جاري التحديث...' : 'تغيير كلمة المرور'}</span>

@@ -135,7 +135,7 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
       window.addEventListener('storage', handleProfileUpdate);
       window.addEventListener('student-profile-updated', handleProfileUpdate);
       window.addEventListener('profileUpdated', handleProfileUpdate);
-      window.addEventListener('nabd_progress_updated', handleProfileUpdate);
+      window.addEventListener('madar_demo_progress_updated', handleProfileUpdate);
     }
 
     return () => {
@@ -143,7 +143,7 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
         window.removeEventListener('storage', handleProfileUpdate);
         window.removeEventListener('student-profile-updated', handleProfileUpdate);
         window.removeEventListener('profileUpdated', handleProfileUpdate);
-        window.removeEventListener('nabd_progress_updated', handleProfileUpdate);
+        window.removeEventListener('madar_demo_progress_updated', handleProfileUpdate);
       }
     };
   }, []);
@@ -178,11 +178,11 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
           className={`relative overflow-hidden rounded-none border-l h-full flex flex-col justify-between transition-all duration-300 ${isCollapsed ? 'p-2 pt-2' : 'px-3.5 py-3'
             }`}
           style={{
-            background: 'rgba(255, 255, 255, 0.96)',
+            background: 'rgba(255, 255, 255, 0.94)',
             backdropFilter: 'blur(28px) saturate(1.8)',
             WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-            boxShadow: '0 0 40px rgba(23, 58, 124, 0.06), 0 4px 20px rgba(0, 0, 0, 0.04)',
-            borderLeft: '1px solid rgba(23, 58, 124, 0.08)',
+            boxShadow: '0 0 40px rgba(11, 55, 102, 0.06), 0 4px 20px rgba(11, 55, 102, 0.04)',
+            borderLeft: '1px solid rgba(11, 55, 102, 0.08)',
           }}
         >
           <div className="space-y-3.5 relative z-10 overflow-y-auto no-scrollbar px-0.5 pt-1 flex-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -192,14 +192,14 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
               className={`rounded-2xl border border-slate-200/90 transition-all duration-300 relative group overflow-hidden ${isCollapsed ? 'p-2 flex flex-col items-center justify-center' : 'p-3.5'
                 }`}
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
-                boxShadow: '0 4px 14px rgba(23, 58, 124, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+                boxShadow: '0 4px 14px rgba(11, 55, 102, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
               }}
             >
               <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3.5'}`}>
                 {/* Prominent Large Avatar Frame */}
                 <div className="relative shrink-0">
-                  <div className={`${isCollapsed ? 'w-12 h-12' : 'w-14 h-14 sm:w-15 sm:h-15'} rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center`}>
+                  <div className={`${isCollapsed ? 'w-12 h-12' : 'w-14 h-14 sm:w-15 sm:h-15'} rounded-2xl overflow-hidden shadow-md ring-2 ring-[#0B3766]/20 border-2 border-white bg-gradient-to-br from-[#0B3766] to-[#2563EB] flex items-center justify-center`}>
                     {userProfile.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -211,23 +211,23 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                         onError={() => setUserProfile((p) => ({ ...p, avatarUrl: null }))}
                       />
                     ) : (
-                      <span className="text-lg sm:text-xl font-black text-white">
+                      <span className="text-lg sm:text-xl font-bold text-white">
                         {userProfile.fullName.charAt(0)}
                       </span>
                     )}
                   </div>
-                  <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
+                  <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-[#19B6C7] border-2 border-white shadow-xs" />
                 </div>
 
                 {!isCollapsed && (
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <h3 className="font-black text-sm sm:text-[15px] text-slate-900 truncate leading-tight" title={userProfile.fullName}>
+                      <h3 className="font-bold text-sm sm:text-[15px] text-slate-900 truncate leading-tight" title={userProfile.fullName}>
                         {userProfile.fullName}
                       </h3>
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <ShieldCheck className="w-4 h-4 text-[#168AD3] shrink-0" />
                     </div>
-                    <p className="text-xs text-emerald-700 font-extrabold truncate">{userProfile.role}</p>
+                    <p className="text-xs text-[#168AD3] font-bold truncate">{userProfile.role}</p>
                   </div>
                 )}
               </div>
@@ -247,7 +247,7 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                   },
                 },
               }}
-              className="space-y-2 px-0.5 py-0.5"
+              className="space-y-1 px-0.5 py-0.5"
             >
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -268,33 +268,33 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                         },
                       },
                     }}
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <Link
                       href={item.href}
                       title={isCollapsed ? item.label : undefined}
-                      className={`dashboard-nav-tab relative flex items-center rounded-xl font-bold text-xs transition-all duration-200 group cursor-pointer ${isCollapsed ? 'p-2.5 justify-center' : 'p-3 justify-between'
+                      className={`dashboard-nav-tab relative flex items-center rounded-xl text-[11.5px] font-semibold transition-all duration-200 group cursor-pointer ${isCollapsed ? 'p-1.5 justify-center' : 'py-1.5 px-2.5 justify-between'
                         } ${isActive
-                          ? 'text-white bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] border border-blue-400/40 shadow-lg shadow-[#173A7C]/30'
-                          : 'text-slate-800 hover:text-[#173A7C] hover:bg-white border border-slate-200/90 shadow-xs'
+                          ? 'text-white bg-gradient-to-r from-[#0B3766] to-[#168AD3] border border-blue-400/40 shadow-md shadow-[#0B3766]/20'
+                          : 'text-[#0B3766] hover:text-[#168AD3] bg-white hover:bg-[#F4F9FD] border border-slate-200/80 shadow-2xs'
                         }`}
                     >
-                      <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+                      <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-2'}`}>
                         <div
-                          className={`rounded-lg transition-all shrink-0 flex items-center justify-center relative ${isCollapsed ? 'w-8 h-8 p-0' : 'p-2'
+                          className={`rounded-lg transition-all shrink-0 flex items-center justify-center relative ${isCollapsed ? 'w-6 h-6 p-0' : 'w-6.5 h-6.5 p-0'
                             } ${isActive
                               ? 'bg-white/20 text-white'
-                              : 'bg-[#173A7C]/10 text-[#173A7C] group-hover:bg-[#173A7C] group-hover:text-white'
+                              : 'bg-[#0B3766]/[0.08] text-[#0B3766] group-hover:bg-[#0B3766] group-hover:text-white'
                             }`}
                         >
-                          <Icon className="w-4 h-4" />
+                          <Icon className="w-3.5 h-3.5" />
                           {isCollapsed && item.count && (
-                            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white" />
+                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#19B6C7] rounded-full border-2 border-white" />
                           )}
                         </div>
                         {!isCollapsed && (
-                          <span className={`dashboard-nav-tab-label truncate font-extrabold ${isActive ? 'text-white' : 'text-slate-800 group-hover:text-[#173A7C]'}`}>
+                          <span className={`dashboard-nav-tab-label truncate text-[11.5px] font-semibold ${isActive ? 'text-white' : 'text-[#0B3766] group-hover:text-[#168AD3]'}`}>
                             {item.label}
                           </span>
                         )}
@@ -304,16 +304,16 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                         <div className="flex items-center gap-1.5 shrink-0">
                           {item.count && (
                             <span
-                              className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${isActive
+                              className={`px-1.5 py-0.5 rounded text-[9.5px] font-mono font-bold ${isActive
                                   ? 'bg-white/20 text-white border border-white/30'
-                                  : 'text-emerald-800 bg-emerald-100 border border-emerald-300'
+                                  : 'text-[#0B3766] bg-[#0B3766]/10 border border-[#0B3766]/15'
                                 }`}
                             >
                               {item.count}
                             </span>
                           )}
                           {item.highlight && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black text-amber-900 bg-amber-200 border border-amber-300">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold text-amber-900 bg-amber-200 border border-amber-300">
                               👑
                             </span>
                           )}
@@ -328,10 +328,10 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
 
           {/* Desktop Footer info */}
           {!isCollapsed && (
-            <div className="pt-3 border-t border-slate-200/80 text-center relative z-10">
-              <p className="text-[10px] text-slate-500 font-bold flex items-center justify-center gap-1">
+            <div className="pt-2 border-t border-slate-200/80 text-center relative z-10">
+              <p className="text-[10px] text-slate-500 font-semibold flex items-center justify-center gap-1">
                 <span>حضور منتظم 100%</span>
-                <span className="font-mono text-emerald-600">Sustain Pulse</span>
+                <span className="font-mono text-[#0B3766] font-bold">Madar Learning</span>
               </p>
             </div>
           )}
@@ -351,11 +351,11 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
           <aside
             className="fixed top-0 bottom-0 right-0 z-[1001] w-[340px] max-w-[90vw] h-full flex flex-col justify-between p-5 overflow-y-auto no-scrollbar lg:hidden font-[family-name:var(--font-cairo)] animate-in slide-in-from-right duration-300 shadow-2xl"
             style={{
-              background: 'rgba(255, 255, 255, 0.88)',
+              background: 'rgba(255, 255, 255, 0.94)',
               backdropFilter: 'blur(28px) saturate(1.8)',
               WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-              borderLeft: '1px solid rgba(255, 255, 255, 0.60)',
-              boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.25)',
+              borderLeft: '1px solid rgba(11, 55, 102, 0.08)',
+              boxShadow: '-10px 0 40px rgba(11, 55, 102, 0.08)',
             }}
             dir="rtl"
           >
@@ -368,13 +368,13 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                   title="الرئيسية"
                 >
                   <img
-                    src="/logo.svg"
-                    alt="شعار منصة النبض المستدام"
+                    src="/madar-learning-logo-compact.svg"
+                    alt="شعار منصة مَدار للتعلّم"
                     className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
                   />
                   <div>
-                    <h2 className="font-extrabold text-sm text-slate-900 group-hover:text-[#173A7C] transition-colors">
-                      النبض المستدام
+                    <h2 className="font-bold text-sm text-slate-900 group-hover:text-[#0B3766] transition-colors">
+                      مَدار للتعلّم
                     </h2>
                     <p className="text-[10px] text-slate-500 font-bold">منصة التدريب والتعلم</p>
                   </div>
@@ -393,12 +393,12 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
               <div
                 className="rounded-2xl border border-slate-200/90 p-3.5 flex items-center gap-3.5"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.95) 100%)',
-                  boxShadow: '0 4px 12px rgba(23, 58, 124, 0.06)',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+                  boxShadow: '0 4px 12px rgba(11, 55, 102, 0.08)',
                 }}
               >
                 <div className="relative shrink-0">
-                  <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md ring-2 ring-[#173A7C]/20 border-2 border-white bg-gradient-to-br from-[#173A7C] to-[#2563EB] flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md ring-2 ring-[#0B3766]/20 border-2 border-white bg-gradient-to-br from-[#0B3766] to-[#2563EB] flex items-center justify-center">
                     {userProfile.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -410,26 +410,26 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                         onError={() => setUserProfile((p) => ({ ...p, avatarUrl: null }))}
                       />
                     ) : (
-                      <span className="text-lg font-black text-white">
+                      <span className="text-lg font-bold text-white">
                         {userProfile.fullName.charAt(0)}
                       </span>
                     )}
                   </div>
-                  <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs animate-pulse" />
+                  <span className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 rounded-full bg-[#19B6C7] border-2 border-white shadow-xs" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 mb-0.5">
-                    <h3 className="font-black text-sm text-slate-900 truncate leading-tight" title={userProfile.fullName}>
+                    <h3 className="font-bold text-sm text-slate-900 truncate leading-tight" title={userProfile.fullName}>
                       {userProfile.fullName}
                     </h3>
-                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <ShieldCheck className="w-4 h-4 text-[#168AD3] shrink-0" />
                   </div>
-                  <p className="text-xs text-emerald-700 font-extrabold truncate">{userProfile.role}</p>
+                  <p className="text-xs text-[#168AD3] font-bold truncate">{userProfile.role}</p>
                 </div>
               </div>
 
               {/* Mobile Navigation Links */}
-              <nav className="space-y-2 overflow-y-auto flex-1 py-1" style={{ scrollbarWidth: 'none' }}>
+              <nav className="space-y-1 overflow-y-auto flex-1 py-1" style={{ scrollbarWidth: 'none' }}>
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
@@ -439,27 +439,27 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
                       key={item.href}
                       href={item.href}
                       onClick={onCloseMobile}
-                      className={`dashboard-nav-tab flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all ${isActive
-                          ? 'bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] text-white shadow-md shadow-[#173A7C]/20 border border-blue-400/40'
-                          : 'text-slate-800 hover:text-[#173A7C] hover:bg-white border border-slate-200/90 shadow-xs'
+                      className={`dashboard-nav-tab flex items-center justify-between py-1.5 px-2.5 rounded-xl text-[11.5px] font-semibold transition-all ${isActive
+                          ? 'bg-gradient-to-r from-[#0B3766] to-[#168AD3] text-white shadow-sm border border-blue-400/40'
+                          : 'text-[#0B3766] hover:text-[#168AD3] bg-white hover:bg-[#F4F9FD] border border-slate-200/80 shadow-2xs'
                         }`}
                     >
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2">
                         <div
-                          className={`p-1.5 rounded-lg shrink-0 flex items-center justify-center ${isActive
+                          className={`w-6.5 h-6.5 rounded-lg shrink-0 flex items-center justify-center ${isActive
                               ? 'bg-white/20 text-white'
-                              : 'bg-[#173A7C]/10 text-[#173A7C]'
+                              : 'bg-[#0B3766]/[0.08] text-[#0B3766]'
                             }`}
                         >
-                          <Icon className="w-4 h-4" />
+                          <Icon className="w-3.5 h-3.5" />
                         </div>
-                        <span className="dashboard-nav-tab-label">{item.label}</span>
+                        <span className={`dashboard-nav-tab-label truncate text-[11.5px] font-semibold ${isActive ? 'text-white' : 'text-[#0B3766]'}`}>{item.label}</span>
                       </div>
                       {item.count && (
                         <span
-                          className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${isActive
+                          className={`text-[9.5px] font-mono px-1.5 py-0.5 rounded font-bold ${isActive
                               ? 'bg-white/20 text-white'
-                              : 'bg-emerald-100 text-emerald-800'
+                              : 'text-[#0B3766] bg-[#0B3766]/10'
                             }`}
                         >
                           {item.count}
@@ -472,10 +472,10 @@ export const StudentSidebar: React.FC<StudentSidebarProps> = ({
             </div>
 
             {/* Mobile Drawer Footer */}
-            <div className="pt-3 border-t border-slate-200/80 text-center shrink-0">
-              <p className="text-[10px] text-slate-500 font-bold flex items-center justify-center gap-1">
+            <div className="pt-2 border-t border-slate-200/80 text-center shrink-0">
+              <p className="text-[10px] text-slate-500 font-semibold flex items-center justify-center gap-1">
                 <span>حضور منتظم 100%</span>
-                <span className="font-mono text-emerald-600">Sustain Pulse</span>
+                <span className="font-mono text-[#0B3766] font-bold">Madar Learning</span>
               </p>
             </div>
           </aside>

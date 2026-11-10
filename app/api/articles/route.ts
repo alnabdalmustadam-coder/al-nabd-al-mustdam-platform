@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAllArticlesAsync, getArticleBySlugAsync } from '@/lib/articles-store';
+import { getAllArticlesAsync,getArticleBySlugAsync } from '@/lib/articles-store';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;

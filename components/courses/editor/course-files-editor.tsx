@@ -1,4 +1,5 @@
 'use client';
+import { createDraftId } from '@/lib/client-draft-id';
 import { useEffect, useId, useRef, useState } from 'react';
 import { ArrowUpFromLine, ExternalLink, FileArchive, FileText, FolderOpen, Loader2, Presentation, Trash2 } from 'lucide-react';
 import type { CourseAttachment } from '@/types';
@@ -31,7 +32,7 @@ export function CourseFilesEditor({ title, description, files, onChange, onBusyC
           const payload = await response.json().catch(() => null);
           if (!response.ok || !payload?.success || !payload.fileUrl) throw new Error(payload?.error || 'تعذر رفع الملف. حاول مرة أخرى');
           if (controller.signal.aborted) break;
-          const item: CourseAttachment = { id: crypto.randomUUID(), title: payload.fileName || file.name,
+          const item: CourseAttachment = { id: createDraftId(), title: payload.fileName || file.name,
             fileUrl: payload.fileUrl, fileType: payload.fileType || 'other', fileSize: payload.fileSize };
           callbacks.current.onChange((current) => single ? [item] : [...current, item]);
         } catch (failure) {
@@ -67,7 +68,7 @@ export function CourseFilesEditor({ title, description, files, onChange, onBusyC
       onDragOver={(event) => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)}
       onDrop={(event) => { event.preventDefault(); setDragging(false); void upload(Array.from(event.dataTransfer.files)); }}
       className={`group flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed px-5 py-6 text-center transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 disabled:cursor-wait ${dragging ? 'border-blue-500 bg-blue-50' : 'border-blue-200 bg-linear-to-b from-white to-blue-50/50 hover:border-blue-400 hover:to-blue-50'}`}>
-      <span aria-hidden="true" className="relative isolate mb-1 flex h-14 w-14 items-center justify-center rounded-2xl border border-white bg-linear-to-br from-blue-600 to-blue-900 text-white shadow-[0_5px_14px_rgba(23,58,124,0.18)] before:absolute before:-z-10 before:h-14 before:w-14 before:rotate-[-14deg] before:rounded-2xl before:border before:border-blue-200 before:bg-blue-100/60">{progress ? <Loader2 className="h-6 w-6 animate-spin" /> : <ArrowUpFromLine className="h-6 w-6" strokeWidth={1.7} />}</span>
+      <span aria-hidden="true" className="relative isolate mb-1 flex h-14 w-14 items-center justify-center rounded-2xl border border-white bg-linear-to-br from-blue-600 to-blue-900 text-white shadow-[0_5px_14px_rgba(11,55,102,0.1)] before:absolute before:-z-10 before:h-14 before:w-14 before:rotate-[-14deg] before:rounded-2xl before:border before:border-blue-200 before:bg-blue-100/60">{progress ? <Loader2 className="h-6 w-6 animate-spin" /> : <ArrowUpFromLine className="h-6 w-6" strokeWidth={1.7} />}</span>
       <span role="status" className="text-sm font-semibold text-slate-700">{progress ? `جاري رفع الملف ${progress.current} من ${progress.total}…` : single && files.length ? 'استبدال الملف' : single ? 'اختر ملف المستند' : 'اضغط لإضافة ملفات أو اسحبها هنا'}</span>
       <span className="flex flex-wrap justify-center gap-1.5" dir="ltr">{(documentsOnly ? ['PDF', 'Word', 'PowerPoint'] : ['PDF', 'Word', 'PowerPoint', 'ZIP', '7Z']).map((type) => <span key={type} className="rounded-md border border-slate-200/80 bg-white px-2 py-1 text-[10px] font-medium text-slate-500">{type}</span>)}</span>
     </button>

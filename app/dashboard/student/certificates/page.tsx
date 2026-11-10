@@ -11,7 +11,6 @@ import {
   Eye,
   FileText,
   CheckCheck,
-  Sparkles,
   BookOpen,
   ArrowRight,
   RefreshCw,
@@ -135,9 +134,9 @@ export default function StudentCertificatesPage() {
           <div className="space-y-2.5 sm:space-y-3 pr-2">
             <motion.div
               variants={textItemVariants}
-              className="student-tag-badge bg-blue-50/90 text-[#173A7C] border border-blue-200/80 shadow-xs"
+              className="student-tag-badge bg-blue-50/90 text-[#0B3766] border border-blue-200/80 shadow-xs"
             >
-              <Award className="w-3.5 h-3.5 text-[#173A7C]" />
+              <Award className="w-3.5 h-3.5 text-[#0B3766]" />
               <span>سجل الشهادات والاعتمادات الرسمية</span>
             </motion.div>
 
@@ -154,10 +153,10 @@ export default function StudentCertificatesPage() {
           </div>
 
           <motion.div variants={textItemVariants} className="flex items-center gap-3 shrink-0">
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/90 text-emerald-800 text-xs font-black border border-white/80 shadow-xs backdrop-blur-md">
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/90 text-emerald-800 text-xs font-bold border border-white/80 shadow-xs backdrop-blur-md">
               <CheckCheck className="w-4 h-4 text-emerald-600" />
               <span>
-                {loading ? 'جاري التحقق...' : `${certificates.length} شهادة صادرة وموثقة`}
+                {loading ? 'جاري التحقق...' : `${certificates.length} شهادة للمعاينة`}
               </span>
             </div>
 
@@ -166,7 +165,7 @@ export default function StudentCertificatesPage() {
               className="p-2.5 rounded-xl bg-white/80 hover:bg-white text-slate-700 border border-slate-200 shadow-xs transition-all cursor-pointer"
               title="تحديث قائمة الشهادات"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#173A7C]' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#0B3766]' : ''}`} />
             </button>
           </motion.div>
         </div>
@@ -182,7 +181,7 @@ export default function StudentCertificatesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ابحث باسم الدورة أو رمز التوثيق..."
-              className="w-full pr-10 pl-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#173A7C]/20 focus:border-[#173A7C] font-bold"
+              className="w-full pr-10 pl-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0B3766]/20 focus:border-[#0B3766] font-bold"
             />
           </div>
           <span className="text-xs text-slate-500 font-bold hidden sm:inline">
@@ -212,7 +211,7 @@ export default function StudentCertificatesPage() {
           </div>
 
           <div className="max-w-md mx-auto space-y-2">
-            <h2 className="text-xl font-black text-slate-900">لا توجد شهادات صادرة حتى الآن</h2>
+            <h2 className="text-xl font-bold text-slate-900">لا توجد شهادات صادرة حتى الآن</h2>
             <p className="text-xs sm:text-sm text-slate-600 font-bold leading-relaxed">
               أكمل دراسة دروسك واجتز التقييمات بنسبة 100% ليتم إصدار شهادتك الأكاديمية المعتمدة تلقائياً برمز توثيق رسمي وقالب فائق الجودة!
             </p>
@@ -221,7 +220,7 @@ export default function StudentCertificatesPage() {
           <div className="pt-2">
             <Link
               href="/dashboard/student/courses"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white text-xs font-black shadow-md shadow-[#173A7C]/20 transition-all hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white text-xs font-bold shadow-md shadow-[#0B3766]/20 transition-all hover:-translate-y-0.5"
             >
               <BookOpen className="w-4 h-4" />
               <span>متابعة دراسة دوراتي التدريبية 🚀</span>
@@ -264,7 +263,7 @@ export default function StudentCertificatesPage() {
                       alt={cert.courseTitle}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-black gap-1.5 backdrop-blur-[2px]">
+                    <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1.5 backdrop-blur-[2px]">
                       <Eye className="w-4 h-4 text-emerald-400" />
                       <span>معاينة وتكبير الشهادة</span>
                     </div>
@@ -275,22 +274,22 @@ export default function StudentCertificatesPage() {
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="space-y-1.5">
                         <div
-                          className="inline-flex items-center gap-1.5 text-xs font-black text-[#0D5C3A] mb-1"
-                          style={{ textShadow: '0 1px 0px rgba(255,255,255,0.6)' }}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D5C3A] mb-1"
+                          style={{ textShadow: '0 1px 0px rgba(255, 255, 255, 0.8)' }}
                         >
                           <ShieldCheck className="w-3.5 h-3.5 text-[#0D5C3A]" />
-                          <span>شهادة معتمدة موثقة بالمركز الوطني</span>
+                          <span>شهادة إتمام ضمن جولة العرض</span>
                         </div>
                         <h3 className="student-heading-h3">{cert.courseTitle}</h3>
                         <p className="student-text-body">
-                          {cert.template?.issuerName || cert.issuer || 'معهد النبض المستدام العالي للتدريب'}
+                          {cert.template?.issuerName || cert.issuer || 'أكاديمية مَدار للتعلّم'}
                         </p>
                       </div>
 
                       <div className="flex flex-col gap-2.5 w-full sm:w-64 shrink-0">
                         <button
                           onClick={() => handleOpenBuilder(cert)}
-                          className="w-full py-2.5 sm:py-3 px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs flex items-center justify-center gap-2 transition-all border border-slate-200 shadow-xs cursor-pointer hover:shadow-md hover:border-slate-300 whitespace-nowrap active:scale-95"
+                          className="w-full py-2.5 sm:py-3 px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all border border-slate-200 shadow-xs cursor-pointer hover:shadow-md hover:border-slate-300 whitespace-nowrap active:scale-95"
                         >
                           <Eye className="w-3.5 h-3.5 text-slate-600 shrink-0" />
                           <span>عرض تفاصيل وتصميم الشهادة</span>
@@ -299,7 +298,7 @@ export default function StudentCertificatesPage() {
                         <button
                           onClick={() => handleDirectDownload(cert)}
                           disabled={activeDownloadId === cert.id}
-                          className="w-full py-2.5 sm:py-3 px-5 rounded-xl bg-gradient-to-r from-[#173A7C] to-[#1E4D9D] hover:from-[#1E4D9D] hover:to-[#173A7C] text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all duration-300 shadow-md shadow-[#173A7C]/20 hover:-translate-y-0.5 border border-blue-400/20 cursor-pointer whitespace-nowrap active:scale-95 disabled:opacity-50"
+                          className="w-full py-2.5 sm:py-3 px-5 rounded-xl bg-gradient-to-r from-[#0B3766] to-[#168AD3] hover:from-[#168AD3] hover:to-[#0B3766] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all duration-300 shadow-md shadow-[#0B3766]/20 hover:-translate-y-0.5 border border-blue-400/20 cursor-pointer whitespace-nowrap active:scale-95 disabled:opacity-50"
                         >
                           {activeDownloadId === cert.id ? (
                             <>
@@ -320,7 +319,7 @@ export default function StudentCertificatesPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-3 border-t border-slate-200/50">
                       <div className="p-3.5 rounded-xl border border-slate-200/30 space-y-1 liquid-glass-inner">
                         <span className="text-slate-400 font-bold block text-[10px]">رمز التوثيق</span>
-                        <span className="font-mono font-black text-[#173A7C] block text-xs">
+                        <span className="font-mono font-bold text-[#0B3766] block text-xs">
                           {cert.code}
                         </span>
                       </div>
@@ -330,7 +329,7 @@ export default function StudentCertificatesPage() {
                       </div>
                       <div className="p-3.5 rounded-xl border border-slate-200/30 space-y-1 liquid-glass-inner">
                         <span className="text-slate-400 font-bold block text-[10px]">التقدير العام</span>
-                        <span className="font-black text-[#0D5C3A] block text-xs">{cert.grade}</span>
+                        <span className="font-bold text-[#0D5C3A] block text-xs">{cert.grade}</span>
                       </div>
                       <div className="p-3.5 rounded-xl border border-slate-200/30 space-y-1 liquid-glass-inner">
                         <span className="text-slate-400 font-bold block text-[10px]">الساعات التدريبية</span>

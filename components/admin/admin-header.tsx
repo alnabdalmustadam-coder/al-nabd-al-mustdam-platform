@@ -211,11 +211,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       <div
         className="w-full rounded-none px-3.5 sm:px-6 py-[calc(0.75rem+1vh)] min-h-[calc(3.75rem+2vh)] flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 relative z-30"
         style={{
-          background: 'rgba(255, 255, 255, 0.88)',
+          background: 'rgba(255, 255, 255, 0.94)',
           backdropFilter: 'blur(28px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.60)',
+          boxShadow: '0 4px 20px rgba(11, 55, 102, 0.06)',
+          borderBottom: '1px solid rgba(11, 55, 102, 0.08)',
         }}
       >
         {/* RIGHT SIDE (RTL): Mobile Sidebar Toggle, Desktop Collapse & Platform Logo */}
@@ -224,7 +224,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
+              className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#0B3766] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
               title="القائمة الجانبية"
             >
               <Menu className="w-5 h-5" />
@@ -236,7 +236,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <button
               onClick={onToggleSidebar}
               title={isSidebarCollapsed ? 'توسيع القائمة الجانبية' : 'طي القائمة الجانبية'}
-              className="hidden lg:flex w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer items-center justify-center"
+              className="hidden lg:flex w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#0B3766] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer items-center justify-center"
             >
               {isSidebarCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
             </button>
@@ -246,15 +246,15 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           <Link
             href="/dashboard/admin"
             className="flex items-center gap-2 shrink-0 transition-transform hover:scale-105"
-            title="لوحة الإدارة - منصة النبض المستدام"
+            title="لوحة الإدارة - منصة مَدار للتعلّم"
           >
-            <img src="/logo.svg" alt="شعار منصة النبض المستدام" className="h-8 sm:h-9 w-auto object-contain" />
+            <img src="/madar-learning-logo-compact.svg" alt="شعار منصة مَدار للتعلّم" className="h-8 sm:h-9 w-auto object-contain" />
           </Link>
         </div>
 
         {/* CENTER: Real-Time Interactive Search Bar */}
         <div ref={searchContainerRef} className="hidden md:flex flex-1 min-w-0 max-w-lg mx-4 relative">
-          <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center px-3.5 rounded-2xl border border-slate-200/90 transition-all focus-within:border-[#173A7C] focus-within:bg-white bg-slate-50/90 shadow-2xs">
+          <form onSubmit={handleSearchSubmit} className="w-full relative flex items-center px-3.5 rounded-2xl border border-slate-200/90 transition-all focus-within:border-[#0B3766] focus-within:bg-white bg-slate-50/90 shadow-2xs">
             <Search className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
             <input
               type="text"
@@ -278,9 +278,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {/* Search Dropdown Quick Categories */}
           {isSearchFocused && (
             <div className="absolute top-full right-0 left-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2.5 z-50 space-y-1 text-right animate-in fade-in zoom-in-95 duration-150 font-[family-name:var(--font-cairo)]">
-              <div className="px-3 py-1.5 text-[11px] font-black text-slate-500 flex items-center justify-between border-b border-slate-100 mb-1">
+              <div className="px-3 py-1.5 text-[11px] font-bold text-slate-500 flex items-center justify-between border-b border-slate-100 mb-1">
                 <span>{searchQuery ? `نتائج البحث عن: "${searchQuery}" (اضغط Enter)` : 'البحث السريع في أقسام الإدارة'}</span>
-                <Search className="w-3.5 h-3.5 text-[#173A7C]" />
+                <Search className="w-3.5 h-3.5 text-[#0B3766]" />
               </div>
 
               {adminSearchCategories.map((item, idx) => {
@@ -296,12 +296,12 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                       <div className={`p-2 rounded-xl ${item.color}`}>
                         <Icon className="w-4 h-4" />
                       </div>
-                      <span className="text-xs font-bold text-slate-700 group-hover:text-[#173A7C]">
+                      <span className="text-xs font-bold text-slate-700 group-hover:text-[#0B3766]">
                         {item.title}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600">
                         {item.badge}
                       </span>
                       <ArrowLeft className="w-3 h-3 text-slate-400 group-hover:-translate-x-1 transition-transform" />
@@ -318,7 +318,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {/* Mobile Search Button Toggle */}
           <button
             onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-            className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
+            className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#0B3766] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center"
             title="البحث بالنظام"
           >
             {isMobileSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
@@ -330,11 +330,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               onClick={() => {
                 setShowNotifications(!showNotifications);
               }}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#173A7C] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center relative"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-slate-700 hover:text-[#0B3766] bg-slate-100/80 hover:bg-slate-200/80 transition-all border border-slate-200/60 shrink-0 cursor-pointer flex items-center justify-center relative"
               title="الإشعارات"
               aria-label="عرض الإشعارات"
             >
-              <Bell className="w-4 h-4 text-[#173A7C]" />
+              <Bell className="w-4 h-4 text-[#0B3766]" />
               {unreadCount > 0 && (
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 animate-pulse ring-2 ring-white" />
               )}
@@ -349,27 +349,27 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 />
                 <div
                   className="absolute top-full mt-2.5 left-0 w-80 sm:w-96 max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200/90 p-4 shadow-2xl z-[1000] text-right space-y-3 bg-white text-slate-800 animate-in fade-in zoom-in-95 duration-150"
-                  style={{ boxShadow: '0 20px 50px rgba(15, 23, 42, 0.18)' }}
+                  style={{ boxShadow: '0 20px 50px rgba(11, 55, 102, 0.12)' }}
                 >
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-[#173A7C]/10 text-[#173A7C]">
+                      <div className="p-1.5 rounded-lg bg-[#0B3766]/10 text-[#0B3766]">
                         <BellRing className="w-4 h-4" />
                       </div>
-                      <h4 className="font-extrabold text-xs text-slate-900">
+                      <h4 className="font-bold text-xs text-slate-900">
                         إشعارات النظام والعمليات
                       </h4>
                     </div>
                     <div className="flex items-center gap-2">
                       {unreadCount > 0 ? (
                         <>
-                          <span className="text-[10px] font-black text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                          <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
                             {unreadCount} جديد
                           </span>
                           <button
                             type="button"
                             onClick={handleMarkAllAsRead}
-                            className="text-[10px] text-slate-400 hover:text-[#173A7C] font-bold underline transition-colors cursor-pointer"
+                            className="text-[10px] text-slate-400 hover:text-[#0B3766] font-bold underline transition-colors cursor-pointer"
                             title="تحديد الكل كمقروء"
                           >
                             قراءة الكل
@@ -410,7 +410,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                             ? 'bg-emerald-50 text-emerald-600'
                             : n.type === 'warning'
                             ? 'bg-amber-50 text-amber-600'
-                            : 'bg-slate-100 text-[#173A7C]';
+                            : 'bg-slate-100 text-[#0B3766]';
 
                         return (
                           <div
@@ -421,7 +421,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                                 : 'bg-slate-50/70 border-slate-200/60'
                             }`}
                           >
-                            <div className="flex items-center justify-between font-black text-slate-900 gap-2">
+                            <div className="flex items-center justify-between font-bold text-slate-900 gap-2">
                               <div className="flex items-center gap-2">
                                 <div className={`p-1 rounded-md shrink-0 ${iconBg}`}>
                                   <IconComponent className="w-3.5 h-3.5" />
@@ -465,18 +465,18 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                       className="fixed inset-y-0 right-0 z-[9999] w-[340px] max-w-[88vw] h-full flex flex-col border-l border-slate-200 text-right font-[family-name:var(--font-cairo)] animate-in slide-in-from-right duration-300 shadow-2xl"
                       style={{
                         backgroundColor: '#ffffff',
-                        boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.35)',
+                        boxShadow: '-10px 0 40px rgba(11, 55, 102, 0.08)',
                       }}
                       dir="rtl"
                     >
                       {/* Drawer Header */}
                       <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50 shrink-0">
                         <div className="flex items-center gap-2.5">
-                          <div className="p-2 rounded-xl bg-[#173A7C] text-white shadow-sm shadow-[#173A7C]/20">
+                          <div className="p-2 rounded-xl bg-[#0B3766] text-white shadow-sm shadow-[#0B3766]/20">
                             <BellRing className="w-5 h-5" />
                           </div>
                           <div>
-                            <h4 className="font-extrabold text-sm text-[#152C5B]">
+                            <h4 className="font-bold text-sm text-[#152C5B]">
                               إشعارات النظام
                             </h4>
                             <p className="text-[10px] text-slate-400 font-bold">العمليات والأنشطة اللحظية</p>
@@ -496,13 +496,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                       <div className="flex items-center justify-between px-4 py-2.5 bg-slate-100/70 border-b border-slate-200/70 shrink-0">
                         {unreadCount > 0 ? (
                           <>
-                            <span className="text-[11px] font-black text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+                            <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
                               {unreadCount} جديد
                             </span>
                             <button
                               type="button"
                               onClick={handleMarkAllAsRead}
-                              className="text-xs text-[#173A7C] font-bold hover:underline cursor-pointer"
+                              className="text-xs text-[#0B3766] font-bold hover:underline cursor-pointer"
                             >
                               قراءة الكل
                             </button>
@@ -537,7 +537,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                                 ? 'bg-emerald-50 text-emerald-600'
                                 : n.type === 'warning'
                                 ? 'bg-amber-50 text-amber-600'
-                                : 'bg-slate-100 text-[#173A7C]';
+                                : 'bg-slate-100 text-[#0B3766]';
 
                             return (
                               <div
@@ -548,7 +548,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                                     : 'bg-slate-50/90 border-slate-200/70'
                                 }`}
                               >
-                                <div className="flex items-center justify-between font-black text-slate-900 gap-2">
+                                <div className="flex items-center justify-between font-bold text-slate-900 gap-2">
                                   <div className="flex items-center gap-2">
                                     <div className={`p-1.5 rounded-lg shrink-0 ${iconBg}`}>
                                       <IconComponent className="w-4 h-4" />
@@ -576,7 +576,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
                       {/* Drawer Footer */}
                       <div className="p-3.5 border-t border-slate-100 text-center bg-slate-50 shrink-0">
-                        <span className="text-[11px] text-slate-400 font-bold">النبض المستدام • مركز الإشعارات</span>
+                        <span className="text-[11px] text-slate-400 font-bold">مَدار للتعلّم • مركز الإشعارات</span>
                       </div>
                     </aside>
                   </div>,
@@ -588,10 +588,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {/* Go to Home Link (Positioned on the outermost left corner) */}
           <Link
             href="/"
-            className="w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-[#173A7C] hover:text-[#1E4D9D] transition-all cursor-pointer border border-slate-200/60 flex items-center justify-center gap-1.5 shrink-0 text-xs font-black"
+            className="w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-[#0B3766] hover:text-[#168AD3] transition-all cursor-pointer border border-slate-200/60 flex items-center justify-center gap-1.5 shrink-0 text-xs font-bold"
             title="الذهاب للرئيسية"
           >
-            <Home className="w-4 h-4 text-[#173A7C] shrink-0" />
+            <Home className="w-4 h-4 text-[#0B3766] shrink-0" />
             <span className="hidden sm:inline">الرئيسية</span>
           </Link>
         </div>
